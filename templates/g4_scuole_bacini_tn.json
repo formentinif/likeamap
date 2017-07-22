@@ -1,0 +1,24 @@
+{
+  "title": "Bacini scuole primarie tempo normale",
+  "layer": "SCU_BACINI_SCO_PTN",
+  "layerGid": "g4_scuole_bacini_tn",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "BAC_SCO",
+      "label": "Bacino",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TIPO",
+      "label": "Tipo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

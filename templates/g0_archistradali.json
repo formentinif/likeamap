@@ -1,0 +1,40 @@
+{
+  "title": "SIT_ARCHISTRADE",
+  "layer": "SIT_ARCHISTRADE",
+  "layerGid": "g0_archistradali",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CATEGORIA",
+      "label": "Categoria",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ID_VIA",
+      "label": "Codice Via",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ID_ARCO",
+      "label": "Codice Arco",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

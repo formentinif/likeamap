@@ -1,0 +1,24 @@
+{
+  "title": "SIT_POLISOCIALI",
+  "layer": "SIT_POLISOCIALI",
+  "layerGid": "g1_polisoc",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_POLOSOC",
+      "label": "Codice Polo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "POLO_SOC",
+      "label": "Polo Sociale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

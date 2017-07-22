@@ -1,0 +1,16 @@
+{
+  "title": "SIT_EDIFICI",
+  "layer": "SIT_EDIFICI",
+  "layerGid": "g0_edifici",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_EDIFICIO",
+      "label": "Codice Edificio",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

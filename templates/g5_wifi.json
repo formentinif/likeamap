@@ -1,0 +1,16 @@
+{
+  "title": "WIFI_REGGIO",
+  "layer": "WIFI_REGGIO",
+  "layerGid": "g5_ambiti",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "NOME_IMPIANTO",
+      "label": "Impianto",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

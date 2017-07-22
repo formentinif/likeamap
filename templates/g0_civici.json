@@ -1,0 +1,64 @@
+{
+  "title": "SIT_CIVICI",
+  "layer": "SIT_CIVICI",
+  "layerGid": "g0_civici",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "NUMESP_CIV",
+      "label": "Civico",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CAP",
+      "label": "CAP",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "AMBITO",
+      "label": "Ambito",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "POLO_SOC",
+      "label": "Polo sociale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ID_SEZ_CENS",
+      "label": "Sezione di censimento",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CAB_CDS",
+      "label": "Centro abitato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

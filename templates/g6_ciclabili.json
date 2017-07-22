@@ -1,0 +1,72 @@
+{
+  "title": "CICLABILI",
+  "layer": "CICLABILI",
+  "layerGid": "g2_ciclabili",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "STATO",
+      "label": "Stato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ITER_DESC",
+      "label": "Itinerario",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "AMBITO",
+      "label": "Ambito",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CONTESTO",
+      "label": "Contesto",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "RETE_STRA",
+      "label": "Rete stradale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CLA_FUNZ",
+      "label": "Classificazione funzionale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SEDE",
+      "label": "Sede",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "PAV",
+      "label": "Pavimentazione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

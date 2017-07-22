@@ -1,0 +1,56 @@
+{
+  "title": "MOB_BICIBUS_PERCORSI",
+  "layer": "MOB_BICIBUS_PERCORSI",
+  "layerGid": "g6_bicibus_percorsi",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "DENOMINAZI",
+      "label": "Nome",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SCUOLA",
+      "label": "Scuola",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+    "field": "BICIBUS",
+      "label": "BiciBus",
+      "type": "yesno",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "PEDIBUS",
+      "label": "PediBus",
+      "type": "yesno",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "PERCORSO",
+      "label": "Percorso",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SIGLA",
+      "label": "Sigla",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

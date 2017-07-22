@@ -1,0 +1,40 @@
+{
+  "title": "MOB_BICIBUS_FERMATE",
+  "layer": "MOB_BICIBUS_FERMATE",
+  "layerGid": "g6_bicibus_fermate",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "GRUPPO",
+      "label": "Nome",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+    "field": "BICIBUS",
+      "label": "BiciBus",
+      "type": "yesno",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "PEDIBUS",
+      "label": "PediBus",
+      "type": "yesno",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "PERCORSO",
+      "label": "Percorso",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

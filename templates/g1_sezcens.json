@@ -1,0 +1,16 @@
+{
+  "title": "STA_SEZ_CENS",
+  "layer": "STA_SEZ_CENS",
+  "layerGid": "g1_sezcens",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_SEZ",
+      "label": "Codice Sezione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

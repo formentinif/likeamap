@@ -1,0 +1,41 @@
+{
+  "title": "Nidi d'infanzia",
+  "layer": "SCU_SCUOLE_NIDO",
+  "layerGid": "g4_nidi_infanzia",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "NOME",
+      "label": "Bacino",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "INDIRIZZO",
+      "label": "Indirizzo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CODICE_SCUOLA",
+      "label": "Codice scuola",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+    ,
+    {
+      "field": "DESCR_GRUPPO",
+      "label": "Gruppo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

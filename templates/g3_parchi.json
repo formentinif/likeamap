@@ -1,0 +1,183 @@
+{
+    "title": "VER_PARCHI_APP",
+    "layer": "VER_PARCHI_APP",
+    "layerGid": "g3_parchi",
+    "templateType": "simple",
+    "fields": [{
+            "field": "NOMEPARCO",
+            "label": "Nome Parco",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "CLASSIFICAZIONE_TIPOLOGIA_AREA",
+            "label": "Tipologia",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "UBICAZIONE",
+            "label": "Ubicazione",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "DIMESIONE",
+            "label": "Dimensione (mq)",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "GIOCO_BIMBI",
+            "label": "Spazi gioco bimbi",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "SPAZI_SPORT",
+            "label": "Spazi per eventi sportivi",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "STRUTTURE_FISSE_CULTURALI",
+            "label": "Strutture per eventi culturali",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "SERVIZI_IGIENICI",
+            "label": "Servizi igienici",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "RISTORO",
+            "label": "Punti ristoro",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "WIFI",
+            "label": "WI-FI",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "SGAMBAMENTO",
+            "label": "Sgambamento cani",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ARREDI",
+            "label": "Arredi urbani",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        },{
+            "field": "ILLUMINAZIONE",
+            "label": "Illuminazione pubblica",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "SEGNALETICA",
+            "label": "Segnaletica",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ALBERI_PREGIO",
+            "label": "Alberi pregio",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ALBERI_TUTELATI",
+            "label": "Alberti tutelati",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "LIMITI_ACCESSO",
+            "label": "Limiti accesso",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "PRESIDIO_FISICO_VIGILI_URBANI",
+            "label": "Presidio fisico dei vigili urbani",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "PRESIDIO_STRUMENTALE",
+            "label": "Presidio strumentale",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ATTIVITA_SPORTIVE",
+            "label": "Attività sportive",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ATTIVITA_CULTURALI",
+            "label": "Attività culturali",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ATTIVITA_SOCIALE",
+            "label": "Attività sociali",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ATTIVITA_ALTRO",
+            "label": "Altre attività",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ATTIVITA_SOGGETTI_PROMOTORI",
+            "label": "Soggetti promotori",
+            "type": "yesno",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "URLSCHEDA",
+            "label": "Scheda",
+            "type": "link",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }
+    ]
+}

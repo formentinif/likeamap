@@ -1,0 +1,16 @@
+{
+  "title": "MOB_CENTRI_ABIT_CDS",
+  "layer": "MOB_CENTRI_ABIT_CDS",
+  "layerGid": "g1_centricds",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "LAYER",
+      "label": "Centro abitato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

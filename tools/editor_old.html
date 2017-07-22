@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>LIKE A MAP - Editor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+      
+    <script src="jsoneditor.js"></script>
+
+    <script>
+        // Set the default CSS theme and icon library globally
+        JSONEditor.defaults.theme = 'bootstrap3';
+        JSONEditor.defaults.iconlib = 'fontawesome4';
+    </script>
+
+    <style>
+        html,
+        body,
+        .container {
+            height: 100%;
+            padding: 10px;
+        }
+
+        textarea.form-control {
+            height: 100%;
+        }
+
+        #output {
+            width: 100%;
+            height: 90%;
+        }
+
+        .fill {
+            min-height: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='container-fluid fill'>
+
+        <div class='row ' style="display:none">
+            <div class='col-xs-6'>
+                <button id='submit' class='tiny'>Submit (console.log)</button>
+                <button id='restore' class='secondary tiny'>Restore to Default</button>
+                <span id='valid_indicator' class='label'></span>
+            </div>
+        </div>
+        <div class='row fill'>
+            <div id='editor_holder' class='col-xs-6'></div>
+            <div class='col-xs-6 fill'>
+                <h2>Output</h2>
+                <textarea id='output'></textarea>
+            </div>
+        </div>
+        <script>
+            // This is the starting value for the editor
+            // We will use this to seed the initial editor
+            // and to provide a "Restore to Default" button.
+            var starting_value = {
+
+            };
+
+            // Initialize the editor
+            var jsoneditor = new JSONEditor(document.getElementById('editor_holder'), {
+                // Enable fetching schemas via ajax
+                ajax: true,
+
+                // The schema for the editor
+                schema: {
+                    $ref: "../js/app-state-schema.json",
+                    format: "grid"
+                },
+
+                // Seed the form with a starting value
+                startval: starting_value
+            });
+            var output = document.getElementById('output');
+
+            // Hook up the submit button to log to the console
+            document.getElementById('submit').addEventListener('click', function() {
+                var json = jsoneditor.getValue();
+                output.value = JSON.stringify(json, null, 2);
+            });
+
+            // Hook up the Restore to Default button
+            document.getElementById('restore').addEventListener('click', function() {
+                jsoneditor.setValue(starting_value);
+            });
+            document.getElementById('output').addEventListener('change', function() {
+                try {
+                    jsoneditor.setValue(JSON.parse(output.value));
+                } catch(e) {
+                    alert("Impossibile caricare la configurazione inviata")
+                }
+            });
+            // Hook up the validation indicator to update its
+            // status whenever the jsoneditor changes
+            jsoneditor.on('change', function() {
+                // Get an array of errors from the validator
+                var errors = jsoneditor.validate();
+
+                var indicator = document.getElementById('valid_indicator');
+
+                // Not valid
+                if (errors.length) {
+                    indicator.className = 'label alert';
+                    indicator.textContent = 'not valid';
+                }
+                // Valid
+                else {
+                    indicator.className = 'label success';
+                    indicator.textContent = 'valid';
+                    var json = jsoneditor.getValue();
+                    output.value = JSON.stringify(json, null, 2);
+                }
+            });
+        </script>
+</body>
+
+</html>

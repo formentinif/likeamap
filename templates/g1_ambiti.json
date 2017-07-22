@@ -1,0 +1,32 @@
+{
+  "title": "SIT_AMBITI",
+  "layer": "SIT_AMBITI",
+  "layerGid": "g1_ambiti",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_AMBITO",
+      "label": "Id Ambito",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "AMBITO",
+      "label": "Ambito",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "AMBITO_AGG",
+      "label": "Ambito Aggregato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

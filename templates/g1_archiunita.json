@@ -1,0 +1,32 @@
+{
+  "title": "ING_ARCHISTRADE_UNI_TERR",
+  "layer": "ING_ARCHISTRADE_UNI_TERR",
+  "layerGid": "g1_archiunita",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ID_UNI_TERR",
+      "label": "Codice unità territoriale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "UNI_TERRIT",
+      "label": "Unità territoriale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

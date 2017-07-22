@@ -1,0 +1,24 @@
+{
+  "title": "Bacini scuole primarie tempo pieno",
+  "layer": "SCU_BACINI_SCO_PTP",
+  "layerGid": "g4_scuole_bacini_tp",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "BAC_SCO",
+      "label": "Bacino",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TIPO",
+      "label": "Tipo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "title": "SEZ_ELETTORALI",
+  "layer": "SEZ_ELETTORALI",
+  "layerGid": "g1_sezele",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "NUM_SEZIONE",
+      "label": "Codice Sezione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DESCRIZIONE",
+      "label": "Descrizione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "UBICAZIONE",
+      "label": "Ubicazione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DESCRIZIONE_LOCALI",
+      "label": "Locali",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SPECIALE",
+      "label": "Speciale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "VOLANTE",
+      "label": "Volante",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "OSPEDALIERA",
+      "label": "Ospedaliera",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

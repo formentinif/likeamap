@@ -1,0 +1,715 @@
+/*
+Copyright 2015-2017 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2017 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
+html, body {
+  height: 100%;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  font-family: "Open Sans", Helvetica, sans-serif;
+}
+
+body {
+  background-color: #fff;
+}
+
+#al-logo {
+  position: absolute;
+  top: 0.5em;
+  right: 5.5em;
+  z-index: 10000;
+  background-color: rgba(252, 252, 252, 0.9);
+  padding: 5px 5px 5px 5px;
+  box-sizing: border-box;
+  margin: 0px;
+  border-radius: 5px;
+}
+
+select {
+  padding: 3px;
+}
+
+.al-loader {
+  position: absolute;
+  bottom: 50%;
+  right: 50%;
+  width: 50px;
+  height: 50px;
+  background-image: url(../img/loader.gif);
+  background-repeat: no-repeat;
+}
+
+.al-title {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  line-height: 34px;
+}
+
+.al-title-h4 {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  line-height: 22px;
+}
+
+.al-map__browser-location {
+  top: 15px;
+  right: .5em;
+  position: absolute;
+}
+
+.ol-touch .al-map__browser-location {
+  /*top: 35px;*/
+  right: 1.5em;
+}
+
+.al-map__zoom-in {
+  top: 60px;
+  right: .5em;
+  position: absolute;
+}
+
+.ol-touch .al-map__zoom-in {
+  /*top: 75px;*/
+  right: 1.5em;
+}
+
+.al-map__zoom-out {
+  top: 105px;
+  right: .5em;
+  position: absolute;
+}
+
+.ol-touch .al-map__zoom-out {
+  /*top: 120px;*/
+  right: 1.5em;
+}
+
+
+/*.al-menu-bottom {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 380px;
+    z-index: 10;
+    box-sizing: border-box;
+    margin: 0px;
+}*/
+
+.al-hidden {
+  display: none;
+}
+
+.al-right {
+  float: right;
+}
+
+.al-table {
+  max-width: 300px !important;
+  width: 100%;
+  border: 0px solid rgba(0, 0, 0, 0.12);
+  border-collapse: collapse;
+  font-size: 13px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+}
+
+.al-table tr {
+  height: 48px;
+  transition-duration: 0.28s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: background-color;
+}
+
+.al-table:hover {
+  background-color: #eeeeee;
+}
+
+.al-table td, .al-table th {
+  vertical-align: middle;
+  height: 48px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 12px;
+  box-sizing: border-box;
+  padding: 0 18px 12px 18px;
+  text-align: left;
+}
+
+.al-menu-toolbar-bottom {
+  position: absolute;
+  z-index: 11;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(252, 252, 252, 0.9);
+  padding: 5px 10px 10px 30px;
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+.al-menu-toolbar-bottom button {
+  margin-right: 10px;
+}
+
+.al-menu-panel-bottom {
+  position: absolute;
+  z-index: 9;
+  left: 0px;
+  top: 0px;
+  width: 330px;
+  height: 100%;
+  z-index: 10;
+  display: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.al-menu-panel-bottom .al-menu-panel-content {
+  position: absolute;
+  z-index: 9;
+  bottom: 0px;
+  left: 0px;
+  height: 100%;
+  width: 288px;
+  background-color: rgba(252, 252, 252, 0.9);
+  padding: 5px 0px 80px 12px;
+  margin: 0px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.al-menu-panel-bottom .al-menu-panel-content .al-menu-panel-content-item {
+  display: none;
+}
+
+.al-menu-panel-close-bottom {
+  position: absolute;
+  top: 0px;
+  left: 288px;
+  width: 12px;
+  height: 100%;
+  background-color: rgba(252, 252, 252, 0.9);
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+.al-menu-panel-close-bottom .al-menu-button-close {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  cursor: pointer;
+}
+
+.al-menu-button-close-top {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  cursor: pointer;
+}
+
+
+/*.al-menu {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 380px;
+    z-index: 10;
+    box-sizing: border-box;
+    margin: 0px;
+}*/
+
+.al-menu-toolbar {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  width: 80px;
+  background-color: #008cba;
+  padding: 30px 10px 10px 12px;
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+.al-menu-panel {
+  position: absolute;
+  left: 81px;
+  top: 0px;
+  height: 100%;
+  width: 330px;
+  z-index: 10;
+  display: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.al-menu-panel .al-menu-panel-content {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 300px;
+  height: 100%;
+  background-color: rgba(252, 252, 252);
+  background-color: rgba(252, 252, 252, 0.5);
+  padding: 30px 10px 10px 12px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+.al-menu-panel .al-menu-panel-content .al-menu-panel-content-item {
+  display: none;
+}
+
+.al-menu-panel-close {
+  position: absolute;
+  top: 0px;
+  left: 300px;
+  height: 100%;
+  width: 30px;
+  background-color: transparent;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+.al-menu-panel-close .al-menu-button-close {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  cursor: pointer;
+}
+
+.al-menu-icon {
+  display: inline-block;
+  color: white;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.al-map {
+  width: 100%;
+  height: 100%;
+}
+
+.al-card {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: 400;
+  overflow: hidden;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  background: #fff;
+  border-radius: 2px;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.al-input-margin-right {
+  margin-right: 1rem;
+}
+
+.al-scrollable {
+  width: 100%;
+  height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.al-fab {
+  width: 60px;
+  float: left;
+  clear: none;
+}
+
+.al-strong {
+  font-weight: bold;
+  ;
+}
+
+#map-container {
+  width: 100%;
+  height: 100%;
+}
+
+#login-container {
+  width: 100%;
+  height: 100%;
+  /*background-image: url(../img/login1.jpg);**/
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: cover;
+  z-index: 10000;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+}
+
+#login-container__access form {
+  padding: 2rem;
+  background-color: white;
+  border-radius: 1rem;
+}
+
+.layertree-list-group {
+  margin: 0px;
+  padding: 0px;
+}
+
+.layertree-list-group-item {
+  list-style-type: none;
+  list-style-position: inside;
+  margin: 0px;
+  padding: 4px 0px;
+  ;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+}
+
+.layertree-span {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.1rem 0.1rem 0.1rem 0.3rem;
+}
+
+.layertree-selected {
+  /*background-color: rgb(251, 251, 251);
+    border-bottom: 1px solid rgb(255, 255, 255);*/
+}
+
+.layertree-group {
+  font-size: 1.4rem;
+  background-color: #009688;
+  box-sizing: border-box;
+  border-top-right-radius: 0px;
+  border-top-left-radius: 0px;
+  border-bottom: 1px solid rgb(251, 251, 251);
+  color: white;
+  padding: 6px 0px 4px 0px;
+}
+
+.layertree-icon {
+  cursor: pointer;
+  line-height: 1em !important;
+}
+
+.layertree-hidden {
+  transition: opacity 0.40s, max-height 0.40s ease-out;
+  opacity: 0.5;
+  max-height: 0px;
+  overflow: hidden;
+}
+
+.layertree-visible {
+  transition: opacity 0.40s, max-height 0.30s ease-in;
+  opacity: 1;
+  max-height: 900px;
+}
+
+.div-5 {
+  width: 100%;
+  display: block;
+  height: 5px;
+}
+
+.div-10 {
+  width: 100%;
+  display: block;
+  height: 10px;
+}
+
+.div-20 {
+  width: 100%;
+  display: block;
+  height: 20px;
+}
+
+.div-halfp {
+  width: 100%;
+  display: block;
+  height: 40%;
+}
+
+.div-spacerp {
+  width: 100%;
+  display: block;
+  height: 0.1rem;
+}
+
+.icon-success {
+  color: green;
+}
+
+.icon-base {
+  color: #008cba;
+  font-size: 1.2rem;
+}
+
+.icon-base-info {
+  color: #008cba;
+  font-size: 1.8rem;
+}
+
+.al-editor-window {
+  top: 50px;
+  left: 30%;
+  display: none;
+  position: absolute !important;
+  z-index: 1000;
+  width: 900px;
+  height: 600px;
+}
+
+.al-bar {
+  box-sizing: border-box;
+  background: #009688;
+  /*#3F51B5;*/
+  color: white;
+  width: 100%;
+  padding: 8px 16px;
+}
+
+.al-info-window__title {
+  cursor: pointer;
+  padding: 3px 16px 3px 16px;
+}
+
+.al-shadow--2dp {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.al-h6 {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.04em;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.fa-stack-3x {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.fa-stack-3x {
+  font-size: 2.5em;
+}
+
+.margin-top-5 {
+  margin-top: 5px;
+}
+
+.fake-link {
+  text-decoration: underline;
+  cursor: pointer;
+  ;
+}
+
+.al-error {
+  width: 100%;
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top:1em;
+  margin-bottom:1em;
+}
+
+.autocomplete-suggestions {
+  border: 1px solid #999;
+  background: #FFF;
+  overflow: auto;
+}
+
+.autocomplete-suggestion {
+  padding: 2px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.autocomplete-selected {
+  background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+  font-weight: normal;
+  color: #3399FF;
+}
+
+.autocomplete-group {
+  padding: 2px 5px;
+}
+
+.autocomplete-group strong {
+  display: block;
+  border-bottom: 1px solid #000;
+}
+
+
+/*MATERIAL ICONS*/
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+
+/*MATERIAL ICONS*/
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(../fonts/MaterialIcons-Regular.woff2) format('woff2'), url(../fonts/MaterialIcons-Regular.woff) format('woff'), url(../fonts/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons.md-icon {
+  color: #008cba;
+  margin: 0.2rem;
+}
+
+.material-icons.md-18 {
+  font-size: 18px;
+}
+
+.material-icons.md-24 {
+  font-size: 24px;
+}
+
+.material-icons.md-36 {
+  font-size: 36px;
+}
+
+.material-icons.md-48 {
+  font-size: 48px;
+}
+
+// Rules for using icons as black on a light background.
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+// Rules for using icons as white on a dark background.
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@media screen and (min-width: 801px) {
+  .al-info-window {
+    top: 30%;
+    right: 30%;
+    display: none;
+    position: absolute;
+    overflow: auto;
+    max-height: 500px;
+    min-width: 350px;
+  }
+  #login-container__access {
+    padding-top: 5rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .al-info-window {
+    bottom: 90px;
+    width: 98%;
+    margin: 1%;
+    display: none;
+    position: absolute;
+    overflow: auto;
+    height: 30%;
+  }
+  #login-container__access {
+    padding-top: 5rem;
+    margin-left: auto;
+    margin-right: auto;
+    width: 96%;
+    max-width: 400px;
+  }
+  #al-logo {
+    max-width: 140px;
+  }
+  #al-logo img {
+    max-width: 120px;
+  }
+}

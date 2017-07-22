@@ -1,0 +1,40 @@
+{
+  "title": "ING_UNITATERRITORIALI",
+  "layer": "ING_UNITATERRITORIALI",
+  "layerGid": "g1_unit",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_UNI_TER",
+      "label": "Id Ambito",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "UNI_TERRIT",
+      "label": "Unità territoriali",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "COORDINATORE",
+      "label": "Coordinatore",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "NOTE",
+      "label": "Note",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

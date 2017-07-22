@@ -1,0 +1,71 @@
+{
+    "title": "VER_ORTI",
+    "layer": "VER_ORTI",
+    "layerGid": "g3_orti",
+    "templateType": "simple",
+    "fields": [{
+            "field": "NOME_ORTO",
+            "label": "Nome",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "DESC_ORTO",
+            "label": "Descrizione",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "TIPOLOGIA",
+            "label": "Tipologia",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ACCESSO1",
+            "label": "Accesso principale",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        },  {
+            "field": "ACCESSO2",
+            "label": "Accesso secondario",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        },  {
+            "field": "AMBITO",
+            "label": "Ambito",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        },  {
+            "field": "N_LOTTI",
+            "label": "Lotti",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        },  {
+            "field": "SOGG_GESTORE",
+            "label": "Gestore",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "LINK_INFO",
+            "label": "Scheda",
+            "type": "link",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }
+    ]
+}

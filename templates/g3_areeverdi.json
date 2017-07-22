@@ -1,0 +1,43 @@
+{
+    "title": "VER_AREEVERDI",
+    "layer": "VER_AREEVERDI",
+    "layerGid": "g3_parchi",
+    "templateType": "simple",
+    "fields": [{
+            "field": "NOME_PARCO_ATTUALE",
+            "label": "Nome Parco",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "CLASSIFICAZIONE_TIPOLOGIA_AREA",
+            "label": "Tipologia",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "ACCESSI",
+            "label": "Accessi",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "DIMESIONE_AREA",
+            "label": "Dimensione (mq)",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }, {
+            "field": "NOTE",
+            "label": "Note",
+            "type": "string",
+            "header": "",
+            "footer": "",
+            "itemTemplate": ""
+        }
+    ]
+}

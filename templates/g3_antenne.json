@@ -1,0 +1,476 @@
+[{
+    "title": "Antenne telefonia mobile",
+    "layer": "AMB_ANTENNE_TELEF_MOBILE",
+    "layerGid": "g3_antenne",
+    "templateType": "simple",
+    "fields": [{
+        "field": "GESTORE",
+        "label": "Gestore",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CODICE_OPE",
+        "label": "Codice opera",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "NOME_SITO",
+        "label": "Nome del sito",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "INDIRIZZO",
+        "label": "Indirizzo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "STRUTTURA",
+        "label": "Struttura",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROPRIETA_",
+        "label": "Proprietà",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "COSITING",
+        "label": "Cositing",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TIPOLOGIA",
+        "label": "Tipologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TECNOLOGIA",
+        "label": "Tecnologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CAPOPALO",
+        "label": "Capopalo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROTOCOLLO",
+        "label": "Protocollo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      }
+    ]
+  },
+  {
+    "title": "Antenne telefonia mobile",
+    "layer": "AMB_ANTENNE_TELEF_MOBILE_TELECOM",
+    "layerGid": "g3_antenne",
+    "templateType": "simple",
+    "fields": [{
+        "field": "GESTORE",
+        "label": "Gestore",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CODICE_OPE",
+        "label": "Codice opera",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "NOME_SITO",
+        "label": "Nome del sito",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "INDIRIZZO",
+        "label": "Indirizzo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "STRUTTURA",
+        "label": "Struttura",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROPRIETA_",
+        "label": "Proprietà",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "COSITING",
+        "label": "Cositing",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TIPOLOGIA",
+        "label": "Tipologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TECNOLOGIA",
+        "label": "Tecnologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CAPOPALO",
+        "label": "Capopalo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROTOCOLLO",
+        "label": "Protocollo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      }
+    ]
+  },
+  {
+    "title": "Antenne telefonia mobile",
+    "layer": "AMB_ANTENNE_TELEF_MOBILE_H3G",
+    "layerGid": "g3_antenne",
+    "templateType": "simple",
+    "fields": [{
+        "field": "GESTORE",
+        "label": "Gestore",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CODICE_OPE",
+        "label": "Codice opera",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "NOME_SITO",
+        "label": "Nome del sito",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "INDIRIZZO",
+        "label": "Indirizzo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "STRUTTURA",
+        "label": "Struttura",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROPRIETA_",
+        "label": "Proprietà",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "COSITING",
+        "label": "Cositing",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TIPOLOGIA",
+        "label": "Tipologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TECNOLOGIA",
+        "label": "Tecnologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CAPOPALO",
+        "label": "Capopalo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROTOCOLLO",
+        "label": "Protocollo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      }
+    ]
+  },
+  {
+    "title": "Antenne telefonia mobile",
+    "layer": "AMB_ANTENNE_TELEF_MOBILE_VODAFONE",
+    "layerGid": "g3_antenne",
+    "templateType": "simple",
+    "fields": [{
+        "field": "GESTORE",
+        "label": "Gestore",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CODICE_OPE",
+        "label": "Codice opera",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "NOME_SITO",
+        "label": "Nome del sito",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "INDIRIZZO",
+        "label": "Indirizzo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "STRUTTURA",
+        "label": "Struttura",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROPRIETA_",
+        "label": "Proprietà",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "COSITING",
+        "label": "Cositing",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TIPOLOGIA",
+        "label": "Tipologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TECNOLOGIA",
+        "label": "Tecnologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CAPOPALO",
+        "label": "Capopalo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROTOCOLLO",
+        "label": "Protocollo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      }
+    ]
+  },
+  {
+    "title": "Antenne telefonia mobile",
+    "layer": "AMB_ANTENNE_TELEF_MOBILE_WIND",
+    "layerGid": "g3_antenne",
+    "templateType": "simple",
+    "fields": [{
+        "field": "GESTORE",
+        "label": "Gestore",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CODICE_OPE",
+        "label": "Codice opera",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "NOME_SITO",
+        "label": "Nome del sito",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "INDIRIZZO",
+        "label": "Indirizzo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "STRUTTURA",
+        "label": "Struttura",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROPRIETA_",
+        "label": "Proprietà",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "COSITING",
+        "label": "Cositing",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TIPOLOGIA",
+        "label": "Tipologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "TECNOLOGIA",
+        "label": "Tecnologia",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "CAPOPALO",
+        "label": "Capopalo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      },
+      {
+        "field": "PROTOCOLLO",
+        "label": "Protocollo",
+        "type": "string",
+        "header": "",
+        "footer": "",
+        "itemTemplate": ""
+      }
+    ]
+  }
+]

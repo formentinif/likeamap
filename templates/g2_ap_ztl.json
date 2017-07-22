@@ -1,0 +1,32 @@
+{
+  "title": "MOB_ZONE_AP_ZTL",
+  "layer": "MOB_ZONE_AP_ZTL",
+  "layerGid": "g2_ap_ztl",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "LAYER",
+      "label": "Area",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+    "field": "DOCVER",
+      "label": "Stato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ANNO",
+      "label": "Anno",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Scuole medie",
+  "layer": "SCU_SCUOLE_MEDIE",
+  "layerGid": "g4_scuole_medie",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "NOME",
+      "label": "Bacino",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "INDIRIZZO",
+      "label": "Indirizzo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CODICE_SCUOLA",
+      "label": "Codice scuola",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+    ,
+    {
+      "field": "DESCR_GRUPPO",
+      "label": "Gruppo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}
