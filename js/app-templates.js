@@ -80,7 +80,6 @@ var AppTemplates = (function() {
         for (var i = 0; i < AppTemplates.templates.length; i++) {
             if (AppTemplates.templates[i].layer === layer || AppTemplates.templates[i].layerGid === layerGid) {
                 try {
-                  debugger
                     var hsTemplate = this.generateTemplate(AppTemplates.templates[i]);
                     var template = Handlebars.compile(hsTemplate);
                     if (Array.isArray(props)) {

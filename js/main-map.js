@@ -480,7 +480,7 @@ var MainMap = (function() {
     button.id = "map__browser-location";
     button.addEventListener('click', handleGetBrowserLocation, false);
     button.addEventListener('touchstart', handleGetBrowserLocation, false);
-    button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-button--mini-fab';
+    button.className = 'btn-floating btn-small waves-effect waves-light';
     var element = document.createElement('div');
     element.className = 'al-map__browser-location ol-unselectable ';
     element.appendChild(button);
@@ -505,7 +505,7 @@ var MainMap = (function() {
     button.addEventListener('click', handleZoomIn, false);
     button.addEventListener('touchstart', handleZoomIn, false);
     button.id = "map__zoom-in";
-    button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-button--mini-fab';
+    button.className = 'btn-floating btn-small waves-effect waves-light';
     var element = document.createElement('div');
     element.className = 'al-map__zoom-in ol-unselectable ';
     element.appendChild(button);
@@ -529,7 +529,7 @@ var MainMap = (function() {
     button.addEventListener('click', handleZoomOut, false);
     button.addEventListener('touchstart', handleZoomOut, false);
     button.id = "map__zoom-out";
-    button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-button--mini-fab';
+    button.className = 'btn-floating btn-small waves-effect waves-light';
     var element = document.createElement('div');
     element.className = 'al-map__zoom-out ol-unselectable ';
     element.appendChild(button);
@@ -954,7 +954,7 @@ var MainMap = (function() {
    */
   var getScaleFromResolution = function(resolution, units) {
     var dpi = 25.4 / 0.28; //inch in mm / dpi in mm
-    var mpu = ol.proj.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
+    var mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
     var inchesPerMeter = 39.3701;
     return parseFloat(resolution) * (mpu * inchesPerMeter * dpi);
   }
@@ -967,7 +967,7 @@ var MainMap = (function() {
    */
   var getResolutionForScale = function(scale, units) {
     var dpi = 25.4 / 0.28; //inch in mm / dpi in mm
-    var mpu = ol.proj.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
+    var mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
     var inchesPerMeter = 39.37;
     return parseFloat(scale) / (mpu * inchesPerMeter * dpi);
   }
@@ -1165,7 +1165,7 @@ var MainMap = (function() {
   }
 
   var stopCopyCoordinate = function() {
-    mainMap.unByKey(copyCoordinateEvent);
+    mainMap.un(copyCoordinateEvent);
   }
 
 
@@ -1346,7 +1346,6 @@ var MainMap = (function() {
 
     }
   }
-
 
   var addDrawInteraction = function(geomType) {
     //Se ci sono freature inserite

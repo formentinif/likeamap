@@ -53,7 +53,8 @@ var PrintTools = (function() {
 
     var init = function init() {
         //Upgrade grafici
-        componentHandler.upgradeElement(document.getElementById('print-tools__print-button'));
+          //Aggiornamenti grafici
+        M.AutoInit();
         //bindo la scala con solo numeri
         $("#print-tools__scale").keyup(function(event) {
             //console.log(event.which);
@@ -93,33 +94,33 @@ var PrintTools = (function() {
         template += '<h3 class="al-title">Stampa</h3>';
         template += '<div class="al-card mdl-shadow--2dp">';
 
-        template += '<div class="mdl-textfield mdl-js-textfield">';
-        template += '<select id="print-tools__paper" class="mdl-textfield__input">';
+        template += '<div class="input-field">';
+        template += '<select id="print-tools__paper" class="">';
         template += '<option value="A4">A4</option>';
         template += '<option value="A3">A3</option>';
         template += '</select>';
         template += '</div>';
 
-        template += '<div class="mdl-textfield mdl-js-textfield">';
-        template += '<select id="print-tools__orientation" class="mdl-textfield__input">';
+        template += '<div class="input-field">';
+        template += '<select id="print-tools__orientation" class="">';
         template += '<option value="portrait">Verticale</option>';
         template += '<option value="landscape">Orizzontale</option>';
         template += '</select>';
         template += '</div>';
 
-        template += '<div class="mdl-textfield mdl-js-textfield">';
-        template += '<input class="mdl-textfield__input" type="text" id="print-tools__scale">';
-        template += '<label class="mdl-textfield__label" for="print-tools__scale">Scala...</label>';
+        template += '<div class="input-field">';
+        template += '<label class="" id="print-tools__scale-label" for="print-tools__scale">Scala...</label>';
+        template += '<input class="" type="text" id="print-tools__scale">';
         template += '</div>';
 
-        template += '<div class="mdl-textfield mdl-js-textfield">';
-        template += '<select id="print-tools__template" class="mdl-textfield__input">';
+        template += '<div class="input-field">';
+        template += '<select id="print-tools__template" class="">';
         template += '<option value="standard">Standard</option>';
         //template += '<option value="personalizzato">Personalizzato</option>';
         template += '</select>';
         template += '</div>';
 
-        template += '<button id="print-tools__print-button" onclick="PrintTools.printMap(); return false;" class="mdl-button mdl-js-button mdl-button--raised  mdl-js-ripple-effect" >Stampa</button>';
+        template += '<button id="print-tools__print-button" onclick="PrintTools.printMap(); return false;" class="waves-effect waves-light btn" >Stampa</button>';
 
         template += '<div class="div-10"></div>';
 
@@ -197,8 +198,8 @@ var PrintTools = (function() {
 
     var setScale = function(scale) {
         $("#print-tools__scale").val(Math.round(scale));
-        $("#print-tools__scale").addClass("is-upgraded is-dirty");
-        $("#print-tools__scale").parent().addClass("is-upgraded is-dirty");
+        $("#print-tools__scale-label").addClass("active");
+        //$("#print-tools__scale").parent().addClass("active");
     }
 
     var getScale = function() {

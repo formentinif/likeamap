@@ -30,14 +30,6 @@ var ShareTools = (function() {
 
   var init = function init() {
     //Upgrade grafici
-    // debugger
-    componentHandler.upgradeElement(document.getElementById('share-tools__create-url'));
-    //componentHandler.upgradeElement(document.getElementById('share-tools__copy-url'));
-    componentHandler.upgradeElement(document.getElementById('share-tools__input-query'));
-    //componentHandler.upgradeElement(document.getElementById('share-tools__copy-url-query'));
-
-
-    //componentHandler.upgradeElement(document.getElementById('share-tools__email-url'));
   }
 
   var render = function(div) {

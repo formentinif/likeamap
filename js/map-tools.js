@@ -30,13 +30,6 @@ var MapTools = (function() {
 
     var init = function init() {
         //carico la tendina dei comuni
-        componentHandler.upgradeElement(document.getElementById('search-tools__gotolonlat'));
-        componentHandler.upgradeElement(document.getElementById('search-tools__start-copy-url'));
-        componentHandler.upgradeElement(document.getElementById('search-tools__stop-copy-url'));
-        componentHandler.upgradeElement(document.getElementById('search-tools__copy-url'));
-
-        componentHandler.upgradeElement(document.getElementById('map-tools__lon-field'));
-        componentHandler.upgradeElement(document.getElementById('map-tools__lat-field'));
         //abilito l'autocomplete sulla via in base al comune
     }
 

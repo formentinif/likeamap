@@ -204,7 +204,6 @@ var AppStore = (function() {
       title += " (" + data.length + ")";
     }
     for (var i = 0; i < data.length; i++) {
-      debugger
       var props = data[i].properties;
       var layerids = data[i].id.split('.');
       var layerid = layerids[0];
@@ -565,9 +564,7 @@ var AppStore = (function() {
 
     //inizializzazione della mappa
     MainMap.render('map', appState);
-    componentHandler.upgradeElement(document.getElementById('map__zoom-in'));
-    componentHandler.upgradeElement(document.getElementById('map__zoom-out'));
-    componentHandler.upgradeElement(document.getElementById('map__browser-location'));
+
     //carico i templates
     AppTemplates.init();
 
@@ -606,7 +603,7 @@ var AppStore = (function() {
       easingTime = 0;
     } else {
       //definizione degli eventi jquery
-      $("#info-window").draggable();
+      //$("#info-window").draggable();
     }
 
     //nascondo il draw per dimensioni piccole

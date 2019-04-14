@@ -52,13 +52,13 @@ var AuthTools = (function() {
     template += '<div id="login-container__access">';
     template += '    <form action="#">';
     template += '        <h2>Accedi</h2>';
-    template += '      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">';
-    template += '        <input class="mdl-textfield__input" type="text" id="login-container__username">';
-    template += '        <label class="mdl-textfield__label" for="login-container__username">username</label>';
+    template += '      <div class="input-field">';
+    template += '        <input class="" type="text" id="login-container__username">';
+    template += '        <label class="" for="login-container__username">username</label>';
     template += '    </div>';
-    template += '    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">';
-    template += '        <input class="mdl-textfield__input" type="password" id="login-container__password">';
-    template += '        <label class="mdl-textfield__label" for="login-container__password">password</label>';
+    template += '    <div class="input-field">';
+    template += '        <input class="" type="password" id="login-container__password">';
+    template += '        <label class="" for="login-container__password">password</label>';
     template += '    </div>';
     template += '    <div id="al-error-message" class="al-hidden al-error">Autenticazione non riuscita</div>';
 

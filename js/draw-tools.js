@@ -30,11 +30,6 @@ var DrawTools = (function() {
 
     var init = function init() {
         //Upgrade grafici
-        // debugger
-        componentHandler.upgradeElement(document.getElementById('draw-tools__point'));
-        componentHandler.upgradeElement(document.getElementById('draw-tools__polyline'));
-        componentHandler.upgradeElement(document.getElementById('draw-tools__polygon'));
-        componentHandler.upgradeElement(document.getElementById('draw-tools__delete'));
 
         $("#draw-tools__point").click(function() {
             $("#draw-tools__draw-settings").show();

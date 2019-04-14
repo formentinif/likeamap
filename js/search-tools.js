@@ -40,11 +40,8 @@ var SearchTools = (function() {
 
   var init = function init() {
     try {
-      componentHandler.upgradeElement(document.getElementById('search-tools__search-via-field'));
-      componentHandler.upgradeElement(document.getElementById('search-tools__search-layers-field'));
-      componentHandler.upgradeElement(document.getElementById('search-tools__menu'));
-      componentHandler.upgradeElement(document.getElementById('search-tools__menu-items'));
-
+      M.AutoInit();
+      $('.dropdown-trigger').dropdown();
     } catch (e) {
 
     } finally {
@@ -117,13 +114,13 @@ var SearchTools = (function() {
 
   var templateMenuString = function() {
     template = '<div class="al-bar">';
-    template += '<button id="search-tools__menu" class="mdl-button mdl-js-button mdl-button--icon" value="Indirizzo">';
-    template += '<i class="material-icons">more_vert</i> ';
+    template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+    template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
     template += '</div>';
-    template += '<ul id="search-tools__menu-items" class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="search-tools__menu">';
-    template += '<li class="mdl-menu__item" onclick="SearchTools.showSearchAddress()">Indirizzo</li>';
-    template += '<li class="mdl-menu__item" onclick="SearchTools.showSearchLayers()">Layer</li>';
+    template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
+    template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
+    template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
     template += '</ul>';
     return template;
   }
@@ -131,15 +128,15 @@ var SearchTools = (function() {
   var templateMenuLayers = function() {
     searchLayers = searchLayers.sort(SortByLayerName);
     var template = '<div id="search-tools__layers" class="al-card mdl-shadow--2dp" style="display:none;">';
-    template += '<select id="search-tools__select-layers" class="mdl-textfield__input">';
+    template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
       template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + '</option>';
     }
     template += '</select>';
     template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-layers-field" class="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" >';
-    template += '<input id="search-tools__search-layers" class="mdl-textfield__input" type="search" onkeyup="SearchTools.searchLayers(event)">';
-    template += '<label class="mdl-textfield__label" for="search-tools__search-layers">Layers...</label>';
+    template += '<div id="search-tools__search-layers-field" class="input-field" >';
+    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
+    template += '<label class="input-field" for="search-tools__search-layers">Layers...</label>';
     template += '</div>';
     template += '</div>';
     return template;
@@ -151,12 +148,12 @@ var SearchTools = (function() {
     template += '<h3 class="al-title">Ricerca</h3>';
     template += templateMenuString();
     template += '<div id="search-tools__address" class="al-card mdl-shadow--2dp">';
-    template += '<select id="search-tools__comune" class="mdl-textfield__input">';
+    template += '<select id="search-tools__comune" class="input-field">';
     template += '</select>';
     template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-via-field" class="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" >';
-    template += '<input id="search-tools__search-via" class="mdl-textfield__input" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
-    template += '<label class="mdl-textfield__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__search-via-field" class="input-field" >';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
+    template += '<label class="input-field" for="search-tools__search-via">Via...</label>';
     template += '</div>';
     template += '</div>';
     template += templateMenuLayers();
@@ -173,9 +170,9 @@ var SearchTools = (function() {
     template += '<h3 class="al-title">Ricerca</h3>';
     template += templateMenuString();
     template += '<div id="search-tools__address" class="al-card mdl-shadow--2dp">';
-    template += '<div id="search-tools__search-via-field" class="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" >';
-    template += '<input id="search-tools__search-via" class="mdl-textfield__input" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
-    template += '<label class="mdl-textfield__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__search-via-field" class="input-field" >';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
+    template += '<label class="input-field" for="search-tools__search-via">Via...</label>';
     template += '</div>';
     template += '</div>';
     template += templateMenuLayers();

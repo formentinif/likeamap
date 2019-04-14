@@ -91,20 +91,7 @@ function appInit() {
         });
       });
     }
-    // var share = function() {
-    //     var deferred = Q.defer();
-    //     $.get("/api/share/" + appStateId, "", deferred.resolve);
-    //     return deferred.promise;
-    // }
-    //
-    // share().then(function(appstate) {
-    //     debugger
-    //     mapInit(appstate);
-    // }).fail(function() {
-    //   debugger
-    //     mapInit();
-    //     alert("Impossibile caricare la mappa condivisa.");
-    // });
+    
   } else {
     $.ajax({
       dataType: "json",
@@ -123,8 +110,10 @@ function appInit() {
       });
     });
   }
+
 }
 
+/*Area funzioni custom */
 function customFunctions() {
   //creo il menu contestuale
   var items = [{
@@ -132,26 +121,11 @@ function customFunctions() {
       classname: 'some-style-class', // add some CSS rules
       //callback: center // `center` is your callback function
       callback: reverseGeocoding
-    },
-    {
-      text: 'Aree metanizzate',
-      classname: 'some-style-class', // you can add this icon with a CSS class
-      // instead of `icon` property (see next line)
-      //icon: 'img/marker.png', // this can be relative or absolute
-      callback: areeMetanizzate
-    },
-    //'-' // this is a separator
+    }
   ];
 
   MainMap.addContextMenu(items);
 
-}
-
-function areeMetanizzate() {
-  dispatch({
-    "eventName": "open-url-location",
-    "urlTemplate": "http://media.perspectiva.it/reggioemilia/web/areemetanizzate.aspx?lat={{lat}}&lon={{lon}}&type=ll&token={{token}}"
-  })
 }
 
 function reverseGeocoding(obj) {
