@@ -91,8 +91,8 @@ var PrintTools = (function() {
     var templatePrint = function() {
         template = '';
         //pannello ricerca via
-        template += '<h3 class="al-title">Stampa</h3>';
-        template += '<div class="al-card mdl-shadow--2dp">';
+        template += '<h4 class="al-title">Stampa</h4>';
+        template += '<div class="al-card z-depth-2">';
 
         template += '<div class="input-field">';
         template += '<select id="print-tools__paper" class="">';

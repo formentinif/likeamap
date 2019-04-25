@@ -1,6 +1,8 @@
 {
   "title": "Applicazione Geo",
   "restAPIUrl": "http://www.perspectiva.it:8082",
+  "templatesRepositoryUrl": "templates",
+  "relationsRepositoryUrl": "relations",
   "startMapLon": 10.63083,
   "startMapLat": 44.69838,
   "startMapZoom": 15,
@@ -25,12 +27,14 @@
     "draw-tools": true,
     "gps-tools": false
   },
-  "layers": [{
+  "layers": [
+    {
       "gid": "g0",
       "layerName": "Base",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
+      "layers": [
+        {
           "gid": "g0_osm",
           "layerName": "Open street map",
           "mapUri": "",
@@ -128,7 +132,8 @@
       "layerName": "Limiti amministrativi",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
+      "layers": [
+        {
           "gid": "g0_limitec",
           "layerName": "Limite comunale",
           "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
@@ -218,7 +223,8 @@
       "layerName": "Mobilità",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
+      "layers": [
+        {
           "gid": "g2_biciplan",
           "layerName": "BiciPlan",
           "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
@@ -297,7 +303,8 @@
       "layerName": "Ambiente",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
+      "layers": [
+        {
           "gid": "g3_parchi",
           "layerName": "Parchi",
           "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
@@ -371,7 +378,6 @@
       "layerType": "group",
       "visible": 0,
       "layers": [
-
         {
           "gid": "g6_ciclabili",
           "layerName": "Piste Ciclabili",
@@ -440,7 +446,8 @@
       "layerName": "Scuole",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
+      "layers": [
+        {
           "gid": "g4_nidi_infanzia",
           "layerName": "Nidi d'infanzia",
           "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
@@ -566,23 +573,25 @@
       "layerName": "Servizi",
       "layerType": "group",
       "visible": 0,
-      "layers": [{
-        "gid": "g5_wifi",
-        "layerName": "WI-FI",
-        "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
-        "layerType": "wmstiled",
-        "layer": "geo_re:WIFI_REGGIO",
-        "srs": "3857",
-        "opacity": 1,
-        "params": "",
-        "tileMode": "xyz",
-        "visible": 0,
-        "queryable": 1,
-        "searchable": 1,
-        "searchField": "NOME_IMPIANTO",
-        "labelField": "NOME_IMPIANTO",
-        "zIndex": 51
-      }]
+      "layers": [
+        {
+          "gid": "g5_wifi",
+          "layerName": "WI-FI",
+          "mapUri": "https://geoserver.comune.re.it/geoserver/geo_re/wms/",
+          "layerType": "wmstiled",
+          "layer": "geo_re:WIFI_REGGIO",
+          "srs": "3857",
+          "opacity": 1,
+          "params": "",
+          "tileMode": "xyz",
+          "visible": 0,
+          "queryable": 1,
+          "searchable": 1,
+          "searchField": "NOME_IMPIANTO",
+          "labelField": "NOME_IMPIANTO",
+          "zIndex": 51
+        }
+      ]
     }
   ]
 }

@@ -1130,9 +1130,6 @@ var MainMap = (function() {
     return feature;
   }
 
-
-
-
   /**
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore

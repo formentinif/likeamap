@@ -127,7 +127,7 @@ var SearchTools = (function() {
 
   var templateMenuLayers = function() {
     searchLayers = searchLayers.sort(SortByLayerName);
-    var template = '<div id="search-tools__layers" class="al-card mdl-shadow--2dp" style="display:none;">';
+    var template = '<div id="search-tools__layers" class="al-card z-depth-2" style="display:none;">';
     template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
       template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + '</option>';
@@ -145,9 +145,9 @@ var SearchTools = (function() {
   var templateSearchNM = function() {
     template = '';
     //pannello ricerca via
-    template += '<h3 class="al-title">Ricerca</h3>';
+    template += '<h4 class="al-title">Ricerca</h4>';
     template += templateMenuString();
-    template += '<div id="search-tools__address" class="al-card mdl-shadow--2dp">';
+    template += '<div id="search-tools__address" class="al-card z-depth-2">';
     template += '<select id="search-tools__comune" class="input-field">';
     template += '</select>';
     template += '<div class="div-5"></div>';
@@ -158,7 +158,7 @@ var SearchTools = (function() {
     template += '</div>';
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="al-card mdl-shadow--2dp al-scrollable">';
+    template += '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
     template += '</div>';
     return Handlebars.compile(template);
   }
@@ -167,9 +167,9 @@ var SearchTools = (function() {
   var templateSearchWMSG = function() {
     template = '';
     //pannello ricerca via
-    template += '<h3 class="al-title">Ricerca</h3>';
+    template += '<h4 class="al-title">Ricerca</h4>';
     template += templateMenuString();
-    template += '<div id="search-tools__address" class="al-card mdl-shadow--2dp">';
+    template += '<div id="search-tools__address" class="al-card z-depth-2">';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
     template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
     template += '<label class="input-field" for="search-tools__search-via">Via...</label>';
@@ -177,7 +177,7 @@ var SearchTools = (function() {
     template += '</div>';
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="al-card mdl-shadow--2dp al-scrollable">';
+    template += '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
     template += '</div>';
     return Handlebars.compile(template);
   }

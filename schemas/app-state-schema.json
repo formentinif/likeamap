@@ -21,11 +21,30 @@
       "options": {
         "grid_columns": 6
       }
-
+    },
+    "templatesRepositoryUrl": {
+      "title": "Url Template repository",
+      "propertyOrder": 3,
+      "description": "Url assoluto o relativo per il caricamento dei template",
+      "type": "string",
+      "default": "templates",
+      "options": {
+        "grid_columns": 6
+      }
+    },
+    "relationsRepositoryUrl": {
+      "title": "Url Relation repository",
+      "propertyOrder": 4,
+      "description": "Url assoluto o relativo per il caricamento delle relation",
+      "type": "string",
+      "default": "templates",
+      "options": {
+        "grid_columns": 6
+      }
     },
     "startMapLon": {
       "title": "Longitudine",
-      "propertyOrder": 3,
+      "propertyOrder": 5,
       "description": "Longitudine iniziale",
       "default": 0,
       "type": "number",
@@ -35,7 +54,7 @@
     },
     "startMapLat": {
       "title": "Latitudine",
-      "propertyOrder": 4,
+      "propertyOrder": 6,
       "description": "Latitudine iniziale",
       "default": 0,
       "type": "number",
@@ -45,7 +64,7 @@
     },
     "startMapZoom": {
       "title": "Zoom",
-      "propertyOrder": 5,
+      "propertyOrder": 7,
       "description": "Zoom iniziale",
       "default": 13,
       "type": "integer",
@@ -55,7 +74,7 @@
     },
     "mapLon": {
       "title": "",
-      "propertyOrder": 5,
+      "propertyOrder": 8,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "number",
@@ -66,7 +85,7 @@
     },
     "mapLat": {
       "title": "",
-      "propertyOrder": 6,
+      "propertyOrder": 9,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "number",
@@ -77,7 +96,7 @@
     },
     "mapZoom": {
       "title": "",
-      "propertyOrder": 7,
+      "propertyOrder": 10,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "integer",
@@ -88,7 +107,7 @@
     },
     "searchProvider": {
       "title": "Provider di ricerca",
-      "propertyOrder": 7,
+      "propertyOrder": 11,
       "description": "Valore di sistema, lasciare a 0",
       "type": "string",
       "enum": ["nominatim", "wms_geoserver", "google", "bing"],
@@ -99,7 +118,7 @@
     },
     "searchProviderAddressUrl": {
       "title": "Url/KEY del provider di ricerca",
-      "propertyOrder": 7,
+      "propertyOrder": 12,
       "description": "Url del provider di ricerca per WMS o API KEY Google/Bing",
       "type": "string",
       "options": {
@@ -108,7 +127,7 @@
     },
     "searchProviderAddressField": {
       "title": "Campo del provider di ricerca vie",
-      "propertyOrder": 8,
+      "propertyOrder": 13,
       "description": "Campo in cui verrà effettuata la ricerca WMS",
       "type": "string",
       "options": {
@@ -117,7 +136,7 @@
     },
     "searchProviderHouseNumberUrl": {
       "title": "Url/KEY del provider di ricerca civici",
-      "propertyOrder": 9,
+      "propertyOrder": 14,
       "description": "Url del provider di ricerca per i civici",
       "type": "string",
       "options": {
@@ -126,7 +145,7 @@
     },
     "searchProviderHouseNumberField": {
       "title": "Campo del provider di ricerca civici",
-      "propertyOrder": 10,
+      "propertyOrder": 15,
       "description": "Campo in cui verrà effettuata la ricerca civici",
       "type": "string",
       "options": {
@@ -135,7 +154,7 @@
     },
     "drawFeatures": {
       "title": "",
-      "propertyOrder": 11,
+      "propertyOrder": 16,
       "description": "Valore di sistema, lasciare a null",
       "default": "",
       "type": "string",
@@ -145,7 +164,7 @@
     },
     "comuni": {
       "title": "",
-      "propertyOrder": 11,
+      "propertyOrder": 17,
       "description": "Valore di sistema, lasciare a null",
       "type": "array",
       "items": {},
@@ -157,7 +176,7 @@
       "options": {
         "collapsed": true
       },
-      "propertyOrder": 12,
+      "propertyOrder": 18,
       "description": "Moduli abilitati",
       "type": "object",
       "title": "Moduli",
@@ -181,7 +200,7 @@
       "options": {
         "collapsed": true
       },
-      "propertyOrder": 12,
+      "propertyOrder": 19,
       "description": "Moduli abilitati",
       "type": "object",
       "title": "Moduli",
@@ -268,21 +287,13 @@
           }
         }
       },
-      "required": [
-        "layer-tree",
-        "search-tools",
-        "print-tools",
-        "share-tools",
-        "map-tools",
-        "draw-tools",
-        "gps-tools"
-      ]
+      "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
     },
     "layers": {
       "options": {
         "collapsed": true
       },
-      "propertyOrder": 11,
+      "propertyOrder": 21,
       "description": "Elenco dei raggruppamenti di layer",
       "type": "array",
       "title": "Gruppi",
@@ -521,6 +532,15 @@
                   "options": {
                     "grid_columns": 2
                   }
+                },
+                "templateUri": {
+                  "title": "Url del template",
+                  "propertyOrder": 20,
+                  "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repo",
+                  "type": "string",
+                  "options": {
+                    "grid_columns": 2
+                  }
                 }
               },
               "required": [
@@ -541,23 +561,9 @@
             }
           }
         },
-        "required": [
-          "gid",
-          "layerType",
-          "layerName",
-          "visible",
-          "layers"
-        ]
+        "required": ["gid", "layerType", "layerName", "visible", "layers"]
       }
     }
   },
-  "required": [
-    "restAPIUrl",
-    "title",
-    "startMapLon",
-    "startMapLat",
-    "startMapZoom",
-    "modules",
-    "layers"
-  ]
+  "required": ["restAPIUrl", "title", "startMapLon", "startMapLat", "startMapZoom", "modules", "layers"]
 }

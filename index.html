@@ -29,7 +29,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="no-js" lang="">
+<html class="" lang="">
 <!--<![endif]-->
 
 <head>
@@ -60,42 +60,43 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 </head>
 
 <body>
-    <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
     <div id="login-container" class="al-hidden">
     </div>
-
     <div id="al-logo">
-      <img src="img/logo.png" alt="Logo"/>
+        <img src="img/logo.png" alt="Logo" />
     </div>
-
-
     <div id="map-container" class="al-hidden">
         <div id="map" class="al-map">
         </div>
 
         <!--<div id="main-menu" class="al-menu-bottom">-->
         <div id="menu-toolbar" class="al-menu-toolbar-bottom">
-            <button id="menu-toolbar__layer-tree" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-layers')">
+            <button id="menu-toolbar__layer-tree" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-layers')">
                 <i class="material-icons">&#xE53B;</i>
             </button>
-            <button id="menu-toolbar__search-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-search')">
+            <button id="menu-toolbar__search-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-search')">
                 <i class="material-icons">&#xE8B6;</i>
             </button>
-            <button id="menu-toolbar__print-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-print')">
+            <button id="menu-toolbar__print-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-print')">
                 <i class="material-icons">&#xE8AD;</i>
             </button>
-            <button id="menu-toolbar__share-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-share')">
+            <button id="menu-toolbar__share-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-share')">
                 <i class="material-icons">&#xE80D;</i>
             </button>
-            <button id="menu-toolbar__map-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-map-tools')">
+            <button id="menu-toolbar__map-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-map-tools')">
                 <i class="material-icons">&#xE869;</i>
             </button>
-            <button id="menu-toolbar__draw-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-draw-tools')">
+            <button id="menu-toolbar__draw-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-draw-tools')">
                 <i class="material-icons">&#xE254;</i>
             </button>
-            <button id="menu-toolbar__gps-tools" class="btn-floating btn-large waves-effect waves-light al-hidden" onClick="dispatch('show-gps-tools')">
+            <button id="menu-toolbar__gps-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
+                onClick="dispatch('show-gps-tools')">
                 <i class="material-icons">&#xE558;</i>
             </button>
             <!--<button class="btn-floating btn-large waves-effect waves-light" onClick="dispatch('show-chart')">
@@ -113,31 +114,31 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
                 <div id="draw-tools" class="al-menu-panel-content-item"></div>
             </div>
             <div id="menu-panel__close" class="al-menu-panel-close-bottom">
-                <div class="div-spacerp"></div>
-                <span class="fa-stack  al-menu-button-close" onClick="Dispatcher.dispatch('hide-menu')">
-                   <!-- <i class="fa fa-square fa-stack-3x fa-inverse"></i> -->
-                   <i class="fa fa-chevron-left icon-base"></i>
-                 </span>
+                <button class="btn-floating btn-small waves-effect waves-light  al-menu-button-close"
+                    onClick="Dispatcher.dispatch('hide-menu')">
+                    <i class="material-icons">chevron_left</i>
+                </button>
             </div>
         </div>
         <!--</div>-->
 
 
-        <div id="info-window" class="mdl-card mdl-shadow--2dp al-info-window">
-            <div class="mdl-card__actions mdl-card--border">
-                <button class="mdl-button mdl-js-button mdl-button--icon al-right" onclick="Dispatcher.dispatch('hide-info-window')">
+        <div id="info-window" class="al-info-window">
+            <div id="info-window__drag" class="al-info-window__drag">
+                <button class="btn-floating btn-small waves-effect waves-light al-right"
+                    onclick="Dispatcher.dispatch('hide-info-window')">
                     <i class="material-icons">&#xE5CD;</i>
                 </button>
             </div>
-            <div id="info-window__title" class="mdl-card__title al-info-window__title">
-                <h2 id="info-window__title" class="mdl-card__title-text ">Info</h2>
+            <div id="info-window__title" class="al-info-window__title">
+                <h2 id="info-window__title" class="">Info</h2>
             </div>
-            <div id="info-window__body" class="mdl-card__supporting-text">
+            <div id="info-window__body" class="">
                 Info
             </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect " onclick="Dispatcher.dispatch('hide-info-window')">
-                  Chiudi
+            <div class="">
+                <a class="waves-effect waves-light btn" onclick="Dispatcher.dispatch('hide-info-window')">
+                    Chiudi
                 </a>
             </div>
         </div>
@@ -145,13 +146,6 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     </div>
 
     <div id="app-loader" class="al-loader al-hidden"></div>
-
-    <script>
-        //Variabili globali
-        //Non disponibili nell'appstate
-        //globalShareUrl = "/api/share/"; //url per lo share delle mappe base
-        globalShareUrl = "http://www.perspectiva.it:8082/api/share/"; //url per lo share delle mappe
-    </script>
 
     <script src="lib/handlebars.js"></script>
     <script src="lib/jquery.js"></script>
@@ -176,8 +170,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <script src="js/map-tools.js"></script>
     <script src="js/auth-tools.js"></script>
     <script src="js/app.js"></script>
-    <!-- /build --> 
-
+    <!-- /build -->
 </body>
 
 </html>

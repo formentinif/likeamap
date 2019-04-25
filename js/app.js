@@ -25,114 +25,107 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-//aggiornamento background
+//Backgroung rotation
 var numBg = Math.floor(Math.random() * 6) + 1;
 var tempBg = "url(img/logins/login" + numBg + ".jpg)";
 $("#login-container").css("background-image", tempBg);
 
-function touchHandler(event) {
-  var touch = event.changedTouches[0];
-
-  var simulatedEvent = document.createEvent("MouseEvent");
-  simulatedEvent.initMouseEvent({
-      touchstart: "mousedown",
-      touchmove: "mousemove",
-      touchend: "mouseup"
-    }[event.type], true, true, window, 1,
-    touch.screenX, touch.screenY,
-    touch.clientX, touch.clientY, false,
-    false, false, false, 0, null);
-
-  touch.target.dispatchEvent(simulatedEvent);
-  event.preventDefault();
-}
-
-//funzione globale per utilizzare il dispatch
+//Global dispatch helper
 function dispatch(payload) {
   Dispatcher.dispatch(payload);
 }
 
 function appInit() {
-  //carico l'appstate
-  var appStateId = decodeURIComponent((new RegExp('[?|&]' + 'appstate' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-  var appStateJson = decodeURIComponent((new RegExp('[?|&]' + 'appstatejson' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-  if (appStateId || appStateJson) {
-    if (appStateId) {
-      $.ajax({
-        dataType: "json",
-        url: globalShareUrl + appStateId,
-      }).done(function(appstate) {
-        if (appstate.authentication.requireAuthentication) {
-          AuthTools.render('login-container');
-        }
-        AppStore.mapInit(appstate, customFunctions);
-      }).fail(function() {
-        //AppStore.mapInit();
-        dispatch({
-          eventName: "log",
-          message: "Share: Impossibile caricare la mappa condivisa"
-        });
-      });
-    }
-    if (appStateJson) {
-      $.ajax({
-        dataType: "json",
-        url: appStateJson,
-      }).done(function(appstate) {
-        if (appstate.authentication.requireAuthentication) {
-          AuthTools.render('login-container');
-        }
-        AppStore.mapInit(appstate, customFunctions);
-      }).fail(function() {
-        //AppStore.mapInit();
-        dispatch({
-          eventName: "log",
-          message: "Share: Impossibile caricare la mappa condivisa"
-        });
-      });
-    }
-    
-  } else {
+  //appstate loader
+  //appstate with filename
+  var appStateId =
+    decodeURIComponent(
+      (new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(
+        location.search
+      ) || [null, ""])[1].replace(/\+/g, "%20")
+    ) || null;
+
+  //appstate json inline with url
+  var appStateJson =
+    decodeURIComponent(
+      (new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(
+        location.search
+      ) || [null, ""])[1].replace(/\+/g, "%20")
+    ) || null;
+
+  if (appStateId) {
+    //call with ajax
     $.ajax({
       dataType: "json",
-      url: "app-state.json",
-    }).done(function(appstate) {
-
-      //dispatch("init-map-app");
-      if (appstate.authentication.requireAuthentication) {
-        AuthTools.render('login-container');
-      }
-      AppStore.mapInit(appstate, customFunctions);
-    }).fail(function() {
-      dispatch({
-        eventName: "log",
-        message: "Share: Impossibile caricare la mappa"
+      url: globalShareUrl + appStateId
+    })
+      .done(function(appState) {
+        loadState(appstate);
+      })
+      .fail(function() {
+        //AppStore.mapInit();
+        dispatch({
+          eventName: "log",
+          message: "Share: Impossibile caricare la mappa condivisa"
+        });
       });
-    });
+  } else if (appStateJson) {
+    $.ajax({
+      dataType: "json",
+      url: appStateJson
+    })
+      .done(function(appstate) {
+        loadState(appstate);
+      })
+      .fail(function() {
+        dispatch({
+          eventName: "log",
+          message: "Share: Impossibile caricare la mappa condivisa"
+        });
+      });
+  } else {
+    //loading appstate in the
+    $.ajax({
+      dataType: "json",
+      url: "states/app-state.json"
+    })
+      .done(function(appstate) {
+        loadState(appstate);
+      })
+      .fail(function() {
+        dispatch({
+          eventName: "log",
+          message: "Share: Impossibile caricare la mappa"
+        });
+      });
   }
 
+  function loadState(appstate) {
+    if (appstate.authentication.requireAuthentication) {
+      AuthTools.render("login-container");
+    }
+    AppStore.mapInit(appstate, customFunctions);
+  }
 }
 
-/*Area funzioni custom */
+/*Custom functions*/
 function customFunctions() {
-  //creo il menu contestuale
-  var items = [{
-      text: 'Cerca qui',
-      classname: 'some-style-class', // add some CSS rules
-      //callback: center // `center` is your callback function
+  //Right click menu
+  var items = [
+    {
+      text: "Cerca qui",
+      classname: "some-style-class",
       callback: reverseGeocoding
     }
   ];
-
   MainMap.addContextMenu(items);
-
 }
 
 function reverseGeocoding(obj) {
   dispatch({
-    "eventName": "reverse-geocoding",
-    "coordinate": obj.coordinate
-  })
+    eventName: "reverse-geocoding",
+    coordinate: obj.coordinate
+  });
 }
 
 //inizializzazione della mappa

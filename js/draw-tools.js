@@ -84,17 +84,17 @@ var DrawTools = (function() {
     var templateDraw = function() {
         template = '';
         //pannello ricerca via
-        template += '<h3 class="al-title">Disegna</h3>';
-        template += '<div class="al-card mdl-shadow--2dp">';
+        template += '<h4 class="al-title">Disegna</h4>';
+        template += '<div class="al-card z-depth-2">';
 
         template += '<div>';
-        template += '  <button id="draw-tools__point" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">';
+        template += '  <button id="draw-tools__point" class="btn-floating btn-large waves-effect waves-light">';
         template += '    <svg width="100%" height="100%">';
         template += '      <circle cx="28" cy="28" r="6" stroke="green" stroke-width="0" fill="white" />';
         template += '    </svg>';
         template += '  </button>';
 
-        template += '  <button id="draw-tools__polyline" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">';
+        template += '  <button id="draw-tools__polyline" class="btn-floating btn-large waves-effect waves-light">';
         template += '    <svg width="100%" height="100%">';
         template += '      <polyline points="16,16 40,40 " style="fill:white;stroke:white;stroke-width:3" />';
         template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -102,7 +102,7 @@ var DrawTools = (function() {
         template += '    </svg>';
         template += '  </button>';
 
-        template += '  <button id="draw-tools__polygon" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">';
+        template += '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light">';
         template += '    <svg width="100%" height="100%">';
         template += '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
         template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -112,11 +112,11 @@ var DrawTools = (function() {
         template += '    </svg>';
         template += '  </button>';
 
-        //template += '  <button id="draw-tools__text" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" >';
+        //template += '  <button id="draw-tools__text" class="btn-floating waves-effect waves-light" >';
         //template += '    <i class="material-icons" style="font-size:35px !important; top:45%;  ">T</i>';
         //template += '  </button>';
 
-        template += '  <button id="draw-tools__delete" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" >';
+        template += '  <button id="draw-tools__delete" class="btn-floating btn-large waves-effect waves-light" >';
         template += '    <i class="material-icons" style="font-size:35px !important; top:50%; left:40%; ">&#xE872;</i>';
         template += '  </button>';
 

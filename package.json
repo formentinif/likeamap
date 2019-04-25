@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "demo project.",
   "scripts": {
-    "lite": "lite-server --port 10001",
+    "lite": "lite-server --port 10002",
     "start": "npm run lite"
   },
   "author": "",

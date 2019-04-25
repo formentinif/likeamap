@@ -25,11 +25,12 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-html, body {
+html,
+body {
   height: 100%;
   padding-bottom: 0px;
   padding-top: 0px;
-  font-family: "Open Sans", Helvetica, sans-serif;
+  /* font-family: "Open Sans", Helvetica, sans-serif; */
 }
 
 body {
@@ -46,10 +47,6 @@ body {
   box-sizing: border-box;
   margin: 0px;
   border-radius: 5px;
-}
-
-select {
-  padding: 3px;
 }
 
 .al-loader {
@@ -76,7 +73,7 @@ select {
 
 .al-map__browser-location {
   top: 15px;
-  right: .5em;
+  right: 0.5em;
   position: absolute;
 }
 
@@ -87,7 +84,7 @@ select {
 
 .al-map__zoom-in {
   top: 60px;
-  right: .5em;
+  right: 0.5em;
   position: absolute;
 }
 
@@ -98,7 +95,7 @@ select {
 
 .al-map__zoom-out {
   top: 105px;
-  right: .5em;
+  right: 0.5em;
   position: absolute;
 }
 
@@ -106,18 +103,6 @@ select {
   /*top: 120px;*/
   right: 1.5em;
 }
-
-
-/*.al-menu-bottom {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-    width: 100%;
-    height: 380px;
-    z-index: 10;
-    box-sizing: border-box;
-    margin: 0px;
-}*/
 
 .al-hidden {
   display: none;
@@ -148,7 +133,8 @@ select {
   background-color: #eeeeee;
 }
 
-.al-table td, .al-table th {
+.al-table td,
+.al-table th {
   vertical-align: middle;
   height: 48px;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
@@ -196,9 +182,9 @@ select {
   bottom: 0px;
   left: 0px;
   height: 100%;
-  width: 288px;
+  width: 100%;
   background-color: rgba(252, 252, 252, 0.9);
-  padding: 5px 0px 80px 12px;
+  padding: 0.5rem 0.8rem 80px 0.8rem;
   margin: 0px;
   box-sizing: border-box;
   overflow: auto;
@@ -210,13 +196,11 @@ select {
 
 .al-menu-panel-close-bottom {
   position: absolute;
-  top: 0px;
-  left: 288px;
-  width: 12px;
-  height: 100%;
-  background-color: rgba(252, 252, 252, 0.9);
-  margin: 0px;
   box-sizing: border-box;
+  top: 0px;
+  right: 0px;
+  width: 40px;
+  z-index: 11;
 }
 
 .al-menu-panel-close-bottom .al-menu-button-close {
@@ -229,25 +213,17 @@ select {
 }
 
 .al-menu-button-close-top {
+  position: absolute;
+  top: 0px;
+  right: 0px;
   display: block;
   margin-top: 5px;
   margin-bottom: 5px;
   margin-left: 0px;
   margin-right: 0px;
   cursor: pointer;
+  z-index: 1000;
 }
-
-
-/*.al-menu {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 100%;
-    width: 380px;
-    z-index: 10;
-    box-sizing: border-box;
-    margin: 0px;
-}*/
 
 .al-menu-toolbar {
   position: absolute;
@@ -364,7 +340,6 @@ select {
 
 .al-strong {
   font-weight: bold;
-  ;
 }
 
 #map-container {
@@ -401,8 +376,6 @@ select {
   list-style-position: inside;
   margin: 0px;
   padding: 4px 0px;
-  ;
-  font-size: 1.3rem;
   transition: all 0.3s ease;
 }
 
@@ -411,11 +384,6 @@ select {
   width: 100%;
   box-sizing: border-box;
   padding: 0.1rem 0.1rem 0.1rem 0.3rem;
-}
-
-.layertree-selected {
-  /*background-color: rgb(251, 251, 251);
-    border-bottom: 1px solid rgb(255, 255, 255);*/
 }
 
 .layertree-group {
@@ -435,14 +403,14 @@ select {
 }
 
 .layertree-hidden {
-  transition: opacity 0.40s, max-height 0.40s ease-out;
+  transition: opacity 0.4s, max-height 0.4s ease-out;
   opacity: 0.5;
   max-height: 0px;
   overflow: hidden;
 }
 
 .layertree-visible {
-  transition: opacity 0.40s, max-height 0.30s ease-in;
+  transition: opacity 0.4s, max-height 0.3s ease-in;
   opacity: 1;
   max-height: 900px;
 }
@@ -510,13 +478,27 @@ select {
   padding: 8px 16px;
 }
 
+.al-info-window {
+  background-color: rgb(255, 255, 255);
+  border-radius: 3px;
+  box-sizing: border-box;
+  padding: 1.2rem;
+  resize: both;
+}
+
+.al-info-window__drag {
+  cursor: pointer !important;
+}
+
 .al-info-window__title {
-  cursor: pointer;
-  padding: 3px 16px 3px 16px;
+  margin-bottom: 1em;
+  font-size: 1em;
+  cursor: pointer !important;
 }
 
 .al-shadow--2dp {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
 .al-h6 {
@@ -545,9 +527,7 @@ select {
 }
 
 .fake-link {
-  text-decoration: underline;
   cursor: pointer;
-  ;
 }
 
 .al-error {
@@ -558,13 +538,13 @@ select {
   text-align: center;
   padding: 5px;
   border-radius: 5px;
-  margin-top:1em;
-  margin-bottom:1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .autocomplete-suggestions {
   border: 1px solid #999;
-  background: #FFF;
+  background: #fff;
   overflow: auto;
 }
 
@@ -575,12 +555,12 @@ select {
 }
 
 .autocomplete-selected {
-  background: #F0F0F0;
+  background: #f0f0f0;
 }
 
 .autocomplete-suggestions strong {
   font-weight: normal;
-  color: #3399FF;
+  color: #3399ff;
 }
 
 .autocomplete-group {
@@ -592,14 +572,33 @@ select {
   border-bottom: 1px solid #000;
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #f0f0f0;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #26a69a;
+}
+
 @media screen and (min-width: 801px) {
   .al-info-window {
     top: 30%;
-    right: 30%;
+    left: 30%;
     display: none;
     position: absolute;
     overflow: auto;
-    max-height: 500px;
     min-width: 350px;
   }
   #login-container__access {

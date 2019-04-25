@@ -57,19 +57,19 @@ var MapTools = (function() {
     var templateTools = function() {
         template = '';
         //pannello ricerca via
-        template += '<h3>Strumenti</h3>';
+        template += '<h4 class="al-title">Strumenti</h4>';
 
-        template += '<div class="al-card mdl-shadow--2dp">';
+        template += '<div class="al-card z-depth-2">';
         template += '<h5>Vai a..</h5>';
-        template += '<div id="map-tools__lon-field" class="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" >';
+        template += '<div id="map-tools__lon-field" class="input-field" >';
         template += '<input id="map-tools__lon" class="mdl-textfield__input" type="number" step="any">';
         template += '<label class="mdl-textfield__label" for="map-tools__lon">Longitune</label>';
         template += '</div>';
-        template += '<div id="map-tools__lat-field" class="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" >';
+        template += '<div id="map-tools__lat-field" class="input-field" >';
         template += '<input id="map-tools__lat" class="mdl-textfield__input" type="number" step="any">';
         template += '<label class="mdl-textfield__label" for="map-tools__lat">Latitudine</label>';
         template += '</div>';
-        template += '<button id="search-tools__gotolonlat"  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect al-input-margin-right" onclick="MapTools.goToLonLat()">Vai</button>';
+        template += '<button id="search-tools__gotolonlat"  class="waves-effect waves-light btn" onclick="MapTools.goToLonLat()">Vai</button>';
 
         template += '<div class="div-20"></div>';
 
@@ -77,9 +77,9 @@ var MapTools = (function() {
         template += '<div>';
         template += '<h5>Copia coordinate</h5>';
         template += '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
-        template += '<button id="search-tools__start-copy-url" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect al-input-margin-right" onclick="MapTools.startCopyCoordinate()">Inizia</button>';
-        template += '<button id="search-tools__stop-copy-url" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect al-input-margin-right al-hidden" onclick="MapTools.stopCopyCoordinate()">Fine</button>';
-        template += '<button id="search-tools__copy-url"  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect al-input-margin-right" >Copia</button>';
+        template += '<button id="search-tools__start-copy-url" class="waves-effect waves-light btn al-input-margin-right" onclick="MapTools.startCopyCoordinate()">Inizia</button>';
+        template += '<button id="search-tools__stop-copy-url" class="waves-effect waves-light btn al-input-margin-right al-hidden" onclick="MapTools.stopCopyCoordinate()">Fine</button>';
+        template += '<button id="search-tools__copy-url"  class="waves-effect waves-light btn al-input-margin-right" >Copia</button>';
 
         template += '</div>';
 

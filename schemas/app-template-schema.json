@@ -40,6 +40,45 @@
                 "grid_columns": 2
             }
         },
+        "relations": {
+            "options": {
+                "collapsed": false
+            },
+            "format": "table",
+            "propertyOrder": 11,
+            "description": "Relazioni del template",
+            "type": "array",
+            "title": "Relazioni",
+            "items": {
+                "options": {
+                    "collapsed": false
+                },
+                "type": "object",
+                "title": "Relazione",
+                "headerTemplate": "{{ self.field }}",
+                "format": "grid",
+                "properties": {
+                    "serviceUrlTemplate": {
+                        "title": "Url del servizion",
+                        "propertyOrder": 1,
+                        "description": "Url del servizio",
+                        "type": "string"
+                    },
+                    "labelTemplate": {
+                        "title": "Template dell link da visualizzare",
+                        "propertyOrder": 1,
+                        "description": "Template del link da visualizzare",
+                        "type": "string"
+                    },
+                    "templateId": {
+                        "title": "Id del template da visualizzare",
+                        "propertyOrder": 1,
+                        "description": "Id del template da visualizzare",
+                        "type": "string"
+                    }
+                }
+            },
+
         "fields": {
             "options": {
                 "collapsed": false

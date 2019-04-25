@@ -107,7 +107,7 @@ var LayerTree = (function() {
 
     var template = function template() {
         var template = '';
-        template += '<h3 class="al-title">Temi</h3>';
+        template += '<h4 class="al-title">Temi</h4>';
         template += '<div id="layertree" class="layertree">';
         template += '<ul class="layertree-list-group">';
         template += '{{#each this}}';
@@ -126,7 +126,7 @@ var LayerTree = (function() {
         template += '{{/each}}';
         //sezione funzioni generali
         template += '<li class="layertree-list-group-item"><span class="layertree-span layertree-selected">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
-        template += '<i title="Nascondi tutti i layer" class="fa fa-times fa-lg pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({eventName:\'reset-layers\'})"></i><i id="lti2{{@../index}}{{@index}}" class="fa icon-success fa-lg fa-fw layertree-icon pull-right " onclick=""></i></span>';
+        template += '<button class="btn-floating btn-small waves-effect waves-light pull-right" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
         template += '</li>';
 
         template += '</ul>';

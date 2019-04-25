@@ -48,15 +48,15 @@ var ShareTools = (function() {
   var templateShare = function() {
     template = '';
     //pannello ricerca via
-    template += '<h3 class="al-title">Condividi</h3>';
-    template += '<div class="al-card mdl-shadow--2dp">';
+    template += '<h4 class="al-title">Condividi</h4>';
+    template += '<div class="al-card z-depth-2">';
 
     //template += 'Crea link da condividere con i tuoi colleghi';
     template += '<div class="div-20"></div>';
     template += '<h4 class="al-title-h4">Link breve</h4>';
     template += '<p>Il link breve condivide la posizione e i layer attivi.</p>';
 
-    template += '<input type="text" class="mdl-textfield__input" id="share-tools__input-query"/>';
+    template += '<input type="text" class="" id="share-tools__input-query"/>';
     template += '<div class="div-20"></div>';
 
     template += '<div class="grid">';
@@ -69,13 +69,13 @@ var ShareTools = (function() {
     template += '<h4 class="al-title-h4">Mappa</h4>';
     template += '<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>';
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template += '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Crea mappa</button>';
+    template += '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
 
     template += '<div id="share-tools__content" class="al-hidden">';
 
     //template += '<div class="mdl-textfield mdl-js-textfield">';
     template += '<div class="div-20"></div>';
-    template += '<input type="text" class="mdl-textfield__input" id="share-tools__input-url"/>';
+    template += '<input type="text" class="" id="share-tools__input-url"/>';
     template += '<div class="div-20"></div>';
 
     template += '<div class="grid">';
