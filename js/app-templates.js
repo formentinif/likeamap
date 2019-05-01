@@ -32,57 +32,81 @@ var AppTemplates = (function() {
     //Ciclo i livelli che non hanno un template
     var tempLayers = AppStore.getAppState().layers;
     const repoTemplatesUrl = AppStore.getAppState().templatesRepositoryUrl;
+    loadLayersTemplates(tempLayers, repoTemplatesUrl);
+    loadRelationsTemplates(tempLayers, repoTemplatesUrl);
+  };
+
+  var loadLayersTemplates = function(tempLayers, repoTemplatesUrl) {
     for (var i = 0; i < tempLayers.length; i++) {
       var groupLayer = tempLayers[i];
       if (groupLayer.layers) {
         for (var li = 0; li < groupLayer.layers.length; li++) {
           //il layer deve essere selezionabile
-          if (groupLayer.layers[li].layer && groupLayer.layers[li].queryable) {
-            var found = false;
-            for (var ti = 0; ti < templates.length; ti++) {
-              if (templates[ti].layer == groupLayer.layers[li].layer) {
-                found = true;
-                break;
-              }
-            }
-            if (!found) {
-              //aggiungo il layer vi ajax
-              let urlTemplate = getTemplateUri(groupLayer.layers[li], repoTemplatesUrl);
-              $.ajax({
-                dataType: "json",
-                url: urlTemplate
-              })
-                .done(function(data) {
-                  if (data) {
-                    if (data.length) {
-                      for (var i = 0; i < data.length; i++) {
-                        templates.push(data[i]);
-                      }
-                    } else {
-                      templates.push(data);
-                    }
-                  }
-                })
-                .fail(function(data) {
-                  dispatch({
-                    eventName: "log",
-                    message: "AppStore: Unable to load template"
-                  });
-                });
-            }
+          if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
+            continue;
+          }
+          let templateUri = getTemplateUri(groupLayer.layers[li], repoTemplatesUrl);
+          let template = templates.find(function(el) {
+            return el.templateUri === templateUri;
+          });
+          if (!template) {
+            //aggiungo il layer vi ajax
+            loadTemplateAjax(templateUri);
           }
         }
       }
     }
   };
 
+  var loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
+    for (let i = 0; i < tempRelations.length; i++) {
+      const relation = tempRelations[i];
+      let templateUri = getTemplateUri(relation, repoTemplatesUrl);
+      let template = templates.filter(function(el) {
+        return el.templateUri === templateUri;
+      });
+      if (!template) {
+        //aggiungo il layer vi ajax
+        loadTemplateAjax(templateUri);
+      }
+    }
+  };
+
+  var loadTemplateAjax = function(templateUri) {
+    $.ajax({
+      dataType: "json",
+      url: templateUri
+    })
+      .done(function(data) {
+        if (data) {
+          if (data.length) {
+            for (var i = 0; i < data.length; i++) {
+              let thisTemplate = data[i];
+              thisTemplate.templateUri = templateUri;
+              templates.push(thisTemplate);
+            }
+          } else {
+            data.templateUri = templateUri;
+            templates.push(data);
+          }
+        }
+      })
+      .fail(function(data) {
+        dispatch({
+          eventName: "log",
+          message: "AppStore: Unable to load template"
+        });
+      });
+  };
+
   /**
-   * @param {object} layer Oggetto del layer
+   * Gets the uri of the template to be loaded by ajax
+   * @param {object} layer Oggetto del layer/relation
    * @param {string} repoUrl Url del repository
    */
   var getTemplateUri = function(layer, repoUrl) {
     if (layer && layer.templateUri) {
-      if (layer.templateUri.toLowerCase().includes("http")) {
+      if (layer.templateUri.toLowerCase().includes("http://")) {
         return layer.templateUri;
       } else {
         return repoTemplatesUrl + "/" + layer.templateUri;
@@ -91,23 +115,41 @@ var AppTemplates = (function() {
     return repoUrl + "/" + layer.gid + ".json";
   };
 
-  var processTemplate = function(layer, layerGid, props) {
+  var processTemplate = function(layerGid, props) {
+    const repoTemplatesUrl = AppStore.getAppState().templatesRepositoryUrl;
+    const layer = AppStore.getLayer(layerGid);
     var result = "";
-    for (var i = 0; i < AppTemplates.templates.length; i++) {
-      if (AppTemplates.templates[i].layer === layer || AppTemplates.templates[i].layerGid === layerGid) {
-        try {
-          var hsTemplate = this.generateTemplate(AppTemplates.templates[i]);
-          var template = Handlebars.compile(hsTemplate);
-          if (Array.isArray(props)) {
-            result = template(props[0]);
-          } else {
-            result = template(props);
-          }
-          break;
-        } catch (e) {
-          break;
+    let template = templates.find(function(el) {
+      return el.templateUri === getTemplateUri(layer, repoTemplatesUrl);
+    });
+    if (template) {
+      try {
+        var hsTemplate = this.generateTemplate(template);
+        var compiledTemplate = Handlebars.compile(hsTemplate);
+        if (Array.isArray(props)) {
+          result = compiledTemplate(props[0]);
+        } else {
+          result = compiledTemplate(props);
         }
+      } catch (e) {
+        dispatch({
+          eventName: "log",
+          message: e
+        });
       }
+    }
+
+    debugger;
+    //adding relations
+    var layerRelations = AppStore.getRelations().filter(function(relation) {
+      return relation.layerGid === layerGid;
+    });
+    if (layerRelations.length > 0) {
+      result += '<div class=""><div class="input-field col s12"><select>';
+      layerRelations.map(function(relation) {
+        result += '<option value="' + relation.gid + '">' + relation.labelTemplate + "</option>";
+      });
+      result += '</select></div><div class=""></div></div>';
     }
     return result;
   };
@@ -175,6 +217,7 @@ var AppTemplates = (function() {
   return {
     init: init,
     generateTemplate: generateTemplate,
+    getTemplateUri: getTemplateUri,
     processTemplate: processTemplate,
     standardTemplate: standardTemplate,
     templates: templates

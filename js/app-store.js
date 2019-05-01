@@ -180,7 +180,7 @@ var AppStore = (function() {
       var props = data[i].properties;
       var layerids = data[i].id.split(".");
       var layerid = layerids[0];
-      var tempBody = AppTemplates.processTemplate(layerid, null, props);
+      var tempBody = AppTemplates.processTemplate(data[i].layerGid, props);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props);
       }
@@ -332,12 +332,7 @@ var AppStore = (function() {
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
           if (appState.layers[i].layers[ki].layer) {
-            if (
-              $.inArray(
-                layerName,
-                appState.layers[i].layers[ki].layer.split(":")
-              ) >= 0
-            ) {
+            if ($.inArray(layerName, appState.layers[i].layers[ki].layer.split(":")) >= 0) {
               return appState.layers[i].layers[ki];
             }
           }
@@ -361,18 +356,10 @@ var AppStore = (function() {
     //layers
     var qLayers = "";
     for (var i = 0; i < appState.layers.length; i++) {
-      qLayers +=
-        appState.layers[i].gid +
-        ":" +
-        parseInt(appState.layers[i].visible) +
-        ",";
+      qLayers += appState.layers[i].gid + ":" + parseInt(appState.layers[i].visible) + ",";
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          qLayers +=
-            appState.layers[i].layers[ki].gid +
-            ":" +
-            parseInt(appState.layers[i].layers[ki].visible) +
-            ",";
+          qLayers += appState.layers[i].layers[ki].gid + ":" + parseInt(appState.layers[i].layers[ki].visible) + ",";
         }
       }
     }
@@ -423,9 +410,7 @@ var AppStore = (function() {
     var centerLL = MainMap.getPrintCenterLonLat();
     //La scala viene ricalcolata in base ad un parametero di conversione locale
     //Questa parte è tutta rivedere
-    var scale =
-      PrintTools.getScale() *
-      MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+    var scale = PrintTools.getScale() * MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
 
     //
     appState.printCenterX = center[0];
@@ -462,11 +447,7 @@ var AppStore = (function() {
   var createShareUrl = function() {
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
     var centerMap = MainMap.getMapCenter();
-    centerMap = ol.proj.transform(
-      [centerMap[0], centerMap[1]],
-      "EPSG:900913",
-      "EPSG:4326"
-    );
+    centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:900913", "EPSG:4326");
 
     appState.mapLon = centerMap[0];
     appState.mapLat = centerMap[1];
@@ -512,8 +493,7 @@ var AppStore = (function() {
     //costruisco l'url da richiemare
     var urlArray = location.href.split("/");
     var baseUrl = urlArray[2];
-    var urlService =
-      "http://" + baseUrl.replace("#", "") + "/" + url + "/" + gid;
+    var urlService = "http://" + baseUrl.replace("#", "") + "/" + url + "/" + gid;
 
     //invio la richiesta
     var moreInfo = function() {
@@ -526,7 +506,7 @@ var AppStore = (function() {
       .then(function(data) {
         var title = "Informazioni aggiuntive";
         var body = "";
-        body = AppTemplates.processTemplate(null, layerGid, data);
+        body = AppTemplates.processTemplate(layerGid, data);
         if (!body) {
           body = AppTemplates.standardTemplate(props);
         }
@@ -713,12 +693,7 @@ var AppStore = (function() {
   };
 
   var doLogin = function(username, password) {
-    var url =
-      getAppState().restAPIUrl +
-      "/api/auth?username=" +
-      username +
-      "&password=" +
-      password;
+    var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
     $.ajax({
       dataType: "json",
       url: url
@@ -750,6 +725,10 @@ var AppStore = (function() {
     win.focus();
   };
 
+  var getRelations = function() {
+    return appState.relations;
+  };
+
   return {
     createShareUrl: createShareUrl,
     doLogin: doLogin,
@@ -760,6 +739,7 @@ var AppStore = (function() {
     getLayer: getLayer,
     getLayerByName: getLayerByName,
     getSearchLayers: getSearchLayers,
+    getRelations: getRelations,
     isDrawing: isDrawing,
     isMobile: isMobile,
     mapInit: mapInit,
