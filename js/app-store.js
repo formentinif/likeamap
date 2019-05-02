@@ -173,13 +173,14 @@ var AppStore = (function() {
     } else {
       data = data.features;
     }
+    this.appState.currentInfoItems = data;
     if (data.length > 0) {
       title += " (" + data.length + ")";
     }
     for (var i = 0; i < data.length; i++) {
       var props = data[i].properties;
       var layerids = data[i].id.split(".");
-      var layerid = layerids[0];
+      //var layerid = layerids[0];
       var tempBody = AppTemplates.processTemplate(data[i].layerGid, props);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props);

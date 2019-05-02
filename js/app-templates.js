@@ -139,17 +139,19 @@ var AppTemplates = (function() {
       }
     }
 
-    debugger;
     //adding relations
     var layerRelations = AppStore.getRelations().filter(function(relation) {
       return relation.layerGid === layerGid;
     });
     if (layerRelations.length > 0) {
-      result += '<div class=""><div class="input-field col s12"><select>';
+      result += '<div class="">';
       layerRelations.map(function(relation) {
-        result += '<option value="' + relation.gid + '">' + relation.labelTemplate + "</option>";
+        debugger;
+        result += '<div class="input-field col s12">';
+        result += '<a href="#" onclick="">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += "</div>";
       });
-      result += '</select></div><div class=""></div></div>';
+      result += "</div>";
     }
     return result;
   };

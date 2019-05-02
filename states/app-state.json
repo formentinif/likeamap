@@ -600,14 +600,14 @@
       "layerGid": "g0_edifici",
       "serviceUrlTemplate": "/sample/temp.json",
       "templateUri": "templates/g0_civici.json",
-      "labelTemplate": "{gid}"
+      "labelTemplate": "Visualizza Pratiche"
     },
     {
       "gid": "r_edifici_pratiche",
-      "layerGid": "g0_pratiche",
+      "layerGid": "g0_edifici",
       "serviceUrlTemplate": "/sample/temp.json",
       "templateUri": "templates/g0_edifici.json",
-      "labelTemplate": "{gid}"
+      "labelTemplate": "Visualizza Civici"
     }
   ]
 }

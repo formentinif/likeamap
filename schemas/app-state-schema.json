@@ -289,11 +289,26 @@
       },
       "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
     },
-    "layers": {
+    "selectedInfoItems": {
       "options": {
         "collapsed": true
       },
       "propertyOrder": 21,
+      "description": "Elenco delle feature correntemente selezionate sulla mappa",
+      "type": "array",
+      "title": "Gruppi",
+      "items": {
+        "options": {
+          "collapsed": true
+        },
+        "type": "object"
+      }
+    },
+    "layers": {
+      "options": {
+        "collapsed": true
+      },
+      "propertyOrder": 22,
       "description": "Elenco dei raggruppamenti di layer",
       "type": "array",
       "title": "Gruppi",
