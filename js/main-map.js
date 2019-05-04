@@ -357,7 +357,7 @@ var MainMap = (function() {
     return wms;
   };
 
-  var getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution) {
+  var getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution, secured) {
     /// <summary>
     /// Restituisce un layer in formato WMS, con le chiamate tagliate a Tile
     /// </summary>
@@ -367,30 +367,41 @@ var MainMap = (function() {
     var params = queryToDictionary(params);
     var serverType = "geoserver";
     params.tiled = "true";
-    //
-    // if (!params.format) {
-    //     params.format = "PNG";
-    // }
-    // if (params.format === 'none') {
-    //
-    //     params.format = null;
-    // } else {
-    //     params.format = wmsImageFormat(params.format);
-    // }
     if (params.serverType) {
       serverType = params.serverType;
     }
+    var source = new ol.source.TileWMS(
+      /** @type {olx.source.TileWMSOptions} */ ({
+        url: uri,
+        params: params,
+        serverType: serverType,
+        //crossOrigin: "Anonymous",
+        attributions: attribution
+      }));
+      if(secured){
+        debugger
+        source.setTileLoadFunction(function(tile, src) {
+          var xhr = new XMLHttpRequest();
+          xhr.responseType = "blob";
+          xhr.addEventListener("loadend", function(evt) {
+            var data = this.response;
+            if (data !== undefined) {
+              tile.getImage().src = URL.createObjectURL(data);
+            } else {
+              tile.setState(3);
+            }
+          });
+          xhr.addEventListener("error", function() {
+            tile.setState(3);
+          });
+          xhr.open("GET", src);
+          xhr.setRequestHeader('Authorization', AppStore.getAuthorizationHeader());
+          xhr.send();
+      });
+    }
     var wms = new ol.layer.Tile({
       //extent: [-13884991, 2870341, -7455066, 6338219],
-      source: new ol.source.TileWMS(
-        /** @type {olx.source.TileWMSOptions} */ ({
-          url: uri,
-          params: params,
-          serverType: serverType,
-          //crossOrigin: "Anonymous"
-          attributions: attribution
-        })
-      )
+      source: source
     });
     return wms;
   };

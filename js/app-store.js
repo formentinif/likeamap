@@ -730,12 +730,18 @@ var AppStore = (function() {
     return appState.relations;
   };
 
+  var getAuthorizationHeader = function(){
+    return "";
+  }
+
+
   return {
     createShareUrl: createShareUrl,
     doLogin: doLogin,
     init: init,
     hideMenu: hideMenu,
     getAppState: getAppState,
+    getAuthorizationHeader: getAuthorizationHeader,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
     getLayerByName: getLayerByName,
