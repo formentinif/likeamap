@@ -28,9 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 var AuthTools = (function() {
   var isRendered = false;
   var divName = "";
-  var init = function init() {
-
-  }
+  var init = function init() {};
 
   var render = function(div) {
     divName = div;
@@ -43,63 +41,52 @@ var AuthTools = (function() {
     jQuery("#" + div).html(output);
     //forzo che il contenuto non sia visualizzato
     isRendered = true;
-  }
+  };
 
   var templateLogin = function() {
-    template = '';
+    template = "";
     //pannello ricerca via
 
     template += '<div id="login-container__access">';
     template += '    <form action="#">';
-    template += '        <h2>Accedi</h2>';
+    template += "        <h2>Accedi</h2>";
     template += '      <div class="input-field">';
     template += '        <input class="" type="text" id="login-container__username">';
     template += '        <label class="" for="login-container__username">username</label>';
-    template += '    </div>';
+    template += "    </div>";
     template += '    <div class="input-field">';
     template += '        <input class="" type="password" id="login-container__password">';
     template += '        <label class="" for="login-container__password">password</label>';
-    template += '    </div>';
+    template += "    </div>";
     template += '    <div id="al-error-message" class="al-hidden al-error">Autenticazione non riuscita</div>';
 
-    //template += '    <div class="mdl-textfield mdl-js-textfield">';
-    //template += '        <select id="login-container__role" class="mdl-textfield__input">';
-    //template += '            <option value="1">Consultazione</option>';
-    //template += '            <option value="2">Progettazione</option>';
-    //template += '      </select>';
-    //template += '  </div>';
     template += '  <button onclick="AuthTools.login();return false" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Accedi</button>';
-    template += '  </form>';
-    template += '</div>';
+    template += "  </form>";
+    template += "</div>";
 
     return Handlebars.compile(template);
-
-  }
-
+  };
 
   var templateEmpty = function(results) {
-    var template = '<p></p>';
+    var template = "<p></p>";
     return Handlebars.compile(template);
-  }
+  };
 
   var login = function() {
-    //if($("#login-container__role").val() == "2"){
-    //  window.location.replace("/www");
-    //}
     dispatch({
       eventName: "do-login",
       username: $("#login-container__username").val(),
       password: $("#login-container__password").val()
     });
-  }
+  };
 
   var hideLogin = function() {
-    $('#' + divName).hide();
-  }
+    $("#" + divName).hide();
+  };
 
   var showError = function() {
     $("#al-error-message").show();
-  }
+  };
 
   return {
     login: login,
@@ -107,7 +94,6 @@ var AuthTools = (function() {
     hideLogin: hideLogin,
     render: render,
     showError: showError,
-    templateLogin: templateLogin,
+    templateLogin: templateLogin
   };
-
-}());
+})();

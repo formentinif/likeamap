@@ -39,19 +39,12 @@ function appInit() {
   //appstate loader
   //appstate with filename
   var appStateId =
-    decodeURIComponent(
-      (new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(
-        location.search
-      ) || [null, ""])[1].replace(/\+/g, "%20")
-    ) || null;
+    decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
 
   //appstate json inline with url
   var appStateJson =
-    decodeURIComponent(
-      (new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(
-        location.search
-      ) || [null, ""])[1].replace(/\+/g, "%20")
-    ) || null;
+    decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
+    null;
 
   if (appStateId) {
     //call with ajax
@@ -84,7 +77,6 @@ function appInit() {
         });
       });
   } else {
-    //loading appstate in the
     $.ajax({
       dataType: "json",
       url: "states/app-state.json"

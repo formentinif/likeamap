@@ -5,204 +5,184 @@
   "properties": {
     "title": {
       "title": "Titolo",
-      "propertyOrder": 1,
       "description": "Nome della mappa",
       "type": "string"
     },
     "restAPIUrl": {
       "title": "Url API Rest",
-      "propertyOrder": 2,
       "description": "Url assoluto o relativo delle API REST",
       "type": "string",
       "default": "/"
     },
     "templatesRepositoryUrl": {
       "title": "Url Template repository",
-      "propertyOrder": 3,
       "description": "Url assoluto o relativo per il caricamento dei template",
       "type": "string",
       "default": "templates"
     },
     "relationsRepositoryUrl": {
       "title": "Url Relation repository",
-      "propertyOrder": 4,
       "description": "Url assoluto o relativo per il caricamento delle relation",
       "type": "string",
       "default": "templates"
     },
     "startMapLon": {
       "title": "Longitudine",
-      "propertyOrder": 5,
       "description": "Longitudine iniziale",
       "default": 0,
       "type": "number"
     },
     "startMapLat": {
       "title": "Latitudine",
-      "propertyOrder": 6,
       "description": "Latitudine iniziale",
       "default": 0,
       "type": "number"
     },
     "startMapZoom": {
       "title": "Zoom",
-      "propertyOrder": 7,
       "description": "Zoom iniziale",
       "default": 13,
       "type": "integer"
     },
     "mapLon": {
       "title": "",
-      "propertyOrder": 8,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "number"
     },
     "mapLat": {
       "title": "",
-      "propertyOrder": 9,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "number"
     },
     "mapZoom": {
       "title": "",
-      "propertyOrder": 10,
       "description": "Valore di sistema, lasciare a 0",
       "default": 0,
       "type": "integer"
     },
     "searchProvider": {
       "title": "Provider di ricerca",
-      "propertyOrder": 11,
       "description": "Valore di sistema, lasciare a 0",
       "type": "string",
       "enum": ["nominatim", "wms_geoserver", "google", "bing"]
     },
     "searchProviderAddressUrl": {
       "title": "Url/KEY del provider di ricerca",
-      "propertyOrder": 12,
       "description": "Url del provider di ricerca per WMS o API KEY Google/Bing",
       "type": "string"
     },
     "searchProviderAddressField": {
       "title": "Campo del provider di ricerca vie",
-      "propertyOrder": 13,
       "description": "Campo in cui verrà effettuata la ricerca WMS",
       "type": "string"
     },
     "searchProviderHouseNumberUrl": {
       "title": "Url/KEY del provider di ricerca civici",
-      "propertyOrder": 14,
       "description": "Url del provider di ricerca per i civici",
       "type": "string"
     },
     "searchProviderHouseNumberField": {
       "title": "Campo del provider di ricerca civici",
-      "propertyOrder": 15,
       "description": "Campo in cui verrà effettuata la ricerca civici",
       "type": "string"
     },
     "drawFeatures": {
       "title": "",
-      "propertyOrder": 16,
       "description": "Valore di sistema, lasciare a null",
       "default": "",
       "type": "string"
     },
     "comuni": {
       "title": "",
-      "propertyOrder": 17,
       "description": "Valore di sistema, lasciare a null",
       "type": "array",
       "items": {}
     },
     "authentication": {
-      "propertyOrder": 18,
-      "description": "Moduli abilitati",
+      "description": "Gestione autenticazione",
       "type": "object",
-      "title": "Moduli",
-      "format": "grid",
+      "title": "Autenticazione",
       "properties": {
-        "requireAuthentication": {
+        "requiresAuth": {
           "title": "Autenticazione Richiesta",
-          "propertyOrder": 1,
           "description": "Richiede l'Autenticazione",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
+        },
+        "authType": {
+          "title": "Tipo di autenticazione",
+          "description": "Tipo di autenticazione",
+          "type": "string",
+          "enum": ["anonymous", "basic", "custom"]
+        },
+        "authToken": {
+          "title": "Token di autenticazione",
+          "description": "Token di autenticazione",
+          "type": "string"
+        },
+        "customAuthUrl": {
+          "title": "Url di autenticazione custom",
+          "description": "Template url. Lo user e password devono essere inseriti nei placeholder {{user}} {{password}}. Il risultato sarà inserito nella proprietà customAuthObject",
+          "type": "string"
+        },
+        "customAuthObject": {
+          "title": "Oggetto con le informazione di autenticazione custom",
+          "description": "Oggetto con le informazione di autenticazione custom",
+          "type": "object"
         },
         "required": []
       }
     },
-
     "modules": {
-      "propertyOrder": 19,
       "description": "Moduli abilitati",
       "type": "object",
       "title": "Moduli",
-      "format": "grid",
       "properties": {
         "layer-tree": {
           "title": "Livelli",
-          "propertyOrder": 1,
           "description": "Elenco dei livelli",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "search-tools": {
           "title": "Ricerca",
-          "propertyOrder": 2,
           "description": "Ricerca vie",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "print-tools": {
           "title": "Stampa",
-          "propertyOrder": 3,
           "description": "Stampa pdf",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "share-tools": {
           "title": "Condividi",
-          "propertyOrder": 4,
           "description": "Condividi mappe",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "map-tools": {
           "title": "Strumenti",
-          "propertyOrder": 6,
           "description": "Strumenti mappa",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "draw-tools": {
           "title": "Disegno",
-          "propertyOrder": 7,
           "description": "Strumenti di disegno",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "gps-tools": {
           "title": "GPS",
-          "propertyOrder": 8,
           "description": "Strumenti GPS",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         },
         "auth-tools": {
           "title": "Login",
-          "propertyOrder": 8,
           "description": "Accesso tramite login",
-          "type": "boolean",
-          "format": "checkbox"
+          "type": "boolean"
         }
       },
       "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
     },
     "selectedInfoItems": {
-      "propertyOrder": 21,
       "description": "Elenco delle feature correntemente selezionate sulla mappa",
       "type": "array",
       "title": "Gruppi",
@@ -211,7 +191,6 @@
       }
     },
     "layers": {
-      "propertyOrder": 22,
       "description": "Elenco dei raggruppamenti di layer",
       "type": "array",
       "title": "Gruppi",
@@ -219,66 +198,55 @@
         "type": "object",
         "title": "Gruppo",
         "headerTemplate": "{{ self.layerName }}",
-        "format": "grid",
         "properties": {
           "gid": {
             "title": "Identificativo univoco",
-            "propertyOrder": 1,
             "description": "Identificatore globale univoco ",
             "type": "string"
           },
           "layerName": {
             "title": "Titolo",
-            "propertyOrder": 2,
             "description": "Nome del layer (visualizzato in mappa)",
             "type": "string"
           },
           "layerType": {
             "title": "Tipologia",
-            "propertyOrder": 3,
             "description": "Tipologia di layer",
             "type": "string",
             "enum": ["group"]
           },
           "visible": {
             "title": "Visibilità",
-            "propertyOrder": 4,
             "description": "Visibilità iniziale in mappa",
             "enum": [0, 1],
             "type": "integer"
           },
           "layers": {
             "title": "Livelli",
-            "propertyOrder": 5,
             "description": "Array dei layer catografici appartenenti al gruppo",
             "type": "array",
             "items": {
               "type": "object",
               "title": "Livello",
               "headerTemplate": "{{ self.layerName }}",
-              "format": "grid",
               "properties": {
                 "gid": {
                   "title": "identificativo univoco",
-                  "propertyOrder": 1,
                   "description": "Identificatore globale univoco",
                   "type": "string"
                 },
                 "layerName": {
                   "title": "Titolo",
-                  "propertyOrder": 2,
                   "description": "Nome del layer (visualizzato in mappa)",
                   "type": "string"
                 },
                 "mapUri": {
                   "title": "URL (WMS, TMS)",
-                  "propertyOrder": 3,
                   "description": "Url base del layer. Es: http://localhost:8080/geoserver/wms?",
                   "type": "string"
                 },
                 "layerType": {
                   "title": "Tipologia",
-                  "propertyOrder": 4,
                   "description": "Tipologia del layer",
                   "enum": ["wmstiled", "wms", "osm"],
                   "type": "string",
@@ -286,104 +254,88 @@
                 },
                 "layer": {
                   "title": "Nome Layer",
-                  "propertyOrder": 5,
                   "description": "Nome del layer WMS da visualizzare. Per geoserver mettere workspace:nome del layer Es: stradario:civici",
                   "type": "string"
                 },
                 "srs": {
                   "title": "SRID",
-                  "propertyOrder": 6,
                   "description": "SRID del layer. Es: 3857 (al momento è supportato solo il 3857)",
                   "enum": ["3857"],
                   "type": "string"
                 },
                 "opacity": {
                   "title": "Opacità",
-                  "propertyOrder": 7,
                   "description": "Trasparenza iniziale del layer",
                   "enum": [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0],
                   "type": "number"
                 },
                 "params": {
                   "title": "Parametri aggiuntivi",
-                  "propertyOrder": 8,
                   "description": "Parametri aggiuntivi da aggiungere alla chiamata WMS. Per maggiori informazioni consultare la specifica del WMS",
                   "type": "string"
                 },
                 "tileMode": {
                   "title": "Tipologia Tile",
-                  "propertyOrder": 9,
                   "description": "Tipologia di tile da utilizare. Lasciare vuoto per il formato server predefinito",
                   "enum": ["", "xyz", "quadkey"],
                   "type": "string"
                 },
                 "visible": {
                   "title": "Visibilità",
-                  "propertyOrder": 10,
                   "description": "Visibilità iniziale in mappa",
                   "enum": [0, 1],
                   "type": "integer"
                 },
                 "queryable": {
                   "title": "Layer interrogabile",
-                  "propertyOrder": 11,
                   "description": "Definire se il layer è interrogabile tramite click, se visibile.",
                   "enum": [0, 1],
                   "type": "integer"
                 },
                 "searchable": {
                   "title": "Layer ricercabile",
-                  "propertyOrder": 13,
                   "description": "Definire se il layer è ricercabile.",
                   "enum": [0, 1],
                   "type": "integer"
                 },
                 "searchField": {
                   "title": "Campo di ricerca",
-                  "propertyOrder": 14,
                   "description": "Campo su cui effettuare la ricerca. Deve essere un campo di tipo string",
                   "type": "string"
                 },
                 "labelField": {
                   "title": "Campo etichetta",
-                  "propertyOrder": 15,
                   "description": "Campo da utilizzare come etichetta. Deve essere un campo di tipo string",
                   "type": "string"
                 },
                 "zIndex": {
                   "title": "Ordine del livello",
-                  "propertyOrder": 16,
                   "description": "Ordine di visualizzazione in mappa",
                   "minimum": 0,
                   "type": "integer"
                 },
                 "attribution": {
                   "title": "Attribuzione del layer",
-                  "propertyOrder": 17,
                   "description": "Attribuzione dei diritti da visualizzare per il layer",
                   "type": "string"
                 },
                 "legendUrl": {
                   "title": "Legenda personalizzata",
-                  "propertyOrder": 18,
                   "description": "Url della legenda personalizzata",
                   "type": "string"
                 },
                 "hideLegend": {
                   "title": "Nascondi Legenda",
-                  "propertyOrder": 19,
                   "description": "Nasconde la legenda se non disponibile",
                   "type": "boolean"
                 },
                 "templateUri": {
                   "title": "Url del template",
-                  "propertyOrder": 20,
                   "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repo",
                   "type": "string"
                 },
                 "secured": {
                   "title": "Autorizzazione richiesta",
-                  "propertyOrder": 21,
                   "description": "Il layer richiede la basic authentication",
                   "type": "boolean"
                 }

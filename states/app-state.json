@@ -16,7 +16,7 @@
   "searchProviderHouseNumberField": "NUMESP_CIV",
   "drawFeatures": "",
   "authentication": {
-    "requireAuthentication": false
+    "requireAuthentication": true
   },
   "modules": {
     "layer-tree": true,

@@ -694,22 +694,36 @@ var AppStore = (function() {
   };
 
   var doLogin = function(username, password) {
-    var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
-    $.ajax({
-      dataType: "json",
-      url: url
-    })
-      .done(function(data) {
-        authToken = data;
+    switch (appState.authentication) {
+      case "anonymous":
+        break;
+      case "basic":
+        //adding the base64 token
+        appState.authentication.authToken = window.btoa(username + ":" + password);
         AuthTools.hideLogin();
-      })
-      .fail(function(data) {
-        AuthTools.showError();
-        dispatch({
-          eventName: "log",
-          message: "AppStore: Unable to autheticate user"
-        });
-      });
+        break;
+      case "custom":
+        //TODO implement custom auth url ancd object
+        var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
+        $.ajax({
+          dataType: "json",
+          url: url
+        })
+          .done(function(data) {
+            authToken = data;
+            AuthTools.hideLogin();
+          })
+          .fail(function(data) {
+            AuthTools.showError();
+            dispatch({
+              eventName: "log",
+              message: "AppStore: Unable to autheticate user"
+            });
+          });
+        break;
+      default:
+        break;
+    }
   };
 
   var openUrlTemplate = function(urlTemplate) {
@@ -730,10 +744,14 @@ var AppStore = (function() {
     return appState.relations;
   };
 
-  var getAuthorizationHeader = function(){
-    return "";
-  }
-
+  var getAuthorizationHeader = function() {
+    switch (appstate.authentication.authType) {
+      case "basic":
+        return "Basic " + appState.authentication.authToken;
+      default:
+        return appState.authentication.authToken;
+    }
+  };
 
   return {
     createShareUrl: createShareUrl,
