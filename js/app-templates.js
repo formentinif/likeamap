@@ -146,7 +146,6 @@ var AppTemplates = (function() {
     if (layerRelations.length > 0) {
       result += '<div class="">';
       layerRelations.map(function(relation) {
-        debugger;
         result += '<div class="input-field col s12">';
         result += '<a href="#" onclick="">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";

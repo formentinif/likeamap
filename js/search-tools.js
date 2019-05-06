@@ -26,7 +26,6 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 var SearchTools = (function() {
-
   var isRendered = false;
 
   var comuni = [];
@@ -39,18 +38,29 @@ var SearchTools = (function() {
   var searchLayers = [];
 
   var init = function init() {
+    Handlebars.registerHelper("hasLayers", function(options) {
+      debugger;
+      //return searchLayers.length > 0;
+      return true;
+    });
+
     try {
       M.AutoInit();
-      $('.dropdown-trigger').dropdown();
+      $(".dropdown-trigger").dropdown();
     } catch (e) {
-
     } finally {
-
     }
-  }
+  };
 
-  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
-
+  var render = function(
+    div,
+    provider,
+    providerAddressUrl,
+    providerAddressField,
+    providerHouseNumberUrl,
+    providerHouseNumberField,
+    layers
+  ) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -60,29 +70,27 @@ var SearchTools = (function() {
         searchHouseNumberProviderField = providerHouseNumberField;
 
         var templateTemp = templateSearchWMSG();
-        var output = templateTemp();
+        var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         break;
       case "nominatim":
       default:
         var templateTemp = templateSearchNM();
-        var output = templateTemp();
+        var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
     }
-
 
     updateScroll(220);
     $(window).resize(function() {
       updateScroll(20);
     });
 
-
     if (!isRendered) {
       init();
     }
 
     isRendered = true;
-  }
+  };
 
   /**
    * Aggiorna la dimensione dello scroll dei contenuti
@@ -91,154 +99,179 @@ var SearchTools = (function() {
   var updateScroll = function(offset) {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#search-tools__search-results").offset();
-    $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
-  }
+    $("#search-tools__search-results").height(
+      positionMenu.top - positionSearch.top - offset
+    );
+  };
 
   var updateComuniNM = function(comuni) {
-
     $.each(comuni, function(i, comune) {
       var nomeComune = comune.nomeComune;
       if (nomeComune) {
-        nomeComune = nomeComune.replace(/_/g, ' ');
+        nomeComune = nomeComune.replace(/_/g, " ");
         if (nomeComune.indexOf("Reggio") >= 0) {
           nomeComune = nomeComune.replace("nell Emilia", "nell'Emilia");
         }
       }
-      $('#search-tools__comune').append($('<option>', {
-        value: comune.istat,
-        text: nomeComune
-      }));
+      $("#search-tools__comune").append(
+        $("<option>", {
+          value: comune.istat,
+          text: nomeComune
+        })
+      );
     });
-  }
-
+  };
 
   var templateMenuString = function() {
     template = '<div class="al-bar">';
-    template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+    template +=
+      '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
-    template += '</div>';
+    template += "</div>";
     template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
-    template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
-    template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
-    template += '</ul>';
+    template +=
+      '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
+    template += "{{#if this.length}}";
+    template +=
+      '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
+    template += "{{/if}}";
+    template += "</ul>";
     return template;
-  }
+  };
 
   var templateMenuLayers = function() {
     searchLayers = searchLayers.sort(SortByLayerName);
-    var template = '<div id="search-tools__layers" class="al-card z-depth-2" style="display:none;">';
+    var template =
+      '<div id="search-tools__layers" class="al-card z-depth-2" style="display:none;">';
     template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
-      template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + '</option>';
+      template +=
+        '<option value="' +
+        searchLayers[i].layer +
+        '">' +
+        searchLayers[i].layerName +
+        "</option>";
     }
-    template += '</select>';
+    template += "</select>";
     template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-layers-field" class="input-field" >';
-    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
-    template += '<label class="input-field" for="search-tools__search-layers">Layers...</label>';
-    template += '</div>';
-    template += '</div>';
+    template +=
+      '<div id="search-tools__search-layers-field" class="input-field" >';
+    template +=
+      '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
+    template +=
+      '<label class="input-field" for="search-tools__search-layers">Layers...</label>';
+    template += "</div>";
+    template += "</div>";
     return template;
-  }
+  };
 
   var templateSearchNM = function() {
-    template = '';
+    template = "";
     //pannello ricerca via
     template += '<h4 class="al-title">Ricerca</h4>';
     template += templateMenuString();
     template += '<div id="search-tools__address" class="al-card z-depth-2">';
     template += '<select id="search-tools__comune" class="input-field">';
-    template += '</select>';
+    template += "</select>";
     template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
-    template += '<label class="input-field" for="search-tools__search-via">Via...</label>';
-    template += '</div>';
-    template += '</div>';
+    template +=
+      '<div id="search-tools__search-via-field" class="input-field" >';
+    template +=
+      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
+    template +=
+      '<label class="input-field" for="search-tools__search-via">Via...</label>';
+    template += "</div>";
+    template += "</div>";
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
-    template += '</div>';
+    template +=
+      '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
+    template += "</div>";
     return Handlebars.compile(template);
-  }
-
+  };
 
   var templateSearchWMSG = function() {
-    template = '';
+    template = "";
     //pannello ricerca via
     template += '<h4 class="al-title">Ricerca</h4>';
     template += templateMenuString();
     template += '<div id="search-tools__address" class="al-card z-depth-2">';
-    template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
-    template += '<label class="input-field" for="search-tools__search-via">Via...</label>';
-    template += '</div>';
-    template += '</div>';
+    template +=
+      '<div id="search-tools__search-via-field" class="input-field" >';
+    template +=
+      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
+    template +=
+      '<label class="input-field" for="search-tools__search-via">Via...</label>';
+    template += "</div>";
+    template += "</div>";
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
-    template += '</div>';
+    template +=
+      '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
+    template += "</div>";
     return Handlebars.compile(template);
-  }
+  };
 
   var templateSearchResultsNM = function(results) {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
-    template += '{{#each this}}';
+    template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNM({{{@index}}});return false">';
-    template += '{{{display_name}}}';
+    template +=
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNM({{{@index}}});return false">';
+    template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
-    template += '{{/each}}';
+    template += "{{/each}}";
     template += "</ul>";
     return Handlebars.compile(template);
-  }
+  };
 
   var templateSearchResultsWMSG = function(results) {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
-    template += '{{#each this}}';
+    template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
-    template += '{{{display_name}}} ';
-    template += '{{{display_name2}}} ';
+    template +=
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
+    template += "{{{display_name}}} ";
+    template += "{{{display_name2}}} ";
     template += "</a>";
     template += "</li>";
-    template += '{{/each}}';
+    template += "{{/each}}";
     template += "</ul>";
     return Handlebars.compile(template);
-  }
+  };
 
   var templateSearchResultsLayers = function(results) {
     template = '<ul class="mdl-list">';
-    template += '{{#each this}}';
+    template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
-    template += '{{{display_name}}}';
+    template +=
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
+    template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
-    template += '{{/each}}';
+    template += "{{/each}}";
     template += "</ul>";
     return Handlebars.compile(template);
-  }
+  };
 
   var templateResultEmpty = function(results) {
-    var template = '<p>Nessun risultato disponibile</p>';
+    var template = "<p>Nessun risultato disponibile</p>";
     return Handlebars.compile(template);
-  }
+  };
 
   var showSearchAddress = function() {
     $("#search-tools__label").text("Indirizzo");
     $("#search-tools__address").show();
     $("#search-tools__layers").hide();
-  }
+  };
 
   var showSearchLayers = function() {
     $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
     $("#search-tools__layers").show();
-  }
-
+  };
 
   var zoomToItemNM = function(index) {
     var payload = {};
@@ -256,7 +289,7 @@ var SearchTools = (function() {
     payload = {};
     payload.eventName = "hide-menu-mobile";
     dispatch(payload);
-  }
+  };
 
   var zoomToItemWMSG = function(lon, lat) {
     var payload = {};
@@ -277,8 +310,7 @@ var SearchTools = (function() {
     payload = {};
     payload.eventName = "hide-menu-mobile";
     dispatch(payload);
-
-  }
+  };
 
   var zoomToItemLayer = function(lon, lat, index) {
     var payload = {};
@@ -291,7 +323,7 @@ var SearchTools = (function() {
       payload.geometry = searchResults[index].item.geometry;
       dispatch(payload);
       Dispatcher.dispatch({
-        eventName: 'show-info-item',
+        eventName: "show-info-item",
         data: searchResults[index].item
       });
       payload = {};
@@ -306,7 +338,6 @@ var SearchTools = (function() {
       payload = {};
       payload.eventName = "hide-menu-mobile";
       dispatch(payload);
-
     } else {
       payload = {};
       payload.eventName = "zoom-lon-lat";
@@ -321,18 +352,16 @@ var SearchTools = (function() {
       payload = {};
       payload.eventName = "hide-menu-mobile";
       dispatch(payload);
-
     }
-
-  }
+  };
 
   var getRegioneFromComuneNM = function(idcomune) {
     return "Emilia-Romagna";
-  }
+  };
 
   var searchAddressNM = function(ev) {
     if (ev.keyCode == 13) {
-      $("#search-tools__search-via").blur()
+      $("#search-tools__search-via").blur();
     }
     var comune = $("#search-tools__comune option:selected").text();
     var idcomune = $("#search-tools__comune option:selected").val();
@@ -341,57 +370,64 @@ var SearchTools = (function() {
 
     if (via.length > 3 && comune) {
       via = via.replace("'", " ");
-      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
+      var url =
+        "http://nominatim.openstreetmap.org/search/IT/" +
+        regione +
+        "/" +
+        comune +
+        "/" +
+        via +
+        "?format=jsonv2&addressdetails=1" +
+        "&";
       console.log(url);
       currentSearchDate = new Date().getTime();
       var searchDate = new Date().getTime();
       $.ajax({
         dataType: "json",
-        url: url,
-      }).done(function(data) {
-        //verifica che la ricerca sia ancora valida
-        if (currentSearchDate > searchDate) {
-          return;
-        }
-        var results = [];
-        if (data.length > 0) {
-          for (var i = 0; i < data.length; i++) {
-            if (data[i].osm_type == 'way') {
-              results.push(data[i]);
-            }
+        url: url
+      })
+        .done(function(data) {
+          //verifica che la ricerca sia ancora valida
+          if (currentSearchDate > searchDate) {
+            return;
           }
-          searchResults = results;
-          //renderizzo i risultati
+          var results = [];
+          if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+              if (data[i].osm_type == "way") {
+                results.push(data[i]);
+              }
+            }
+            searchResults = results;
+            //renderizzo i risultati
 
-          var templateTemp = templateSearchResultsNM();
-          var output = templateTemp(results);
-          jQuery("#search-tools__search-results").html(output);
-        } else {
-          var templateTemp = templateResultEmpty();
-          var output = templateTemp();
-          jQuery("#search-tools__search-results").html(output);
-        }
-
-      }).fail(function(data) {
-        dispatch({
-          eventName: "log",
-          message: "SearchTools: unable to bind comuni"
+            var templateTemp = templateSearchResultsNM();
+            var output = templateTemp(results);
+            jQuery("#search-tools__search-results").html(output);
+          } else {
+            var templateTemp = templateResultEmpty();
+            var output = templateTemp();
+            jQuery("#search-tools__search-results").html(output);
+          }
         })
-      });
+        .fail(function(data) {
+          dispatch({
+            eventName: "log",
+            message: "SearchTools: unable to bind comuni"
+          });
+        });
     }
-  }
-
+  };
 
   var searchAddressWMSG = function(ev) {
-
     if (ev.keyCode == 13) {
-      $("#search-tools__search-via").blur()
+      $("#search-tools__search-via").blur();
     }
     var via = $("#search-tools__search-via").val();
-    var cql = '';
-    var arrTerms = via.split(' ');
-    var street = '';
-    var civico = '';
+    var cql = "";
+    var arrTerms = via.split(" ");
+    var street = "";
+    var civico = "";
 
     if (via.indexOf(",") > -1) {
       var viaArr = via.split(",");
@@ -401,12 +437,12 @@ var SearchTools = (function() {
       for (var i = 0; i < arrTerms.length; i++) {
         //verifica dei civici e dei barrati
         if (isNaN(arrTerms[i])) {
-          if (arrTerms[i].indexOf('/') > -1) {
+          if (arrTerms[i].indexOf("/") > -1) {
             civico += arrTerms[i];
           } else if (arrTerms[i].length === 1) {
             civico += arrTerms[i];
           } else {
-            street += arrTerms[i] + ' ';
+            street += arrTerms[i] + " ";
           }
         } else {
           if (i === 0) {
@@ -421,12 +457,25 @@ var SearchTools = (function() {
     var url = searchAddressProviderUrl;
     if (!civico) {
       //solo ricerca via
-      url += "&cql_filter=[" + searchAddressProviderField + "]ilike%27%25" + street.trim() + "%25%27";
+      url +=
+        "&cql_filter=[" +
+        searchAddressProviderField +
+        "]ilike%27%25" +
+        street.trim() +
+        "%25%27";
     } else {
       //ricerca via e civico
       var url = searchHouseNumberProviderUrl;
-      url += "&cql_filter=" + searchAddressProviderField + "%20ilike%20%27%25" + street.trim() + "%25%27%20AND%20" + searchHouseNumberProviderField + "%20ILIKE%20%27" + civico + "%25%27"
-
+      url +=
+        "&cql_filter=" +
+        searchAddressProviderField +
+        "%20ilike%20%27%25" +
+        street.trim() +
+        "%25%27%20AND%20" +
+        searchHouseNumberProviderField +
+        "%20ILIKE%20%27" +
+        civico +
+        "%25%27";
     }
 
     if (via.length > 2) {
@@ -448,29 +497,36 @@ var SearchTools = (function() {
             var toponimi = [];
             var results = [];
             for (var i = 0; i < data.features.length; i++) {
-              var currentAddress = data.features[i].properties[searchAddressProviderField];
+              var currentAddress =
+                data.features[i].properties[searchAddressProviderField];
               if (data.features[i].properties[searchHouseNumberProviderField]) {
-                currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
+                currentAddress =
+                  " " +
+                  data.features[i].properties[searchHouseNumberProviderField];
               }
               if ($.inArray(currentAddress, toponimi) === -1) {
                 var cent = null;
-                if (data.features[i].geometry.type != 'POINT') {
+                if (data.features[i].geometry.type != "POINT") {
                   cent = centroid(data.features[i].geometry.coordinates);
                 } else {
                   cent = data.features[i].geometry.coordinates;
                 }
 
                 var tempItem = {
-                  display_name: data.features[i].properties[searchAddressProviderField],
+                  display_name:
+                    data.features[i].properties[searchAddressProviderField],
                   lon: cent[0],
                   lat: cent[1],
                   item: data.features[i]
-                }
+                };
                 if (searchHouseNumberProviderField) {
-                  tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
+                  tempItem.display_name2 =
+                    data.features[i].properties[searchHouseNumberProviderField];
                 }
                 results.push(tempItem);
-                toponimi.push(data.features[i].properties[searchAddressProviderField])
+                toponimi.push(
+                  data.features[i].properties[searchAddressProviderField]
+                );
               }
             }
             searchResults = results.sort(SortByDisplayName);
@@ -492,16 +548,14 @@ var SearchTools = (function() {
         }
       });
     }
-  }
-
-
+  };
 
   var searchLayers = function(ev) {
     if (ev.keyCode == 13) {
-      $("#search-tools__search-layers").blur()
+      $("#search-tools__search-layers").blur();
     }
     var itemStr = $("#search-tools__search-layers").val();
-    var cql = '';
+    var cql = "";
     //ricavo l'elenco dei layer da interrogare
     currentSearchDate = new Date().getTime();
     var searchDate = new Date().getTime();
@@ -513,7 +567,15 @@ var SearchTools = (function() {
         if (searchLayers[li].layer == currentLayer) {
           var layer = searchLayers[li];
           var url = layer.mapUri; //https://geoserver.comune.re.it/geoserver/geo_re/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geo_re:SIT_ARCHISTRADE&maxFeatures=50&outputFormat=text%2Fjavascript
-          url = url.replace("/wms", "/") + "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + layer.layer + "&maxFeatures=50&outputFormat=text%2Fjavascript&cql_filter=[" + layer.searchField + "]ilike%27%25" + itemStr.trim() + "%25%27";
+          url =
+            url.replace("/wms", "/") +
+            "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" +
+            layer.layer +
+            "&maxFeatures=50&outputFormat=text%2Fjavascript&cql_filter=[" +
+            layer.searchField +
+            "]ilike%27%25" +
+            itemStr.trim() +
+            "%25%27";
           itemStr = itemStr.replace("'", " ");
 
           $.ajax({
@@ -531,7 +593,12 @@ var SearchTools = (function() {
                 var resultsIndex = [];
                 var results = [];
                 for (var i = 0; i < data.features.length; i++) {
-                  if ($.inArray(data.features[i].properties[layer.searchField], resultsIndex) === -1) {
+                  if (
+                    $.inArray(
+                      data.features[i].properties[layer.searchField],
+                      resultsIndex
+                    ) === -1
+                  ) {
                     var cent = null;
                     if (data.features[i].geometry.coordinates[0][0]) {
                       cent = centroid(data.features[i].geometry.coordinates[0]);
@@ -543,12 +610,15 @@ var SearchTools = (function() {
                     item.crs = data.crs;
                     //item.id = currentLayer;
                     results.push({
-                      display_name: data.features[i].properties[layer.searchField],
+                      display_name:
+                        data.features[i].properties[layer.searchField],
                       lon: cent[0],
                       lat: cent[1],
                       item: item
                     });
-                    resultsIndex.push(data.features[i].properties[layer.searchField])
+                    resultsIndex.push(
+                      data.features[i].properties[layer.searchField]
+                    );
                   }
                 }
                 searchResults = results.sort(SortByDisplayName);
@@ -573,7 +643,7 @@ var SearchTools = (function() {
         }
       }
     }
-  }
+  };
 
   /**
    * Mostra dei risultati generici ricavati ad esempio da un reverseGeocoding
@@ -600,12 +670,13 @@ var SearchTools = (function() {
           item.crs = data.crs;
           //item.id = currentLayer;
           results.push({
-            display_name: layer.layerName + "-" + data[i].properties[layer.labelField],
+            display_name:
+              layer.layerName + "-" + data[i].properties[layer.labelField],
             lon: cent[0],
             lat: cent[1],
             item: item
           });
-          resultsIndex.push(data[i].properties[layer.labelField])
+          resultsIndex.push(data[i].properties[layer.labelField]);
         }
       }
       searchResults = results;
@@ -619,24 +690,22 @@ var SearchTools = (function() {
       var output = templateTemp();
       jQuery("#search-tools__search-results").html(output);
     }
+  };
 
-
-  }
-
-  var selectLayer = function(layer){
-      $("#search-tools__select-layers").val(layer);
-  }
+  var selectLayer = function(layer) {
+    $("#search-tools__select-layers").val(layer);
+  };
 
   function SortByDisplayName(a, b) {
     var aName = a.display_name.toLowerCase();
     var bName = b.display_name.toLowerCase();
-    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+    return aName < bName ? -1 : aName > bName ? 1 : 0;
   }
 
   function SortByLayerName(a, b) {
     var aName = a.layerName.toLowerCase();
     var bName = b.layerName.toLowerCase();
-    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+    return aName < bName ? -1 : aName > bName ? 1 : 0;
   }
 
   function centroid(lonlats) {
@@ -645,18 +714,18 @@ var SearchTools = (function() {
     var lonDegreesTotal = 0;
 
     var currentLatLong;
-    for (var i = 0; currentLatLong = lonlats[i]; i++) {
+    for (var i = 0; (currentLatLong = lonlats[i]); i++) {
       var latDegrees = currentLatLong[1];
       var lonDegrees = currentLatLong[0];
 
-      var latRadians = Math.PI * latDegrees / 180;
+      var latRadians = (Math.PI * latDegrees) / 180;
       latXTotal += Math.cos(latRadians);
       latYTotal += Math.sin(latRadians);
 
       lonDegreesTotal += lonDegrees;
     }
     var finalLatRadians = Math.atan2(latYTotal, latXTotal);
-    var finalLatDegrees = finalLatRadians * 180 / Math.PI;
+    var finalLatDegrees = (finalLatRadians * 180) / Math.PI;
     var finalLonDegrees = lonDegreesTotal / lonlats.length;
     return [finalLonDegrees, finalLatDegrees];
   }
@@ -677,5 +746,4 @@ var SearchTools = (function() {
     zoomToItemWMSG: zoomToItemWMSG,
     zoomToItemLayer: zoomToItemLayer
   };
-
-}());
+})();

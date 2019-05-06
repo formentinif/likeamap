@@ -34,6 +34,10 @@ var AppStore = (function() {
   var panelContentItemSelected = "";
 
   var init = function() {
+    //normalizing appstate
+    if(!appState.currentInfoItems){
+      appState.currentInfoItems = [];
+    }
     //Comuni array load
     if (appState.searchProvider == "nominatim") {
       var url = appState.restAPIUrl + "/api/comuni";
@@ -173,7 +177,7 @@ var AppStore = (function() {
     } else {
       data = data.features;
     }
-    this.appState.currentInfoItems = data;
+    AppStore.getAppState().currentInfoItems = data;
     if (data.length > 0) {
       title += " (" + data.length + ")";
     }
@@ -694,8 +698,9 @@ var AppStore = (function() {
   };
 
   var doLogin = function(username, password) {
-    switch (appState.authentication) {
+    switch (appState.authentication.authType) {
       case "anonymous":
+        AuthTools.hideLogin();
         break;
       case "basic":
         //adding the base64 token

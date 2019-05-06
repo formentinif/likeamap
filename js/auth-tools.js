@@ -60,7 +60,7 @@ var AuthTools = (function() {
     template += "    </div>";
     template += '    <div id="al-error-message" class="al-hidden al-error">Autenticazione non riuscita</div>';
 
-    template += '  <button onclick="AuthTools.login();return false" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Accedi</button>';
+    template += '  <button onclick="AuthTools.login();return false" class="waves-effect waves-light btn">Accedi</button>';
     template += "  </form>";
     template += "</div>";
 

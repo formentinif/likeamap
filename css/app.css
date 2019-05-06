@@ -366,6 +366,7 @@ body {
   border-radius: 1rem;
 }
 
+/*layers*/
 .layertree-list-group {
   margin: 0px;
   padding: 0px;
@@ -403,7 +404,7 @@ body {
 }
 
 .layertree-hidden {
-  transition: opacity 0.4s, max-height 0.4s ease-out;
+  /*transition: opacity 0.4s, max-height 0.4s ease-out;*/
   opacity: 0.5;
   max-height: 0px;
   overflow: hidden;
@@ -415,6 +416,30 @@ body {
   max-height: 900px;
 }
 
+/*layers arguments*/
+.layertree-argument__groups {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.layertree-argument__group-item{
+  order: 0;
+  flex: 1 1; 
+}
+
+.layertree-argument__group-item-text{
+  display: inline-block;
+  margin-top: 0.5em;
+  color:rgba(0, 0, 0, 0.60);
+  font-weight: 500;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/*dividers*/
 .div-5 {
   width: 100%;
   display: block;
@@ -431,6 +456,12 @@ body {
   width: 100%;
   display: block;
   height: 20px;
+}
+
+.div-30 {
+  width: 100%;
+  display: block;
+  height: 30px;
 }
 
 .div-halfp {
