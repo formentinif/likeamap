@@ -39,7 +39,6 @@ var SearchTools = (function() {
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function(options) {
-      debugger;
       //return searchLayers.length > 0;
       return true;
     });
@@ -318,11 +317,11 @@ var SearchTools = (function() {
     payload.wkt = wkt;
     dispatch(payload);
     if (searchResults[index]) {
-      payload = {};
-      payload.eventName = "zoom-geometry";
-      payload.geometry = searchResults[index].item.geometry;
-      dispatch(payload);
-      Dispatcher.dispatch({
+      dispatch({
+        eventName: "zoom-geometry",
+        geometry: searchResults[index].item.geometry
+      });
+      dispatch({
         eventName: "show-info-item",
         data: searchResults[index].item
       });
@@ -603,7 +602,7 @@ var SearchTools = (function() {
                     if (data.features[i].geometry.coordinates[0][0]) {
                       cent = centroid(data.features[i].geometry.coordinates[0]);
                     } else {
-                      cent = centroid(data.features[i].geometry.coordinates);
+                      cent = data.features[i].geometry.coordinates;
                     }
                     var item = data.features[i];
                     //salvo il crs della feature
@@ -623,7 +622,6 @@ var SearchTools = (function() {
                 }
                 searchResults = results.sort(SortByDisplayName);
                 //renderizzo i risultati
-
                 var templateTemp = templateSearchResultsLayers();
                 var output = templateTemp(results);
                 jQuery("#search-tools__search-results").append(output);
@@ -681,7 +679,6 @@ var SearchTools = (function() {
       }
       searchResults = results;
       //renderizzo i risultati
-
       var templateTemp = templateSearchResultsLayers();
       var output = templateTemp(results);
       jQuery("#search-tools__search-results").html(output);

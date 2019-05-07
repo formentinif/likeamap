@@ -122,13 +122,17 @@ var LayerTree = (function() {
     template +=
       '<ul id="ltgu{{@index}}" class="layertree-list-group layertree-{{visible visible}}">';
     template += "{{#each layers}}";
+    template += '<li class="layertree-list-group-item">';
     template +=
-      '<li class="layertree-list-group-item"><span class="layertree-span layertree-selected">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
-    template += "<span>{{layerName}}</span>";
+      '<div class="layertree-list-group-item__title layertree-selected">';
+    template += "{{layerName}}";
+    template += "</div>";
+    template += '<div class="layertree-list-group-item__icons">';
     template +=
-      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
+      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info " onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
     template +=
-      '<i title="Mostra/Nascondi layer" id="lti2{{@../index}}{{@index}}" class="far {{checksquarefa visible}} fa-lg fa-fw layertree-icon fa-pull-right " onclick="LayerTree.toggleCheck(\'lti2{{@../index}}{{@index}}\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{{gid}}\' })"></i></span>';
+      '<i title="Mostra/Nascondi layer" id="lti2{{@../index}}{{@index}}" class="far {{checksquarefa visible}} fa-lg layertree-icon fa-pull-right " onclick="LayerTree.toggleCheck(\'lti2{{@../index}}{{@index}}\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{{gid}}\' })"></i></span>';
+    template += "</div>";
     template += "</li>";
     template += "{{/each}}";
     template += "</ul>";

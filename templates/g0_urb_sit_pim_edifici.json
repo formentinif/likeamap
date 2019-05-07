@@ -1,0 +1,48 @@
+{
+  "title": "Edifici",
+  "layer": "SIT_PIM:URB_SIT_PIM_EDIFICI",
+  "layerGid": "g0_urb_sit_pim_edifici",
+  "templateType": "simple",
+  "fields": [
+    {
+      "field": "ID_EDIFI_1",
+      "label": "Codice Edificio",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ID_DBTR",
+      "label": "Codice Edificio DBTR",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "STATO",
+      "label": "Stato",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "ORIG_DATO",
+      "label": "Origine",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "USE_S",
+      "label": "Uso",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

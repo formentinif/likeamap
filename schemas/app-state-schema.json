@@ -180,7 +180,15 @@
           "type": "boolean"
         }
       },
-      "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
+      "required": [
+        "layer-tree",
+        "search-tools",
+        "print-tools",
+        "share-tools",
+        "map-tools",
+        "draw-tools",
+        "gps-tools"
+      ]
     },
     "selectedInfoItems": {
       "description": "Elenco delle feature correntemente selezionate sulla mappa",
@@ -220,6 +228,32 @@
             "description": "Visibilità iniziale in mappa",
             "enum": [0, 1],
             "type": "integer"
+          },
+          "color": {
+            "title": "Colore del gruppo",
+            "description": "Colore del gruppo. Possono essere inserite classi css come i colori forniti da materialize",
+            "enum": [
+              "red",
+              "pink",
+              "purple",
+              "deep-purple",
+              "blue",
+              "light-blue",
+              "cyan",
+              "teal",
+              "green",
+              "light-green",
+              "lime",
+              "yellow",
+              "amber",
+              "orange",
+              "deep-orange",
+              "brown",
+              "grey",
+              "blue-grey",
+              "black"
+            ],
+            "type": "string"
           },
           "layers": {
             "title": "Livelli",
@@ -362,5 +396,13 @@
       }
     }
   },
-  "required": ["restAPIUrl", "title", "startMapLon", "startMapLat", "startMapZoom", "modules", "layers"]
+  "required": [
+    "restAPIUrl",
+    "title",
+    "startMapLon",
+    "startMapLat",
+    "startMapZoom",
+    "modules",
+    "layers"
+  ]
 }

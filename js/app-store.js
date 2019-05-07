@@ -35,7 +35,7 @@ var AppStore = (function() {
 
   var init = function() {
     //normalizing appstate
-    if(!appState.currentInfoItems){
+    if (!appState.currentInfoItems) {
       appState.currentInfoItems = [];
     }
     //Comuni array load
@@ -182,19 +182,108 @@ var AppStore = (function() {
       title += " (" + data.length + ")";
     }
     for (var i = 0; i < data.length; i++) {
-      var props = data[i].properties;
-      var layerids = data[i].id.split(".");
-      //var layerid = layerids[0];
-      var tempBody = AppTemplates.processTemplate(data[i].layerGid, props);
+      var props = data[i].properties ? data[i].properties : data[i];
+      var template = AppTemplates.getTemplate(
+        data[i].layerGid,
+        data[i].templateUri,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
+      var tempBody = AppTemplates.processTemplate(template, props);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props);
       }
+      //sezione relations
+      var layerRelations = AppStore.getRelations().filter(function(relation) {
+        return relation.layerGid === data[i].layerGid;
+      });
+      tempBody += AppTemplates.relationsTemplate(layerRelations, props, i);
+
       if (data.length > 0) {
         tempBody += "<div class='div-20'/>";
       }
       body += tempBody;
     }
     this.showInfoWindow(title, body);
+  };
+
+  var showRelation = function(relationGid, resultIndex) {
+    debugger;
+    var item = AppStore.getCurrentInfoItems()[resultIndex];
+    var relation = AppStore.getRelation(relationGid);
+    var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
+    var urlService = templateUrl(item.properties);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUri,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
+
+    $.ajax({
+      dataType: "jsonp",
+      url: urlService,
+      jsonp: true,
+      jsonpCallback: "parseResponse",
+      success: function(data) {
+        if (data.features) {
+          data = data.features;
+        }
+        var title = "Relations";
+        var body = "";
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
+        for (let i = 0; i < data.length; i++) {
+          var props = data[i].properties ? data[i].properties : data[i];
+          body += AppTemplates.processTemplate(template, props);
+          if (!body) {
+            body += AppTemplates.standardTemplate(props);
+          }
+          if (data.length > 1) {
+            body += "<div class='div-20'></div>";
+          }
+        }
+        AppStore.showInfoWindow(title, body);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        dispatch({
+          eventName: "log",
+          message: "SearchTools: unable to complete response"
+        });
+      }
+    });
+
+    /*
+    var ajaxRelationRequest = function() {
+      var deferred = Q.defer();
+      $.get(urlService, "", deferred.resolve);
+      return deferred.promise;
+    };
+    ajaxRelationRequest()
+      .then(function(data) {
+        debugger;
+        var title = "Relations";
+        var body = "";
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
+        for (let i = 0; i < data.length; i++) {
+          body += AppTemplates.processTemplate(template, data[i]);
+          if (!body) {
+            body += AppTemplates.standardTemplate(props);
+          }
+          if (data.length > 1) {
+            body += "<div class='div-20'></div>";
+          }
+        }
+        AppStore.showInfoWindow(title, body);
+      })
+      .fail(function() {
+        dispatch({
+          eventName: "log",
+          message: "AppStore: show-relation" + err
+        });
+      });
+      */
   };
 
   var showInfoWindow = function(title, body) {
@@ -337,7 +426,12 @@ var AppStore = (function() {
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
           if (appState.layers[i].layers[ki].layer) {
-            if ($.inArray(layerName, appState.layers[i].layers[ki].layer.split(":")) >= 0) {
+            if (
+              $.inArray(
+                layerName,
+                appState.layers[i].layers[ki].layer.split(":")
+              ) >= 0
+            ) {
               return appState.layers[i].layers[ki];
             }
           }
@@ -361,10 +455,18 @@ var AppStore = (function() {
     //layers
     var qLayers = "";
     for (var i = 0; i < appState.layers.length; i++) {
-      qLayers += appState.layers[i].gid + ":" + parseInt(appState.layers[i].visible) + ",";
+      qLayers +=
+        appState.layers[i].gid +
+        ":" +
+        parseInt(appState.layers[i].visible) +
+        ",";
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          qLayers += appState.layers[i].layers[ki].gid + ":" + parseInt(appState.layers[i].layers[ki].visible) + ",";
+          qLayers +=
+            appState.layers[i].layers[ki].gid +
+            ":" +
+            parseInt(appState.layers[i].layers[ki].visible) +
+            ",";
         }
       }
     }
@@ -415,7 +517,9 @@ var AppStore = (function() {
     var centerLL = MainMap.getPrintCenterLonLat();
     //La scala viene ricalcolata in base ad un parametero di conversione locale
     //Questa parte è tutta rivedere
-    var scale = PrintTools.getScale() * MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+    var scale =
+      PrintTools.getScale() *
+      MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
 
     //
     appState.printCenterX = center[0];
@@ -452,7 +556,11 @@ var AppStore = (function() {
   var createShareUrl = function() {
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
     var centerMap = MainMap.getMapCenter();
-    centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:900913", "EPSG:4326");
+    centerMap = ol.proj.transform(
+      [centerMap[0], centerMap[1]],
+      "EPSG:900913",
+      "EPSG:4326"
+    );
 
     appState.mapLon = centerMap[0];
     appState.mapLat = centerMap[1];
@@ -493,25 +601,24 @@ var AppStore = (function() {
    * @param  {[type]} url        parte dell'url da chiamare. La radice dell'url è sempre il sito attuale.
    * @param  {[type]} templateId id del template da richiamare per maggiori informazioni.
    * @return {null}            La funzione non restituisce un valore ma una promise
-   */
+   
   var showMoreInfo = function(gid, url, layerGid) {
     //costruisco l'url da richiemare
     var urlArray = location.href.split("/");
     var baseUrl = urlArray[2];
-    var urlService = "http://" + baseUrl.replace("#", "") + "/" + url + "/" + gid;
-
+    var urlService =
+      "http://" + baseUrl.replace("#", "") + "/" + url + "/" + gid;
     //invio la richiesta
     var moreInfo = function() {
       var deferred = Q.defer();
       $.get(urlService, "", deferred.resolve);
       return deferred.promise;
     };
-
     moreInfo()
       .then(function(data) {
         var title = "Informazioni aggiuntive";
         var body = "";
-        body = AppTemplates.processTemplate(layerGid, data);
+        body = AppTemplates.processTemplate(template, data);
         if (!body) {
           body = AppTemplates.standardTemplate(props);
         }
@@ -524,6 +631,7 @@ var AppStore = (function() {
         });
       });
   };
+ */
 
   var dragElement = function(elmnt) {
     var pos1 = 0,
@@ -704,12 +812,19 @@ var AppStore = (function() {
         break;
       case "basic":
         //adding the base64 token
-        appState.authentication.authToken = window.btoa(username + ":" + password);
+        appState.authentication.authToken = window.btoa(
+          username + ":" + password
+        );
         AuthTools.hideLogin();
         break;
       case "custom":
         //TODO implement custom auth url ancd object
-        var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
+        var url =
+          getAppState().restAPIUrl +
+          "/api/auth?username=" +
+          username +
+          "&password=" +
+          password;
         $.ajax({
           dataType: "json",
           url: url
@@ -749,6 +864,13 @@ var AppStore = (function() {
     return appState.relations;
   };
 
+  var getRelation = function(gid) {
+    let relationResult = appState.relations.filter(function(el) {
+      return el.gid == gid;
+    });
+    return relationResult[0];
+  };
+
   var getAuthorizationHeader = function() {
     switch (appstate.authentication.authType) {
       case "basic":
@@ -758,6 +880,10 @@ var AppStore = (function() {
     }
   };
 
+  var getCurrentInfoItems = function() {
+    return AppStore.getAppState().currentInfoItems;
+  };
+
   return {
     createShareUrl: createShareUrl,
     doLogin: doLogin,
@@ -765,11 +891,13 @@ var AppStore = (function() {
     hideMenu: hideMenu,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
+    getCurrentInfoItems: getCurrentInfoItems,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
     getLayerByName: getLayerByName,
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,
+    getRelation: getRelation,
     isDrawing: isDrawing,
     isMobile: isMobile,
     mapInit: mapInit,
@@ -784,9 +912,10 @@ var AppStore = (function() {
     showInfoItem: showInfoItem,
     showInfoWindow: showInfoWindow,
     showAppTools: showAppTools,
+    showRelation: showRelation,
     toggleLoader: toggleLoader,
     resetInitialLayers: resetInitialLayers,
-    showMoreInfo: showMoreInfo,
+    //showMoreInfo: showMoreInfo,
     hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,
     toggleLayer: toggleLayer,

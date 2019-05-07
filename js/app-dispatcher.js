@@ -27,173 +27,178 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 //definizione e inizializzazione del Dispatcher
 var Dispatcher = (function() {
-
   var init = function functionName() {
-    this.bind('log', function(payload) {
-      console.log('log', payload);
+    this.bind("log", function(payload) {
+      console.log("log", payload);
     });
-    this.bind('show-menu', function(payload) {
+    this.bind("show-menu", function(payload) {
       AppStore.showMenu();
     });
-    this.bind('hide-menu', function(payload) {
+    this.bind("hide-menu", function(payload) {
       AppStore.hideMenu();
     });
-    this.bind('show-tool', function(payload) {
+    this.bind("show-tool", function(payload) {
       if (payload.tool == "layers") {
-        AppStore.showMenuContent('layer-tree');
+        AppStore.showMenuContent("layer-tree");
       }
       if (payload.tool.indexOf("print") > -1) {
-        AppStore.showMenuContent('print-tools');
+        AppStore.showMenuContent("print-tools");
       }
       if (payload.tool.indexOf("share") > -1) {
-        AppStore.showMenuContent('share-tools');
+        AppStore.showMenuContent("share-tools");
       }
       if (payload.tool.indexOf("map") > -1) {
-        AppStore.showMenuContent('map-tools');
+        AppStore.showMenuContent("map-tools");
       }
       if (payload.tool.indexOf("draw") > -1) {
-        AppStore.showMenuContent('draw-tools');
+        AppStore.showMenuContent("draw-tools");
       }
       if (payload.tool.indexOf("search") > -1) {
-        AppStore.showMenuContent('search-tools');
+        AppStore.showMenuContent("search-tools");
         //verifica dei layers
-        if(payload.tool.indexOf('search-layers') > -1){
-          var arrSearch = payload.tool.split(',');
-          setTimeout(function(){
-              SearchTools.showSearchLayers();
-              if(arrSearch.length>1){
-                SearchTools.selectLayer(arrSearch[1]);
-              }
+        if (payload.tool.indexOf("search-layers") > -1) {
+          var arrSearch = payload.tool.split(",");
+          setTimeout(function() {
+            SearchTools.showSearchLayers();
+            if (arrSearch.length > 1) {
+              SearchTools.selectLayer(arrSearch[1]);
+            }
           }, 1000);
         }
       }
     });
 
-    this.bind('show-layers', function(payload) {
-      AppStore.showMenuContent('layer-tree');
+    this.bind("show-layers", function(payload) {
+      AppStore.showMenuContent("layer-tree");
     });
-    this.bind('show-search', function(payload) {
-      AppStore.showMenuContent('search-tools');
+    this.bind("show-search", function(payload) {
+      AppStore.showMenuContent("search-tools");
     });
-    this.bind('show-print', function(payload) {
-      AppStore.showMenuContent('print-tools');
+    this.bind("show-print", function(payload) {
+      AppStore.showMenuContent("print-tools");
     });
-    this.bind('show-share', function(payload) {
-      AppStore.showMenuContent('share-tools');
+    this.bind("show-share", function(payload) {
+      AppStore.showMenuContent("share-tools");
     });
-    this.bind('show-map-tools', function(payload) {
-      AppStore.showMenuContent('map-tools');
+    this.bind("show-map-tools", function(payload) {
+      AppStore.showMenuContent("map-tools");
     });
-    this.bind('show-draw-tools', function(payload) {
-      AppStore.showMenuContent('draw-tools');
+    this.bind("show-draw-tools", function(payload) {
+      AppStore.showMenuContent("draw-tools");
     });
-    this.bind('show-editor', function(payload) {
+    this.bind("show-editor", function(payload) {
       EditorTools.showEditorWindow();
     });
-    this.bind('show-info-item', function(payload) {
+    this.bind("show-info-item", function(payload) {
       AppStore.showInfoItem(payload.data);
     });
-    this.bind('hide-menu-mobile', function(payload) {
+    this.bind("hide-menu-mobile", function(payload) {
       if (AppStore.isMobile()) {
         AppStore.hideMenu();
       }
     });
-    this.bind('hide-info-window', function(payload) {
+    this.bind("hide-info-window", function(payload) {
       AppStore.hideInfoWindow();
       MainMap.clearLayerInfo();
     });
-    this.bind('hide-editor-window', function(payload) {
+    this.bind("hide-editor-window", function(payload) {
       EditorTools.hideEditorWindow();
     });
 
-    this.bind('hide-loader', function(payload) {
+    this.bind("hide-loader", function(payload) {
       AppStore.toggleLoader(false);
     });
-    this.bind('show-loader', function(payload) {
+    this.bind("show-loader", function(payload) {
       AppStore.toggleLoader(true);
     });
 
-    this.bind('live-reload', function(payload) {
+    this.bind("live-reload", function(payload) {
       AppStore.liveReload(payload.appState);
     });
-    this.bind('show-legend', function(payload) {
+    this.bind("show-legend", function(payload) {
       AppStore.showLegend(payload.gid);
     });
-    this.bind('search-address', function(payload) {
+    this.bind("search-address", function(payload) {
       AppStore.searchAddress(payload.data, "AppStore.processAddress");
     });
-    this.bind('zoom-lon-lat', function(payload) {
+    this.bind("zoom-lon-lat", function(payload) {
       MainMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
-    this.bind('zoom-geometry', function(payload) {
+    this.bind("zoom-geometry", function(payload) {
       MainMap.goToGeometry(payload.geometry);
     });
-    this.bind('add-info-map', function(payload) {
+    this.bind("add-info-map", function(payload) {
       MainMap.addInfoToMap(payload.wkt);
     });
-    this.bind('add-feature-info-map', function(payload) {
+    this.bind("add-feature-info-map", function(payload) {
       MainMap.addFeatureInfoToMap(payload.geometry, payload.srid);
     });
-    this.bind('toggle-layer', function(payload) {
+    this.bind("toggle-layer", function(payload) {
       MainMap.toggleLayer(payload.gid);
       AppStore.toggleLayer(payload.gid);
     });
-    this.bind('set-layer-visibility', function(payload) {
+    this.bind("set-layer-visibility", function(payload) {
       MainMap.setLayerVisibility(payload.gid, payload.visibility);
       AppStore.setLayerVisibility(payload.gid, payload.visibility);
     });
-    this.bind('reset-layers', function(payload) {
+    this.bind("reset-layers", function(payload) {
       AppStore.resetInitialLayers();
     });
-    this.bind('print-map', function(payload) {
-      AppStore.printMap(payload.paper, payload.orientation, payload.format, payload.template);
+    this.bind("print-map", function(payload) {
+      AppStore.printMap(
+        payload.paper,
+        payload.orientation,
+        payload.format,
+        payload.template
+      );
     });
-    this.bind('create-share-url', function(payload) {
+    this.bind("create-share-url", function(payload) {
       AppStore.createShareUrl();
     });
-    this.bind('show-share-url-query', function(payload) {
+    this.bind("show-share-url-query", function(payload) {
       AppStore.createShareUrl();
       ShareTools.setShareUrlQuery(AppStore.writeUrlShare());
     });
-    this.bind('more-info', function(payload) {
-      AppStore.showMoreInfo(payload.gid, payload.url, payload.layerGid);
-    });
 
-    this.bind('stop-copy-coordinate', function(payload) {
+    //this.bind('more-info', function(payload) {
+    //  AppStore.showMoreInfo(payload.gid, payload.url, payload.layerGid);
+    //});
+
+    this.bind("stop-copy-coordinate", function(payload) {
       MainMap.stopCopyCoordinate();
     });
 
-    this.bind('start-copy-coordinate', function(payload) {
+    this.bind("start-copy-coordinate", function(payload) {
       MainMap.startCopyCoordinate();
     });
 
-    this.bind('map-click', function(payload) {
+    this.bind("map-click", function(payload) {
       MapTools.addCoordinate(payload.lon, payload.lat);
     });
 
-    this.bind('remove-info', function(payload) {
+    this.bind("remove-info", function(payload) {
       MainMap.clearLayerInfo();
     });
 
-    this.bind('add-info-point', function(payload) {
+    this.bind("add-info-point", function(payload) {
       MainMap.addInfoPoint(payload.lon, payload.lat);
     });
 
-    this.bind('init-map-app', function(payload) {
+    this.bind("init-map-app", function(payload) {
       appInit();
     });
 
-    this.bind('map-move-end', function(payload) {
+    this.bind("map-move-end", function(payload) {
       ShareTools.hideUrl();
       ShareTools.setShareUrlQuery(AppStore.writeUrlShare());
     });
 
-    this.bind('map-zoom-end', function(payload) {
+    this.bind("map-zoom-end", function(payload) {
       ShareTools.hideUrl();
       ShareTools.setShareUrlQuery(AppStore.writeUrlShare());
     });
 
-    this.bind('show-print-area', function(payload) {
+    this.bind("show-print-area", function(payload) {
       //ricavo posizione e risoluzione
       //Cerco il centro del rettangolo attuale di stampa o lo metto al centro della mappa
       var printCenter = MainMap.getPrintCenter();
@@ -212,53 +217,62 @@ var Dispatcher = (function() {
       }
       var paper = payload.paper;
       var orientation = payload.orientation;
-      var printSize = PrintTools.getPrintMapSize(paper, orientation, resolution);
+      var printSize = PrintTools.getPrintMapSize(
+        paper,
+        orientation,
+        resolution
+      );
 
-      MainMap.setPrintBox(printCenter[0], printCenter[1], printSize.width, printSize.height);
+      MainMap.setPrintBox(
+        printCenter[0],
+        printCenter[1],
+        printSize.width,
+        printSize.height
+      );
     });
 
-    this.bind('set-draw', function(payload) {
+    this.bind("set-draw", function(payload) {
       MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction()
+      MainMap.removeDrawDeleteInteraction();
       MainMap.addDrawInteraction(payload.type);
     });
 
-    this.bind('unset-draw', function(payload) {
+    this.bind("unset-draw", function(payload) {
       MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction()
+      MainMap.removeDrawDeleteInteraction();
     });
 
-    this.bind('set-draw-delete', function(payload) {
+    this.bind("set-draw-delete", function(payload) {
       MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction()
+      MainMap.removeDrawDeleteInteraction();
       MainMap.addDrawDeleteInteraction(payload.type);
     });
 
-    this.bind('delete-draw', function(payload) {
+    this.bind("delete-draw", function(payload) {
       MainMap.deleteDrawFeatures(payload.type);
     });
 
-    this.bind('do-login', function(payload) {
+    this.bind("do-login", function(payload) {
       AppStore.doLogin(payload.username, payload.password);
     });
 
-    this.bind('open-url-location', function(payload) {
+    this.bind("open-url-location", function(payload) {
       AppStore.openUrlTemplate(payload.urlTemplate);
     });
 
-    this.bind('reverse-geocoding', function(payload) {
+    this.bind("reverse-geocoding", function(payload) {
       //conversione coordinate
       MainMap.getRequestInfo(payload.coordinate, false);
     });
 
-    this.bind('show-reverse-geocoding-result', function(payload) {
+    this.bind("show-reverse-geocoding-result", function(payload) {
       //conversione coordinate
-      AppStore.showMenuContent('search-tools', true);
+      AppStore.showMenuContent("search-tools", true);
       SearchTools.showSearchLayers();
       SearchTools.displayGenericResults(payload.results);
     });
 
-    this.bind('log', function(payload) {
+    this.bind("log", function(payload) {
       if (console) {
         console.log(payload.str);
       }
@@ -266,23 +280,21 @@ var Dispatcher = (function() {
         alert(payload.str);
       }
     });
-  }
+  };
 
   var dispatch = function dispatch(payload) {
-    if (typeof(payload) == "string") {
+    if (typeof payload == "string") {
       payload = {
         eventName: payload
-      }
+      };
     }
     Dispatcher.trigger(payload.eventName, payload);
-  }
-
+  };
 
   return {
     dispatch: dispatch,
     init: init
   };
-
-}());
+})();
 MicroEvent.mixin(Dispatcher);
 Dispatcher.init();
