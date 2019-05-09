@@ -565,7 +565,7 @@ var SearchTools = (function() {
       for (li = 0; li < searchLayers.length; li++) {
         if (searchLayers[li].layer == currentLayer) {
           var layer = searchLayers[li];
-          var url = layer.mapUri; //https://geoserver.comune.re.it/geoserver/geo_re/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geo_re:SIT_ARCHISTRADE&maxFeatures=50&outputFormat=text%2Fjavascript
+          var url = layer.mapUri;
           url =
             url.replace("/wms", "/") +
             "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" +

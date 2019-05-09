@@ -767,6 +767,12 @@ var AppStore = (function() {
     MainMap.loadConfig(newAppState);
   };
 
+  var mapReload = function() {
+    LayerTree.render("layer-tree", appState.layers);
+    MainMap.removeAllLayersFromMap();
+    MainMap.loadConfig(appState);
+  };
+
   /**
    * Resetta i layer alla situazione iniziale
    * @return {null} Nessun valore restituito
@@ -817,6 +823,23 @@ var AppStore = (function() {
         );
         AuthTools.hideLogin();
         break;
+      case "form":
+        debugger;
+        var username = "";
+        var password = "";
+        $.ajax({
+          type: "POST",
+          url: "",
+          dataType: "html",
+          async: false,
+          data:
+            '{"username": "' + username + '", "password" : "' + password + '"}',
+          success: function() {
+            alert("Thanks for your comment!");
+          }
+        });
+        AuthTools.hideLogin();
+        break;
       case "custom":
         //TODO implement custom auth url ancd object
         var url =
@@ -844,6 +867,7 @@ var AppStore = (function() {
       default:
         break;
     }
+    mapReload();
   };
 
   var openUrlTemplate = function(urlTemplate) {
@@ -872,7 +896,7 @@ var AppStore = (function() {
   };
 
   var getAuthorizationHeader = function() {
-    switch (appstate.authentication.authType) {
+    switch (appState.authentication.authType) {
       case "basic":
         return "Basic " + appState.authentication.authToken;
       default:
@@ -901,6 +925,7 @@ var AppStore = (function() {
     isDrawing: isDrawing,
     isMobile: isMobile,
     mapInit: mapInit,
+    mapReload: mapReload,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
     printMap: printMap,

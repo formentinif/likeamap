@@ -257,7 +257,8 @@ var MainMap = (function() {
     zIndex,
     queryable,
     opacity,
-    attribution
+    attribution,
+    secured
   ) {
     /// <summary>
     /// Aggiunge un layer alla mappa
@@ -292,10 +293,10 @@ var MainMap = (function() {
         thisLayer = getLayerOCM();
         break;
       case "wms":
-        thisLayer = getLayerWMS(gid, uri, params, attribution);
+        thisLayer = getLayerWMS(gid, uri, params, attribution, secured);
         break;
       case "wmstiled":
-        thisLayer = getLayerWMSTiled(gid, uri, params, attribution);
+        thisLayer = getLayerWMSTiled(gid, uri, params, attribution, secured);
         break;
       case "tms": //TO DO implementare
         switch (tileMode.toLowerCase()) {
@@ -815,7 +816,8 @@ var MainMap = (function() {
         layer.zIndex,
         layer.queryable,
         layer.opacity,
-        layer.attribution
+        layer.attribution,
+        layer.secured
       );
       if (layer.layers) {
         addLayersToMap(layer.layers);
