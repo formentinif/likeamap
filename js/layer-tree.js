@@ -27,7 +27,8 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 var LayerTree = (function() {
   var isRendered = false;
-
+  var layerGroupItemPrefix = "ltgi";
+  var layerGroupItemIconPrefix = "ltgic";
   var init = function init() {
     Handlebars.registerHelper("visible", function(v1, options) {
       if (v1 === 1) {
@@ -62,14 +63,20 @@ var LayerTree = (function() {
   };
 
   var toggleCheck = function(item) {
-    if ($("#" + item).hasClass("fa-square")) {
-      $("#" + item).removeClass("fa-square");
-      $("#" + item).addClass("fa-check-square");
+    if ($("#" + layerGroupItemIconPrefix + item).hasClass("fa-square")) {
+      $("#" + layerGroupItemIconPrefix + item).removeClass("fa-square");
+      $("#" + layerGroupItemIconPrefix + item).addClass("fa-check-square");
+      $("#" + layerGroupItemPrefix + item).addClass(
+        "layertree-layers__item-selected"
+      );
       return;
     }
-    if ($("#" + item).hasClass("fa-check-square")) {
-      $("#" + item).removeClass("fa-check-square");
-      $("#" + item).addClass("fa-square");
+    if ($("#" + layerGroupItemIconPrefix + item).hasClass("fa-check-square")) {
+      $("#" + layerGroupItemIconPrefix + item).removeClass("fa-check-square");
+      $("#" + layerGroupItemIconPrefix + item).addClass("fa-square");
+      $("#" + layerGroupItemPrefix + item).removeClass(
+        "layertree-layers__item-selected"
+      );
       return;
     }
   };
@@ -99,29 +106,43 @@ var LayerTree = (function() {
 
   var template = function template() {
     var template = "";
-    template += '<h4 class="al-title">Temi</h4>';
+    if (!AppStore.getAppState().logoPanelUrl) {
+      template += '<h4 class="lk-title">Temi</h4>';
+    }
     template += '<div class="layertree-list">';
     template += "{{#each this}}";
     template += '<div class="layertree-list-group__item" >';
+
     template +=
-      '<div  class="layertree-group"><i id="ltgm{{@index}}" class="fas {{minussquarefa visible}} fa-lg fa-fw layertree-icon" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i>';
+      '<div  class="layertree-group {{#if color}}{{color}}{{/if}}"><i id="ltgm{{@index}}" class="fas {{minussquarefa visible}} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i>';
     template += "<span>{{layerName}}</span></div>";
 
-    template += '<div id="ltgu{{@index}}" class="layertree-layers layertree-{{visible visible}}">';
+    template +=
+      '<div id="ltgu{{@index}}" class="layertree-layers layertree-{{visible visible}}">';
     template += "{{#each layers}}";
-
-    template += '<div class="layertree-layers__item">';
-
-    template += '<div class="layertree-layers__item__title">{{layerName}}</div>';
+    //--------------
+    template +=
+      '<div id="' +
+      layerGroupItemPrefix +
+      '{{@../index}}{{@index}}" class="layertree-layers__item " ' +
+      //"onclick=\"LayerTree.toggleCheck('{{@../index}}{{@index}}');Dispatcher.dispatch({eventName:'toggle-layer',gid:'{{gid}}' })\"" +
+      ">";
+    template +=
+      '<div class="layertree-layers__item__title">{{layerName}}</div>';
     template += '<div class="layertree-layers__item__icons">';
     template +=
       '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
     template +=
-      '<i title="Mostra/Nascondi layer" id="lti2{{@../index}}{{@index}}" class="far {{checksquarefa visible}} fa-lg fa-fw layertree-icon fa-pull-right " onclick="LayerTree.toggleCheck(\'lti2{{@../index}}{{@index}}\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{{gid}}\' })"></i>';
+      '<i title="Mostra/Nascondi layer" id="' +
+      layerGroupItemIconPrefix +
+      "{{@../index}}{{@index}}\" class=\"far {{checksquarefa visible}} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right \" onclick=\"LayerTree.toggleCheck('{{@../index}}{{@index}}');Dispatcher.dispatch({eventName:'toggle-layer',gid:'{{gid}}' })\"></i>";
     template += "</div>";
 
     template += "</div>";
+    //--------------
     template += "{{/each}}";
+
+    template += "</div>";
     template += "</div>";
 
     template += "{{/each}}";

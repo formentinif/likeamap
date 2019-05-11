@@ -599,14 +599,14 @@
       "gid": "r_edifici_civici",
       "layerGid": "g0_edifici",
       "serviceUrlTemplate": "/sample/temp.json",
-      "templateUri": "templates/g0_civici.json",
+      "templateUrl": "templates/g0_civici.json",
       "labelTemplate": "Visualizza Pratiche"
     },
     {
       "gid": "r_edifici_pratiche",
       "layerGid": "g0_edifici",
       "serviceUrlTemplate": "/sample/temp.json",
-      "templateUri": "templates/g0_edifici.json",
+      "templateUrl": "templates/g0_edifici.json",
       "labelTemplate": "Visualizza Civici"
     }
   ]

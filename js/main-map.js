@@ -529,7 +529,7 @@ var MainMap = (function() {
     button.addEventListener("touchstart", handleGetBrowserLocation, false);
     button.className = "btn-floating btn-small waves-effect waves-light";
     var element = document.createElement("div");
-    element.className = "al-map__browser-location ol-unselectable ";
+    element.className = "lk-map__browser-location ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
       element: element,
@@ -552,7 +552,7 @@ var MainMap = (function() {
     button.id = "map__zoom-in";
     button.className = "btn-floating btn-small waves-effect waves-light";
     var element = document.createElement("div");
-    element.className = "al-map__zoom-in ol-unselectable ";
+    element.className = "lk-map__zoom-in ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
       element: element,
@@ -575,7 +575,7 @@ var MainMap = (function() {
     button.id = "map__zoom-out";
     button.className = "btn-floating btn-small waves-effect waves-light";
     var element = document.createElement("div");
-    element.className = "al-map__zoom-out ol-unselectable ";
+    element.className = "lk-map__zoom-out ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
       element: element,

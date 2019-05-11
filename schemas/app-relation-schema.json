@@ -10,11 +10,17 @@
         "description": "Gid della relation",
         "type": "string"
       },
-      "layerGid": {
-        "title": "Gid del layer di origine",
+      "title": {
+        "title": "Titolo della relation",
         "propertyOrder": 1,
-        "description": "Gid del layer di origine",
+        "description": "Titolo della relation",
         "type": "string"
+      },
+      "layerGids": {
+        "title": "Gid dei layer di origine",
+        "propertyOrder": 1,
+        "description": "Gid dei layer di origine",
+        "type": "array"
       },
       "serviceUrlTemplate": {
         "title": "Url del servizio",
@@ -22,7 +28,7 @@
         "description": "Url del servizio",
         "type": "string"
       },
-      "templateUri": {
+      "templateUrl": {
         "title": "Uri del template da visualizzare",
         "propertyOrder": 4,
         "description": "Uri del template da visualizzare",

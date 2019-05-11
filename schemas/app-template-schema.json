@@ -5,63 +5,47 @@
   "properties": {
     "gid": {
       "title": "Codice del template",
-      "propertyOrder": 1,
       "description": "Codice del template",
-      "type": "string",
-      "options": {
-        "grid_columns": 2
-      }
+      "type": "string"
     },
     "title": {
       "title": "Titolo",
-      "propertyOrder": 1,
       "description": "Nome del template",
-      "type": "string",
-      "options": {
-        "grid_columns": 2
-      }
+      "type": "string"
     },
     "layer": {
       "title": "Layer",
-      "propertyOrder": 2,
       "description": "Identificativo del layer WMS, senza workspace",
-      "type": "string",
-      "options": {
-        "grid_columns": 2
-      }
+      "type": "string"
     },
     "layerGid": {
       "title": "GID",
-      "propertyOrder": 2,
-      "description": "Identificativo del layer definito nel file di configurazione dell'applicatione",
-      "type": "string",
-      "options": {
-        "grid_columns": 2
-      }
+      "description": "Identificativo del layer definito nel file di configurazione dell'applicatione. DEPRECATED",
+      "type": "string"
+    },
+    "multipleItems": {
+      "title": "Template per array di oggetti",
+      "description": "Elabora gli oggetti con un singolo template. Valido solo per gli templateType=string",
+      "enum": ["simple", "string"],
+      "type": "string"
     },
     "templateType": {
       "title": "Tipologia",
-      "propertyOrder": 2,
       "description": "Tipologia del template",
-      "enum": ["simple"],
-      "type": "string",
-      "options": {
-        "grid_columns": 2
-      }
+      "enum": ["simple", "string"],
+      "type": "string"
+    },
+    "templateString": {
+      "title": "Stringa del template",
+      "description": "Stringa del template in formato handlebars",
+      "type": "string"
     },
     "fields": {
-      "options": {
-        "collapsed": false
-      },
-      "format": "table",
       "propertyOrder": 11,
       "description": "Campi da visualizzare",
       "type": "array",
       "title": "Campi",
       "items": {
-        "options": {
-          "collapsed": false
-        },
         "type": "object",
         "title": "Campo",
         "headerTemplate": "{{ self.field }}",
@@ -69,58 +53,34 @@
         "properties": {
           "field": {
             "title": "Nome Campo",
-            "propertyOrder": 1,
             "description": "Nome del campo della tabella ",
-            "type": "string",
-            "options": {
-              "grid_columns": 2
-            }
+            "type": "string"
           },
           "label": {
             "title": "Alias",
-            "propertyOrder": 1,
             "description": "Etichetta del campo da visualizzare",
-            "type": "string",
-            "options": {
-              "grid_columns": 2
-            }
+            "type": "string"
           },
           "type": {
             "title": "Tipologia",
-            "propertyOrder": 1,
             "description": "Tipo di campo",
             "type": "string",
-            "enum": ["string", "int", "yesno", "moreinfo", "array", "link"],
-            "options": {
-              "grid_columns": 2
-            }
+            "enum": ["string", "int", "yesno", "moreinfo", "array", "link"]
           },
           "header": {
             "title": "Intestazione",
-            "propertyOrder": 1,
             "description": "Intestazione del campo",
-            "type": "string",
-            "options": {
-              "grid_columns": 2
-            }
+            "type": "string"
           },
           "footer": {
             "title": "Piè pagina",
-            "propertyOrder": 1,
             "description": "Fine del campo",
-            "type": "string",
-            "options": {
-              "grid_columns": 2
-            }
+            "type": "string"
           },
           "itemTemplate": {
             "title": "Oggetto",
-            "propertyOrder": 1,
             "description": "Template handlebars del singolo oggetto. (Solo per tipologia 'array')",
-            "type": "string",
-            "options": {
-              "grid_columns": 2
-            }
+            "type": "string"
           }
         },
         "required": ["field", "label", "type"]

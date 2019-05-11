@@ -24,128 +24,166 @@ il software distribuito nei termini della Licenza è distribuito
 Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
 
 -->
-<!doctype html>
+<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="" lang="">
-<!--<![endif]-->
+<html class="" lang="" manifest="manifest.appcache">
+  <!--<![endif]-->
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <html manifest="manifest.appcache">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title></title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <style>
-        body {
-            padding-top: 50px;
-            padding-bottom: 20px;
-        }
+      body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+      }
     </style>
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="css/materialize.css">
-    <link rel="stylesheet" href="css/simplegrid.css">
-    <link rel="stylesheet" href="css/font-awesome.css">
-    <link rel="stylesheet" href="css/ol.css">
-    <link rel="stylesheet" href="css/ol3-contextmenu.css">
-    <link rel="stylesheet" href="css/colorPicker.css">
-    <link rel="stylesheet" href="css/app.css">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="//fonts.googleapis.com/css?family=Open+Sans"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="//fonts.googleapis.com/css?family=Roboto"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/materialize.css" />
+    <link rel="stylesheet" href="css/simplegrid.css" />
+    <link rel="stylesheet" href="css/font-awesome.css" />
+    <link rel="stylesheet" href="css/ol.css" />
+    <link rel="stylesheet" href="css/ol3-contextmenu.css" />
+    <link rel="stylesheet" href="css/colorPicker.css" />
+    <link rel="stylesheet" href="css/app.css?1" />
+  </head>
 
-</head>
-
-<body>
-    <div id="login-container" class="al-hidden">
+  <body>
+    <div id="login-container" class="lk-hidden"></div>
+    <div id="lk-logo" class="z-depth-2">
+      <img src="img/logo.png" alt="Logo" id="lk-logo__img" />
     </div>
-    <div id="al-logo">
-        <img src="img/logo.png" alt="Logo" />
-    </div>
-    <div id="map-container" class="al-hidden">
-        <div id="map" class="al-map">
-        </div>
+    <div id="map-container" class="lk-hidden">
+      <div id="map" class="lk-map"></div>
 
-        <!--<div id="main-menu" class="al-menu-bottom">-->
-        <div id="menu-toolbar" class="al-menu-toolbar-bottom">
-            <button id="menu-toolbar__layer-tree" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-layers')">
-                <i class="material-icons">&#xE53B;</i>
-            </button>
-            <button id="menu-toolbar__search-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-search')">
-                <i class="material-icons">&#xE8B6;</i>
-            </button>
-            <button id="menu-toolbar__print-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-print')">
-                <i class="material-icons">&#xE8AD;</i>
-            </button>
-            <button id="menu-toolbar__share-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-share')">
-                <i class="material-icons">&#xE80D;</i>
-            </button>
-            <button id="menu-toolbar__map-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-map-tools')">
-                <i class="material-icons">&#xE869;</i>
-            </button>
-            <button id="menu-toolbar__draw-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-draw-tools')">
-                <i class="material-icons">&#xE254;</i>
-            </button>
-            <button id="menu-toolbar__gps-tools" class="btn-floating btn-large waves-effect waves-light al-hidden"
-                onClick="dispatch('show-gps-tools')">
-                <i class="material-icons">&#xE558;</i>
-            </button>
-            <!--<button class="btn-floating btn-large waves-effect waves-light" onClick="dispatch('show-chart')">
+      <!--<div id="main-menu" class="lk-menu-bottom">-->
+      <div id="menu-toolbar" class="lk-menu-toolbar-bottom">
+        <button
+          id="menu-toolbar__layer-tree"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-layers')"
+        >
+          <i class="material-icons">&#xE53B;</i>
+        </button>
+        <button
+          id="menu-toolbar__search-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-search')"
+        >
+          <i class="material-icons">&#xE8B6;</i>
+        </button>
+        <button
+          id="menu-toolbar__print-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-print')"
+        >
+          <i class="material-icons">&#xE8AD;</i>
+        </button>
+        <button
+          id="menu-toolbar__share-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-share')"
+        >
+          <i class="material-icons">&#xE80D;</i>
+        </button>
+        <button
+          id="menu-toolbar__map-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-map-tools')"
+        >
+          <i class="material-icons">&#xE869;</i>
+        </button>
+        <button
+          id="menu-toolbar__draw-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-draw-tools')"
+        >
+          <i class="material-icons">&#xE254;</i>
+        </button>
+        <button
+          id="menu-toolbar__gps-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-gps-tools')"
+        >
+          <i class="material-icons">&#xE558;</i>
+        </button>
+        <!--<button class="btn-floating btn-large waves-effect waves-light" onClick="dispatch('show-chart')">
                 <i class="material-icons">&#xE6C4;</i>
             </button>-->
-
+      </div>
+      <div id="menu-panel" class="lk-menu-panel-bottom">
+        <div id="menu-panel__content" class="lk-menu-panel-content">
+          <div class="menu-panel__top-margin"></div>
+          <div id="menu-panel__logo" class="lk-hidden menu-panel__logo">
+            <img src="" id="menu-panel__logo-img" />
+          </div>
+          <div id="layer-tree" class="lk-menu-panel-content-item "></div>
+          <div id="search-tools" class="lk-menu-panel-content-item"></div>
+          <div id="print-tools" class="lk-menu-panel-content-item"></div>
+          <div id="map-tools" class="lk-menu-panel-content-item"></div>
+          <div id="share-tools" class="lk-menu-panel-content-item"></div>
+          <div id="draw-tools" class="lk-menu-panel-content-item"></div>
         </div>
-        <div id="menu-panel" class="al-menu-panel-bottom">
-            <div id="menu-panel__content" class="al-menu-panel-content">
-                <div id="layer-tree" class="al-menu-panel-content-item "></div>
-                <div id="search-tools" class="al-menu-panel-content-item"></div>
-                <div id="print-tools" class="al-menu-panel-content-item"></div>
-                <div id="map-tools" class="al-menu-panel-content-item"></div>
-                <div id="share-tools" class="al-menu-panel-content-item"></div>
-                <div id="draw-tools" class="al-menu-panel-content-item"></div>
-            </div>
-            <div id="menu-panel__close" class="al-menu-panel-close-bottom">
-                <button class="btn-floating btn-small waves-effect waves-light  al-menu-button-close"
-                    onClick="Dispatcher.dispatch('hide-menu')">
-                    <i class="material-icons">chevron_left</i>
-                </button>
-            </div>
+        <div id="menu-panel__close" class="lk-menu-panel-close-bottom">
+          <button
+            class="btn-floating btn-small waves-effect waves-light  lk-menu-button-close"
+            onClick="Dispatcher.dispatch('hide-menu')"
+          >
+            <i class="material-icons">chevron_left</i>
+          </button>
         </div>
-        <!--</div>-->
+      </div>
+      <!--</div>-->
 
-
-        <div id="info-window" class="al-info-window">
-            <div id="info-window__drag" class="al-info-window__drag">
-                <button class="btn-floating btn-small waves-effect waves-light al-right"
-                    onclick="Dispatcher.dispatch('hide-info-window')">
-                    <i class="material-icons">&#xE5CD;</i>
-                </button>
-            </div>
-            <div id="info-window__title" class="al-info-window__title">
-                <h2 id="info-window__title" class="">Info</h2>
-            </div>
-            <div id="info-window__body" class="">
-                Info
-            </div>
-            <div class="">
-                <a class="waves-effect waves-light btn" onclick="Dispatcher.dispatch('hide-info-window')">
-                    Chiudi
-                </a>
-            </div>
+      <div id="info-window" class="lk-info-window">
+        <div id="info-window__resize" class="">
+          <div id="info-window__drag" class="lk-info-window__drag">
+            <button
+              class="btn-floating btn-small waves-effect waves-light lk-right"
+              onclick="Dispatcher.dispatch('hide-info-window')"
+            >
+              <i class="material-icons">&#xE5CD;</i>
+            </button>
+          </div>
+          <div id="info-window__title" class="lk-info-window__title">
+            <h2 id="info-window__title" class="">Info</h2>
+          </div>
+          <div id="info-window__body" class="">
+            Info
+          </div>
+          <div class="lk-mt-3">
+            <a
+              class="waves-effect waves-light btn"
+              onclick="Dispatcher.dispatch('hide-info-window')"
+            >
+              Chiudi
+            </a>
+          </div>
         </div>
-
+      </div>
     </div>
 
-    <div id="app-loader" class="al-loader al-hidden"></div>
+    <div id="app-loader" class="lk-loader lk-hidden"></div>
 
     <script src="https://geoserver.comune.re.it/autenticazione/controllo.js"></script>
     <script src="lib/handlebars.js"></script>
@@ -160,6 +198,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <script src="lib/q.js"></script>
     <!-- build:js app.js -->
     <script src="js/app-dispatcher.js"></script>
+    <script src="js/app-resources.js"></script>
     <script src="js/app-templates.js"></script>
     <script src="js/main-map.js"></script>
     <script src="js/app-store.js"></script>
@@ -172,6 +211,5 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <script src="js/auth-tools.js"></script>
     <script src="js/app.js"></script>
     <!-- /build -->
-</body>
-
+  </body>
 </html>

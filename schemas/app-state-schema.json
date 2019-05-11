@@ -8,6 +8,16 @@
       "description": "Nome della mappa",
       "type": "string"
     },
+    "logoUrl": {
+      "title": "Logo",
+      "description": "Logo della mappa",
+      "type": "string"
+    },
+    "logoPanelUrl": {
+      "title": "Logo del pannello",
+      "description": "Logo del pannello",
+      "type": "string"
+    },
     "restAPIUrl": {
       "title": "Url API Rest",
       "description": "Url assoluto o relativo delle API REST",
@@ -159,6 +169,11 @@
           "description": "Condividi mappe",
           "type": "boolean"
         },
+        "map-tools-create-url": {
+          "title": "Condividi",
+          "description": "Condividi mappe",
+          "type": "boolean"
+        },
         "map-tools": {
           "title": "Strumenti",
           "description": "Strumenti mappa",
@@ -231,7 +246,7 @@
           },
           "color": {
             "title": "Colore del gruppo",
-            "description": "Colore del gruppo. Possono essere inserite classi css come i colori forniti da materialize",
+            "description": "Colore del gruppo. Devono essere inserite classi css o le classi fornite i colori forniti da materialize",
             "enum": [
               "red",
               "pink",
@@ -363,7 +378,7 @@
                   "description": "Nasconde la legenda se non disponibile",
                   "type": "boolean"
                 },
-                "templateUri": {
+                "templateUrl": {
                   "title": "Url del template",
                   "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repo",
                   "type": "string"
@@ -393,6 +408,14 @@
           }
         },
         "required": ["gid", "layerType", "layerName", "visible", "layers"]
+      }
+    },
+    "relations": {
+      "description": "Elenco delle relations dell'applicazione. Vedere lo schema dedicato",
+      "type": "array",
+      "title": "Relazioni",
+      "items": {
+        "type": "object"
       }
     }
   },

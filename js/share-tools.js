@@ -30,7 +30,7 @@ var ShareTools = (function() {
 
   var init = function init() {
     //Upgrade grafici
-  }
+  };
 
   var render = function(div) {
     var templateTemp = templateShare();
@@ -43,35 +43,45 @@ var ShareTools = (function() {
     $("#share-tools__content").hide();
     isRendered = true;
     dispatch("show-share-url-query");
-  }
+  };
 
   var templateShare = function() {
-    template = '';
+    template = "";
     //pannello ricerca via
-    template += '<h4 class="al-title">Condividi</h4>';
-    template += '<div class="al-card z-depth-2">';
+    if (!AppStore.getAppState().logoPanelUrl) {
+      template += '<h4 class="lk-title">Condividi</h4>';
+    }
+    template += '<div class="lk-card z-depth-2">';
 
     //template += 'Crea link da condividere con i tuoi colleghi';
     template += '<div class="div-20"></div>';
-    template += '<h4 class="al-title-h4">Link breve</h4>';
-    template += '<p>Il link breve condivide la posizione e i layer attivi.</p>';
+    template += '<h4 class="lk-title-h4">Link breve</h4>';
+    template += "<p>Il link breve condivide la posizione e i layer attivi.</p>";
 
     template += '<input type="text" class="" id="share-tools__input-query"/>';
     template += '<div class="div-20"></div>';
 
     template += '<div class="grid">';
-    template += '<div class="col-2-1"><a id="share-tools__url-query" target="_blank" >Apri</a></div>';
-    template += '<div class="col-2-1"><a id="share-tools__copy-url-query" class="fake-link" target="_blank" >Copia</a></div>';
-    template += '</div>';
+    template +=
+      '<div class="col-2-1"><a id="share-tools__url-query" target="_blank" >Apri</a></div>';
+    template +=
+      '<div class="col-2-1"><a id="share-tools__copy-url-query" class="fake-link" target="_blank" >Copia</a></div>';
+    template += "</div>";
 
     template += '<div class="div-20"></div>';
-
-    template += '<h4 class="al-title-h4">Mappa</h4>';
-    template += '<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>';
+    template += "<div id='share-tools__create_tool' class='";
+    if (!AppStore.getAppState().modules["map-tools-create-url"]) {
+      template += " lk-hidden ";
+    }
+    template += "'>";
+    template += '<h4 class="lk-title-h4">Mappa</h4>';
+    template +=
+      "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template += '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
+    template +=
+      '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
 
-    template += '<div id="share-tools__content" class="al-hidden">';
+    template += '<div id="share-tools__content" class="lk-hidden">';
 
     //template += '<div class="mdl-textfield mdl-js-textfield">';
     template += '<div class="div-20"></div>';
@@ -79,26 +89,27 @@ var ShareTools = (function() {
     template += '<div class="div-20"></div>';
 
     template += '<div class="grid">';
-    template += '<div class="col-2-1"><a id="share-tools__url" target="_blank" >Apri</a></div>';
-    template += '<div class="col-2-1"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
-    template += '</div>';
+    template +=
+      '<div class="col-2-1"><a id="share-tools__url" target="_blank" >Apri</a></div>';
+    template +=
+      '<div class="col-2-1"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
+    template += "</div>";
+    template += "</div>";
 
-    //template += '<button id="share-tools__copy-url"  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect al-input-margin-right">Copia</button>';
+    //template += '<button id="share-tools__copy-url"  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect lk-input-margin-right">Copia</button>';
     //template += '<button id="share-tools__email-url" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Email</button>';
     //template += '</div>';
     template += '<div class="div-10"></div>';
 
-    template += '</div>';
+    template += "</div>";
 
     return Handlebars.compile(template);
-
-  }
-
+  };
 
   var templateEmpty = function(results) {
-    var template = '<p></p>';
+    var template = "<p></p>";
     return Handlebars.compile(template);
-  }
+  };
 
   /**
    * Chiama il disptcher per creare l'url di condivisione
@@ -106,7 +117,7 @@ var ShareTools = (function() {
    */
   var createUrl = function() {
     Dispatcher.dispatch("create-share-url");
-  }
+  };
 
   /**
    * Visualizza l'url da condividere
@@ -116,15 +127,15 @@ var ShareTools = (function() {
    */
   var displayUrl = function(appStateId, url) {
     ////ricavo lurl di base
-    var urlArray = location.href.split('?');
-    var baseUrl = urlArray[0].replace('#', '');
+    var urlArray = location.href.split("?");
+    var baseUrl = urlArray[0].replace("#", "");
     var shareLink = baseUrl + "?appstate=" + appStateId;
 
     //$("#share-tools__url").text(shareLink);
     $("#share-tools__url").attr("href", shareLink);
     $("#share-tools__input-url").val(shareLink);
 
-    var clipboard = new Clipboard('#share-tools__copy-url', {
+    var clipboard = new Clipboard("#share-tools__copy-url", {
       text: function(trigger) {
         return shareLink;
       }
@@ -135,8 +146,7 @@ var ShareTools = (function() {
     //});
 
     $("#share-tools__content").show();
-
-  }
+  };
 
   /**
    * Nasconde i link
@@ -144,18 +154,18 @@ var ShareTools = (function() {
    */
   var hideUrl = function() {
     $("#share-tools__content").hide();
-  }
+  };
 
   var setShareUrlQuery = function(shareLink) {
     $("#share-tools__input-query").val(shareLink);
     $("#share-tools__url-query").attr("href", shareLink);
 
-    var clipboard = new Clipboard('#share-tools__copy-url-query', {
+    var clipboard = new Clipboard("#share-tools__copy-url-query", {
       text: function(trigger) {
         return shareLink;
       }
     });
-  }
+  };
 
   return {
     createUrl: createUrl,
@@ -164,7 +174,6 @@ var ShareTools = (function() {
     init: init,
     render: render,
     setShareUrlQuery: setShareUrlQuery,
-    templateShare: templateShare,
+    templateShare: templateShare
   };
-
-}());
+})();

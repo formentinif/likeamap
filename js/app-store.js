@@ -142,7 +142,7 @@ var AppStore = (function() {
     //verifico se il pannello non è già selezionato
     if (panelContentItemSelected != content) {
       panelContentItemSelected = content;
-      $(".al-menu-panel-content-item").hide();
+      $(".lk-menu-panel-content-item").hide();
       showMenu(content);
     } else {
       if ($("#menu-panel").css("display") == "none" || keepOpen) {
@@ -183,9 +183,10 @@ var AppStore = (function() {
     }
     for (var i = 0; i < data.length; i++) {
       var props = data[i].properties ? data[i].properties : data[i];
+      let layer = AppStore.getLayer(data[i].layerGid);
       var template = AppTemplates.getTemplate(
         data[i].layerGid,
-        data[i].templateUri,
+        layer.templateUrl,
         AppStore.getAppState().templatesRepositoryUrl
       );
       var tempBody = AppTemplates.processTemplate(template, props);
@@ -194,27 +195,27 @@ var AppStore = (function() {
       }
       //sezione relations
       var layerRelations = AppStore.getRelations().filter(function(relation) {
-        return relation.layerGid === data[i].layerGid;
+        return $.inArray(data[i].layerGid, relation.layerGids) >= 0;
       });
+
       tempBody += AppTemplates.relationsTemplate(layerRelations, props, i);
 
-      if (data.length > 0) {
-        tempBody += "<div class='div-20'/>";
-      }
+      //if (data.length > 0) {
+      //  tempBody += "<div class='div-10'/>";
+      //}
       body += tempBody;
     }
     this.showInfoWindow(title, body);
   };
 
   var showRelation = function(relationGid, resultIndex) {
-    debugger;
     var item = AppStore.getCurrentInfoItems()[resultIndex];
     var relation = AppStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
     var template = AppTemplates.getTemplate(
       relation.gid,
-      relation.templateUri,
+      relation.templateUrl,
       AppStore.getAppState().templatesRepositoryUrl
     );
 
@@ -227,20 +228,36 @@ var AppStore = (function() {
         if (data.features) {
           data = data.features;
         }
-        var title = "Relations";
+        var title = relation.title;
         var body = "";
         if (!Array.isArray(data)) {
           data = [data];
         }
+        let propsList = [];
         for (let i = 0; i < data.length; i++) {
           var props = data[i].properties ? data[i].properties : data[i];
-          body += AppTemplates.processTemplate(template, props);
-          if (!body) {
-            body += AppTemplates.standardTemplate(props);
+          propsList.push(props);
+          if (!template.multipleItems) {
+            //single template not active by default
+            body += AppTemplates.processTemplate(template, props);
+            if (!body) {
+              body += AppTemplates.standardTemplate(props);
+            }
+            if (data.length > 1) {
+              body += "<div class='div-10'></div>";
+            }
           }
-          if (data.length > 1) {
-            body += "<div class='div-20'></div>";
-          }
+        }
+
+        //single template not active by default
+        if (template.multipleItems && propsList.length > 0) {
+          body += AppTemplates.processTemplate(template, propsList);
+        }
+        if (data.length === 0) {
+          body +=
+            '<div class="lk-warning lk-mb-2 lk-p-2">' +
+            AppResources.risultati_non_trovati +
+            "</div>";
         }
         AppStore.showInfoWindow(title, body);
       },
@@ -260,7 +277,6 @@ var AppStore = (function() {
     };
     ajaxRelationRequest()
       .then(function(data) {
-        debugger;
         var title = "Relations";
         var body = "";
         if (!Array.isArray(data)) {
@@ -334,9 +350,9 @@ var AppStore = (function() {
 
   var toggleLoader = function(visibility) {
     if (visibility) {
-      $("#app-loader").removeClass("al-hidden");
+      $("#app-loader").removeClass("lk-hidden");
     } else {
-      $("#app-loader").addClass("al-hidden");
+      $("#app-loader").addClass("lk-hidden");
     }
   };
 
@@ -638,9 +654,11 @@ var AppStore = (function() {
       pos2 = 0,
       pos3 = 0,
       pos4 = 0;
-    if (document.getElementById(elmnt.id + "__title")) {
+    if (document.getElementById(elmnt.id + "__resize")) {
       // if present, the header is where you move the DIV from:
-      document.getElementById(elmnt.id + "__title").onmousedown = dragMouseDown;
+      document.getElementById(
+        elmnt.id + "__resize"
+      ).onmousedown = dragMouseDown;
     } else {
       // otherwise, move the DIV from anywhere inside the DIV:
       elmnt.onmousedown = dragMouseDown;
@@ -684,22 +702,26 @@ var AppStore = (function() {
     AppStore.setInitialAppState(state);
     AppStore.setAppState(state);
 
-    $("#map-container").removeClass("al-hidden");
+    $("#map-container").removeClass("lk-hidden");
+
+    //definizione dei loghi
+    if (state.logoUrl) {
+      $("#lk-logo__img").attr("src", state.logoUrl);
+    }
+    if (state.logoPanelUrl) {
+      $("#menu-panel__logo-img").attr("src", state.logoPanelUrl);
+      $("#menu-panel__logo").removeClass("lk-hidden");
+    }
 
     //inizializzazione dell appstore
     AppStore.init();
-
     AppStore.showAppTools();
-
     //inizializzazione della mappa
     MainMap.render("map", appState);
-
     //carico i templates
     AppTemplates.init();
-
     //carico i layers
     LayerTree.render("layer-tree", appState.layers);
-
     //carico gli strumenti di ricerca
     SearchTools.render(
       "search-tools",
@@ -710,16 +732,12 @@ var AppStore = (function() {
       appState.searchProviderHouseNumberField,
       getSearchLayers()
     );
-
     //carico gli strumenti di share
     ShareTools.render("share-tools", null);
-
     //carico gli strumenti di Stampa
     PrintTools.render("print-tools");
-
     //carico gli strumenti di mappa
     MapTools.render("map-tools");
-
     //carico gli strumenti di disegno
     DrawTools.render("draw-tools");
 
@@ -734,7 +752,7 @@ var AppStore = (function() {
       $("#menu-toolbar__gps-tools").addClass("mdl-button--mini-fab");
       $("#menu-toolbar").height("50px");
       $("#menu-toolbar").css("padding-left", "10px");
-      $(".al-menu-toolbar-bottom button").css("margin-right", "0px");
+      $(".lk-menu-toolbar-bottom button").css("margin-right", "0px");
       easingTime = 0;
     } else {
       //definizione degli eventi jquery
@@ -748,11 +766,6 @@ var AppStore = (function() {
 
     //eseguo il callback
     callback();
-
-    //TODO da modificare inizializzo l'editor
-    try {
-      EditorTools.init();
-    } catch (e) {}
   };
 
   /**
@@ -824,7 +837,6 @@ var AppStore = (function() {
         AuthTools.hideLogin();
         break;
       case "form":
-        debugger;
         var username = "";
         var password = "";
         $.ajax({

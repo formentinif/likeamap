@@ -5,24 +5,8 @@
   "templateType": "simple",
   "fields": [
     {
-      "field": "ID_EDIFI_1",
-      "label": "Codice Edificio",
-      "type": "string",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "ID_DBTR",
-      "label": "Codice Edificio DBTR",
-      "type": "string",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "STATO",
-      "label": "Stato",
+      "field": "ID_EDIFICIO",
+      "label": "ID Edificio",
       "type": "string",
       "header": "",
       "footer": "",
@@ -30,7 +14,7 @@
     },
     {
       "field": "ORIG_DATO",
-      "label": "Origine",
+      "label": "Origine Dato",
       "type": "string",
       "header": "",
       "footer": "",
@@ -38,7 +22,95 @@
     },
     {
       "field": "USE_S",
-      "label": "Uso",
+      "label": "Uso prevalente",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "USE_M",
+      "label": "Uso dettaglio",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "USE_DES",
+      "label": "Uso origine",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SC",
+      "label": "SC mq",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SF",
+      "label": "SF mq",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SF_RIF_EDI",
+      "label": "SF Rid Edificio",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "HEIGHT_HEI",
+      "label": "Altezza m",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "VOLUME_VAL",
+      "label": "Volume mc",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "VOLUME_SOU",
+      "label": "Volume origine",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DATE_C_BEG",
+      "label": "Anno costruzione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DATE_C_BEG",
+      "label": "Destinazione PSC",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DATE_C_BEG",
+      "label": "Destinazione RUE",
       "type": "string",
       "header": "",
       "footer": "",

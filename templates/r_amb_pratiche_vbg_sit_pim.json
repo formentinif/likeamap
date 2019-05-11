@@ -1,8 +1,10 @@
 {
-  "title": "V_AMB_PRATICHE_VBG_SIT_PIM",
+  "title": "Pratiche Edilizie",
   "layer": "V_AMB_PRATICHE_VBG_SIT_PIM",
   "layerGid": "r_v_amb_pratiche_vbg_sit_pim",
-  "templateType": "simple",
+  "templateType": "string",
+  "templateString": "<table class='lk-table'><tr><th>ID Edificio</th><th>Numero Istanza</th><th>Codice Pratica</th><th>SC Codice</th><th>Fattore Ambientale</th><th>Ramo</th><th>Data presentazione</th><th>Responsabile</th><th>Toponimo</th><th>Civico</th><th>Link Pratica</th></tr>{{#each this}}<tr><td>{{ID_EDIF}}</td><td>{{NUMERO_ISTANZA}}</td><td>{{CODICE_PRATICA}}</td><td>{{SC_CODICE}}</td><td>{{FATTORE_AMBIENTALE}}</td><td>{{RAMO}}</td><td>{{DATA_PRESENTAZIONE}}</td><td>{{RESPONSABILE}}</td><td>{{TOPONIMO}}</td><td>{{CIVICO}}</td><td><a href='{{LINK_PRATICA}}' target='_blank'>Apri</a></td></tr>{{/each}}</table>",
+  "multipleItems": true,
   "fields": [
     {
       "field": "ID_EDIF",

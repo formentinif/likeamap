@@ -122,7 +122,7 @@ var SearchTools = (function() {
   };
 
   var templateMenuString = function() {
-    template = '<div class="al-bar">';
+    template = '<div class="lk-bar">';
     template +=
       '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
@@ -142,7 +142,7 @@ var SearchTools = (function() {
   var templateMenuLayers = function() {
     searchLayers = searchLayers.sort(SortByLayerName);
     var template =
-      '<div id="search-tools__layers" class="al-card z-depth-2" style="display:none;">';
+      '<div id="search-tools__layers" class="lk-card z-depth-2" style="display:none;">';
     template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
       template +=
@@ -168,9 +168,11 @@ var SearchTools = (function() {
   var templateSearchNM = function() {
     template = "";
     //pannello ricerca via
-    template += '<h4 class="al-title">Ricerca</h4>';
+    if (!AppStore.getAppState().logoPanelUrl) {
+      template += '<h4 class="lk-title">Ricerca</h4>';
+    }
     template += templateMenuString();
-    template += '<div id="search-tools__address" class="al-card z-depth-2">';
+    template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<select id="search-tools__comune" class="input-field">';
     template += "</select>";
     template += '<div class="div-5"></div>';
@@ -185,7 +187,7 @@ var SearchTools = (function() {
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
     template +=
-      '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
+      '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -193,9 +195,11 @@ var SearchTools = (function() {
   var templateSearchWMSG = function() {
     template = "";
     //pannello ricerca via
-    template += '<h4 class="al-title">Ricerca</h4>';
+    if (!AppStore.getAppState().logoPanelUrl) {
+      template += '<h4 class="lk-title">Ricerca</h4>';
+    }
     template += templateMenuString();
-    template += '<div id="search-tools__address" class="al-card z-depth-2">';
+    template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template +=
       '<div id="search-tools__search-via-field" class="input-field" >';
     template +=
@@ -207,7 +211,7 @@ var SearchTools = (function() {
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
     template +=
-      '<div id="search-tools__search-results" class="al-card z-depth-2 al-scrollable">';
+      '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -231,7 +235,7 @@ var SearchTools = (function() {
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
     template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
     template += "{{{display_name}}} ";
     template += "{{{display_name2}}} ";
     template += "</a>";
@@ -246,7 +250,7 @@ var SearchTools = (function() {
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
     template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}});return false">';
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -311,20 +315,23 @@ var SearchTools = (function() {
     dispatch(payload);
   };
 
-  var zoomToItemLayer = function(lon, lat, index) {
+  var zoomToItemLayer = function(lon, lat, index, showInfo) {
     var payload = {};
     payload.eventName = "remove-info";
     payload.wkt = wkt;
     dispatch(payload);
+
     if (searchResults[index]) {
       dispatch({
         eventName: "zoom-geometry",
         geometry: searchResults[index].item.geometry
       });
-      dispatch({
-        eventName: "show-info-item",
-        data: searchResults[index].item
-      });
+      if (showInfo) {
+        dispatch({
+          eventName: "show-info-item",
+          data: searchResults[index].item
+        });
+      }
       payload = {};
       payload.eventName = "add-feature-info-map";
       payload.geometry = searchResults[index].item.geometry;

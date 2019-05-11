@@ -43,16 +43,23 @@ var AppTemplates = (function() {
       if (groupLayer.layers) {
         for (var li = 0; li < groupLayer.layers.length; li++) {
           //il layer deve essere selezionabile
-          if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
+          if (
+            !groupLayer.layers[li].layer ||
+            !groupLayer.layers[li].queryable
+          ) {
             continue;
           }
-          let templateUri = getTemplateUri(groupLayer.layers[li].gid, groupLayer.layers[li].templateUri, repoTemplatesUrl);
+          let templateUrl = getTemplateUrl(
+            groupLayer.layers[li].gid,
+            groupLayer.layers[li].templateUrl,
+            repoTemplatesUrl
+          );
           let template = templates.find(function(el) {
-            return el.templateUri === templateUri;
+            return el.templateUrl === templateUrl;
           });
           if (!template) {
             //aggiungo il layer vi ajax
-            loadTemplateAjax(templateUri);
+            loadTemplateAjax(templateUrl);
           }
         }
       }
@@ -62,32 +69,36 @@ var AppTemplates = (function() {
   var loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
     for (let i = 0; i < tempRelations.length; i++) {
       const relation = tempRelations[i];
-      let templateUri = getTemplateUri(relation.gid, relation.templateUri, repoTemplatesUrl);
+      let templateUrl = getTemplateUrl(
+        relation.gid,
+        relation.templateUrl,
+        repoTemplatesUrl
+      );
       let template = templates.filter(function(el) {
-        return el.templateUri === templateUri;
+        return el.templateUrl === templateUrl;
       });
       if (!template.length) {
         //aggiungo il layer vi ajax
-        loadTemplateAjax(templateUri);
+        loadTemplateAjax(templateUrl);
       }
     }
   };
 
-  var loadTemplateAjax = function(templateUri) {
+  var loadTemplateAjax = function(templateUrl) {
     $.ajax({
       dataType: "json",
-      url: templateUri
+      url: templateUrl
     })
       .done(function(data) {
         if (data) {
           if (data.length) {
             for (var i = 0; i < data.length; i++) {
               let thisTemplate = data[i];
-              thisTemplate.templateUri = templateUri;
+              thisTemplate.templateUrl = templateUrl;
               templates.push(thisTemplate);
             }
           } else {
-            data.templateUri = templateUri;
+            data.templateUrl = templateUrl;
             templates.push(data);
           }
         }
@@ -105,20 +116,20 @@ var AppTemplates = (function() {
    * @param {object} layer Oggetto del layer/relation
    * @param {string} repoUrl Url del repository
    */
-  var getTemplateUri = function(gid, templateUri, repoUrl) {
-    if (templateUri) {
-      if (templateUri.toLowerCase().includes("http://")) {
-        return templateUri;
+  var getTemplateUrl = function(gid, templateUrl, repoUrl) {
+    if (templateUrl) {
+      if (templateUrl.toLowerCase().includes("http://")) {
+        return templateUrl;
       } else {
-        return repoUrl + "/" + templateUri;
+        return repoUrl + "/" + templateUrl;
       }
     }
     return repoUrl + "/" + gid + ".json";
   };
 
-  var getTemplate = function(gid, templateUri, repoUrl) {
+  var getTemplate = function(gid, templateUrl, repoUrl) {
     let template = templates.find(function(el) {
-      return el.templateUri === getTemplateUri(gid, templateUri, repoUrl);
+      return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
     });
     return template;
   };
@@ -129,7 +140,7 @@ var AppTemplates = (function() {
       try {
         var hsTemplate = this.generateTemplate(template);
         var compiledTemplate = Handlebars.compile(hsTemplate);
-        if (Array.isArray(props)) {
+        if (!template.multipleItems && Array.isArray(props)) {
           result = compiledTemplate(props[0]);
         } else {
           result = compiledTemplate(props);
@@ -145,9 +156,14 @@ var AppTemplates = (function() {
   };
 
   var standardTemplate = function(props) {
-    var body = "<table>";
+    var body = "<table class='lk-table lk-mb-3'>";
     for (var propertyName in props) {
-      body += "<tr><td>" + propertyName + ":</td><td>" + props[propertyName] + "</td></tr>";
+      body +=
+        "<tr><td>" +
+        propertyName +
+        ":</td><td>" +
+        props[propertyName] +
+        "</td></tr>";
     }
     body += "</table>";
     return body;
@@ -158,8 +174,15 @@ var AppTemplates = (function() {
     if (relations.length > 0) {
       result += '<div class="">';
       relations.map(function(relation) {
-        result += '<div class="input-field col s12">';
-        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<div class="lk-mb-2 col s12">';
+        result +=
+          '<a href="#" onclick="AppStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          relation.labelTemplate +
+          "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -173,20 +196,31 @@ var AppTemplates = (function() {
     }
     var str = "";
     if (template.templateType === "simple") {
-      str += "<div class='al-h6'>" + template.title + "</div>";
-      str += "<table class='al-table'>";
+      str += "<div class='lk-h6'>" + template.title + "</div>";
+      str += "<table class='lk-table lk-mb-3'>";
       for (var i = 0; i < template.fields.length; i++) {
         var field = template.fields[i];
         switch (field.type) {
           case "int":
-            str += "<tr><td class='al-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
+            str +=
+              "<tr><td class='lk-strong'>" +
+              field.label +
+              "</td><td>{{{" +
+              field.field +
+              "}}}</td></tr>";
             break;
           case "string":
-            str += "<tr><td class='al-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
+            str +=
+              "<tr><td class='lk-strong'>" +
+              field.label +
+              "</td><td>{{{" +
+              field.field +
+              "}}}</td></tr>";
             break;
           case "yesno":
-            str += "<tr><td class='al-strong'>" + field.label + "</td>";
-            str += "<td>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</td></tr>";
+            str += "<tr><td class='lk-strong'>" + field.label + "</td>";
+            str +=
+              "<td>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</td></tr>";
             break;
           /*  case "moreinfo":
             str +=
@@ -209,7 +243,12 @@ var AppTemplates = (function() {
             str += field.footer;
             break;
           case "link":
-            str += '<tr><td colspan="2"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></td>";
+            str +=
+              '<tr><td colspan="2"><a href="{{' +
+              field.field +
+              '}}" target="_blank">' +
+              field.label +
+              "</a></td>";
             break;
         }
       }
@@ -222,7 +261,7 @@ var AppTemplates = (function() {
     init: init,
     generateTemplate: generateTemplate,
     getTemplate: getTemplate,
-    getTemplateUri: getTemplateUri,
+    getTemplateUrl: getTemplateUrl,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     standardTemplate: standardTemplate,
