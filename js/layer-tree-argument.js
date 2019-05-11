@@ -111,23 +111,20 @@ var LayerTree = (function() {
     template += '<div class="layertree-argument__group-item" >';
     template +=
       '<a id="ltgm{{@index}}" class="btn-floating btn-large waves-effect waves-light {{color}} fake-link"><i class="fas fa-map" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i></a>';
-    template +=
-      '<p class="layertree-argument__group-item-text">{{layerName}}</p>';
+    template += '<p class="layertree-argument__group-item-text">{{layerName}}</p>';
     template += "</div>";
     template += "{{/each}}";
     template += "</div>";
 
     template += '<div id="layers-argument">';
     template += "{{#each this}}";
-    template +=
-      '<ul id="ltgu{{@index}}" class="layertree-list-group layertree-{{visible visible}}">';
+    template += '<ul id="ltgu{{@index}}" class="layertree-argument-list-group layertree-{{visible visible}}">';
     template += "{{#each layers}}";
-    template += '<li class="layertree-list-group-item">';
-    template +=
-      '<div class="layertree-list-group-item__title layertree-selected">';
+    template += '<li class="layertree-argument-list-group-item">';
+    template += '<div class="layertree-argument-list-group-item__title layertree-selected">';
     template += "{{layerName}}";
     template += "</div>";
-    template += '<div class="layertree-list-group-item__icons">';
+    template += '<div class="layertree-argument-list-group-item__icons">';
     template +=
       '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info " onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
     template +=

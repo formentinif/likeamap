@@ -26,117 +26,121 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 var LayerTree = (function() {
+  var isRendered = false;
 
-    var isRendered = false;
+  var init = function init() {
+    Handlebars.registerHelper("visible", function(v1, options) {
+      if (v1 === 1) {
+        return "visible";
+      }
+      return "hidden";
+    });
 
-    var init = function init() {
+    Handlebars.registerHelper("checksquarefa", function(v1, options) {
+      if (v1 === 1) {
+        return "fa-check-square";
+      }
+      return "fa-square";
+    });
 
-        Handlebars.registerHelper('visible', function(v1, options) {
-            if (v1 === 1) {
-                return "visible";
-            }
-            return "hidden";
-        });
+    Handlebars.registerHelper("minussquarefa", function(v1, options) {
+      if (v1 === 1) {
+        return "fa-minus-square";
+      }
+      return "fa-plus-square";
+    });
+  };
 
-        Handlebars.registerHelper('checksquarefa', function(v1, options) {
-            if (v1 === 1) {
-                return "fa-check-square";
-            }
-            return "fa-square";
-        });
-
-        Handlebars.registerHelper('minussquarefa', function(v1, options) {
-            if (v1 === 1) {
-                return "fa-minus-square";
-            }
-            return "fa-plus-square";
-        });
+  var render = function(div, layers) {
+    if (!isRendered) {
+      init();
     }
+    var templateTemp = template();
+    var output = templateTemp(layers);
+    jQuery("#" + div).html(output);
+    isRendered = true;
+  };
 
-    var render = function(div, layers) {
-        if(!isRendered){
-            init();
-        }
-        var templateTemp = template();
-        var output = templateTemp(layers);
-        jQuery("#" + div).html(output);
-        isRendered = true;
+  var toggleCheck = function(item) {
+    if ($("#" + item).hasClass("fa-square")) {
+      $("#" + item).removeClass("fa-square");
+      $("#" + item).addClass("fa-check-square");
+      return;
     }
-
-    var toggleCheck = function(item) {
-        if ($("#" + item).hasClass("fa-square")) {
-            $("#" + item).removeClass("fa-square");
-            $("#" + item).addClass("fa-check-square");
-            return;
-        }
-        if ($("#" + item).hasClass("fa-check-square")) {
-            $("#" + item).removeClass("fa-check-square");
-            $("#" + item).addClass("fa-square");
-            return;
-        }
+    if ($("#" + item).hasClass("fa-check-square")) {
+      $("#" + item).removeClass("fa-check-square");
+      $("#" + item).addClass("fa-square");
+      return;
     }
+  };
 
-    var toggleGroup = function(item, icon) {
-        if ($("#" + item).hasClass("layertree-hidden")) {
-            $("#" + item).removeClass("layertree-hidden");
-            $("#" + item).addClass("layertree-visible");
-
-        } else {
-            if ($("#" + item).hasClass("layertree-visible")) {
-                $("#" + item).removeClass("layertree-visible");
-                $("#" + item).addClass("layertree-hidden");
-
-            }
-        }
-        if ($("#" + icon).hasClass("fa-plus-square")) {
-            $("#" + icon).removeClass("fa-plus-square");
-            $("#" + icon).addClass("fa-minus-square");
-            return;
-        } else {
-            if ($("#" + icon).hasClass("fa-minus-square")) {
-                $("#" + icon).removeClass("fa-minus-square");
-                $("#" + icon).addClass("fa-plus-square");
-                return;
-            }
-        }
+  var toggleGroup = function(item, icon) {
+    if ($("#" + item).hasClass("layertree-hidden")) {
+      $("#" + item).removeClass("layertree-hidden");
+      $("#" + item).addClass("layertree-visible");
+    } else {
+      if ($("#" + item).hasClass("layertree-visible")) {
+        $("#" + item).removeClass("layertree-visible");
+        $("#" + item).addClass("layertree-hidden");
+      }
     }
+    if ($("#" + icon).hasClass("fa-plus-square")) {
+      $("#" + icon).removeClass("fa-plus-square");
+      $("#" + icon).addClass("fa-minus-square");
+      return;
+    } else {
+      if ($("#" + icon).hasClass("fa-minus-square")) {
+        $("#" + icon).removeClass("fa-minus-square");
+        $("#" + icon).addClass("fa-plus-square");
+        return;
+      }
+    }
+  };
 
-    var template = function template() {
-        var template = '';
-        template += '<h4 class="al-title">Temi</h4>';
-        template += '<div id="layertree" class="layertree">';
-        template += '<ul class="layertree-list-group">';
-        template += '{{#each this}}';
-        template += '<li class="layertree-list-group-item" >';
-        template += '<span  class="layertree-span layertree-group"><i id="ltgm{{@index}}" class="fas {{minussquarefa visible}} fa-lg fa-fw layertree-icon" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i>';
-        template += '<span>{{layerName}}</span></span>';
+  var template = function template() {
+    var template = "";
+    template += '<h4 class="al-title">Temi</h4>';
+    template += '<div class="layertree-list">';
+    template += "{{#each this}}";
+    template += '<div class="layertree-list-group__item" >';
+    template +=
+      '<div  class="layertree-group"><i id="ltgm{{@index}}" class="fas {{minussquarefa visible}} fa-lg fa-fw layertree-icon" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i>';
+    template += "<span>{{layerName}}</span></div>";
 
-        template += '<ul id="ltgu{{@index}}" class="layertree-list-group layertree-{{visible visible}}">';
-        template += '{{#each layers}}';
-        template += '<li class="layertree-list-group-item"><span class="layertree-span layertree-selected">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
-        template += '<span>{{layerName}}</span>';
-        template += '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i><i title="Mostra/Nascondi tutti i layer" id="lti2{{@../index}}{{@index}}" class="fas {{checksquarefa visible}} fa-lg fa-fw layertree-icon fa-pull-right " onclick="LayerTree.toggleCheck(\'lti2{{@../index}}{{@index}}\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{{gid}}\' })"></i></span>';
-        template += '</li>';
-        template += '{{/each}}';
-        template += '</ul>';
-        template += '{{/each}}';
-        //sezione funzioni generali
-        template += '<li class="layertree-list-group-item"><span class="layertree-span layertree-selected">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
-        template += '<button class="btn-floating btn-small waves-effect waves-light fa-pull-right" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
-        template += '</li>';
+    template += '<div id="ltgu{{@index}}" class="layertree-layers layertree-{{visible visible}}">';
+    template += "{{#each layers}}";
 
-        template += '</ul>';
-        template += '</div>';
+    template += '<div class="layertree-layers__item">';
 
-        return Handlebars.compile(template);
-    };
+    template += '<div class="layertree-layers__item__title">{{layerName}}</div>';
+    template += '<div class="layertree-layers__item__icons">';
+    template +=
+      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
+    template +=
+      '<i title="Mostra/Nascondi layer" id="lti2{{@../index}}{{@index}}" class="far {{checksquarefa visible}} fa-lg fa-fw layertree-icon fa-pull-right " onclick="LayerTree.toggleCheck(\'lti2{{@../index}}{{@index}}\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{{gid}}\' })"></i>';
+    template += "</div>";
 
-    return {
-        render: render,
-        template: template,
-        init: init,
-        toggleCheck: toggleCheck,
-        toggleGroup: toggleGroup
-    };
+    template += "</div>";
+    template += "{{/each}}";
+    template += "</div>";
 
-}());
+    template += "{{/each}}";
+
+    //sezione funzioni generali
+    //template += '<div class="layertree-layers__item"><span class="">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
+    //template += "</div>";
+
+    template += "</div>";
+    template += "</div>";
+
+    return Handlebars.compile(template);
+  };
+
+  return {
+    render: render,
+    template: template,
+    init: init,
+    toggleCheck: toggleCheck,
+    toggleGroup: toggleGroup
+  };
+})();
