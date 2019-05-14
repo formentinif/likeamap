@@ -387,6 +387,11 @@
                   "title": "Autorizzazione richiesta",
                   "description": "Il layer richiede la basic authentication",
                   "type": "boolean"
+                },
+                "apikey": {
+                  "title": "Api Key del servizio",
+                  "description": "Api Key del servizio",
+                  "type": "string"
                 }
               },
               "required": [
