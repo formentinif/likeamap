@@ -71,6 +71,18 @@ var SearchTools = (function() {
         var templateTemp = templateSearchWMSG();
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
+        $("#search-tools__select-layers").on("change", function() {
+          var currentLayer = $(
+            "#search-tools__select-layers option:selected"
+          ).val();
+          for (li = 0; li < searchLayers.length; li++) {
+            if (searchLayers[li].layer == currentLayer) {
+              $("#search-tools__search-layers__label").text(
+                searchLayers[li].searchField
+              );
+            }
+          }
+        });
         break;
       case "nominatim":
       default:
@@ -159,7 +171,13 @@ var SearchTools = (function() {
     template +=
       '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
     template +=
-      '<label class="input-field" for="search-tools__search-layers">Layers...</label>';
+      '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
+    if (searchLayers.length > 0) {
+      template += searchLayers[0].searchField;
+    } else {
+      template += "Layers...";
+    }
+    template += "</label>";
     template += "</div>";
     template += "</div>";
     return template;
@@ -181,7 +199,7 @@ var SearchTools = (function() {
     template +=
       '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
     template +=
-      '<label class="input-field" for="search-tools__search-via">Via...</label>';
+      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateMenuLayers();
@@ -205,7 +223,7 @@ var SearchTools = (function() {
     template +=
       '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
     template +=
-      '<label class="input-field" for="search-tools__search-via">Via...</label>';
+      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateMenuLayers();

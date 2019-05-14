@@ -1136,7 +1136,7 @@ body {
 
 @media screen and (min-width: 801px) {
   .lk-info-window {
-    top: 30%;
+    top: 5%;
     left: 30%;
     display: none;
     position: absolute;

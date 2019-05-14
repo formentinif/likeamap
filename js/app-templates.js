@@ -54,10 +54,10 @@ var AppTemplates = (function() {
             groupLayer.layers[li].templateUrl,
             repoTemplatesUrl
           );
-          let template = templates.find(function(el) {
+          let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
-          if (!template) {
+          if (template.length === 0) {
             //aggiungo il layer vi ajax
             loadTemplateAjax(templateUrl);
           }
@@ -128,10 +128,13 @@ var AppTemplates = (function() {
   };
 
   var getTemplate = function(gid, templateUrl, repoUrl) {
-    let template = templates.find(function(el) {
+    let templatesFilter = templates.filter(function(el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
     });
-    return template;
+    if (templatesFilter.length > 0) {
+      return templatesFilter[0];
+    }
+    return null;
   };
 
   var processTemplate = function(template, props) {

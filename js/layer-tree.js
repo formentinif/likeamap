@@ -144,12 +144,13 @@ var LayerTree = (function() {
 
     template += "</div>";
     template += "</div>";
-
     template += "{{/each}}";
 
     //sezione funzioni generali
-    //template += '<div class="layertree-layers__item"><span class="">'; //<i class="fa  fa-lg fa-fw layertree-icon "></i>
-    //template += "</div>";
+    template += '<div class="layertree-list-group-item">';
+    template +=
+      '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+    template += "</div>";
 
     template += "</div>";
     template += "</div>";
