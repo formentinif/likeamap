@@ -428,7 +428,7 @@ body {
 
 .layertree-layers__item__title {
   padding: 0rem 0rem 0rem 0rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   order: 0;
   flex-grow: 1;
 }
@@ -436,9 +436,8 @@ body {
 .layertree-layers__item__icons {
   padding: 0rem 0rem 0rem 0rem;
   font-size: 1.2rem;
-  order: 1;
-  flex-grow: 1;
-  flex-basis: 7rem;
+  order: 2;
+  min-width: 70px;
 }
 
 .layertree-icon {

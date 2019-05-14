@@ -1041,6 +1041,7 @@ var MainMap = (function() {
 
   var getLegendUrl = function getLegendUrl(gid) {
     var layer = getLayer(gid);
+    var layerStore = AppStore.getLayer(gid);
     var url = "";
     try {
       if (layer) {
@@ -1056,6 +1057,18 @@ var MainMap = (function() {
             .getParams()
             .LAYERS.trim() +
           "&format=image/jpeg&legend_options=fontAntiAliasing:true;dpi:180";
+        if (layerStore.params) {
+          let arrParams = layerStore.params.split("&");
+          for (let index = 0; index < arrParams.length; index++) {
+            let element = arrParams[index];
+            if (element) {
+              let arrEle = element.split("=");
+              if (arrEle[0].toLowerCase() == "styles") {
+                url += "&STYLE=" + arrEle[1];
+              }
+            }
+          }
+        }
       }
     } catch (e) {}
     return url;
