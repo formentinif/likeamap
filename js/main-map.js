@@ -37,6 +37,9 @@ var MainMap = (function() {
     },
     OCM: {
       gid: 1001
+    },
+    OTM: {
+      gid: 1002
     }
   };
 
@@ -258,7 +261,8 @@ var MainMap = (function() {
     queryable,
     opacity,
     attribution,
-    secured
+    secured,
+    apikey
   ) {
     /// <summary>
     /// Aggiunge un layer alla mappa
@@ -290,7 +294,11 @@ var MainMap = (function() {
         thisLayer = getLayerOSM();
         break;
       case "ocm":
-        thisLayer = getLayerOCM();
+        debugger;
+        thisLayer = getLayerOCM(apikey);
+        break;
+      case "otm":
+        thisLayer = getLayerOTM(apikey);
         break;
       case "wms":
         thisLayer = getLayerWMS(gid, uri, params, attribution, secured);
@@ -346,18 +354,35 @@ var MainMap = (function() {
     return osm;
   };
 
-  var getLayerOCM = function getLayerOCM() {
+  var getLayerOCM = function getLayerOCM(key) {
     /// <summary>
-    /// Restituisce il layer standard di Open Street Map
+    /// Restituisce il layer standard di Open Cycle Map
     /// </summary>
     var ocm = new ol.layer.Tile({
       source: new ol.source.OSM({
-        url: "https://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png",
+        url:
+          "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=" + key,
         crossOrigin: null
       })
     });
     ocm.gid = defaultLayers.OCM.gid;
     return ocm;
+  };
+
+  var getLayerOTM = function getLayerOTM(key) {
+    /// <summary>
+    /// Restituisce il layer standard di Open Cycle Map
+    /// </summary>
+    var otm = new ol.layer.Tile({
+      source: new ol.source.OSM({
+        url:
+          "https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=" +
+          key,
+        crossOrigin: null
+      })
+    });
+    otm.gid = defaultLayers.OTM.gid;
+    return otm;
   };
 
   var getLayerWMS = function getLayerWMS(gid, uri, params, attribution) {
@@ -817,7 +842,8 @@ var MainMap = (function() {
         layer.queryable,
         layer.opacity,
         layer.attribution,
-        layer.secured
+        layer.secured,
+        layer.apikey
       );
       if (layer.layers) {
         addLayersToMap(layer.layers);
