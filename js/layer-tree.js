@@ -27,9 +27,18 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 var LayerTree = (function() {
   var isRendered = false;
-  var layerGroupItemPrefix = "ltgi";
-  var layerGroupItemIconPrefix = "ltgic";
+  var layerGroupPrefix = "lt";
+  var layerGroupItemPrefix = "lti";
+  var layerGroupItemIconPrefix = "ltic";
+  let countRequest = 0;
+
   var init = function init() {
+    //carico i layer
+    countRequest = 0;
+    AppStore.getAppState().layers.forEach(function(layer) {
+      loadLayersUri(layer);
+    });
+
     Handlebars.registerHelper("visible", function(v1, options) {
       if (v1 === 1) {
         return "visible";
@@ -52,115 +61,169 @@ var LayerTree = (function() {
     });
   };
 
-  var render = function(div, layers) {
-    if (!isRendered) {
-      init();
+  var loadLayersUri = function(layer) {
+    if (layer.layersUri) {
+      countRequest++;
+      $.ajax({
+        dataType: "json",
+        url: layer.layersUri
+      })
+        .done(function(data) {
+          layer.layers = data;
+          layer.layers.forEach(function(e) {
+            loadLayersUri(e);
+          });
+        })
+        .fail(function(data) {
+          dispatch({
+            eventName: "log",
+            message: "Layer Tree: Unable to load layers " + layer.layersUri
+          });
+        })
+        .always(function(data) {
+          debugger;
+          countRequest--;
+          if (countRequest === 0) {
+            render("layer-tree", AppStore.getAppState().layers);
+          }
+        });
+    } else if (layer.layers) {
+      layer.layers.forEach(function(e) {
+        loadLayersUri(e);
+      });
     }
-    var templateTemp = template();
-    var output = templateTemp(layers);
+  };
+
+  var render = function(div, layers) {
+    //if (!isRendered) {
+    //  init();
+    //}
+
+    var output = "";
+    if (!AppStore.getAppState().logoPanelUrl) {
+      output += '<h4 class="lk-title">Temi</h4>';
+    }
+    output += '<div class="layertree-list">'; //generale
+    let index = 0;
+    layers.forEach(function(element) {
+      output += renderGroup(element, layerGroupPrefix + "_" + index);
+      index++;
+    });
+    //sezione funzioni generali
+    output += '<div class="layertree-list-group-item">';
+    output +=
+      '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+    output += "</div>";
+    output += "</div>"; //generale
+
     jQuery("#" + div).html(output);
     isRendered = true;
   };
 
-  var toggleCheck = function(item) {
-    if ($("#" + layerGroupItemIconPrefix + item).hasClass("fa-square")) {
-      $("#" + layerGroupItemIconPrefix + item).removeClass("fa-square");
-      $("#" + layerGroupItemIconPrefix + item).addClass("fa-check-square");
-      $("#" + layerGroupItemPrefix + item).addClass(
-        "layertree-layers__item-selected"
-      );
+  var renderLayer = function(layer, layerId) {
+    let output = "";
+    //--------------
+    output += formatString('<div id="{0}" class="layertree-layers__item">', layerId);
+    output += formatString('<div class="layertree-layers__item__title">{0}</div>', layer.layerName);
+    output += '<div class="layertree-layers__item__icons">';
+    output += formatString(
+      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\' })"></i>',
+      layer.gid
+    );
+    output += formatString(
+      '<i title="Mostra/Nascondi layer" id="{0}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="LayerTree.toggleCheck(\'{0}_c\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
+      layerId,
+      layer.visible ? "fa-check-square" : "fa-square",
+      layer.gid
+    );
+    output += "</div>";
+    output += "</div>";
+    return output;
+  };
+
+  var renderGroup = function(groupLayer, groupName) {
+    let output = "";
+    output += '<div class="layertree-list-group__item" >';
+    output += formatString(
+      '<div  class="layertree-group {1}"><i id="{0}_i" class="fas {2} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'{0}\');"></i>',
+      groupName,
+      groupLayer.color,
+      groupLayer.visible ? "fa-minus-square" : "fa-plus-square"
+    );
+    output += "<span>" + groupLayer.layerName + "</span>";
+    output += "</div>";
+    output += formatString('<div id="{0}_u" class="layertree-layers layertree-{1}">', groupName, groupLayer.visible ? "visible" : "hidden");
+    if (groupLayer.layers) {
+      let index = 0;
+      groupLayer.layers.forEach(function(element) {
+        switch (element.layerType) {
+          case "group":
+            output += renderGroup(element);
+            break;
+          default:
+            output += renderLayer(element, groupName + "_" + index);
+            break;
+        }
+        index++;
+      });
+    }
+    output += "</div>";
+    output += "</div>";
+    return output;
+  };
+
+  var toggleCheck = function(iconId, groupId) {
+    const item = "#" + iconId;
+    if ($(item).hasClass("fa-square")) {
+      $(item).removeClass("fa-square");
+      $(item).addClass("fa-check-square");
+      $("#" + groupId).addClass("layertree-layers__item-selected");
       return;
     }
-    if ($("#" + layerGroupItemIconPrefix + item).hasClass("fa-check-square")) {
-      $("#" + layerGroupItemIconPrefix + item).removeClass("fa-check-square");
-      $("#" + layerGroupItemIconPrefix + item).addClass("fa-square");
-      $("#" + layerGroupItemPrefix + item).removeClass(
-        "layertree-layers__item-selected"
-      );
+    if ($(item).hasClass("fa-check-square")) {
+      $(item).removeClass("fa-check-square");
+      $(item).addClass("fa-square");
+      $("#" + groupId).removeClass("layertree-layers__item-selected");
       return;
     }
   };
 
-  var toggleGroup = function(item, icon) {
-    if ($("#" + item).hasClass("layertree-hidden")) {
-      $("#" + item).removeClass("layertree-hidden");
-      $("#" + item).addClass("layertree-visible");
+  var toggleGroup = function(groupName) {
+    const item = "#" + groupName + "_u";
+    if ($(item).hasClass("layertree-hidden")) {
+      $(item).removeClass("layertree-hidden");
+      $(item).addClass("layertree-visible");
     } else {
-      if ($("#" + item).hasClass("layertree-visible")) {
-        $("#" + item).removeClass("layertree-visible");
-        $("#" + item).addClass("layertree-hidden");
+      if ($(item).hasClass("layertree-visible")) {
+        $(item).removeClass("layertree-visible");
+        $(item).addClass("layertree-hidden");
       }
     }
-    if ($("#" + icon).hasClass("fa-plus-square")) {
-      $("#" + icon).removeClass("fa-plus-square");
-      $("#" + icon).addClass("fa-minus-square");
+    const icon = "#" + groupName + "_i";
+    if ($(icon).hasClass("fa-plus-square")) {
+      $(icon).removeClass("fa-plus-square");
+      $(icon).addClass("fa-minus-square");
       return;
     } else {
-      if ($("#" + icon).hasClass("fa-minus-square")) {
-        $("#" + icon).removeClass("fa-minus-square");
-        $("#" + icon).addClass("fa-plus-square");
+      if ($(icon).hasClass("fa-minus-square")) {
+        $(icon).removeClass("fa-minus-square");
+        $(icon).addClass("fa-plus-square");
         return;
       }
     }
   };
 
-  var template = function template() {
-    var template = "";
-    if (!AppStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lk-title">Temi</h4>';
+  let formatString = function() {
+    var str = arguments[0];
+    for (k = 0; k < arguments.length - 1; k++) {
+      str = str.replace(new RegExp("\\{" + k + "\\}", "g"), arguments[k + 1]);
     }
-    template += '<div class="layertree-list">';
-    template += "{{#each this}}";
-    template += '<div class="layertree-list-group__item" >';
-
-    template +=
-      '<div  class="layertree-group {{#if color}}{{color}}{{/if}}"><i id="ltgm{{@index}}" class="fas {{minussquarefa visible}} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'ltgu{{@index}}\', \'ltgm{{@index}}\');"></i>';
-    template += "<span>{{layerName}}</span></div>";
-
-    template +=
-      '<div id="ltgu{{@index}}" class="layertree-layers layertree-{{visible visible}}">';
-    template += "{{#each layers}}";
-    //--------------
-    template +=
-      '<div id="' +
-      layerGroupItemPrefix +
-      '{{@../index}}{{@index}}" class="layertree-layers__item " ' +
-      //"onclick=\"LayerTree.toggleCheck('{{@../index}}{{@index}}');Dispatcher.dispatch({eventName:'toggle-layer',gid:'{{gid}}' })\"" +
-      ">";
-    template +=
-      '<div class="layertree-layers__item__title">{{layerName}}</div>';
-    template += '<div class="layertree-layers__item__icons">';
-    template +=
-      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{{gid}}\' })"></i>';
-    template +=
-      '<i title="Mostra/Nascondi layer" id="' +
-      layerGroupItemIconPrefix +
-      "{{@../index}}{{@index}}\" class=\"far {{checksquarefa visible}} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right \" onclick=\"LayerTree.toggleCheck('{{@../index}}{{@index}}');Dispatcher.dispatch({eventName:'toggle-layer',gid:'{{gid}}' })\"></i>";
-    template += "</div>";
-
-    template += "</div>";
-    //--------------
-    template += "{{/each}}";
-
-    template += "</div>";
-    template += "</div>";
-    template += "{{/each}}";
-
-    //sezione funzioni generali
-    template += '<div class="layertree-list-group-item">';
-    template +=
-      '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
-    template += "</div>";
-
-    template += "</div>";
-    template += "</div>";
-
-    return Handlebars.compile(template);
+    return str;
   };
 
   return {
+    formatString: formatString,
     render: render,
-    template: template,
     init: init,
     toggleCheck: toggleCheck,
     toggleGroup: toggleGroup

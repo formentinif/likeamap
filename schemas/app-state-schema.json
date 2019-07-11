@@ -195,15 +195,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "layer-tree",
-        "search-tools",
-        "print-tools",
-        "share-tools",
-        "map-tools",
-        "draw-tools",
-        "gps-tools"
-      ]
+      "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
     },
     "selectedInfoItems": {
       "description": "Elenco delle feature correntemente selezionate sulla mappa",
@@ -220,7 +212,6 @@
       "items": {
         "type": "object",
         "title": "Gruppo",
-        "headerTemplate": "{{ self.layerName }}",
         "properties": {
           "gid": {
             "title": "Identificativo univoco",
@@ -289,6 +280,11 @@
                   "description": "Nome del layer (visualizzato in mappa)",
                   "type": "string"
                 },
+                "layersUri": {
+                  "title": "Layer URI",
+                  "description": "Posizione di un oggetto JSON che sarà caricato in sostituzione di questo oggetto ",
+                  "type": "string"
+                },
                 "mapUri": {
                   "title": "URL (WMS, TMS)",
                   "description": "Url base del layer. Es: http://localhost:8080/geoserver/wms?",
@@ -297,7 +293,7 @@
                 "layerType": {
                   "title": "Tipologia",
                   "description": "Tipologia del layer",
-                  "enum": ["wmstiled", "wms", "osm"],
+                  "enum": ["group", "osm", "otm", "ocm", "wms", "wmstiled", "tms"],
                   "type": "string",
                   "default": "wmstiled"
                 },
@@ -424,13 +420,5 @@
       }
     }
   },
-  "required": [
-    "restAPIUrl",
-    "title",
-    "startMapLon",
-    "startMapLat",
-    "startMapZoom",
-    "modules",
-    "layers"
-  ]
+  "required": ["restAPIUrl", "title", "startMapLon", "startMapLat", "startMapZoom", "modules", "layers"]
 }

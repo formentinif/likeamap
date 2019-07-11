@@ -184,11 +184,7 @@ var AppStore = (function() {
     for (var i = 0; i < data.length; i++) {
       var props = data[i].properties ? data[i].properties : data[i];
       let layer = AppStore.getLayer(data[i].layerGid);
-      var template = AppTemplates.getTemplate(
-        data[i].layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
+      var template = AppTemplates.getTemplate(data[i].layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       var tempBody = AppTemplates.processTemplate(template, props);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props);
@@ -213,11 +209,7 @@ var AppStore = (function() {
     var relation = AppStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
-    var template = AppTemplates.getTemplate(
-      relation.gid,
-      relation.templateUrl,
-      AppStore.getAppState().templatesRepositoryUrl
-    );
+    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",
@@ -254,10 +246,7 @@ var AppStore = (function() {
           body += AppTemplates.processTemplate(template, propsList);
         }
         if (data.length === 0) {
-          body +=
-            '<div class="lk-warning lk-mb-2 lk-p-2">' +
-            AppResources.risultati_non_trovati +
-            "</div>";
+          body += '<div class="lk-warning lk-mb-2 lk-p-2">' + AppResources.risultati_non_trovati + "</div>";
         }
         AppStore.showInfoWindow(title, body);
       },
@@ -442,12 +431,7 @@ var AppStore = (function() {
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
           if (appState.layers[i].layers[ki].layer) {
-            if (
-              $.inArray(
-                layerName,
-                appState.layers[i].layers[ki].layer.split(":")
-              ) >= 0
-            ) {
+            if ($.inArray(layerName, appState.layers[i].layers[ki].layer.split(":")) >= 0) {
               return appState.layers[i].layers[ki];
             }
           }
@@ -471,18 +455,10 @@ var AppStore = (function() {
     //layers
     var qLayers = "";
     for (var i = 0; i < appState.layers.length; i++) {
-      qLayers +=
-        appState.layers[i].gid +
-        ":" +
-        parseInt(appState.layers[i].visible) +
-        ",";
+      qLayers += appState.layers[i].gid + ":" + parseInt(appState.layers[i].visible) + ",";
       if (appState.layers[i].layers) {
         for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          qLayers +=
-            appState.layers[i].layers[ki].gid +
-            ":" +
-            parseInt(appState.layers[i].layers[ki].visible) +
-            ",";
+          qLayers += appState.layers[i].layers[ki].gid + ":" + parseInt(appState.layers[i].layers[ki].visible) + ",";
         }
       }
     }
@@ -533,9 +509,7 @@ var AppStore = (function() {
     var centerLL = MainMap.getPrintCenterLonLat();
     //La scala viene ricalcolata in base ad un parametero di conversione locale
     //Questa parte è tutta rivedere
-    var scale =
-      PrintTools.getScale() *
-      MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+    var scale = PrintTools.getScale() * MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
 
     //
     appState.printCenterX = center[0];
@@ -572,11 +546,7 @@ var AppStore = (function() {
   var createShareUrl = function() {
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
     var centerMap = MainMap.getMapCenter();
-    centerMap = ol.proj.transform(
-      [centerMap[0], centerMap[1]],
-      "EPSG:900913",
-      "EPSG:4326"
-    );
+    centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:900913", "EPSG:4326");
 
     appState.mapLon = centerMap[0];
     appState.mapLat = centerMap[1];
@@ -656,9 +626,7 @@ var AppStore = (function() {
       pos4 = 0;
     if (document.getElementById(elmnt.id + "__resize")) {
       // if present, the header is where you move the DIV from:
-      document.getElementById(
-        elmnt.id + "__resize"
-      ).onmousedown = dragMouseDown;
+      document.getElementById(elmnt.id + "__resize").onmousedown = dragMouseDown;
     } else {
       // otherwise, move the DIV from anywhere inside the DIV:
       elmnt.onmousedown = dragMouseDown;
@@ -721,7 +689,9 @@ var AppStore = (function() {
     //carico i templates
     AppTemplates.init();
     //carico i layers
-    LayerTree.render("layer-tree", appState.layers);
+    debugger;
+    LayerTree.init();
+    //LayerTree.render("layer-tree", appState.layers);
     //carico gli strumenti di ricerca
     SearchTools.render(
       "search-tools",
@@ -831,9 +801,7 @@ var AppStore = (function() {
         break;
       case "basic":
         //adding the base64 token
-        appState.authentication.authToken = window.btoa(
-          username + ":" + password
-        );
+        appState.authentication.authToken = window.btoa(username + ":" + password);
         AuthTools.hideLogin();
         break;
       case "form":
@@ -844,8 +812,7 @@ var AppStore = (function() {
           url: "",
           dataType: "html",
           async: false,
-          data:
-            '{"username": "' + username + '", "password" : "' + password + '"}',
+          data: '{"username": "' + username + '", "password" : "' + password + '"}',
           success: function() {
             alert("Thanks for your comment!");
           }
@@ -854,12 +821,7 @@ var AppStore = (function() {
         break;
       case "custom":
         //TODO implement custom auth url ancd object
-        var url =
-          getAppState().restAPIUrl +
-          "/api/auth?username=" +
-          username +
-          "&password=" +
-          password;
+        var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
         $.ajax({
           dataType: "json",
           url: url
