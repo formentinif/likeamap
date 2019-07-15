@@ -167,11 +167,7 @@ var MainMap = (function() {
       feature = transform3857(feature, srid);
     }
     if (feature.getGeometry().getType() === "Point") {
-      goToLonLat(
-        feature.getGeometry().getCoordinates()[0],
-        feature.getGeometry().getCoordinates()[1],
-        17
-      );
+      goToLonLat(feature.getGeometry().getCoordinates()[0], feature.getGeometry().getCoordinates()[1], 17);
     } else {
       var extent = feature.getGeometry().getExtent();
       goToExtent(extent[0], extent[1], extent[2], extent[3]);
@@ -294,7 +290,6 @@ var MainMap = (function() {
         thisLayer = getLayerOSM();
         break;
       case "ocm":
-        debugger;
         thisLayer = getLayerOCM(apikey);
         break;
       case "otm":
@@ -326,18 +321,7 @@ var MainMap = (function() {
       thisLayer.setZIndex(parseInt(zIndex));
       thisLayer.setOpacity(parseFloat(opacity));
     } else {
-      log(
-        "Impossibile aggiungere il layer " +
-          gid +
-          ", " +
-          uri +
-          ", " +
-          layerType +
-          ", " +
-          params +
-          ", " +
-          tileMode
-      );
+      log("Impossibile aggiungere il layer " + gid + ", " + uri + ", " + layerType + ", " + params + ", " + tileMode);
     }
   };
 
@@ -360,8 +344,7 @@ var MainMap = (function() {
     /// </summary>
     var ocm = new ol.layer.Tile({
       source: new ol.source.OSM({
-        url:
-          "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=" + key,
+        url: "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=" + key,
         crossOrigin: null
       })
     });
@@ -375,9 +358,7 @@ var MainMap = (function() {
     /// </summary>
     var otm = new ol.layer.Tile({
       source: new ol.source.OSM({
-        url:
-          "https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=" +
-          key,
+        url: "https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=" + key,
         crossOrigin: null
       })
     });
@@ -418,13 +399,7 @@ var MainMap = (function() {
     return wms;
   };
 
-  var getLayerWMSTiled = function getLayerWMSTiled(
-    gid,
-    uri,
-    params,
-    attribution,
-    secured
-  ) {
+  var getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution, secured) {
     /// <summary>
     /// Restituisce un layer in formato WMS, con le chiamate tagliate a Tile
     /// </summary>
@@ -462,10 +437,7 @@ var MainMap = (function() {
           tile.setState(3);
         });
         xhr.open("GET", src);
-        xhr.setRequestHeader(
-          "Authorization",
-          AppStore.getAuthorizationHeader()
-        );
+        xhr.setRequestHeader("Authorization", AppStore.getAuthorizationHeader());
         xhr.send();
       });
     }
@@ -661,10 +633,7 @@ var MainMap = (function() {
       dispatch("map-move-end");
     });
 
-    proj4.defs(
-      "EPSG:25832",
-      "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-    );
+    proj4.defs("EPSG:25832", "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
     proj4.defs(
       "EPSG:3003",
       "+proj=tmerc +lat_0=0 +lon_0=9 +k=0.9996 +x_0=1500000 +y_0=0 +ellps=intl +towgs84=-104.1,-49.1,-9.9,0.971,-2.917,0.714,-11.68 +units=m +no_defs"
@@ -878,15 +847,11 @@ var MainMap = (function() {
       var layer = mainMap.getLayers().item(i);
       if (!layer.queryable) continue;
       if (!requestQueue.visibleLayers || layer.getVisible()) {
-        var url = layer
-          .getSource()
-          .getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
-            INFO_FORMAT: "text/javascript",
-            feature_count: 50
-          });
-        requestQueue.layers.push(
-          new RequestLayer(url, layer.zIndex, layer.gid)
-        );
+        var url = layer.getSource().getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
+          INFO_FORMAT: "text/javascript",
+          feature_count: 50
+        });
+        requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
       }
     }
     requestQueue.layers = requestQueue.layers.sort(SortByZIndex);
@@ -967,8 +932,7 @@ var MainMap = (function() {
         addFeatureInfoToMap(data.features[0].geometry, srid);
       }
       for (var i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid =
-          requestQueue.layers[requestQueue.currentLayerIndex].gid;
+        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
       }
       Dispatcher.dispatch({
         eventName: "show-info-item",
@@ -996,8 +960,7 @@ var MainMap = (function() {
     //se il dato è presente lo aggiungo al contenitore global
     if (data && data.features.length > 0) {
       for (var i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid =
-          requestQueue.layers[requestQueue.currentLayerIndex].gid;
+        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
         requestQueueData.push(data.features[i]);
       }
     }
@@ -1234,11 +1197,7 @@ var MainMap = (function() {
     copyCoordinateEvent = mainMap.on("singleclick", function(evt) {
       var pp = new ol.geom.Point([evt.coordinate[0], evt.coordinate[1]]);
       if (evt.coordinate[0] > 180) {
-        pp = ol.proj.transform(
-          [evt.coordinate[0], evt.coordinate[1]],
-          "EPSG:900913",
-          "EPSG:4326"
-        );
+        pp = ol.proj.transform([evt.coordinate[0], evt.coordinate[1]], "EPSG:900913", "EPSG:4326");
       }
       dispatch({
         eventName: "map-click",
@@ -1306,10 +1265,7 @@ var MainMap = (function() {
    */
   var dragInteractionPrint = new ol.interaction.Pointer({
     handleDownEvent: function(event) {
-      var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(
-        feature,
-        layer
-      ) {
+      var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
         return feature;
       });
 
@@ -1336,10 +1292,7 @@ var MainMap = (function() {
       if (dragCursorPrint) {
         var mainMap = event.map;
 
-        var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(
-          feature,
-          layer
-        ) {
+        var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
           return feature;
         });
 
@@ -1433,10 +1386,7 @@ var MainMap = (function() {
       // that new vertices can be drawn at the same position
       // of existing vertices
       deleteCondition: function(event) {
-        return (
-          ol.events.condition.shiftKeyOnly(event) &&
-          ol.events.condition.singleClick(event)
-        );
+        return ol.events.condition.shiftKeyOnly(event) && ol.events.condition.singleClick(event);
       }
     });
     modifyInteraction.on("modifyend", function(event) {});
@@ -1506,14 +1456,8 @@ var MainMap = (function() {
   };
 
   var deleteDrawFeatures = function() {
-    for (
-      var i = 0;
-      i < deleteInteraction.getFeatures().getArray().length;
-      i++
-    ) {
-      vectorWKT
-        .getSource()
-        .removeFeature(deleteInteraction.getFeatures().getArray()[i]);
+    for (var i = 0; i < deleteInteraction.getFeatures().getArray().length; i++) {
+      vectorWKT.getSource().removeFeature(deleteInteraction.getFeatures().getArray()[i]);
     }
     deleteInteraction.getFeatures().clear();
   };
@@ -1541,20 +1485,7 @@ var MainMap = (function() {
         .toString(16)
         .substring(1);
     }
-    return (
-      s4() +
-      s4() +
-      "-" +
-      s4() +
-      "-" +
-      s4() +
-      "-" +
-      s4() +
-      "-" +
-      s4() +
-      s4() +
-      s4()
-    );
+    return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
   function SortByZIndex(a, b) {
@@ -1647,11 +1578,7 @@ var MainMap = (function() {
 
   var getUriParameter = function(parameter) {
     return (
-      decodeURIComponent(
-        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(
-          location.search
-        ) || [null, ""])[1].replace(/\+/g, "%20")
-      ) || null
+      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
     );
   };
 
@@ -1670,10 +1597,7 @@ var MainMap = (function() {
    * @return {float}                Aspect Ratio
    */
   var aspectRatio = function(topLat, bottomLat) {
-    return (
-      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
-      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
-    );
+    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
   var addContextMenu = function(items) {

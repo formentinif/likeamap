@@ -377,7 +377,7 @@ body {
 
 /*layer-tree*/
 
-.layertree-list {
+.layertree {
   margin: 0px;
   padding: 0px;
   width: 100%;
@@ -386,17 +386,15 @@ body {
   flex-flow: column;
 }
 
-.layertree-layers {
+.layertree-item {
   margin: 0px;
-  padding: 0px;
+  padding: 4px 0px;
+  transition: all 0.3s ease;
   width: 100%;
-  display: flex;
-  flex-flow: column;
 }
 
-.layertree-group {
+.layertree-item__title {
   font-size: 1.4rem;
-  background-color: #009688;
   box-sizing: border-box;
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
@@ -406,14 +404,43 @@ body {
   width: 100%;
 }
 
-.layertree-list-group__item {
-  margin: 0px;
-  padding: 4px 0px;
-  transition: all 0.3s ease;
+.layertree-item__title--sub1 {
+  font-size: 1.3rem;
+  filter: brightness(110%);
+  padding: 0.1rem 0.1rem 0.1rem 0.1rem;
   width: 100%;
 }
 
-.layertree-layers__item {
+.layertree-item__title--sub2 {
+  font-size: 1.2rem;
+  filter: brightness(130%);
+  padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+  width: 100%;
+}
+
+.layertree-item__title--sub3 {
+  font-size: 1.1rem;
+  filter: brightness(150%);
+  padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+  width: 100%;
+}
+
+.layertree-item__title--sub4 {
+  font-size: 1.1rem;
+  filter: brightness(170%);
+  padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+  width: 100%;
+}
+
+.layertree-item__layers {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.layertree-layer {
   margin: 0px;
   padding: 0.2rem 0.3rem;
   transition: all 0.3s ease;
@@ -422,18 +449,18 @@ body {
   flex-direction: row;
 }
 
-.layertree-layers__item-selected {
+.layertree-layer--selected {
   background-color: #ebebeb;
 }
 
-.layertree-layers__item__title {
+.layertree-layer__title {
   padding: 0rem 0rem 0rem 0rem;
   font-size: 1.1rem;
   order: 0;
   flex-grow: 1;
 }
 
-.layertree-layers__item__icons {
+.layertree-layer__icons {
   padding: 0rem 0rem 0rem 0rem;
   font-size: 1.2rem;
   order: 2;
@@ -445,20 +472,20 @@ body {
   line-height: 1em !important;
 }
 
-.layertree-hidden {
+.layertree--hidden {
   /*transition: opacity 0.4s, max-height 0.4s ease-out;*/
   opacity: 0.5;
   max-height: 0px;
   overflow: hidden;
 }
 
-.layertree-visible {
+.layertree--visible {
   transition: opacity 0.4s, max-height 0.3s ease-in;
   opacity: 1;
   max-height: 900px;
 }
 
-/*layers arguments*/
+/*layers arguments
 .layertree-argument__groups {
   display: flex;
   flex-wrap: wrap;
@@ -515,7 +542,7 @@ body {
   flex-grow: 1;
   flex-basis: 7rem;
 }
-
+*/
 /*dividers*/
 .div-5 {
   width: 100%;
@@ -578,7 +605,6 @@ body {
 
 .lk-bar {
   box-sizing: border-box;
-  background: #009688;
   /*#3F51B5;*/
   color: white;
   width: 100%;
@@ -605,8 +631,7 @@ body {
 }
 
 .lk-shadow--2dp {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
 .lk-h6 {
@@ -1177,6 +1202,9 @@ body {
 }
 
 /*Custom*/
+.lk-background {
+  background-color: #009688;
+}
 .color-violet {
   background-color: #735ab6;
 }

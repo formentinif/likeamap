@@ -689,7 +689,6 @@ var AppStore = (function() {
     //carico i templates
     AppTemplates.init();
     //carico i layers
-    debugger;
     LayerTree.init();
     //LayerTree.render("layer-tree", appState.layers);
     //carico gli strumenti di ricerca

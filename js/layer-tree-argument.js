@@ -77,23 +77,23 @@ var LayerTree = (function() {
   var toggleGroup = function(item, icon) {
     $('[id*="ltgu"]').each(function() {
       if (this.id === item) {
-        $(this).removeClass("layertree-hidden");
-        $(this).addClass("layertree-visible");
+        $(this).removeClass("layertree--hidden");
+        $(this).addClass("layertree--visible");
       } else {
-        $(this).removeClass("layertree-visible");
-        $(this).addClass("layertree-hidden");
+        $(this).removeClass("layertree--visible");
+        $(this).addClass("layertree--hidden");
       }
     });
 
     /*
-        if ($("#" + item).hasClass("layertree-hidden")) {
-            $("#" + item).removeClass("layertree-hidden");
-            $("#" + item).addClass("layertree-visible");
+        if ($("#" + item).hasClass("layertree--hidden")) {
+            $("#" + item).removeClass("layertree--hidden");
+            $("#" + item).addClass("layertree--visible");
 
         } else {
-            if ($("#" + item).hasClass("layertree-visible")) {
-                $("#" + item).removeClass("layertree-visible");
-                $("#" + item).addClass("layertree-hidden");
+            if ($("#" + item).hasClass("layertree--visible")) {
+                $("#" + item).removeClass("layertree--visible");
+                $("#" + item).addClass("layertree--hidden");
 
             }
         }

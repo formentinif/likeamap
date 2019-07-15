@@ -81,7 +81,6 @@ var LayerTree = (function() {
           });
         })
         .always(function(data) {
-          debugger;
           countRequest--;
           if (countRequest === 0) {
             render("layer-tree", AppStore.getAppState().layers);
@@ -103,14 +102,14 @@ var LayerTree = (function() {
     if (!AppStore.getAppState().logoPanelUrl) {
       output += '<h4 class="lk-title">Temi</h4>';
     }
-    output += '<div class="layertree-list">'; //generale
+    output += '<div class="layertree">'; //generale
     let index = 0;
     layers.forEach(function(element) {
       output += renderGroup(element, layerGroupPrefix + "_" + index);
       index++;
     });
     //sezione funzioni generali
-    output += '<div class="layertree-list-group-item">';
+    output += '<div class="layertree-item">';
     output +=
       '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
     output += "</div>";
@@ -123,9 +122,9 @@ var LayerTree = (function() {
   var renderLayer = function(layer, layerId) {
     let output = "";
     //--------------
-    output += formatString('<div id="{0}" class="layertree-layers__item">', layerId);
-    output += formatString('<div class="layertree-layers__item__title">{0}</div>', layer.layerName);
-    output += '<div class="layertree-layers__item__icons">';
+    output += formatString('<div id="{0}" class="layertree-layer">', layerId);
+    output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
+    output += '<div class="layertree-layer__icons">';
     output += formatString(
       '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\' })"></i>',
       layer.gid
@@ -141,27 +140,28 @@ var LayerTree = (function() {
     return output;
   };
 
-  var renderGroup = function(groupLayer, groupName) {
+  var renderGroup = function(groupLayer, groupId) {
     let output = "";
-    output += '<div class="layertree-list-group__item" >';
+    output += '<div class="layertree-item" >';
     output += formatString(
-      '<div  class="layertree-group {1}"><i id="{0}_i" class="fas {2} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'{0}\');"></i>',
-      groupName,
+      '<div  class="layertree-item__title lk-background {1} {3}"><i id="{0}_i" class="fas {2} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'{0}\');"></i>',
+      groupId,
       groupLayer.color,
-      groupLayer.visible ? "fa-minus-square" : "fa-plus-square"
+      groupLayer.visible ? "fa-minus-square" : "fa-plus-square",
+      groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString('<div id="{0}_u" class="layertree-layers layertree-{1}">', groupName, groupLayer.visible ? "visible" : "hidden");
+    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {
         switch (element.layerType) {
           case "group":
-            output += renderGroup(element);
+            output += renderGroup(element, groupId + "_" + index);
             break;
           default:
-            output += renderLayer(element, groupName + "_" + index);
+            output += renderLayer(element, groupId + "_" + index);
             break;
         }
         index++;
@@ -177,26 +177,26 @@ var LayerTree = (function() {
     if ($(item).hasClass("fa-square")) {
       $(item).removeClass("fa-square");
       $(item).addClass("fa-check-square");
-      $("#" + groupId).addClass("layertree-layers__item-selected");
+      $("#" + groupId).addClass("layertree-layer--selected");
       return;
     }
     if ($(item).hasClass("fa-check-square")) {
       $(item).removeClass("fa-check-square");
       $(item).addClass("fa-square");
-      $("#" + groupId).removeClass("layertree-layers__item-selected");
+      $("#" + groupId).removeClass("layertree-layer--selected");
       return;
     }
   };
 
   var toggleGroup = function(groupName) {
     const item = "#" + groupName + "_u";
-    if ($(item).hasClass("layertree-hidden")) {
-      $(item).removeClass("layertree-hidden");
-      $(item).addClass("layertree-visible");
+    if ($(item).hasClass("layertree--hidden")) {
+      $(item).removeClass("layertree--hidden");
+      $(item).addClass("layertree--visible");
     } else {
-      if ($(item).hasClass("layertree-visible")) {
-        $(item).removeClass("layertree-visible");
-        $(item).addClass("layertree-hidden");
+      if ($(item).hasClass("layertree--visible")) {
+        $(item).removeClass("layertree--visible");
+        $(item).addClass("layertree--hidden");
       }
     }
     const icon = "#" + groupName + "_i";

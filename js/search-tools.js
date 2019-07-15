@@ -51,15 +51,7 @@ var SearchTools = (function() {
     }
   };
 
-  var render = function(
-    div,
-    provider,
-    providerAddressUrl,
-    providerAddressField,
-    providerHouseNumberUrl,
-    providerHouseNumberField,
-    layers
-  ) {
+  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -72,14 +64,10 @@ var SearchTools = (function() {
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function() {
-          var currentLayer = $(
-            "#search-tools__select-layers option:selected"
-          ).val();
+          var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
             if (searchLayers[li].layer == currentLayer) {
-              $("#search-tools__search-layers__label").text(
-                searchLayers[li].searchField
-              );
+              $("#search-tools__search-layers__label").text(searchLayers[li].searchField);
             }
           }
         });
@@ -110,9 +98,7 @@ var SearchTools = (function() {
   var updateScroll = function(offset) {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#search-tools__search-results").offset();
-    $("#search-tools__search-results").height(
-      positionMenu.top - positionSearch.top - offset
-    );
+    $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
   };
 
   var updateComuniNM = function(comuni) {
@@ -134,18 +120,15 @@ var SearchTools = (function() {
   };
 
   var templateMenuString = function() {
-    template = '<div class="lk-bar">';
-    template +=
-      '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+    template = '<div class="lk-bar lk-background">';
+    template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
     template += "</div>";
     template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
-    template +=
-      '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
+    template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
     template += "{{#if this.length}}";
-    template +=
-      '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
+    template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
     template += "{{/if}}";
     template += "</ul>";
     return template;
@@ -153,25 +136,16 @@ var SearchTools = (function() {
 
   var templateMenuLayers = function() {
     searchLayers = searchLayers.sort(SortByLayerName);
-    var template =
-      '<div id="search-tools__layers" class="lk-card z-depth-2" style="display:none;">';
+    var template = '<div id="search-tools__layers" class="lk-card z-depth-2" style="display:none;">';
     template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
-      template +=
-        '<option value="' +
-        searchLayers[i].layer +
-        '">' +
-        searchLayers[i].layerName +
-        "</option>";
+      template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
     template += '<div class="div-5"></div>';
-    template +=
-      '<div id="search-tools__search-layers-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
+    template += '<div id="search-tools__search-layers-field" class="input-field" >';
+    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
+    template += '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
     } else {
@@ -194,18 +168,14 @@ var SearchTools = (function() {
     template += '<select id="search-tools__comune" class="input-field">';
     template += "</select>";
     template += '<div class="div-5"></div>';
-    template +=
-      '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__search-via-field" class="input-field" >';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template +=
-      '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
+    template += '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -218,18 +188,14 @@ var SearchTools = (function() {
     }
     template += templateMenuString();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
-    template +=
-      '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__search-via-field" class="input-field" >';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateMenuLayers();
     template += '<div class="div-10"></div>';
-    template +=
-      '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
+    template += '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -238,8 +204,7 @@ var SearchTools = (function() {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNM({{{@index}}});return false">';
+    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNM({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -394,15 +359,7 @@ var SearchTools = (function() {
 
     if (via.length > 3 && comune) {
       via = via.replace("'", " ");
-      var url =
-        "http://nominatim.openstreetmap.org/search/IT/" +
-        regione +
-        "/" +
-        comune +
-        "/" +
-        via +
-        "?format=jsonv2&addressdetails=1" +
-        "&";
+      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
       console.log(url);
       currentSearchDate = new Date().getTime();
       var searchDate = new Date().getTime();
@@ -481,12 +438,7 @@ var SearchTools = (function() {
     var url = searchAddressProviderUrl;
     if (!civico) {
       //solo ricerca via
-      url +=
-        "&cql_filter=[" +
-        searchAddressProviderField +
-        "]ilike%27%25" +
-        street.trim() +
-        "%25%27";
+      url += "&cql_filter=[" + searchAddressProviderField + "]ilike%27%25" + street.trim() + "%25%27";
     } else {
       //ricerca via e civico
       var url = searchHouseNumberProviderUrl;
@@ -521,12 +473,9 @@ var SearchTools = (function() {
             var toponimi = [];
             var results = [];
             for (var i = 0; i < data.features.length; i++) {
-              var currentAddress =
-                data.features[i].properties[searchAddressProviderField];
+              var currentAddress = data.features[i].properties[searchAddressProviderField];
               if (data.features[i].properties[searchHouseNumberProviderField]) {
-                currentAddress =
-                  " " +
-                  data.features[i].properties[searchHouseNumberProviderField];
+                currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
               }
               if ($.inArray(currentAddress, toponimi) === -1) {
                 var cent = null;
@@ -537,20 +486,16 @@ var SearchTools = (function() {
                 }
 
                 var tempItem = {
-                  display_name:
-                    data.features[i].properties[searchAddressProviderField],
+                  display_name: data.features[i].properties[searchAddressProviderField],
                   lon: cent[0],
                   lat: cent[1],
                   item: data.features[i]
                 };
                 if (searchHouseNumberProviderField) {
-                  tempItem.display_name2 =
-                    data.features[i].properties[searchHouseNumberProviderField];
+                  tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
                 }
                 results.push(tempItem);
-                toponimi.push(
-                  data.features[i].properties[searchAddressProviderField]
-                );
+                toponimi.push(data.features[i].properties[searchAddressProviderField]);
               }
             }
             searchResults = results.sort(SortByDisplayName);
@@ -617,12 +562,7 @@ var SearchTools = (function() {
                 var resultsIndex = [];
                 var results = [];
                 for (var i = 0; i < data.features.length; i++) {
-                  if (
-                    $.inArray(
-                      data.features[i].properties[layer.searchField],
-                      resultsIndex
-                    ) === -1
-                  ) {
+                  if ($.inArray(data.features[i].properties[layer.searchField], resultsIndex) === -1) {
                     var cent = null;
                     if (data.features[i].geometry.coordinates[0][0]) {
                       cent = centroid(data.features[i].geometry.coordinates[0]);
@@ -634,15 +574,12 @@ var SearchTools = (function() {
                     item.crs = data.crs;
                     //item.id = currentLayer;
                     results.push({
-                      display_name:
-                        data.features[i].properties[layer.searchField],
+                      display_name: data.features[i].properties[layer.searchField],
                       lon: cent[0],
                       lat: cent[1],
                       item: item
                     });
-                    resultsIndex.push(
-                      data.features[i].properties[layer.searchField]
-                    );
+                    resultsIndex.push(data.features[i].properties[layer.searchField]);
                   }
                 }
                 searchResults = results.sort(SortByDisplayName);
@@ -693,8 +630,7 @@ var SearchTools = (function() {
           item.crs = data.crs;
           //item.id = currentLayer;
           results.push({
-            display_name:
-              layer.layerName + "-" + data[i].properties[layer.labelField],
+            display_name: layer.layerName + "-" + data[i].properties[layer.labelField],
             lon: cent[0],
             lat: cent[1],
             item: item

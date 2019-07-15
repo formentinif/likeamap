@@ -229,6 +229,12 @@
             "type": "string",
             "enum": ["group"]
           },
+          "nestingStyle": {
+            "title": "Dimensione gerarchia",
+            "description": "Dimensione da applicare per la gerarchia dell'oggetto",
+            "type": "string",
+            "enum": ["sub1", "sub2", "sub3", "sub4"]
+          },
           "visible": {
             "title": "Visibilità",
             "description": "Visibilità iniziale in mappa",
@@ -268,7 +274,6 @@
             "items": {
               "type": "object",
               "title": "Livello",
-              "headerTemplate": "{{ self.layerName }}",
               "properties": {
                 "gid": {
                   "title": "identificativo univoco",
