@@ -116,7 +116,7 @@ var AppLayerTree = (function() {
       layer.gid
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{0}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="LayerTree.toggleCheck(\'{0}_c\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
+      '<i title="Mostra/Nascondi layer" id="{0}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="AppLayerTree.toggleCheck(\'{0}_c\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
       layerId,
       layer.visible ? "fa-check-square" : "fa-square",
       layer.gid
@@ -130,7 +130,7 @@ var AppLayerTree = (function() {
     let output = "";
     output += '<div class="layertree-item" >';
     output += formatString(
-      '<div  class="layertree-item__title lk-background {1} {3}"><i id="{0}_i" class="fas {2} fa-fw lk-pointer" onclick="LayerTree.toggleGroup(\'{0}\');"></i>',
+      '<div  class="layertree-item__title lk-background {1} {3}"><i id="{0}_i" class="fas {2} fa-fw lk-pointer" onclick="AppLayerTree.toggleGroup(\'{0}\');"></i>',
       groupId,
       groupLayer.color,
       groupLayer.visible ? "fa-minus-square" : "fa-plus-square",

@@ -26,7 +26,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 //Object that expose temporary functions. These function should be moved to other objects
-var Dispatcher = (function() {
+var AppCustom = (function() {
   //thanks to David Walsh https://davidwalsh.name/convert-xml-json
   function xmlToJson(xml) {
     var obj = {};
