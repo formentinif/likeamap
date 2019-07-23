@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
 
 http://www.apache.org/licenses/LICENSE-2.0
@@ -105,8 +105,8 @@ var AppStore = (function() {
    */
   var resetTools = function() {
     MapTools.stopCopyCoordinate();
-    MainMap.clearLayerInfo();
-    MainMap.clearLayerPrint();
+    AppMap.clearLayerInfo();
+    AppMap.clearLayerPrint();
   };
 
   var showMenu = function(content) {
@@ -317,7 +317,7 @@ var AppStore = (function() {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
       } else {
-        urlImg = MainMap.getLegendUrl(gid);
+        urlImg = AppMap.getLegendUrl(gid);
       }
 
       if (urlImg) {
@@ -328,7 +328,7 @@ var AppStore = (function() {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
     html += "<div>";
-    var layer = MainMap.getLayerInfo(gid);
+    var layer = AppMap.getLayerInfo(gid);
     var layerName = "";
     if (layer) {
       layerName = layer.layerName;
@@ -449,9 +449,9 @@ var AppStore = (function() {
   var writeUrlShare = function() {
     //posizione
     var qPos = "";
-    var center = MainMap.getMapCenterLonLat();
+    var center = AppMap.getMapCenterLonLat();
     qPos += "lon=" + center[0] + "&lat=" + center[1];
-    qPos += "&zoom=" + MainMap.getMapZoom();
+    qPos += "&zoom=" + AppMap.getMapZoom();
     //layers
     var qLayers = "";
     for (var i = 0; i < appState.layers.length; i++) {
@@ -504,12 +504,12 @@ var AppStore = (function() {
     appState.printHeight = paperDimension.height;
 
     //ricavo i dati della mappa per la stampa
-    var resolution = MainMap.getResolutionForScale(scale);
-    var center = MainMap.getPrintCenter();
-    var centerLL = MainMap.getPrintCenterLonLat();
+    var resolution = AppMap.getResolutionForScale(scale);
+    var center = AppMap.getPrintCenter();
+    var centerLL = AppMap.getPrintCenterLonLat();
     //La scala viene ricalcolata in base ad un parametero di conversione locale
     //Questa parte è tutta rivedere
-    var scale = PrintTools.getScale() * MainMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+    var scale = PrintTools.getScale() * AppMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
 
     //
     appState.printCenterX = center[0];
@@ -545,13 +545,13 @@ var AppStore = (function() {
 
   var createShareUrl = function() {
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
-    var centerMap = MainMap.getMapCenter();
+    var centerMap = AppMap.getMapCenter();
     centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:900913", "EPSG:4326");
 
     appState.mapLon = centerMap[0];
     appState.mapLat = centerMap[1];
-    appState.mapZoom = MainMap.getMapZoom();
-    appState.drawFeatures = MainMap.getDrawFeature();
+    appState.mapZoom = AppMap.getMapZoom();
+    appState.drawFeatures = AppMap.getDrawFeature();
 
     //invio la richiesta
     var share = function() {
@@ -685,12 +685,12 @@ var AppStore = (function() {
     AppStore.init();
     AppStore.showAppTools();
     //inizializzazione della mappa
-    MainMap.render("map", appState);
+    AppMap.render("map", appState);
     //carico i templates
     AppTemplates.init();
     //carico i layers
-    LayerTree.init();
-    //LayerTree.render("layer-tree", appState.layers);
+    AppLayerTree.init();
+    //AppLayerTree.render("layer-tree", appState.layers);
     //carico gli strumenti di ricerca
     SearchTools.render(
       "search-tools",
@@ -744,15 +744,15 @@ var AppStore = (function() {
   var liveReload = function(newAppState) {
     AppStore.setAppState(newAppState);
     AppStore.showAppTools();
-    LayerTree.render("layer-tree", newAppState.layers);
-    MainMap.removeAllLayersFromMap();
-    MainMap.loadConfig(newAppState);
+    AppLayerTree.render("layer-tree", newAppState.layers);
+    AppMap.removeAllLayersFromMap();
+    AppMap.loadConfig(newAppState);
   };
 
   var mapReload = function() {
-    LayerTree.render("layer-tree", appState.layers);
-    MainMap.removeAllLayersFromMap();
-    MainMap.loadConfig(appState);
+    AppLayerTree.render("layer-tree", appState.layers);
+    AppMap.removeAllLayersFromMap();
+    AppMap.loadConfig(appState);
   };
 
   /**
@@ -760,7 +760,7 @@ var AppStore = (function() {
    * @return {null} Nessun valore restituito
    */
   var resetInitialLayers = function() {
-    LayerTree.render("layer-tree", initialAppState.layers);
+    AppLayerTree.render("layer-tree", initialAppState.layers);
     for (var i = 0; i < initialAppState.layers.length; i++) {
       dispatch({
         eventName: "set-layer-visibility",
@@ -847,7 +847,7 @@ var AppStore = (function() {
     //credo delle proprietà standard
     var props = {};
     props.token = authToken.token;
-    var ll = MainMap.getMapCenterLonLat();
+    var ll = AppMap.getMapCenterLonLat();
     props.lon = ll[0];
     props.lat = ll[1];
     var template = Handlebars.compile(urlTemplate);

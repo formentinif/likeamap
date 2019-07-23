@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
 
 http://www.apache.org/licenses/LICENSE-2.0
@@ -25,11 +25,13 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LayerTree = (function() {
-  var isRendered = false;
-  var layerGroupPrefix = "lt";
-  var layerGroupItemPrefix = "lti";
-  var layerGroupItemIconPrefix = "ltic";
+var AppLayerTree = (function() {
+  let treeDiv = "layer-tree";
+  let isRendered = false;
+  let layerGroupPrefix = "lt";
+  let layerGroupItemPrefix = "lti";
+  let layerGroupItemIconPrefix = "ltic";
+  let layerUriCount = 0;
   let countRequest = 0;
 
   var init = function init() {
@@ -38,32 +40,16 @@ var LayerTree = (function() {
     AppStore.getAppState().layers.forEach(function(layer) {
       loadLayersUri(layer);
     });
-
-    Handlebars.registerHelper("visible", function(v1, options) {
-      if (v1 === 1) {
-        return "visible";
-      }
-      return "hidden";
-    });
-
-    Handlebars.registerHelper("checksquarefa", function(v1, options) {
-      if (v1 === 1) {
-        return "fa-check-square";
-      }
-      return "fa-square";
-    });
-
-    Handlebars.registerHelper("minussquarefa", function(v1, options) {
-      if (v1 === 1) {
-        return "fa-minus-square";
-      }
-      return "fa-plus-square";
-    });
+    if (layerUriCount === 0) {
+      //no ajax request sent, loading all json immediately
+      render(treeDiv, AppStore.getAppState().layers);
+    }
   };
 
   var loadLayersUri = function(layer) {
     if (layer.layersUri) {
       countRequest++;
+      layerUriCount++;
       $.ajax({
         dataType: "json",
         url: layer.layersUri
@@ -83,7 +69,7 @@ var LayerTree = (function() {
         .always(function(data) {
           countRequest--;
           if (countRequest === 0) {
-            render("layer-tree", AppStore.getAppState().layers);
+            render(treeDiv, AppStore.getAppState().layers);
           }
         });
     } else if (layer.layers) {
@@ -97,7 +83,7 @@ var LayerTree = (function() {
     //if (!isRendered) {
     //  init();
     //}
-
+    debugger;
     var output = "";
     if (!AppStore.getAppState().logoPanelUrl) {
       output += '<h4 class="lk-title">Temi</h4>';

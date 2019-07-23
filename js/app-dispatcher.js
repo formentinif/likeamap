@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
 
 http://www.apache.org/licenses/LICENSE-2.0
@@ -99,7 +99,7 @@ var Dispatcher = (function() {
     });
     this.bind("hide-info-window", function(payload) {
       AppStore.hideInfoWindow();
-      MainMap.clearLayerInfo();
+      AppMap.clearLayerInfo();
     });
     this.bind("hide-editor-window", function(payload) {
       EditorTools.hideEditorWindow();
@@ -122,35 +122,30 @@ var Dispatcher = (function() {
       AppStore.searchAddress(payload.data, "AppStore.processAddress");
     });
     this.bind("zoom-lon-lat", function(payload) {
-      MainMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
+      AppMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
     this.bind("zoom-geometry", function(payload) {
-      MainMap.goToGeometry(payload.geometry);
+      AppMap.goToGeometry(payload.geometry);
     });
     this.bind("add-info-map", function(payload) {
-      MainMap.addInfoToMap(payload.wkt);
+      AppMap.addInfoToMap(payload.wkt);
     });
     this.bind("add-feature-info-map", function(payload) {
-      MainMap.addFeatureInfoToMap(payload.geometry, payload.srid);
+      AppMap.addFeatureInfoToMap(payload.geometry, payload.srid);
     });
     this.bind("toggle-layer", function(payload) {
-      MainMap.toggleLayer(payload.gid);
+      AppMap.toggleLayer(payload.gid);
       AppStore.toggleLayer(payload.gid);
     });
     this.bind("set-layer-visibility", function(payload) {
-      MainMap.setLayerVisibility(payload.gid, payload.visibility);
+      AppMap.setLayerVisibility(payload.gid, payload.visibility);
       AppStore.setLayerVisibility(payload.gid, payload.visibility);
     });
     this.bind("reset-layers", function(payload) {
       AppStore.resetInitialLayers();
     });
     this.bind("print-map", function(payload) {
-      AppStore.printMap(
-        payload.paper,
-        payload.orientation,
-        payload.format,
-        payload.template
-      );
+      AppStore.printMap(payload.paper, payload.orientation, payload.format, payload.template);
     });
     this.bind("create-share-url", function(payload) {
       AppStore.createShareUrl();
@@ -165,11 +160,11 @@ var Dispatcher = (function() {
     //});
 
     this.bind("stop-copy-coordinate", function(payload) {
-      MainMap.stopCopyCoordinate();
+      AppMap.stopCopyCoordinate();
     });
 
     this.bind("start-copy-coordinate", function(payload) {
-      MainMap.startCopyCoordinate();
+      AppMap.startCopyCoordinate();
     });
 
     this.bind("map-click", function(payload) {
@@ -177,11 +172,11 @@ var Dispatcher = (function() {
     });
 
     this.bind("remove-info", function(payload) {
-      MainMap.clearLayerInfo();
+      AppMap.clearLayerInfo();
     });
 
     this.bind("add-info-point", function(payload) {
-      MainMap.addInfoPoint(payload.lon, payload.lat);
+      AppMap.addInfoPoint(payload.lon, payload.lat);
     });
 
     this.bind("init-map-app", function(payload) {
@@ -201,55 +196,46 @@ var Dispatcher = (function() {
     this.bind("show-print-area", function(payload) {
       //ricavo posizione e risoluzione
       //Cerco il centro del rettangolo attuale di stampa o lo metto al centro della mappa
-      var printCenter = MainMap.getPrintCenter();
+      var printCenter = AppMap.getPrintCenter();
       if (!printCenter) {
-        printCenter = MainMap.getMapCenter();
+        printCenter = AppMap.getMapCenter();
       }
       //setto la risoluzione base a quella della mappa
       var scale = payload.scale;
-      var resolution = MainMap.getMapResolution() / 2;
+      var resolution = AppMap.getMapResolution() / 2;
       //se la scala non è nulla setto la risoluzione in base alla Scala
       if (scale) {
-        resolution = MainMap.getResolutionForScale(scale, "m");
+        resolution = AppMap.getResolutionForScale(scale, "m");
       } else {
         //setto la scala per la stampa in ui
-        PrintTools.setScale(MainMap.getMapScale() / 2);
+        PrintTools.setScale(AppMap.getMapScale() / 2);
       }
       var paper = payload.paper;
       var orientation = payload.orientation;
-      var printSize = PrintTools.getPrintMapSize(
-        paper,
-        orientation,
-        resolution
-      );
+      var printSize = PrintTools.getPrintMapSize(paper, orientation, resolution);
 
-      MainMap.setPrintBox(
-        printCenter[0],
-        printCenter[1],
-        printSize.width,
-        printSize.height
-      );
+      AppMap.setPrintBox(printCenter[0], printCenter[1], printSize.width, printSize.height);
     });
 
     this.bind("set-draw", function(payload) {
-      MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction();
-      MainMap.addDrawInteraction(payload.type);
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
+      AppMap.addDrawInteraction(payload.type);
     });
 
     this.bind("unset-draw", function(payload) {
-      MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction();
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
     });
 
     this.bind("set-draw-delete", function(payload) {
-      MainMap.removeDrawInteraction();
-      MainMap.removeDrawDeleteInteraction();
-      MainMap.addDrawDeleteInteraction(payload.type);
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
+      AppMap.addDrawDeleteInteraction(payload.type);
     });
 
     this.bind("delete-draw", function(payload) {
-      MainMap.deleteDrawFeatures(payload.type);
+      AppMap.deleteDrawFeatures(payload.type);
     });
 
     this.bind("do-login", function(payload) {
@@ -262,7 +248,7 @@ var Dispatcher = (function() {
 
     this.bind("reverse-geocoding", function(payload) {
       //conversione coordinate
-      MainMap.getRequestInfo(payload.coordinate, false);
+      AppMap.getRequestInfo(payload.coordinate, false);
     });
 
     this.bind("show-reverse-geocoding-result", function(payload) {

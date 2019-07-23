@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Copyright 2015-2017 Perspectiva di Formentini Filippo
+Copyright 2015-2019 Perspectiva di Formentini Filippo
 Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
 
 http://www.apache.org/licenses/LICENSE-2.0
@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var MainMap = (function() {
+var AppMap = (function() {
   /// <summary>
   /// Classe per la gestione delle funzionalità di mapping
   /// </summary>
@@ -897,9 +897,9 @@ var MainMap = (function() {
     }
     //adding the right callback on request
     if (requestQueue.visibleLayers) {
-      url += "&format_options=callback:MainMap.processRequest";
+      url += "&format_options=callback:AppMap.processRequest";
     } else {
-      url += "&format_options=callback:MainMap.processRequestAll";
+      url += "&format_options=callback:AppMap.processRequestAll";
     }
     requestQueue.ajaxPending = true;
     dispatch("show-loader");
@@ -1569,7 +1569,7 @@ var MainMap = (function() {
 
   var goToBrowserLocation = function() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(MainMap.showBrowserLocation);
+      navigator.geolocation.getCurrentPosition(AppMap.showBrowserLocation);
     }
   };
   var showBrowserLocation = function(position) {
