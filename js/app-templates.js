@@ -43,17 +43,10 @@ var AppTemplates = (function() {
       if (groupLayer.layers) {
         for (var li = 0; li < groupLayer.layers.length; li++) {
           //il layer deve essere selezionabile
-          if (
-            !groupLayer.layers[li].layer ||
-            !groupLayer.layers[li].queryable
-          ) {
+          if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(
-            groupLayer.layers[li].gid,
-            groupLayer.layers[li].templateUrl,
-            repoTemplatesUrl
-          );
+          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -69,11 +62,7 @@ var AppTemplates = (function() {
   var loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
     for (let i = 0; i < tempRelations.length; i++) {
       const relation = tempRelations[i];
-      let templateUrl = getTemplateUrl(
-        relation.gid,
-        relation.templateUrl,
-        repoTemplatesUrl
-      );
+      let templateUrl = getTemplateUrl(relation.gid, relation.templateUrl, repoTemplatesUrl);
       let template = templates.filter(function(el) {
         return el.templateUrl === templateUrl;
       });
@@ -161,12 +150,7 @@ var AppTemplates = (function() {
   var standardTemplate = function(props) {
     var body = "<table class='lk-table lk-mb-3'>";
     for (var propertyName in props) {
-      body +=
-        "<tr><td>" +
-        propertyName +
-        ":</td><td>" +
-        props[propertyName] +
-        "</td></tr>";
+      body += "<tr><td>" + propertyName + ":</td><td>" + (props[propertyName] == null ? "" : props[propertyName]) + "</td></tr>";
     }
     body += "</table>";
     return body;
@@ -178,14 +162,7 @@ var AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lk-mb-2 col s12">';
-        result +=
-          '<a href="#" onclick="AppStore.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          relation.labelTemplate +
-          "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -205,25 +182,14 @@ var AppTemplates = (function() {
         var field = template.fields[i];
         switch (field.type) {
           case "int":
-            str +=
-              "<tr><td class='lk-strong'>" +
-              field.label +
-              "</td><td>{{{" +
-              field.field +
-              "}}}</td></tr>";
+            str += "<tr><td class='lk-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
             break;
           case "string":
-            str +=
-              "<tr><td class='lk-strong'>" +
-              field.label +
-              "</td><td>{{{" +
-              field.field +
-              "}}}</td></tr>";
+            str += "<tr><td class='lk-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
             break;
           case "yesno":
             str += "<tr><td class='lk-strong'>" + field.label + "</td>";
-            str +=
-              "<td>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</td></tr>";
+            str += "<td>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</td></tr>";
             break;
           /*  case "moreinfo":
             str +=
@@ -246,12 +212,7 @@ var AppTemplates = (function() {
             str += field.footer;
             break;
           case "link":
-            str +=
-              '<tr><td colspan="2"><a href="{{' +
-              field.field +
-              '}}" target="_blank">' +
-              field.label +
-              "</a></td>";
+            str += '<tr><td colspan="2"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></td>";
             break;
         }
       }

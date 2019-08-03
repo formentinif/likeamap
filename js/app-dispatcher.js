@@ -116,7 +116,7 @@ var Dispatcher = (function() {
       AppStore.liveReload(payload.appState);
     });
     this.bind("show-legend", function(payload) {
-      AppStore.showLegend(payload.gid);
+      AppStore.showLegend(payload.gid, payload.scaled);
     });
     this.bind("search-address", function(payload) {
       AppStore.searchAddress(payload.data, "AppStore.processAddress");

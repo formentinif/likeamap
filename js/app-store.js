@@ -307,7 +307,7 @@ var AppStore = (function() {
     $("#info-window").hide();
   };
 
-  var showLegend = function(gid) {
+  var showLegend = function(gid, scaled) {
     var html = "<div>";
     var urlImg = "";
 
@@ -317,7 +317,7 @@ var AppStore = (function() {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
       } else {
-        urlImg = AppMap.getLegendUrl(gid);
+        urlImg = AppMap.getLegendUrl(gid, scaled);
       }
 
       if (urlImg) {
@@ -327,6 +327,14 @@ var AppStore = (function() {
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
+
+    if (scaled) {
+      html +=
+        "<p class='mt-2'><a href='#' onclick=\"Dispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        gid +
+        "', scaled: false })\">Visualizza legenda completa</a></p>";
+    }
+
     html += "<div>";
     var layer = AppMap.getLayerInfo(gid);
     var layerName = "";
@@ -394,26 +402,39 @@ var AppStore = (function() {
     }
   };
 
+  var getLayerArray = function(layers, gid) {
+    var layerFound = null;
+    layers.forEach(function(layer) {
+      if (layer.gid === gid) {
+        layerFound = layer;
+      }
+      if (!layerFound && layer.layers) {
+        layerFound = AppStore.getLayerArray(layer.layers, gid);
+      }
+    });
+    return layerFound;
+  };
+
+  var getLayerArrayByName = function(layers, layerName) {
+    var layerFound = null;
+    layers.forEach(function(layer) {
+      if (layer.layer && $.inArray(layerName, layer.layer.split(":")) >= 0) {
+        layerFound = layer;
+      }
+      if (!layerFound && layer.layers) {
+        layerFound = AppStore.getLayerArrayByName(layer.layers, layerName);
+      }
+    });
+    return layerFound;
+  };
+
   /**
    * Restituisce il layer dall'identificativo
    * @param  {string} gid identificativo del layer
    * @return {object}     Layer
    */
   var getLayer = function(gid) {
-    for (var i = 0; i < appState.layers.length; i++) {
-      if (appState.layers[i].gid === gid) {
-        return appState.layers[i];
-      }
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          if (appState.layers[i].layers[ki].gid === gid) {
-            return appState.layers[i].layers[ki];
-          }
-        }
-      }
-    }
-
-    return null;
+    return AppStore.getLayerArray(appState.layers, gid);
   };
 
   /**
@@ -422,24 +443,7 @@ var AppStore = (function() {
    * @return {object}     Layer
    */
   var getLayerByName = function(layerName) {
-    for (var i = 0; i < appState.layers.length; i++) {
-      if (appState.layers[i].layer) {
-        if ($.inArray(layerName, appState.layers[i].layer.split(":")) >= 0) {
-          return appState.layers[i];
-        }
-      }
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          if (appState.layers[i].layers[ki].layer) {
-            if ($.inArray(layerName, appState.layers[i].layers[ki].layer.split(":")) >= 0) {
-              return appState.layers[i].layers[ki];
-            }
-          }
-        }
-      }
-    }
-
-    return null;
+    return AppStore.getLayerArrayByName(appState.layers, layerName);
   };
 
   /**
@@ -891,6 +895,8 @@ var AppStore = (function() {
     getCurrentInfoItems: getCurrentInfoItems,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
+    getLayerArray: getLayerArray,
+    getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,

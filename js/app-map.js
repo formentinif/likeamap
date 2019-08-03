@@ -1028,7 +1028,7 @@ var AppMap = (function() {
     return mainMap.getView().getZoom();
   };
 
-  var getLegendUrl = function getLegendUrl(gid) {
+  var getLegendUrl = function getLegendUrl(gid, scaled) {
     var layer = getLayer(gid);
     var layerStore = AppStore.getLayer(gid);
     var url = "";
@@ -1060,6 +1060,9 @@ var AppMap = (function() {
         }
       }
     } catch (e) {}
+    if (scaled) {
+      url += "&SCALE=" + AppMap.getMapScale();
+    }
     return url;
   };
 

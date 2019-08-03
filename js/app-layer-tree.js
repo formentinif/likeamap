@@ -70,6 +70,7 @@ var AppLayerTree = (function() {
           countRequest--;
           if (countRequest === 0) {
             render(treeDiv, AppStore.getAppState().layers);
+            AppMap.loadConfig(AppStore.getAppState()); //reloading layer state
           }
         });
     } else if (layer.layers) {
@@ -80,10 +81,6 @@ var AppLayerTree = (function() {
   };
 
   var render = function(div, layers) {
-    //if (!isRendered) {
-    //  init();
-    //}
-    debugger;
     var output = "";
     if (!AppStore.getAppState().logoPanelUrl) {
       output += '<h4 class="lk-title">Temi</h4>';
@@ -112,7 +109,7 @@ var AppLayerTree = (function() {
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
-      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\' })"></i>',
+      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })"></i>',
       layer.gid
     );
     output += formatString(
