@@ -32,6 +32,7 @@ var AppStore = (function() {
   var easingTime = 300;
 
   var panelContentItemSelected = "";
+  var resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }, { eventName: "clear-layer-info" }, { eventName: "clear-layer-print" }];
 
   var init = function() {
     //normalizing appstate
@@ -104,9 +105,13 @@ var AppStore = (function() {
    * @return {null} La funzione non restituisce un valore
    */
   var resetTools = function() {
-    MapTools.stopCopyCoordinate();
-    AppMap.clearLayerInfo();
-    AppMap.clearLayerPrint();
+    resetToolsPayloads.forEach(function(payload) {
+      dispatch(payload);
+    });
+  };
+
+  var addResetToolsEvent = function(event) {
+    resetToolsPayloads.push(event);
   };
 
   var showMenu = function(content) {
@@ -145,6 +150,7 @@ var AppStore = (function() {
       $(".lk-menu-panel-content-item").hide();
       showMenu(content);
     } else {
+      panelContentItemSelected = "";
       if ($("#menu-panel").css("display") == "none" || keepOpen) {
         showMenu(content);
       } else {
@@ -471,22 +477,56 @@ var AppStore = (function() {
     return arrUrl[0] + "?" + qPos + "&layers=" + qLayers;
   };
 
+  function SortByLayerName(a, b) {
+    var aName = a.layerName.toLowerCase();
+    var bName = b.layerName.toLowerCase();
+    return aName < bName ? -1 : aName > bName ? 1 : 0;
+  }
+
+  /**
+   * Restituisce tutti i layer abilitati all'interrogazione
+   * @return {array} Array dei layer interrogabili
+   */
+  var getQueryLayers = function() {
+    let layers = getQueryLayersArray(appState.layers);
+    layers.sort(SortByLayerName);
+    return layers;
+  };
+
+  var getQueryLayersArray = function(layers) {
+    var layersFound = [];
+    layers.forEach(function(layer) {
+      if (layer.queryable) {
+        layersFound.push(layer);
+      }
+      if (layer.layers) {
+        layersFound = layersFound.concat(getQueryLayersArray(layer.layers));
+      }
+    });
+    return layersFound;
+  };
+
   /**
    * Restituisce tutti i layer abilitati alla ricerca
    * @return {array} Array dei layer ricercarbili
    */
   var getSearchLayers = function() {
-    var searchLayers = [];
-    for (var i = 0; i < appState.layers.length; i++) {
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          if (appState.layers[i].layers[ki].searchable) {
-            searchLayers.push(appState.layers[i].layers[ki]);
-          }
-        }
+    let layers = getSearchLayersArray(appState.layers);
+    layers.sort(SortByLayerName);
+    return layers;
+  };
+
+  var getSearchLayersArray = function(layers) {
+    var layersFound = [];
+    layers.forEach(function(layer) {
+      if (layer.searchable) {
+        layersFound.push(layer);
       }
-    }
-    return searchLayers;
+      if (layer.layers) {
+        layersFound = layersFound.concat(getSearchLayersArray(layer.layers));
+      }
+    });
+    return layersFound;
   };
 
   /**
@@ -693,26 +733,29 @@ var AppStore = (function() {
     //carico i templates
     AppTemplates.init();
     //carico i layers
-    AppLayerTree.init();
-    //AppLayerTree.render("layer-tree", appState.layers);
-    //carico gli strumenti di ricerca
-    SearchTools.render(
-      "search-tools",
-      appState.searchProvider,
-      appState.searchProviderAddressUrl,
-      appState.searchProviderAddressField,
-      appState.searchProviderHouseNumberUrl,
-      appState.searchProviderHouseNumberField,
-      getSearchLayers()
-    );
-    //carico gli strumenti di share
-    ShareTools.render("share-tools", null);
-    //carico gli strumenti di Stampa
-    PrintTools.render("print-tools");
-    //carico gli strumenti di mappa
-    MapTools.render("map-tools");
-    //carico gli strumenti di disegno
-    DrawTools.render("draw-tools");
+    AppLayerTree.init(function() {
+      //carico gli strumenti di ricerca
+      SearchTools.render(
+        "search-tools",
+        appState.searchProvider,
+        appState.searchProviderAddressUrl,
+        appState.searchProviderAddressField,
+        appState.searchProviderHouseNumberUrl,
+        appState.searchProviderHouseNumberField,
+        getSearchLayers()
+      );
+      //carico gli strumenti di share
+      ShareTools.render("share-tools", null);
+      //carico gli strumenti di Stampa
+      PrintTools.render("print-tools");
+      //carico gli strumenti di mappa
+      MapTools.render("map-tools");
+      //carico gli strumenti di disegno
+      DrawTools.render("draw-tools");
+      if (appState.modules["select-tools"]) {
+        SelectTools.render(getQueryLayers());
+      }
+    });
 
     //eseguo degli aggiustamente in caso di browser mobile
     if (isMobile()) {
@@ -885,7 +928,12 @@ var AppStore = (function() {
     return AppStore.getAppState().currentInfoItems;
   };
 
+  let getPanelContentItemSelected = function() {
+    return panelContentItemSelected;
+  };
+
   return {
+    addResetToolsEvent: addResetToolsEvent,
     createShareUrl: createShareUrl,
     doLogin: doLogin,
     init: init,
@@ -898,6 +946,8 @@ var AppStore = (function() {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getPanelContentItemSelected: getPanelContentItemSelected,
+    getQueryLayers: getQueryLayers,
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,
     getRelation: getRelation,

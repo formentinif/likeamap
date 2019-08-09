@@ -62,32 +62,25 @@ var MapTools = (function() {
     template += '<div class="lk-card z-depth-2">';
     template += "<h5>Vai a..</h5>";
     template += '<div id="map-tools__lon-field" class="input-field" >';
-    template +=
-      '<input id="map-tools__lon" class="mdl-textfield__input" type="number" step="any">';
-    template +=
-      '<label class="mdl-textfield__label" for="map-tools__lon">Longitune</label>';
+    template += '<input id="map-tools__lon" class="mdl-textfield__input" type="number" step="any">';
+    template += '<label class="mdl-textfield__label" for="map-tools__lon">Longitune</label>';
     template += "</div>";
     template += '<div id="map-tools__lat-field" class="input-field" >';
-    template +=
-      '<input id="map-tools__lat" class="mdl-textfield__input" type="number" step="any">';
-    template +=
-      '<label class="mdl-textfield__label" for="map-tools__lat">Latitudine</label>';
+    template += '<input id="map-tools__lat" class="mdl-textfield__input" type="number" step="any">';
+    template += '<label class="mdl-textfield__label" for="map-tools__lat">Latitudine</label>';
     template += "</div>";
-    template +=
-      '<button id="search-tools__gotolonlat"  class="waves-effect waves-light btn" onclick="MapTools.goToLonLat()">Vai</button>';
+    template += '<button id="search-tools__gotolonlat"  class="waves-effect waves-light btn" onclick="MapTools.goToLonLat()">Vai</button>';
 
     template += '<div class="div-20"></div>';
 
     template += "<div>";
     template += "<h5>Copia coordinate</h5>";
-    template +=
-      '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
+    template += '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
     template +=
       '<button id="search-tools__start-copy-url" class="waves-effect waves-light btn lk-input-margin-right" onclick="MapTools.startCopyCoordinate()">Inizia</button>';
     template +=
       '<button id="search-tools__stop-copy-url" class="waves-effect waves-light btn lk-input-margin-right lk-hidden" onclick="MapTools.stopCopyCoordinate()">Fine</button>';
-    template +=
-      '<button id="search-tools__copy-url"  class="waves-effect waves-light btn lk-input-margin-right" >Copia</button>';
+    template += '<button id="search-tools__copy-url"  class="waves-effect waves-light btn lk-input-margin-right" >Copia</button>';
 
     template += "</div>";
 
@@ -147,16 +140,13 @@ var MapTools = (function() {
   var stopCopyCoordinate = function() {
     $("#search-tools__start-copy-url").show();
     $("#search-tools__stop-copy-url").hide();
-    dispatch("stop-copy-coordinate");
+    AppMap.stopCopyCoordinate();
   };
 
   var addCoordinate = function(lon, lat) {
-    dispatch({ eventName: "add-info-point", lon: lon, lat: lat }),
-      (lon = Math.round(lon * 1000000) / 1000000);
+    dispatch({ eventName: "add-info-point", lon: lon, lat: lat }), (lon = Math.round(lon * 1000000) / 1000000);
     lat = Math.round(lat * 1000000) / 1000000;
-    $("#map-tools__coordinate-textarea").val(
-      $("#map-tools__coordinate-textarea").val() + lon + " " + lat + ";\n"
-    );
+    $("#map-tools__coordinate-textarea").val($("#map-tools__coordinate-textarea").val() + lon + " " + lat + ";\n");
   };
 
   return {

@@ -60,7 +60,7 @@ var SearchTools = (function() {
         searchHouseNumberProviderUrl = providerHouseNumberUrl;
         searchHouseNumberProviderField = providerHouseNumberField;
 
-        var templateTemp = templateSearchWMSG();
+        var templateTemp = templateSearchWFSGeoserver(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function() {
@@ -74,7 +74,7 @@ var SearchTools = (function() {
         break;
       case "nominatim":
       default:
-        var templateTemp = templateSearchNM();
+        var templateTemp = templateSearchNominatim(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
     }
@@ -101,7 +101,7 @@ var SearchTools = (function() {
     $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
   };
 
-  var updateComuniNM = function(comuni) {
+  var updateComuniNominatim = function(comuni) {
     $.each(comuni, function(i, comune) {
       var nomeComune = comune.nomeComune;
       if (nomeComune) {
@@ -119,8 +119,11 @@ var SearchTools = (function() {
     });
   };
 
-  var templateMenuString = function() {
-    template = '<div class="lk-bar lk-background">';
+  /**
+   * General html code that will be injected in the panel as the main tools
+   */
+  var templateTopTools = function() {
+    let template = '<div class="lk-bar lk-background">';
     template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
@@ -134,9 +137,11 @@ var SearchTools = (function() {
     return template;
   };
 
-  var templateMenuLayers = function() {
-    searchLayers = searchLayers.sort(SortByLayerName);
-    var template = '<div id="search-tools__layers" class="lk-card z-depth-2" style="display:none;">';
+  /**
+   * General html code that will be injected in order to display the layer tools
+   */
+  var templateLayersTools = function(searchLayers) {
+    let template = '<div id="search-tools__layers" class="lk-card z-depth-2" style="display:none;">';
     template += '<select id="search-tools__select-layers" class="input-field">';
     for (var i = 0; i < searchLayers.length; i++) {
       template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
@@ -157,54 +162,64 @@ var SearchTools = (function() {
     return template;
   };
 
-  var templateSearchNM = function() {
-    template = "";
+  /**
+   * Initialize the panel if Nominatim is selected as default address provider
+   */
+  var templateSearchNominatim = function(searchLayers) {
+    let template = "";
     //pannello ricerca via
     if (!AppStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lk-title">Ricerca</h4>';
     }
-    template += templateMenuString();
+    template += templateTopTools();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<select id="search-tools__comune" class="input-field">';
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressNM(event)">';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
     template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
-    template += templateMenuLayers();
+    template += templateLayersTools(searchLayers);
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
 
-  var templateSearchWMSG = function() {
-    template = "";
+  /**
+   * Initialize the panel if Geoserver is selected as default address provider
+   */
+  var templateSearchWFSGeoserver = function() {
+    let template = "";
     //pannello ricerca via
     if (!AppStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lk-title">Ricerca</h4>';
     }
-    template += templateMenuString();
+    template += templateTopTools();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.searchAddressWMSG(event)">';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
     template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
-    template += templateMenuLayers();
+    template += templateLayersTools(searchLayers);
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lk-card z-depth-2 lk-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
 
-  var templateSearchResultsNM = function(results) {
+  /**
+   * Display the list of the nominatim results in the left panel
+   * @param {Object} results
+   */
+  var templateResultsNominatim = function(results) {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNM({{{@index}}});return false">';
+    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -213,7 +228,11 @@ var SearchTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateSearchResultsWMSG = function(results) {
+  /**
+   * Display the list of the WFS Address results in the left panel
+   * @param {Object} results
+   */
+  var templateSearchResultsWFSGeoserver = function(results) {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
@@ -228,6 +247,10 @@ var SearchTools = (function() {
     return Handlebars.compile(template);
   };
 
+  /**
+   * Display the list of the WFS Layers results in the left panel
+   * @param {Object} results
+   */
   var templateSearchResultsLayers = function(results) {
     template = '<ul class="mdl-list">';
     template += "{{#each this}}";
@@ -247,63 +270,72 @@ var SearchTools = (function() {
     return Handlebars.compile(template);
   };
 
+  /**
+   * Switch the address/layers tools
+   */
   var showSearchAddress = function() {
     $("#search-tools__label").text("Indirizzo");
     $("#search-tools__address").show();
     $("#search-tools__layers").hide();
   };
 
+  /**
+   * Switch the address/layers tools
+   */
   var showSearchLayers = function() {
     $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
     $("#search-tools__layers").show();
   };
 
-  var zoomToItemNM = function(index) {
-    var payload = {};
-    payload.eventName = "zoom-lon-lat";
-    var result = searchResults[index];
-    payload.zoom = 18;
-    payload.lon = parseFloat(result.lon);
-    payload.lat = parseFloat(result.lat);
-    dispatch(payload);
-    var wkt = "POINT(" + payload.lon + " " + payload.lat + ")";
-    payload = {};
-    payload.eventName = "add-info-map";
-    payload.wkt = wkt;
-    dispatch(payload);
-    payload = {};
-    payload.eventName = "hide-menu-mobile";
-    dispatch(payload);
+  /**
+   * Zoom the map to the item provided
+   * @param {int} index  Item's index in the Nominatim array result
+   */
+  var zoomToItemNominatim = function(index) {
+    let result = searchResults[index];
+    dispatch({
+      eventName: "zoom-lon-lat",
+      zoom: 18,
+      lon: parseFloat(result.lon),
+      lat: parseFloat(result.lat)
+    });
+    dispatch({
+      eventName: "add-info-map",
+      wkt: "POINT(" + result.lon + " " + result.lat + ")"
+    });
+    dispatch({ eventName: "hide-menu-mobile" });
   };
 
-  var zoomToItemWMSG = function(lon, lat) {
-    var payload = {};
-    payload.eventName = "remove-info";
-    payload.wkt = wkt;
-    dispatch(payload);
-    payload = {};
-    payload.eventName = "zoom-lon-lat";
-    payload.zoom = 18;
-    payload.lon = parseFloat(lon);
-    payload.lat = parseFloat(lat);
-    dispatch(payload);
-    var wkt = "POINT(" + payload.lon + " " + payload.lat + ")";
-    payload = {};
-    payload.eventName = "add-info-map";
-    payload.wkt = wkt;
-    dispatch(payload);
-    payload = {};
-    payload.eventName = "hide-menu-mobile";
-    dispatch(payload);
+  /**
+   * Zoom the map to the lon-lat given and add a point to the map
+   * @param {float} lon
+   * @param {float} lat
+   */
+  var zoomToItemWFSGeoserver = function(lon, lat) {
+    dispatch("remove-info");
+    dispatch({
+      eventName: "zoom-lon-lat",
+      zoom: 18,
+      lon: parseFloat(lon),
+      lat: parseFloat(lat)
+    });
+    dispatch({
+      eventName: "add-info-map",
+      wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
+    });
+    dispatch("hide-menu-mobile");
   };
 
+  /**
+   * Zoom the map to the lon-lat given and show the infobox of the given item index
+   * @param {float} lon
+   * @param {float} lat
+   * @param {int} index Item's index in the result array
+   * @param {boolean} showInfo
+   */
   var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    var payload = {};
-    payload.eventName = "remove-info";
-    payload.wkt = wkt;
-    dispatch(payload);
-
+    dispatch("remove-info");
     if (searchResults[index]) {
       dispatch({
         eventName: "zoom-geometry",
@@ -315,46 +347,45 @@ var SearchTools = (function() {
           data: searchResults[index].item
         });
       }
-      payload = {};
-      payload.eventName = "add-feature-info-map";
-      payload.geometry = searchResults[index].item.geometry;
+      let payload = {
+        eventName: "add-feature-info-map",
+        geometry: searchResults[index].item.geometry
+      };
       try {
         payload.srid = searchResults[index].item.crs;
       } catch (e) {
         payload.srid = null;
       }
       dispatch(payload);
-      payload = {};
-      payload.eventName = "hide-menu-mobile";
-      dispatch(payload);
+      dispatch("hide-menu-mobile");
     } else {
-      payload = {};
-      payload.eventName = "zoom-lon-lat";
-      payload.zoom = 18;
-      payload.lon = parseFloat(lon);
-      payload.lat = parseFloat(lat);
-      var wkt = "POINT(" + payload.lon + " " + payload.lat + ")";
-      payload = {};
-      payload.eventName = "add-info-map";
-      payload.wkt = wkt;
-      dispatch(payload);
-      payload = {};
-      payload.eventName = "hide-menu-mobile";
-      dispatch(payload);
+      dispatch({
+        eventName: "zoom-lon-lat",
+        zoom: 18,
+        lon: parseFloat(lon),
+        lat: parseFloat(lat),
+        eventName: "add-info-map",
+        wkt: "POINT(" + lon + " " + lat + ")"
+      });
+      dispatch("hide-menu-mobile");
     }
   };
 
-  var getRegioneFromComuneNM = function(idcomune) {
+  var getRegioneFromComuneNominatim = function(idcomune) {
     return "Emilia-Romagna";
   };
 
-  var searchAddressNM = function(ev) {
+  /**
+   * Start the search in the Nominatim Provider
+   * @param {Object} ev key click event result
+   */
+  var doSearchAddressNominatim = function(ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-via").blur();
     }
     var comune = $("#search-tools__comune option:selected").text();
     var idcomune = $("#search-tools__comune option:selected").val();
-    var regione = getRegioneFromComuneNM(idcomune);
+    var regione = getRegioneFromComuneNominatim(idcomune);
     var via = $("#search-tools__search-via").val();
 
     if (via.length > 3 && comune) {
@@ -382,7 +413,7 @@ var SearchTools = (function() {
             searchResults = results;
             //renderizzo i risultati
 
-            var templateTemp = templateSearchResultsNM();
+            var templateTemp = templateResultsNominatim();
             var output = templateTemp(results);
             jQuery("#search-tools__search-results").html(output);
           } else {
@@ -400,7 +431,11 @@ var SearchTools = (function() {
     }
   };
 
-  var searchAddressWMSG = function(ev) {
+  /**
+   * Start the search in the WFS Geoserver Provider
+   * @param {Object} ev key click event result
+   */
+  var doSearchAddressWMSG = function(ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-via").blur();
     }
@@ -480,7 +515,7 @@ var SearchTools = (function() {
               if ($.inArray(currentAddress, toponimi) === -1) {
                 var cent = null;
                 if (data.features[i].geometry.type != "POINT") {
-                  cent = centroid(data.features[i].geometry.coordinates);
+                  cent = AppMap.getCentroid(data.features[i].geometry.coordinates);
                 } else {
                   cent = data.features[i].geometry.coordinates;
                 }
@@ -500,7 +535,7 @@ var SearchTools = (function() {
             }
             searchResults = results.sort(SortByDisplayName);
             //renderizzo i risultati
-            var templateTemp = templateSearchResultsWMSG();
+            var templateTemp = templateSearchResultsWFSGeoserver();
             var output = templateTemp(results);
             jQuery("#search-tools__search-results").html(output);
           } else {
@@ -519,7 +554,11 @@ var SearchTools = (function() {
     }
   };
 
-  var searchLayers = function(ev) {
+  /**
+   * Start the search in the WFS Geoserver Provider
+   * @param {Object} ev key click event result
+   */
+  var doSearchLayers = function(ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-layers").blur();
     }
@@ -565,7 +604,7 @@ var SearchTools = (function() {
                   if ($.inArray(data.features[i].properties[layer.searchField], resultsIndex) === -1) {
                     var cent = null;
                     if (data.features[i].geometry.coordinates[0][0]) {
-                      cent = centroid(data.features[i].geometry.coordinates[0]);
+                      cent = AppMap.getCentroid(data.features[i].geometry.coordinates[0]);
                     } else {
                       cent = data.features[i].geometry.coordinates;
                     }
@@ -621,9 +660,9 @@ var SearchTools = (function() {
         if (layer) {
           var cent = null;
           if (data[i].geometry.coordinates[0][0]) {
-            cent = centroid(data[i].geometry.coordinates[0]);
+            cent = AppMap.getCentroid(data[i].geometry.coordinates[0]);
           } else {
-            cent = centroid(data[i].geometry.coordinates);
+            cent = AppMap.getCentroid(data[i].geometry.coordinates);
           }
           var item = data[i];
           //salvo il crs della feature
@@ -660,48 +699,20 @@ var SearchTools = (function() {
     return aName < bName ? -1 : aName > bName ? 1 : 0;
   }
 
-  function SortByLayerName(a, b) {
-    var aName = a.layerName.toLowerCase();
-    var bName = b.layerName.toLowerCase();
-    return aName < bName ? -1 : aName > bName ? 1 : 0;
-  }
-
-  function centroid(lonlats) {
-    var latXTotal = 0;
-    var latYTotal = 0;
-    var lonDegreesTotal = 0;
-
-    var currentLatLong;
-    for (var i = 0; (currentLatLong = lonlats[i]); i++) {
-      var latDegrees = currentLatLong[1];
-      var lonDegrees = currentLatLong[0];
-
-      var latRadians = (Math.PI * latDegrees) / 180;
-      latXTotal += Math.cos(latRadians);
-      latYTotal += Math.sin(latRadians);
-
-      lonDegreesTotal += lonDegrees;
-    }
-    var finalLatRadians = Math.atan2(latYTotal, latXTotal);
-    var finalLatDegrees = (finalLatRadians * 180) / Math.PI;
-    var finalLonDegrees = lonDegreesTotal / lonlats.length;
-    return [finalLonDegrees, finalLatDegrees];
-  }
-
   return {
     displayGenericResults: displayGenericResults,
     render: render,
-    templateSearchNM: templateSearchNM,
+    templateSearchNominatim: templateSearchNominatim,
     init: init,
-    searchAddressNM: searchAddressNM,
-    updateComuniNM: updateComuniNM,
-    zoomToItemNM: zoomToItemNM,
-    searchAddressWMSG: searchAddressWMSG,
-    searchLayers: searchLayers,
+    doSearchAddressNominatim: doSearchAddressNominatim,
+    updateComuniNominatim: updateComuniNominatim,
+    zoomToItemNominatim: zoomToItemNominatim,
+    doSearchAddressWMSG: doSearchAddressWMSG,
+    dosearchLayers: doSearchLayers,
     selectLayer: selectLayer,
     showSearchAddress: showSearchAddress,
     showSearchLayers: showSearchLayers,
-    zoomToItemWMSG: zoomToItemWMSG,
+    zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
     zoomToItemLayer: zoomToItemLayer
   };
 })();

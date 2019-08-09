@@ -184,6 +184,11 @@
           "description": "Strumenti di disegno",
           "type": "boolean"
         },
+        "select-tools": {
+          "title": "Selezione",
+          "description": "Selezione ad area delle features",
+          "type": "boolean"
+        },
         "gps-tools": {
           "title": "GPS",
           "description": "Strumenti GPS",

@@ -37,6 +37,19 @@ var Dispatcher = (function() {
     this.bind("hide-menu", function(payload) {
       AppStore.hideMenu();
     });
+    this.bind("reset-tools", function(payload) {
+      AppStore.resetTools();
+    });
+    this.bind("stop-copy-coordinate", function(payload) {
+      MapTools.stopCopyCoordinate();
+    });
+    this.bind("clear-layer-info", function(payload) {
+      AppMap.clearLayerInfo();
+    });
+    this.bind("clear-layer-print", function(payload) {
+      AppMap.clearLayerPrint();
+    });
+
     this.bind("show-tool", function(payload) {
       if (payload.tool == "layers") {
         AppStore.showMenuContent("layer-tree");
@@ -155,14 +168,6 @@ var Dispatcher = (function() {
       ShareTools.setShareUrlQuery(AppStore.writeUrlShare());
     });
 
-    //this.bind('more-info', function(payload) {
-    //  AppStore.showMoreInfo(payload.gid, payload.url, payload.layerGid);
-    //});
-
-    this.bind("stop-copy-coordinate", function(payload) {
-      AppMap.stopCopyCoordinate();
-    });
-
     this.bind("start-copy-coordinate", function(payload) {
       AppMap.startCopyCoordinate();
     });
@@ -264,6 +269,24 @@ var Dispatcher = (function() {
       }
       if (payload.showAlert) {
         alert(payload.str);
+      }
+    });
+
+    this.bind("show-message", function(payload) {
+      let message = { title: payload.title, message: payload.message };
+      switch (payload.type) {
+        case "error":
+          $.growl.error(message);
+          break;
+        case "notice":
+          $.growl.notice(message);
+          break;
+        case "warning":
+          $.growl.warning(message);
+          break;
+        default:
+          $.growl(message);
+          break;
       }
     });
   };

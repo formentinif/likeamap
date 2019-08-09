@@ -193,6 +193,7 @@ body {
 
 .lk-menu-panel-bottom .lk-menu-panel-content .lk-menu-panel-content-item {
   display: none;
+  height: 90%;
 }
 
 .lk-menu-panel-close-bottom {
@@ -328,6 +329,10 @@ body {
   border-radius: 2px;
   box-sizing: border-box;
   padding: 5px;
+}
+
+.lk-full-height {
+  height: 100%;
 }
 
 .lk-input-margin-right {

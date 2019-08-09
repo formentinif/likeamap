@@ -25,13 +25,13 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var AppMap = (function() {
+let AppMap = (function() {
   /// <summary>
   /// Classe per la gestione delle funzionalità di mapping
   /// </summary>
   "use strict";
 
-  var defaultLayers = {
+  let defaultLayers = {
     OSM: {
       gid: 1000
     },
@@ -43,22 +43,41 @@ var AppMap = (function() {
     }
   };
 
-  var mainMap;
-  var mainConfig;
-  var layers = [];
+  let mainMap;
+  let mainConfig;
+  let layers = [];
 
   //Array with the requests to elaborate
-  var requestQueue = {};
+  let requestQueue = {};
   //Array with the requests results. Data are features of different types.
-  var requestQueueData = [];
+  let requestQueueData = [];
 
-  var formatWKT = new ol.format.WKT();
-  var featuresWKT = new ol.Collection();
-  var vectorWKT;
+  let formatWKT = new ol.format.WKT();
+  let featuresWKT = new ol.Collection();
+  let vectorWKT;
+  let featuresSelection = new ol.Collection();
+  let featuresSelectionMask = new ol.Collection();
+  let vectorSelectionMask;
+  let vectorSelection;
+  let styleSelection = new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: [255, 216, 0, 0.2]
+    }),
+    stroke: new ol.style.Stroke({
+      color: [255, 216, 0, 1],
+      width: 2
+    }),
+    image: new ol.style.Circle({
+      radius: 7,
+      fill: new ol.style.Fill({
+        color: [255, 216, 0, 1]
+      })
+    })
+  });
 
-  var getCurrentColor = function(opacity, color) {
+  let getCurrentColor = function(opacity, color) {
     if (!opacity) opacity = 1;
-    var resultColor = {
+    let resultColor = {
       r: 68,
       g: 138,
       b: 255,
@@ -70,7 +89,7 @@ var AppMap = (function() {
     try {
       if ($("#draw-tools__color").val()) {
         resultColor = $("#draw-tools__color").val();
-        var rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(resultColor);
+        let rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(resultColor);
         resultColor = rgb
           ? {
               r: parseInt(rgb[1], 16),
@@ -79,11 +98,13 @@ var AppMap = (function() {
             }
           : null;
       }
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
     return [resultColor.r, resultColor.g, resultColor.b, opacity];
   };
 
-  var vectorInfo = new ol.layer.Vector({
+  let vectorInfo = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: []
     }),
@@ -104,37 +125,23 @@ var AppMap = (function() {
     })
   });
 
-  var vectorPrint = new ol.layer.Vector({
+  let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: []
     }),
-    style: new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: getCurrentColor(1, [68, 138, 255, 0.2])
-      }),
-      stroke: new ol.style.Stroke({
-        color: getCurrentColor(1, [68, 138, 255, 1]),
-        width: 2
-      }),
-      image: new ol.style.Circle({
-        radius: 7,
-        fill: new ol.style.Fill({
-          color: getCurrentColor(1, [255, 255, 0, 1])
-        })
-      })
-    })
+    style: styleSelection
   });
 
-  var copyCoordinateEvent; //evento per la copia coordinate
+  let copyCoordinateEvent; //evento per la copia coordinate
 
-  var getMap = function getMap() {
+  let getMap = function getMap() {
     /// <summary>
     /// Restituisce l'oggetto Mappa inizializzato da questa classe
     /// </summary>
     return mainMap;
   };
 
-  var goToLonLat = function goToLonLat(lon, lat, zoom) {
+  let goToLonLat = function goToLonLat(lon, lat, zoom) {
     /// <summary>
     /// Posiziona la mappa per Longitudine, Latitudine, Zoom o X, Y con EPSG:3857 , Zoom
     /// </summary>
@@ -144,7 +151,7 @@ var AppMap = (function() {
     if (!zoom) {
       zoom = 16;
     }
-    var point = new ol.geom.Point([lon, lat]);
+    let point = new ol.geom.Point([lon, lat]);
     if (lon < 180) {
       point = ol.proj.transform([lon, lat], "EPSG:4326", "EPSG:900913");
     } else {
@@ -158,9 +165,9 @@ var AppMap = (function() {
     );
   };
 
-  var goToGeometry = function goToGeometry(geometry, srid) {
-    var geometryOl = getGeometryFromGeoJsonGeometry(geometry);
-    var feature = new ol.Feature({
+  let goToGeometry = function goToGeometry(geometry, srid) {
+    let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
+    let feature = new ol.Feature({
       geometry: geometryOl
     });
     if (srid) {
@@ -169,12 +176,12 @@ var AppMap = (function() {
     if (feature.getGeometry().getType() === "Point") {
       goToLonLat(feature.getGeometry().getCoordinates()[0], feature.getGeometry().getCoordinates()[1], 17);
     } else {
-      var extent = feature.getGeometry().getExtent();
+      let extent = feature.getGeometry().getExtent();
       goToExtent(extent[0], extent[1], extent[2], extent[3]);
     }
   };
 
-  var goToExtent = function goToExtent(lon1, lat1, lon2, lat2) {
+  let goToExtent = function goToExtent(lon1, lat1, lon2, lat2) {
     /// <summary>
     /// Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
     /// </summary>
@@ -182,26 +189,26 @@ var AppMap = (function() {
     /// <param name="lat1">Latitudine o Y minimo</param>
     /// <param name="lon2">Longitune o X massimo</param>
     /// <param name="lat2">Latitudine o Y massimo</param>
-    var point1 = new ol.geom.Point([lon1, lat1]);
+    let point1 = new ol.geom.Point([lon1, lat1]);
     if (lon1 < 180) {
       point1 = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:900913");
     }
-    var point2 = new ol.geom.Point([lon2, lat2]);
+    let point2 = new ol.geom.Point([lon2, lat2]);
     if (lon2 < 180) {
       point2 = ol.proj.transform([lon2, lat2], "EPSG:4326", "EPSG:900913");
     }
 
-    var extent = [point1[0], point1[1], point2[0], point2[1]];
+    let extent = [point1[0], point1[1], point2[0], point2[1]];
     mainMap.getView().fit(extent, mainMap.getSize());
   };
 
-  var layerIsPresent = function layerIsPresent(gid) {
+  let layerIsPresent = function layerIsPresent(gid) {
     /// <summary>
     /// Verifica se un layer è presente in base ad un identificativo numerico univoco
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
-    var result = false;
-    for (var i = 0; i < mainMap.getLayers().getLength(); i++) {
+    let result = false;
+    for (let i = 0; i < mainMap.getLayers().getLength(); i++) {
       if (mainMap.getLayers().item(i).gid === gid) {
         result = true;
       }
@@ -209,13 +216,13 @@ var AppMap = (function() {
     return result;
   };
 
-  var getLayer = function getLayer(gid) {
+  let getLayer = function getLayer(gid) {
     /// <summary>
     /// Restituisce un layer in base al proprio identificativo numerico
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
-    var layer = null;
-    for (var i = 0; i < mainMap.getLayers().getLength(); i++) {
+    let layer = null;
+    for (let i = 0; i < mainMap.getLayers().getLength(); i++) {
       if (mainMap.getLayers().item(i).gid === gid) {
         layer = mainMap.getLayers().item(i);
         return layer;
@@ -224,17 +231,17 @@ var AppMap = (function() {
     return layer;
   };
 
-  var getLayerInfo = function getLayerInfo(gid) {
+  let getLayerInfo = function getLayerInfo(gid) {
     /// <summary>
     /// Restituisce un layer in base al proprio identificativo numerico
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
-    var layer = null;
-    for (var i = 0; i < mainConfig.layers.length; i++) {
+    let layer = null;
+    for (let i = 0; i < mainConfig.layers.length; i++) {
       if (gid == mainConfig.layers[i].gid) {
         return mainConfig.layers[i];
       }
-      for (var ki = 0; ki < mainConfig.layers[i].layers.length; ki++) {
+      for (let ki = 0; ki < mainConfig.layers[i].layers.length; ki++) {
         if (gid == mainConfig.layers[i].layers[ki].gid) {
           return mainConfig.layers[i].layers[ki];
         }
@@ -243,7 +250,7 @@ var AppMap = (function() {
     return layer;
   };
 
-  var addLayerToMap = function addLayerToMap(
+  let addLayerToMap = function addLayerToMap(
     gid,
     uri,
     layerType,
@@ -270,7 +277,7 @@ var AppMap = (function() {
     /// <param name="tileMode">Tipo di tile in caso di layer TMS (non implementato)</param>
     /// <param name="opacity">Opacit del layer</param>
 
-    var thisLayer;
+    let thisLayer;
     if (!params) {
       params = "";
     }
@@ -325,11 +332,11 @@ var AppMap = (function() {
     }
   };
 
-  var getLayerOSM = function getLayerOSM() {
+  let getLayerOSM = function getLayerOSM() {
     /// <summary>
     /// Restituisce il layer standard di Open Street Map
     /// </summary>
-    var osm = new ol.layer.Tile({
+    let osm = new ol.layer.Tile({
       source: new ol.source.OSM({
         crossOrigin: null
       })
@@ -338,11 +345,11 @@ var AppMap = (function() {
     return osm;
   };
 
-  var getLayerOCM = function getLayerOCM(key) {
+  let getLayerOCM = function getLayerOCM(key) {
     /// <summary>
     /// Restituisce il layer standard di Open Cycle Map
     /// </summary>
-    var ocm = new ol.layer.Tile({
+    let ocm = new ol.layer.Tile({
       source: new ol.source.OSM({
         url: "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=" + key,
         crossOrigin: null
@@ -352,11 +359,11 @@ var AppMap = (function() {
     return ocm;
   };
 
-  var getLayerOTM = function getLayerOTM(key) {
+  let getLayerOTM = function getLayerOTM(key) {
     /// <summary>
     /// Restituisce il layer standard di Open Cycle Map
     /// </summary>
-    var otm = new ol.layer.Tile({
+    let otm = new ol.layer.Tile({
       source: new ol.source.OSM({
         url: "https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=" + key,
         crossOrigin: null
@@ -366,15 +373,15 @@ var AppMap = (function() {
     return otm;
   };
 
-  var getLayerWMS = function getLayerWMS(gid, uri, params, attribution) {
+  let getLayerWMS = function getLayerWMS(gid, uri, params, attribution) {
     /// <summary>
     /// Restituisce un layer in formato WMS
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
     /// <param name="uri">Url sorgente del layer</param>
     /// <param name="params">Parametri aggiuntivi da aggiungere alle chiamate (formato url querystring)</param>
-    var params = queryToDictionary(params);
-    var serverType = "geoserver";
+    let paramsLocal = queryToDictionary(params);
+    let serverType = "geoserver";
     // if (!params.format) {
     //     params.format = "PNG";
     // }
@@ -384,13 +391,13 @@ var AppMap = (function() {
     //     params.format = wmsImageFormat(params.format);
     //
     // }
-    if (params.serverType) {
-      serverType = params.serverType;
+    if (paramsLocal.serverType) {
+      serverType = paramsLocal.serverType;
     }
-    var wms = new ol.layer.Image({
+    let wms = new ol.layer.Image({
       source: new ol.source.ImageWMS({
         url: uri,
-        params: params,
+        params: paramsLocal,
         serverType: serverType,
         //crossOrigin: "Anonymous"
         attributions: attribution
@@ -399,23 +406,23 @@ var AppMap = (function() {
     return wms;
   };
 
-  var getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution, secured) {
+  let getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution, secured) {
     /// <summary>
     /// Restituisce un layer in formato WMS, con le chiamate tagliate a Tile
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
     /// <param name="uri">Url sorgente del layer</param>
     /// <param name="params">Parametri aggiuntivi da aggiungere alle chiamate (formato url querystring)</param>
-    var params = queryToDictionary(params);
-    var serverType = "geoserver";
-    params.tiled = "true";
+    let paramsLocal = queryToDictionary(params);
+    let serverType = "geoserver";
+    paramsLocal.tiled = "true";
     if (params.serverType) {
-      serverType = params.serverType;
+      serverType = paramsLocal.serverType;
     }
-    var source = new ol.source.TileWMS(
+    let source = new ol.source.TileWMS(
       /** @type {olx.source.TileWMSOptions} */ ({
         url: uri,
-        params: params,
+        params: paramsLocal,
         serverType: serverType,
         //crossOrigin: "Anonymous",
         attributions: attribution
@@ -423,10 +430,10 @@ var AppMap = (function() {
     );
     if (secured) {
       source.setTileLoadFunction(function(tile, src) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.responseType = "blob";
         xhr.addEventListener("loadend", function(evt) {
-          var data = this.response;
+          let data = this.response;
           if (data !== undefined) {
             tile.getImage().src = URL.createObjectURL(data);
           } else {
@@ -441,7 +448,7 @@ var AppMap = (function() {
         xhr.send();
       });
     }
-    var wms = new ol.layer.Tile({
+    let wms = new ol.layer.Tile({
       //extent: [-13884991, 2870341, -7455066, 6338219],
       source: source
     });
@@ -453,8 +460,8 @@ var AppMap = (function() {
    * @param  {string} format formato immagine
    * @return {string}        formato immagine wms
    */
-  var wmsImageFormat = function(format) {
-    var result = format;
+  let wmsImageFormat = function(format) {
+    let result = format;
     switch (format.toLowerCase()) {
       case "png":
         result = "image/png";
@@ -471,12 +478,12 @@ var AppMap = (function() {
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
    */
-  var removeLayerFromMap = function FromMap(gid) {
+  let removeLayerFromMap = function FromMap(gid) {
     /// <summary>
     /// Rimuove un layer dalla mappa
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
-    for (var i = 0; i < mainMap.getLayers().getLength(); i++) {
+    for (let i = 0; i < mainMap.getLayers().getLength(); i++) {
       if (mainMap.getLayers().item(i).gid === gid) {
         mainMap.getLayers().removeAt(i);
         return;
@@ -488,44 +495,45 @@ var AppMap = (function() {
    * Rimuove tutti i livelli dalla mappa
    * @return {null}
    */
-  var removeAllLayersFromMap = function() {
+  let removeAllLayersFromMap = function() {
     try {
       mainMap.getLayers().clear();
       layers = [];
     } catch (e) {
+      log(e);
     } finally {
     }
   };
 
-  var queryToDictionary = function queryToDictionary(params) {
+  let queryToDictionary = function queryToDictionary(params) {
     /// <summary>
     /// Trasforma una stringa in formato "url querystring" in un oggetto dictionary con le coppie chiave/valore
     /// </summary>
     /// <param name="params"></param>
-    var dict = {};
-    var arrKeys = params.split("&");
-    for (var i = 0; i < arrKeys.length; i++) {
+    let dict = {};
+    let arrKeys = params.split("&");
+    for (let i = 0; i < arrKeys.length; i++) {
       try {
-        var arrVal = arrKeys[i].split("=");
+        let arrVal = arrKeys[i].split("=");
         dict[arrVal[0]] = arrVal[1];
       } catch (e) {}
     }
     return dict;
   };
 
-  var GetBrowserLocationControl = function(opt_options) {
-    var options = opt_options || {};
-    var button = document.createElement("button");
+  let GetBrowserLocationControl = function(opt_options) {
+    let options = opt_options || {};
+    let button = document.createElement("button");
     button.innerHTML = '<i class="material-icons">&#xE55C;</i>';
-    var this_ = this;
-    var handleGetBrowserLocation = function() {
+    let this_ = this;
+    let handleGetBrowserLocation = function() {
       goToBrowserLocation();
     };
     button.id = "map__browser-location";
     button.addEventListener("click", handleGetBrowserLocation, false);
     button.addEventListener("touchstart", handleGetBrowserLocation, false);
     button.className = "btn-floating btn-small waves-effect waves-light";
-    var element = document.createElement("div");
+    let element = document.createElement("div");
     element.className = "lk-map__browser-location ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
@@ -534,13 +542,13 @@ var AppMap = (function() {
     });
   };
 
-  var GetZoomInControl = function(opt_options) {
-    var options = opt_options || {};
-    var button = document.createElement("button");
+  let GetZoomInControl = function(opt_options) {
+    let options = opt_options || {};
+    let button = document.createElement("button");
     button.innerHTML = '<i class="material-icons">&#xE145;</i>';
-    var this_ = this;
-    var handleZoomIn = function() {
-      var currentView = mainMap.getView();
+    let this_ = this;
+    let handleZoomIn = function() {
+      let currentView = mainMap.getView();
       currentView.setZoom(currentView.getZoom() + 1);
       mainMap.setView(currentView);
     };
@@ -548,7 +556,7 @@ var AppMap = (function() {
     button.addEventListener("touchstart", handleZoomIn, false);
     button.id = "map__zoom-in";
     button.className = "btn-floating btn-small waves-effect waves-light";
-    var element = document.createElement("div");
+    let element = document.createElement("div");
     element.className = "lk-map__zoom-in ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
@@ -557,13 +565,13 @@ var AppMap = (function() {
     });
   };
 
-  var GetZoomOutControl = function(opt_options) {
-    var options = opt_options || {};
-    var button = document.createElement("button");
+  let GetZoomOutControl = function(opt_options) {
+    let options = opt_options || {};
+    let button = document.createElement("button");
     button.innerHTML = '<i class="material-icons">&#xE15B;</i>';
-    var this_ = this;
-    var handleZoomOut = function() {
-      var currentView = mainMap.getView();
+    let this_ = this;
+    let handleZoomOut = function() {
+      let currentView = mainMap.getView();
       currentView.setZoom(currentView.getZoom() - 1);
       mainMap.setView(currentView);
     };
@@ -571,7 +579,7 @@ var AppMap = (function() {
     button.addEventListener("touchstart", handleZoomOut, false);
     button.id = "map__zoom-out";
     button.className = "btn-floating btn-small waves-effect waves-light";
-    var element = document.createElement("div");
+    let element = document.createElement("div");
     element.className = "lk-map__zoom-out ol-unselectable ";
     element.appendChild(button);
     ol.control.Control.call(this, {
@@ -580,7 +588,7 @@ var AppMap = (function() {
     });
   };
 
-  var render = function render(divMap, mapConfig) {
+  let render = function render(divMap, mapConfig) {
     /// <summary>
     /// Inizializza l'oggetto mappa
     /// </summary>
@@ -592,7 +600,7 @@ var AppMap = (function() {
     ol.inherits(GetZoomOutControl, ol.control.Control);
     ol.inherits(GetZoomInControl, ol.control.Control);
 
-    var layers = [
+    let layers = [
       //new ol.layer.Tile({
       //    source: new ol.source.OSM()
       //})
@@ -603,7 +611,7 @@ var AppMap = (function() {
     //         collapsible: false
     //     })
     // }).
-    var controls = new ol.Collection([]);
+    let controls = new ol.Collection([]);
     mainMap = new ol.Map({
       controls: controls.extend([
         new GetBrowserLocationControl(),
@@ -647,15 +655,15 @@ var AppMap = (function() {
     //    if (evt.dragging) {
     //        return;
     //    }
-    //    var pixel = mainMap.getEventPixel(evt.originalEvent);
-    //    var hit = mainMap.forEachLayerAtPixel(pixel, function (layer) {
+    //    let pixel = mainMap.getEventPixel(evt.originalEvent);
+    //    let hit = mainMap.forEachLayerAtPixel(pixel, function (layer) {
     //        return true;
     //    });
     //    mainMap.getTargetElement().style.cursor = hit ? 'pointer' : '';
     //});
     mainMap.addInteraction(dragInteractionPrint);
 
-    // var modify = new ol.interaction.Modify({
+    // let modify = new ol.interaction.Modify({
     //     features: featuresWKT,
     //     // the SHIFT key must be pressed to delete vertices, so
     //     // that new vertices can be drawn at the same position
@@ -667,7 +675,7 @@ var AppMap = (function() {
     // });
     // mainMap.addInteraction(modify);
     //
-    // var draw; // global so we can remove it later
+    // let draw; // global so we can remove it later
     //
     // draw = new ol.interaction.Draw({
     //     features: featuresWKT,
@@ -678,7 +686,7 @@ var AppMap = (function() {
     log("Creazione della mappa completata");
   };
 
-  var loadConfig = function loadConfig(config) {
+  let loadConfig = function loadConfig(config) {
     /// <summary>
     /// Carica l'oggetto di configurazione sulla mappa
     /// </summary>
@@ -687,11 +695,11 @@ var AppMap = (function() {
     mainConfig = config;
 
     //ricavo i parametri per il posizionamento custom da querystring
-    var initLon = getUriParameter("lon");
-    var initLat = getUriParameter("lat");
-    var initZoom = getUriParameter("zoom");
-    var initLayers = getUriParameter("layers");
-    var initTool = getUriParameter("tool");
+    let initLon = getUriParameter("lon");
+    let initLat = getUriParameter("lat");
+    let initZoom = getUriParameter("zoom");
+    let initLayers = getUriParameter("layers");
+    let initTool = getUriParameter("tool");
     try {
       if (initLon) config.mapLon = parseFloat(initLon);
       if (initLat) config.mapLat = parseFloat(initLat);
@@ -704,10 +712,10 @@ var AppMap = (function() {
     if (initLayers) {
       try {
         initLayers = initLayers.split(",");
-        for (var i = 0; i < initLayers.length; i++) {
+        for (let i = 0; i < initLayers.length; i++) {
           if (initLayers[i]) {
-            var initLayer = initLayers[i].split(":");
-            var payload = {};
+            let initLayer = initLayers[i].split(":");
+            let payload = {};
             payload.eventName = "set-layer-visibility";
             payload.gid = initLayer[0];
             payload.visibility = parseInt(initLayer[1]);
@@ -726,14 +734,12 @@ var AppMap = (function() {
       });
     }
     //aggiungo layer WKT alla mappa
-    //mainMap.addLayer(vectorWKT);
     vectorWKT = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresWKT
       }),
-
       style: (function() {
-        var style = new ol.style.Style({
+        let style = new ol.style.Style({
           fill: new ol.style.Fill({
             color: getCurrentColor(0.2, [68, 138, 255, 0.2])
           }),
@@ -761,7 +767,89 @@ var AppMap = (function() {
             })
           })
         });
-        var styles = [style];
+        let styles = [style];
+        return function(feature, resolution) {
+          style.getText().setText(feature.get("name"));
+          return styles;
+        };
+      })()
+    });
+
+    vectorSelectionMask = new ol.layer.Vector({
+      source: new ol.source.Vector({
+        features: featuresSelectionMask
+      }),
+      style: (function() {
+        let style = new ol.style.Style({
+          fill: new ol.style.Fill({
+            color: getCurrentColor(0.2, [255, 216, 0, 0.1])
+          }),
+          stroke: new ol.style.Stroke({
+            color: getCurrentColor(1, [255, 216, 0, 0.5]),
+            width: 2
+          }),
+          image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({
+              color: getCurrentColor(1, [255, 216, 0, 0.5])
+            })
+          }),
+          text: new ol.style.Text({
+            text: "",
+            scale: 1.7,
+            textAlign: "Left",
+            textBaseline: "Top",
+            fill: new ol.style.Fill({
+              color: "#000000"
+            }),
+            stroke: new ol.style.Stroke({
+              color: "#FFFFFF",
+              width: 3.5
+            })
+          })
+        });
+        let styles = [style];
+        return function(feature, resolution) {
+          style.getText().setText(feature.get("name"));
+          return styles;
+        };
+      })()
+    });
+
+    vectorSelection = new ol.layer.Vector({
+      source: new ol.source.Vector({
+        features: featuresSelection
+      }),
+      style: (function() {
+        let style = new ol.style.Style({
+          fill: new ol.style.Fill({
+            color: getCurrentColor(0.2, [0, 255, 255, 0.2])
+          }),
+          stroke: new ol.style.Stroke({
+            color: getCurrentColor(1, [0, 255, 255, 1]),
+            width: 2
+          }),
+          image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({
+              color: getCurrentColor(1, [0, 255, 255, 1])
+            })
+          }),
+          text: new ol.style.Text({
+            text: "",
+            scale: 1.7,
+            textAlign: "Left",
+            textBaseline: "Top",
+            fill: new ol.style.Fill({
+              color: "#000000"
+            }),
+            stroke: new ol.style.Stroke({
+              color: "#FFFFFF",
+              width: 3.5
+            })
+          })
+        });
+        let styles = [style];
         return function(feature, resolution) {
           style.getText().setText(feature.get("name"));
           return styles;
@@ -770,16 +858,18 @@ var AppMap = (function() {
     });
 
     vectorWKT.setMap(mainMap);
+    vectorSelectionMask.setMap(mainMap);
+    vectorSelection.setMap(mainMap);
 
     //aggiungo le feature KML alla mappa
     if (config.drawFeatures) {
       try {
-        var formatKml = new ol.format.KML();
-        var tempfeaturesWKT = formatKml.readFeatures(config.drawFeatures, {
+        let formatKml = new ol.format.KML();
+        let tempfeaturesWKT = formatKml.readFeatures(config.drawFeatures, {
           featureProjection: "EPSG:3857"
         });
-        for (var i = 0; i < tempfeaturesWKT.length; i++) {
-          var feat = tempfeaturesWKT[i].clone();
+        for (let i = 0; i < tempfeaturesWKT.length; i++) {
+          let feat = tempfeaturesWKT[i].clone();
           feat.setStyle(vectorWKT.style);
           vectorWKT.getSource().addFeature(feat);
         }
@@ -794,9 +884,9 @@ var AppMap = (function() {
     //mainMap.addLayer(vectorPrint);
   };
 
-  var addLayersToMap = function addLayersToMap(tempLayers) {
-    for (var i = 0; i < tempLayers.length; i++) {
-      var layer = tempLayers[i];
+  let addLayersToMap = function addLayersToMap(tempLayers) {
+    for (let i = 0; i < tempLayers.length; i++) {
+      let layer = tempLayers[i];
       addLayerToMap(
         layer.gid,
         layer.mapUri,
@@ -821,6 +911,22 @@ var AppMap = (function() {
   };
 
   /**
+   * Restituisce l'url per ricavare le informazioni sulla mappa
+   * @param {Object} layer
+   * @param {Array} coordinate
+   * @param {float} viewResolution
+   * @param {String} infoFormat
+   * @param {int} featureCount
+   */
+  let getGetFeatureInfoUrl = function(layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
+    let url = layer.getSource().getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
+      INFO_FORMAT: infoFormat,
+      feature_count: featureCount
+    });
+    return url;
+  };
+
+  /**
    * Execute the info request on map click. The function generates a RequestQueue
    * Object with the layer request to be executed. Ad the user can click multiple times
    * the RequestQueue has a pending state and an unique ID in order to keep track of the
@@ -832,25 +938,22 @@ var AppMap = (function() {
    * @param {Array} coordinate Coordinate of the point clicked
    * @param {boolean} visibleLayers Visibile Layers
    */
-  var getRequestInfo = function getRequestInfo(coordinate, visibleLayers) {
+  let getRequestInfo = function getRequestInfo(coordinate, visibleLayers) {
     //verifico che non sia attivo il disegno globale
     if (AppStore.isDrawing()) {
       return;
     }
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
-    var viewResolution = mainMap.getView().getResolution();
+    let viewResolution = mainMap.getView().getResolution();
 
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
-    for (var i = 0; i < mainMap.getLayers().getLength(); i++) {
+    for (let i = 0; i < mainMap.getLayers().getLength(); i++) {
       //TODO refactor whe IE support will drop
-      var layer = mainMap.getLayers().item(i);
+      let layer = mainMap.getLayers().item(i);
       if (!layer.queryable) continue;
       if (!requestQueue.visibleLayers || layer.getVisible()) {
-        var url = layer.getSource().getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
-          INFO_FORMAT: "text/javascript",
-          feature_count: 50
-        });
+        let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
         requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
       }
     }
@@ -869,11 +972,11 @@ var AppMap = (function() {
    * Executes the request on the first layer not sent in the RequestQueue
    * @param {boolean} visibleLayers The request will be executed only on the visibile layers
    */
-  var getFeatureInfoRequest = function getFeatureInfoRequest() {
-    var url = "";
+  let getFeatureInfoRequest = function getFeatureInfoRequest() {
+    let url = "";
     //ricavo l'url corrente dalla coda globale e setto il layer come completato
     //TODO refactor whe IE support will drop
-    for (var i = 0; i < requestQueue.layers.length; i++) {
+    for (let i = 0; i < requestQueue.layers.length; i++) {
       if (!requestQueue.layers[i].sent) {
         requestQueue.layers[i].sent = true;
         requestQueue.currentLayerIndex = i;
@@ -921,17 +1024,17 @@ var AppMap = (function() {
    * Visualize the first object found
    * @param {Object} data Request result
    */
-  var processRequest = function processRequest(data) {
+  let processRequest = function processRequest(data) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
     //se il dato è presente lo visualizzo
     if (data && data.features.length > 0) {
       if (data.features[0].geometry) {
-        var srid = getSRIDfromCRSName(data.crs.properties.name);
+        let srid = getSRIDfromCRSName(data.crs.properties.name);
         addFeatureInfoToMap(data.features[0].geometry, srid);
       }
-      for (var i = 0; i < data.features.length; i++) {
+      for (let i = 0; i < data.features.length; i++) {
         data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
       }
       Dispatcher.dispatch({
@@ -954,12 +1057,12 @@ var AppMap = (function() {
    * Process the next step on a Request Queue
    * @param {Array} data
    */
-  var processRequestAll = function processRequestAll(data) {
+  let processRequestAll = function processRequestAll(data) {
     clearLayerInfo();
     dispatch("hide-loader");
     //se il dato è presente lo aggiungo al contenitore global
     if (data && data.features.length > 0) {
-      for (var i = 0; i < data.features.length; i++) {
+      for (let i = 0; i < data.features.length; i++) {
         data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
         requestQueueData.push(data.features[i]);
       }
@@ -977,7 +1080,7 @@ var AppMap = (function() {
    * Return the resolution of the current map
    * @return {float} resolution in map units
    */
-  var getMapResolution = function getMapResolution() {
+  let getMapResolution = function getMapResolution() {
     return mainMap.getView().getResolution();
   };
 
@@ -985,7 +1088,7 @@ var AppMap = (function() {
    * return the map scale based on  current resolution
    * @return {float} map scale (approx)
    */
-  var getMapScale = function getMapScale() {
+  let getMapScale = function getMapScale() {
     return getScaleFromResolution(mainMap.getView().getResolution(), "m");
   };
 
@@ -995,10 +1098,10 @@ var AppMap = (function() {
    * @param  {[type]} units      [description]
    * @return {[type]}            [description]
    */
-  var getScaleFromResolution = function(resolution, units) {
-    var dpi = 25.4 / 0.28; //inch in mm / dpi in mm
-    var mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
-    var inchesPerMeter = 39.3701;
+  let getScaleFromResolution = function(resolution, units) {
+    let dpi = 25.4 / 0.28; //inch in mm / dpi in mm
+    let mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
+    let inchesPerMeter = 39.3701;
     return parseFloat(resolution) * (mpu * inchesPerMeter * dpi);
   };
 
@@ -1008,35 +1111,36 @@ var AppMap = (function() {
    * @param  {[type]} units [description]
    * @return {[type]}       [description]
    */
-  var getResolutionForScale = function(scale, units) {
-    var dpi = 25.4 / 0.28; //inch in mm / dpi in mm
-    var mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
-    var inchesPerMeter = 39.37;
+  let getResolutionForScale = function(scale, units) {
+    let dpi = 25.4 / 0.28; //inch in mm / dpi in mm
+    let mpu = ol.proj.Units.METERS_PER_UNIT[units]; //'degrees', 'ft', 'm' or 'pixels'.
+    let inchesPerMeter = 39.37;
     return parseFloat(scale) / (mpu * inchesPerMeter * dpi);
   };
 
-  var getMapCenter = function getMapCenter() {
+  let getMapCenter = function getMapCenter() {
     return mainMap.getView().getCenter();
   };
 
-  var getMapCenterLonLat = function getMapCenterLonLat() {
-    var center = mainMap.getView().getCenter();
+  let getMapCenterLonLat = function getMapCenterLonLat() {
+    let center = mainMap.getView().getCenter();
     return ol.proj.transform(center, "EPSG:3857", "EPSG:4326");
   };
 
-  var getMapZoom = function getMapZoom() {
+  let getMapZoom = function getMapZoom() {
     return mainMap.getView().getZoom();
   };
 
-  var getLegendUrl = function getLegendUrl(gid, scaled) {
-    var layer = getLayer(gid);
-    var layerStore = AppStore.getLayer(gid);
-    var url = "";
+  let getLegendUrl = function getLegendUrl(gid, scaled) {
+    let layer = getLayer(gid);
+    let layerStore = AppStore.getLayer(gid);
+    let url = "";
     try {
       if (layer) {
         try {
           url = layer.getSource().getUrls()[0];
         } catch (err) {
+          log(err);
           url = layer.getSource().getUrl();
         }
         url +=
@@ -1059,33 +1163,35 @@ var AppMap = (function() {
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
     if (scaled) {
       url += "&SCALE=" + AppMap.getMapScale();
     }
     return url;
   };
 
-  var toggleLayer = function toggleLayer(gid) {
+  let toggleLayer = function toggleLayer(gid) {
     /// <summary>
     /// Cambia lo stato di visibilità (acceso/spento) di un layer
     /// </summary>
     /// <param name="gid">Codice numerico identificativo del layer</param>
     /// <returns type=""></returns>
-    var layer = getLayer(gid);
+    let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
     }
   };
 
-  var setLayerVisibility = function setLayerVisibility(gid, visibility) {
-    var layer = getLayer(gid);
+  let setLayerVisibility = function setLayerVisibility(gid, visibility) {
+    let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(visibility);
     }
   };
 
-  var log = function log(str) {
+  let log = function log(str) {
     /// <summary>
     /// Scrive un messaggio nella console del browser se attivata
     /// </summary>
@@ -1099,30 +1205,43 @@ var AppMap = (function() {
     }
   };
 
-  var addWKTToMap = function addWKTToMap(wkt) {
+  let addWKTToMap = function addWKTToMap(wkt) {
     /// <summary>
     /// Aggiunge una geometria in formato WKT nella mappa
     /// </summary>
     /// <param name="wkt">Geometria da caricare</param>
     /// <returns type=""></returns>
-    var feature = formatWKT.readFeature(wkt);
-    /*var feature = formatWKT.readFeature(
+    let feature = formatWKT.readFeature(wkt);
+    /*let feature = formatWKT.readFeature(
     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
     vectorWKT.getSource().addFeature(feature);
   };
 
-  var addInfoToMap = function addInfoToMap(wkt) {
+  let addFeatureToMap = function addFeatureToMap(geometry, srid, vector) {
+    let feature = null;
+    if (geometry) {
+      let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
+      feature = new ol.Feature({
+        geometry: geometryOl
+      });
+      feature = transform3857(feature, srid);
+      //feature.getGeometry().transform(projection, 'EPSG:3857');
+      vector.getSource().addFeature(feature);
+    }
+    return feature;
+  };
+
+  let addInfoToMap = function addInfoToMap(wkt) {
     /// <summary>
     /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
     /// </summary>
     /// <param name="wkt">Geometria da caricare</param>
     /// <returns type=""></returns>
 
-    var geometryOl = null;
-    var feature = null;
-    var feature = formatWKT.readFeature(wkt);
-    /*var feature = formatWKT.readFeature(
+    let geometryOl = null;
+    let feature = formatWKT.readFeature(wkt);
+    /*let feature = formatWKT.readFeature(
     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
 
@@ -1132,33 +1251,17 @@ var AppMap = (function() {
     return feature;
   };
 
-  var addFeatureInfoToMap = function addFeatureInfoToMap(geometry, srid) {
-    /// <summary>
-    /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
-    /// </summary>
-    /// <param name="wkt">Geometria da caricare</param>
-    /// <returns type=""></returns>
-    var geometryOl = null;
-    var feature = null;
-    if (geometry) {
-      var geometryOl = getGeometryFromGeoJsonGeometry(geometry);
-      feature = new ol.Feature({
-        geometry: geometryOl
-      });
-      feature = transform3857(feature, srid);
-      //feature.getGeometry().transform(projection, 'EPSG:3857');
-      vectorInfo.getSource().addFeature(feature);
-    }
-    return feature;
+  let addFeatureInfoToMap = function addFeatureInfoToMap(geometry, srid) {
+    return addFeatureToMap(geometry, srid, vectorInfo);
   };
 
   /**
    * Aggiunge un infopoint alla mappa
    * @return {[type]} [description]
    */
-  var addInfoPoint = function(lon, lat) {
-    var geometryOl = null;
-    var feature = null;
+  let addInfoPoint = function(lon, lat) {
+    let geometryOl = null;
+    let feature = null;
     geometryOl = new ol.geom.Point([lon, lat]);
     feature = new ol.Feature({
       geometry: geometryOl
@@ -1174,9 +1277,9 @@ var AppMap = (function() {
    * @param  {object} geometry geometria in formato geojson
    * @return {object} Feature appena creata
    */
-  var addPolygonInfo = function(geometry) {
-    var geometryOl = null;
-    var feature = null;
+  let addPolygonInfo = function(geometry) {
+    let geometryOl = null;
+    let feature = null;
     geometryOl = new ol.geom.Polygon(geometry.coordinates);
     feature = new ol.Feature({
       geometry: geometryOl
@@ -1192,13 +1295,13 @@ var AppMap = (function() {
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
-  var clearLayerInfo = function() {
+  let clearLayerInfo = function() {
     vectorInfo.getSource().clear(true);
   };
 
-  var startCopyCoordinate = function() {
+  let startCopyCoordinate = function() {
     copyCoordinateEvent = mainMap.on("singleclick", function(evt) {
-      var pp = new ol.geom.Point([evt.coordinate[0], evt.coordinate[1]]);
+      let pp = new ol.geom.Point([evt.coordinate[0], evt.coordinate[1]]);
       if (evt.coordinate[0] > 180) {
         pp = ol.proj.transform([evt.coordinate[0], evt.coordinate[1]], "EPSG:900913", "EPSG:4326");
       }
@@ -1208,7 +1311,7 @@ var AppMap = (function() {
         lon: pp[0],
         lat: pp[1]
       });
-      //var feature = map.forEachFeatureAtPixel(evt.pixel,
+      //let feature = map.forEachFeatureAtPixel(evt.pixel,
       // function(feature, layer) {
       // do stuff here with feature
       // return [feature, layer];
@@ -1216,7 +1319,7 @@ var AppMap = (function() {
     });
   };
 
-  var stopCopyCoordinate = function() {
+  let stopCopyCoordinate = function() {
     mainMap.un(copyCoordinateEvent);
   };
 
@@ -1228,11 +1331,11 @@ var AppMap = (function() {
    * @param  {float} height altezza in pixels
    * @return {object}        feature generata dalla funzione
    */
-  var setPrintBox = function(x, y, width, height) {
+  let setPrintBox = function(x, y, width, height) {
     //elimino la geometria attuale
     clearLayerPrint();
-    var geometryOl = null;
-    var feature = null;
+    let geometryOl = null;
+    let feature = null;
     // geometryOl = new ol.geom.Point([lon, lat]);
     // feature = new ol.Feature({
     //     geometry: geometryOl
@@ -1241,11 +1344,11 @@ var AppMap = (function() {
     // lon = feature.coordinates[0][0];
     // lat = feature.coordinates[0][1];
 
-    var x1 = x - width / 2;
-    var x2 = x + width / 2;
-    var y1 = y - height / 2;
-    var y2 = y + height / 2;
-    var vertices = [[[x1, y1], [x1, y2], [x2, y2], [x2, y1], [x1, y1]]];
+    let x1 = x - width / 2;
+    let x2 = x + width / 2;
+    let y1 = y - height / 2;
+    let y2 = y + height / 2;
+    let vertices = [[[x1, y1], [x1, y2], [x2, y2], [x2, y1], [x1, y1]]];
     //vertices  = [[10.60009,44.703497], [10.650215,44.703131], [10.628929,44.682508],[10.60009,44.703497]];
     geometryOl = new ol.geom.Polygon(vertices);
     feature = new ol.Feature({
@@ -1259,16 +1362,16 @@ var AppMap = (function() {
   };
 
   //oggetti helper per il drag della stampa
-  var dragFeaturePrint = null;
-  var dragCoordinatePrint = null;
-  var dragCursorPrint = "pointer";
-  var dragPrevCursorPrint = null;
+  let dragFeaturePrint = null;
+  let dragCoordinatePrint = null;
+  let dragCursorPrint = "pointer";
+  let dragPrevCursorPrint = null;
   /**
    * Aggiunge l'interazione di drag anc drop per la stampa
    */
-  var dragInteractionPrint = new ol.interaction.Pointer({
+  let dragInteractionPrint = new ol.interaction.Pointer({
     handleDownEvent: function(event) {
-      var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
+      let feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
         return feature;
       });
 
@@ -1282,10 +1385,10 @@ var AppMap = (function() {
       return false;
     },
     handleDragEvent: function(event) {
-      var deltaX = event.coordinate[0] - dragCoordinatePrint[0];
-      var deltaY = event.coordinate[1] - dragCoordinatePrint[1];
+      let deltaX = event.coordinate[0] - dragCoordinatePrint[0];
+      let deltaY = event.coordinate[1] - dragCoordinatePrint[1];
 
-      var geometry = dragFeaturePrint.getGeometry();
+      let geometry = dragFeaturePrint.getGeometry();
       geometry.translate(deltaX, deltaY);
 
       dragCoordinatePrint[0] = event.coordinate[0];
@@ -1293,13 +1396,13 @@ var AppMap = (function() {
     },
     handleMoveEvent: function(event) {
       if (dragCursorPrint) {
-        var mainMap = event.map;
+        let mainMap = event.map;
 
-        var feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
+        let feature = mainMap.forEachFeatureAtPixel(event.pixel, function(feature, layer) {
           return feature;
         });
 
-        var element = event.map.getTargetElement();
+        let element = event.map.getTargetElement();
 
         if (feature) {
           if (element.style.cursor != dragCursorPrint) {
@@ -1319,14 +1422,14 @@ var AppMap = (function() {
     }
   });
 
-  var getPrintCenter = function() {
-    var feature = null;
-    var features = vectorPrint.getSource().getFeatures();
-    for (var i = 0; i < features.length; i++) {
+  let getPrintCenter = function() {
+    let feature = null;
+    let features = vectorPrint.getSource().getFeatures();
+    for (let i = 0; i < features.length; i++) {
       if (features[i].gid === "print-box") {
-        var geomOl = features[i].getGeometry().getCoordinates();
-        var x = (geomOl[0][0][0] + geomOl[0][2][0]) / 2;
-        var y = (geomOl[0][0][1] + geomOl[0][1][1]) / 2;
+        let geomOl = features[i].getGeometry().getCoordinates();
+        let x = (geomOl[0][0][0] + geomOl[0][2][0]) / 2;
+        let y = (geomOl[0][0][1] + geomOl[0][1][1]) / 2;
         feature = [x, y];
         break;
       }
@@ -1334,8 +1437,8 @@ var AppMap = (function() {
     return feature;
   };
 
-  var getPrintCenterLonLat = function() {
-    var center = getPrintCenter();
+  let getPrintCenterLonLat = function() {
+    let center = getPrintCenter();
     return ol.proj.transform(center, "EPSG:3857", "EPSG:4326");
   };
 
@@ -1343,46 +1446,129 @@ var AppMap = (function() {
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
-  var clearLayerPrint = function() {
+  let clearLayerPrint = function() {
     vectorPrint.getSource().clear(true);
+  };
+
+  /*SEZIONE SELECTION    *************************************/
+  let selectInteraction;
+
+  let removeSelectInteraction = function() {
+    try {
+      mainMap.removeInteraction(selectInteraction);
+    } catch (e) {
+      log(e);
+    }
+  };
+
+  let addSelectInteraction = function() {
+    let geomType = "Polygon";
+    //Se ci sono freature inserite
+    try {
+      mainMap.removeInteraction(selectInteraction);
+    } catch (e) {
+      log(e);
+    }
+    selectInteraction = new ol.interaction.Draw({
+      features: featuresSelectionMask,
+      type: geomType,
+      style: styleSelection
+    });
+    selectInteraction.on("drawend", function(evt) {
+      let feature = evt.feature.clone();
+      dispatch({
+        eventName: "start-selection-search",
+        coords: feature
+          .getGeometry()
+          .transform("EPSG:3857", "EPSG:4326")
+          .getCoordinates()
+      });
+    });
+    selectInteraction.on("drawstart", function(evt) {
+      clearLayerSelectionMask();
+    });
+    mainMap.addInteraction(selectInteraction);
+  };
+
+  /**
+   * Rimuove tutte le geometrie dal layer selection
+   * @return {null} La funzione non restituisce un valore
+   */
+  let clearLayerSelection = function() {
+    vectorSelection.getSource().clear(true);
+  };
+
+  /**
+   * Rimuove tutte le geometrie dal layer selection mask
+   * @return {null} La funzione non restituisce un valore
+   */
+  let clearLayerSelectionMask = function() {
+    vectorSelectionMask.getSource().clear(true);
+  };
+
+  let getSelectionMask = function() {
+    let result = null;
+    vectorSelectionMask
+      .getSource()
+      .getFeatures()
+      .forEach(function(feature) {
+        let featureClone = feature.clone();
+        result = featureClone
+          .getGeometry()
+          .transform("EPSG:3857", "EPSG:4326")
+          .getCoordinates();
+      });
+    return result;
+  };
+
+  let addFeatureSelectionToMap = function(geometry, srid) {
+    return addFeatureToMap(geometry, srid, vectorSelection);
   };
 
   /* SEZIONE DRAWING    *************************************/
 
   //Tipo di interazione per la modifica
   //oggetti globali per poterlo rimuovere in un momento successivo
-  var modifyInteraction;
-  var drawInteraction;
-  var deleteInteraction;
+  let modifyInteraction;
+  let drawInteraction;
+  let deleteInteraction;
 
   /**
    * Elimina l'interazione per il disegno
    * @return {null}
    */
-  var removeDrawInteraction = function() {
+  let removeDrawInteraction = function() {
     try {
       mainMap.removeInteraction(modifyInteraction);
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
     try {
       mainMap.removeInteraction(drawInteraction);
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
   };
 
   /**
    * Rimuove l'interazione per l'eliminazione delle features
    * @return {null}
    */
-  var removeDrawDeleteInteraction = function() {
+  let removeDrawDeleteInteraction = function() {
     try {
       mainMap.removeInteraction(deleteInteraction);
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
   };
 
-  var addDrawInteraction = function(geomType) {
+  let addDrawInteraction = function(geomType) {
     //Se ci sono freature inserite
     try {
       mainMap.removeInteraction(modifyInteraction);
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
     modifyInteraction = new ol.interaction.Modify({
       features: featuresWKT,
       // the SHIFT key must be pressed to delete vertices, so
@@ -1397,35 +1583,37 @@ var AppMap = (function() {
 
     try {
       mainMap.removeInteraction(drawInteraction);
-    } catch (e) {}
+    } catch (e) {
+      log(e);
+    }
     drawInteraction = new ol.interaction.Draw({
       features: featuresWKT, //definizione delle features
       type: geomType
     });
     drawInteraction.on("drawend", function(evt) {
       //evt.feature.NAME = "pippo";
-      evt.feature.set("name", $("#draw-tools__textarea").val());
-      var defaultStyle = new ol.style.Style({
-        fill: new ol.style.Fill({
-          color: getCurrentColor(1)
-        }),
-        stroke: new ol.style.Stroke({
-          color: getCurrentColor(1),
-          width: 1
-        })
-      });
+      // evt.feature.set("name", $("#draw-tools__textarea").val());
+      // let defaultStyle = new ol.style.Style({
+      //   fill: new ol.style.Fill({
+      //     color: getCurrentColor(1)
+      //   }),
+      //   stroke: new ol.style.Stroke({
+      //     color: getCurrentColor(1),
+      //     width: 1
+      //   })
+      //});
       //evt.feature.setStyle(defaultStyle); //$("#draw-tools__textarea").val());
     });
     mainMap.addInteraction(drawInteraction);
   };
 
-  var addDrawDeleteInteraction = function(geomType) {
+  let addDrawDeleteInteraction = function(geomType) {
     deleteInteraction = new ol.interaction.Select({
       // make sure only the desired layer can be selected
       layers: [vectorWKT]
     });
 
-    var style_modify = new ol.style.Style({
+    let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
         color: getCurrentColor(1, [255, 0, 0, 1])
@@ -1436,12 +1624,11 @@ var AppMap = (function() {
     });
 
     deleteInteraction.on("select", function(evt) {
-      var selected = evt.selected;
-      var deselected = evt.deselected;
+      let selected = evt.selected;
+      let deselected = evt.deselected;
 
       if (selected.length) {
         selected.forEach(function(feature) {
-          console.info(feature);
           feature.setStyle(style_modify);
           //abilita eliminazione single click
           //vectorWKT.getSource().removeFeature(feature);
@@ -1450,7 +1637,6 @@ var AppMap = (function() {
         });
       } else {
         deselected.forEach(function(feature) {
-          console.info(feature);
           feature.setStyle(null);
         });
       }
@@ -1458,8 +1644,8 @@ var AppMap = (function() {
     mainMap.addInteraction(deleteInteraction);
   };
 
-  var deleteDrawFeatures = function() {
-    for (var i = 0; i < deleteInteraction.getFeatures().getArray().length; i++) {
+  let deleteDrawFeatures = function() {
+    for (let i = 0; i < deleteInteraction.getFeatures().getArray().length; i++) {
       vectorWKT.getSource().removeFeature(deleteInteraction.getFeatures().getArray()[i]);
     }
     deleteInteraction.getFeatures().clear();
@@ -1469,10 +1655,10 @@ var AppMap = (function() {
    * Restituisce tutte le feature disegnate in formato KML
    * @return {string} Elenco delle feature in formato KML
    */
-  var getDrawFeature = function() {
-    var features = vectorWKT.getSource().getFeatures();
-    var kmlFormat = new ol.format.KML();
-    var kml = kmlFormat.writeFeatures(features, {
+  let getDrawFeature = function() {
+    let features = vectorWKT.getSource().getFeatures();
+    let kmlFormat = new ol.format.KML();
+    let kml = kmlFormat.writeFeatures(features, {
       featureProjection: "EPSG:3857"
     });
     return kml;
@@ -1482,7 +1668,7 @@ var AppMap = (function() {
    * Genera un GUID
    * @return {string} guid
    */
-  var guid = function() {
+  let guid = function() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
         .toString(16)
@@ -1492,13 +1678,13 @@ var AppMap = (function() {
   };
 
   function SortByZIndex(a, b) {
-    var aName = a.zIndex;
-    var bName = b.zIndex;
+    let aName = a.zIndex;
+    let bName = b.zIndex;
     return aName > bName ? -1 : aName < bName ? 1 : 0;
   }
 
-  var getGeometryFromGeoJsonGeometry = function(geometry) {
-    var geometryOl = null;
+  let getGeometryFromGeoJsonGeometry = function(geometry) {
+    let geometryOl = null;
     switch (geometry.type.toLowerCase()) {
       case "polygon":
         geometryOl = new ol.geom.Polygon(geometry.coordinates);
@@ -1522,8 +1708,8 @@ var AppMap = (function() {
     return geometryOl;
   };
 
-  var getSRIDfromCRSName = function(name) {
-    var srid;
+  let getSRIDfromCRSName = function(name) {
+    let srid;
     try {
       if (name) {
         if (name.indexOf("4326") > -1) {
@@ -1540,12 +1726,13 @@ var AppMap = (function() {
         }
       }
     } catch (e) {
+      log(e);
       return null;
     }
     return srid;
   };
 
-  var transform3857 = function(feature, srid) {
+  let transform3857 = function(feature, srid) {
     //verifico che lo srid sia un oggetto crs
     if (srid) {
       if (srid.properties) {
@@ -1570,26 +1757,26 @@ var AppMap = (function() {
     return feature;
   };
 
-  var goToBrowserLocation = function() {
+  let goToBrowserLocation = function() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(AppMap.showBrowserLocation);
     }
   };
-  var showBrowserLocation = function(position) {
+  let showBrowserLocation = function(position) {
     goToLonLat(position.coords.longitude, position.coords.latitude, 18);
   };
 
-  var getUriParameter = function(parameter) {
+  let getUriParameter = function(parameter) {
     return (
       decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
     );
   };
 
-  var degreesToRadians = function(degrees) {
+  let degreesToRadians = function(degrees) {
     return (degrees / 180) * Math.PI;
   };
 
-  var mercatorLatitudeToY = function(latitude) {
+  let mercatorLatitudeToY = function(latitude) {
     return Math.log(Math.tan(Math.PI / 4 + degreesToRadians(latitude) / 2));
   };
 
@@ -1599,13 +1786,13 @@ var AppMap = (function() {
    * @param  {float} bottomLatitude latitude bottom dell'area da stampare
    * @return {float}                Aspect Ratio
    */
-  var aspectRatio = function(topLat, bottomLat) {
+  let aspectRatio = function(topLat, bottomLat) {
     return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
-  var addContextMenu = function(items) {
+  let addContextMenu = function(items) {
     //Aggiunta del menu contestuale
-    var contextmenu = new ContextMenu({
+    let contextmenu = new ContextMenu({
       width: 170,
       defaultItems: false, // defaultItems are (for now) Zoom In/Zoom Out
       items: items
@@ -1619,7 +1806,7 @@ var AppMap = (function() {
    * Request that is sent on map click
    * @param {Array} coordinate X,Y of the request position
    */
-  var RequestQueue = function(coordinate, visibleLayers) {
+  let RequestQueue = function(coordinate, visibleLayers) {
     this.id = guid();
     this.layers = []; //Array of RequestLayer
     this.coordinate = coordinate;
@@ -1634,11 +1821,33 @@ var AppMap = (function() {
    * @param {int} zIndex Index of the layer
    * @param {string} gid Unique id of the layer
    */
-  var RequestLayer = function(url, zIndex, gid) {
+  let RequestLayer = function(url, zIndex, gid) {
     this.url = url;
     this.zIndex = zIndex;
     this.sent = false;
     this.gid = gid;
+  };
+
+  let getCentroid = function(lonlats) {
+    var latXTotal = 0;
+    var latYTotal = 0;
+    var lonDegreesTotal = 0;
+
+    var currentLatLong;
+    for (var i = 0; (currentLatLong = lonlats[i]); i++) {
+      var latDegrees = currentLatLong[1];
+      var lonDegrees = currentLatLong[0];
+
+      var latRadians = (Math.PI * latDegrees) / 180;
+      latXTotal += Math.cos(latRadians);
+      latYTotal += Math.sin(latRadians);
+
+      lonDegreesTotal += lonDegrees;
+    }
+    var finalLatRadians = Math.atan2(latYTotal, latXTotal);
+    var finalLatDegrees = (finalLatRadians * 180) / Math.PI;
+    var finalLonDegrees = lonDegreesTotal / lonlats.length;
+    return [finalLonDegrees, finalLatDegrees];
   };
 
   return {
@@ -1646,16 +1855,21 @@ var AppMap = (function() {
     addDrawInteraction: addDrawInteraction,
     addDrawDeleteInteraction: addDrawDeleteInteraction,
     addFeatureInfoToMap: addFeatureInfoToMap,
+    addFeatureSelectionToMap: addFeatureSelectionToMap,
     addLayerToMap: addLayerToMap,
     addInfoToMap: addInfoToMap,
     addInfoPoint: addInfoPoint,
+    addSelectInteraction: addSelectInteraction,
     setPrintBox: setPrintBox,
     addWKTToMap: addWKTToMap,
     aspectRatio: aspectRatio,
     clearLayerInfo: clearLayerInfo,
     clearLayerPrint: clearLayerPrint,
+    clearLayerSelection: clearLayerSelection,
+    clearLayerSelectionMask: clearLayerSelectionMask,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
+    getCentroid: getCentroid,
     getDrawFeature: getDrawFeature,
     getRequestInfo: getRequestInfo,
     getLayerInfo: getLayerInfo,
@@ -1668,6 +1882,7 @@ var AppMap = (function() {
     getMapZoom: getMapZoom,
     getPrintCenter: getPrintCenter,
     getPrintCenterLonLat: getPrintCenterLonLat,
+    getSelectionMask: getSelectionMask,
     getSRIDfromCRSName: getSRIDfromCRSName,
     goToBrowserLocation: goToBrowserLocation,
     goToLonLat: goToLonLat,
@@ -1683,6 +1898,7 @@ var AppMap = (function() {
     removeLayerFromMap: removeLayerFromMap,
     removeDrawInteraction: removeDrawInteraction,
     removeDrawDeleteInteraction: removeDrawDeleteInteraction,
+    removeSelectInteraction: removeSelectInteraction,
     setLayerVisibility: setLayerVisibility,
     showBrowserLocation: showBrowserLocation,
     startCopyCoordinate: startCopyCoordinate,

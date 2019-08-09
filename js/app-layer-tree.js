@@ -34,19 +34,20 @@ var AppLayerTree = (function() {
   let layerUriCount = 0;
   let countRequest = 0;
 
-  var init = function init() {
+  var init = function(callback) {
     //carico i layer
     countRequest = 0;
     AppStore.getAppState().layers.forEach(function(layer) {
-      loadLayersUri(layer);
+      loadLayersUri(layer, callback);
     });
     if (layerUriCount === 0) {
       //no ajax request sent, loading all json immediately
       render(treeDiv, AppStore.getAppState().layers);
+      callback();
     }
   };
 
-  var loadLayersUri = function(layer) {
+  var loadLayersUri = function(layer, callback) {
     if (layer.layersUri) {
       countRequest++;
       layerUriCount++;
@@ -71,6 +72,7 @@ var AppLayerTree = (function() {
           if (countRequest === 0) {
             render(treeDiv, AppStore.getAppState().layers);
             AppMap.loadConfig(AppStore.getAppState()); //reloading layer state
+            callback();
           }
         });
     } else if (layer.layers) {
