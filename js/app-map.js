@@ -45,7 +45,6 @@ let AppMap = (function() {
 
   let mainMap;
   let mainConfig;
-  let layers = [];
 
   //Array with the requests to elaborate
   let requestQueue = {};
@@ -180,15 +179,15 @@ let AppMap = (function() {
       goToExtent(extent[0], extent[1], extent[2], extent[3]);
     }
   };
-
+/**
+ * Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
+ * 
+ * @param {float} lon1 Longitune o X minimo
+ * @param {float} lat1 Latitudine o Y minimo
+ * @param {float} lon2 Longitune o X massimo
+ * @param {float} lat2 Latitudine o Y massimo
+ */
   let goToExtent = function goToExtent(lon1, lat1, lon2, lat2) {
-    /// <summary>
-    /// Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
-    /// </summary>
-    /// <param name="lon1">Longitune o X minimo</param>
-    /// <param name="lat1">Latitudine o Y minimo</param>
-    /// <param name="lon2">Longitune o X massimo</param>
-    /// <param name="lat2">Latitudine o Y massimo</param>
     let point1 = new ol.geom.Point([lon1, lat1]);
     if (lon1 < 180) {
       point1 = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:900913");
@@ -477,7 +476,7 @@ let AppMap = (function() {
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
-   */
+   */ 
   let removeLayerFromMap = function FromMap(gid) {
     /// <summary>
     /// Rimuove un layer dalla mappa
@@ -498,7 +497,6 @@ let AppMap = (function() {
   let removeAllLayersFromMap = function() {
     try {
       mainMap.getLayers().clear();
-      layers = [];
     } catch (e) {
       log(e);
     } finally {
