@@ -44,7 +44,7 @@ var Dispatcher = (function() {
       MapTools.stopCopyCoordinate();
     });
     this.bind("clear-layer-info", function(payload) {
-      AppMap.clearLayerInfo();
+      AppMapInfo.clearLayerInfo();
     });
     this.bind("clear-layer-print", function(payload) {
       AppMap.clearLayerPrint();
@@ -112,7 +112,7 @@ var Dispatcher = (function() {
     });
     this.bind("hide-info-window", function(payload) {
       AppStore.hideInfoWindow();
-      AppMap.clearLayerInfo();
+      AppMapInfo.clearLayerInfo();
     });
     this.bind("hide-editor-window", function(payload) {
       EditorTools.hideEditorWindow();
@@ -177,7 +177,7 @@ var Dispatcher = (function() {
     });
 
     this.bind("remove-info", function(payload) {
-      AppMap.clearLayerInfo();
+      AppMapInfo.clearLayerInfo();
     });
 
     this.bind("add-info-point", function(payload) {

@@ -31,7 +31,6 @@ let SelectTools = (function() {
   let selectionResult = [];
 
   let init = function init(layers) {
-    debugger;
     selectLayers = layers.filter(function(layer) {
       return layer.labelField != null && layer.labelField != "";
     });
@@ -189,7 +188,6 @@ let SelectTools = (function() {
    * @param {Array} coords coordinate of the selected polygon
    */
   let doSelectionLayers = function(coords, currentLayer) {
-    debugger;
     if (Array.isArray(coords)) coords = coords[0];
     let coordsString = coords
       .map(function(coord) {
@@ -225,7 +223,6 @@ let SelectTools = (function() {
       jsonp: true,
       jsonpCallback: "parseResponse",
       success: function(data) {
-        debugger;
         //verifica che la ricerca sia ancora valida
         if (currentSearchDate > searchDate) {
           return;

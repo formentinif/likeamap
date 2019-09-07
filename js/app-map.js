@@ -44,12 +44,6 @@ let AppMap = (function() {
   };
 
   let mainMap;
-  let mainConfig;
-
-  //Array with the requests to elaborate
-  let requestQueue = {};
-  //Array with the requests results. Data are features of different types.
-  let requestQueueData = [];
 
   let formatWKT = new ol.format.WKT();
   let featuresWKT = new ol.Collection();
@@ -102,27 +96,6 @@ let AppMap = (function() {
     }
     return [resultColor.r, resultColor.g, resultColor.b, opacity];
   };
-
-  let vectorInfo = new ol.layer.Vector({
-    source: new ol.source.Vector({
-      features: []
-    }),
-    style: new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: getCurrentColor(1, [255, 125, 0, 1])
-      }),
-      stroke: new ol.style.Stroke({
-        color: getCurrentColor(1, [255, 125, 0, 1]),
-        width: 3
-      }),
-      image: new ol.style.Circle({
-        radius: 7,
-        fill: new ol.style.Fill({
-          color: getCurrentColor(1, [255, 125, 0, 1])
-        })
-      })
-    })
-  });
 
   let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
@@ -179,14 +152,14 @@ let AppMap = (function() {
       goToExtent(extent[0], extent[1], extent[2], extent[3]);
     }
   };
-/**
- * Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
- * 
- * @param {float} lon1 Longitune o X minimo
- * @param {float} lat1 Latitudine o Y minimo
- * @param {float} lon2 Longitune o X massimo
- * @param {float} lat2 Latitudine o Y massimo
- */
+  /**
+   * Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
+   *
+   * @param {float} lon1 Longitune o X minimo
+   * @param {float} lat1 Latitudine o Y minimo
+   * @param {float} lon2 Longitune o X massimo
+   * @param {float} lat2 Latitudine o Y massimo
+   */
   let goToExtent = function goToExtent(lon1, lat1, lon2, lat2) {
     let point1 = new ol.geom.Point([lon1, lat1]);
     if (lon1 < 180) {
@@ -225,25 +198,6 @@ let AppMap = (function() {
       if (mainMap.getLayers().item(i).gid === gid) {
         layer = mainMap.getLayers().item(i);
         return layer;
-      }
-    }
-    return layer;
-  };
-
-  let getLayerInfo = function getLayerInfo(gid) {
-    /// <summary>
-    /// Restituisce un layer in base al proprio identificativo numerico
-    /// </summary>
-    /// <param name="gid">Codice numerico identificativo del layer</param>
-    let layer = null;
-    for (let i = 0; i < mainConfig.layers.length; i++) {
-      if (gid == mainConfig.layers[i].gid) {
-        return mainConfig.layers[i];
-      }
-      for (let ki = 0; ki < mainConfig.layers[i].layers.length; ki++) {
-        if (gid == mainConfig.layers[i].layers[ki].gid) {
-          return mainConfig.layers[i].layers[ki];
-        }
       }
     }
     return layer;
@@ -476,7 +430,8 @@ let AppMap = (function() {
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
-   */ 
+   */
+
   let removeLayerFromMap = function FromMap(gid) {
     /// <summary>
     /// Rimuove un layer dalla mappa
@@ -632,7 +587,7 @@ let AppMap = (function() {
 
     mainMap.on("singleclick", function(evt) {
       //interrogo solo i layer visibile
-      getRequestInfo(evt.coordinate, true);
+      AppMapInfo.getRequestInfo(evt.coordinate, true);
     });
 
     mainMap.on("moveend", function() {
@@ -690,7 +645,6 @@ let AppMap = (function() {
     /// </summary>
     /// <param name="config">Oggetto con i parametri di configurazione</param>
     /// <returns type=""></returns>
-    mainConfig = config;
 
     //ricavo i parametri per il posizionamento custom da querystring
     let initLon = getUriParameter("lon");
@@ -876,9 +830,8 @@ let AppMap = (function() {
       } finally {
       }
     }
-    vectorInfo.setMap(mainMap);
+
     vectorPrint.setMap(mainMap);
-    //mainMap.addLayer(vectorInfo);
     //mainMap.addLayer(vectorPrint);
   };
 
@@ -906,172 +859,6 @@ let AppMap = (function() {
         addLayersToMap(layer.layers);
       }
     }
-  };
-
-  /**
-   * Restituisce l'url per ricavare le informazioni sulla mappa
-   * @param {Object} layer
-   * @param {Array} coordinate
-   * @param {float} viewResolution
-   * @param {String} infoFormat
-   * @param {int} featureCount
-   */
-  let getGetFeatureInfoUrl = function(layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
-    let url = layer.getSource().getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
-      INFO_FORMAT: infoFormat,
-      feature_count: featureCount
-    });
-    return url;
-  };
-
-  /**
-   * Execute the info request on map click. The function generates a RequestQueue
-   * Object with the layer request to be executed. Ad the user can click multiple times
-   * the RequestQueue has a pending state and an unique ID in order to keep track of the
-   * requests and stop them if needed
-   * The pipeline is
-   * 1. getRequestInfo
-   * 2. getFeatureInfoRequest
-   * 3. processRequest/processRequestAll based on the variable visibleLayers
-   * @param {Array} coordinate Coordinate of the point clicked
-   * @param {boolean} visibleLayers Visibile Layers
-   */
-  let getRequestInfo = function getRequestInfo(coordinate, visibleLayers) {
-    //verifico che non sia attivo il disegno globale
-    if (AppStore.isDrawing()) {
-      return;
-    }
-    requestQueue = new RequestQueue(coordinate, visibleLayers);
-    requestQueueData = [];
-    let viewResolution = mainMap.getView().getResolution();
-
-    //ricavo i livelli visibili e li ordino per livello di visualizzazione
-    for (let i = 0; i < mainMap.getLayers().getLength(); i++) {
-      //TODO refactor whe IE support will drop
-      let layer = mainMap.getLayers().item(i);
-      if (!layer.queryable) continue;
-      if (!requestQueue.visibleLayers || layer.getVisible()) {
-        let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-        requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
-      }
-    }
-    requestQueue.layers = requestQueue.layers.sort(SortByZIndex);
-
-    //eseguo il loop delle richieste
-    if (!requestQueue.ajaxPending) {
-      getFeatureInfoRequest(requestQueue.visibleLayers);
-    } else {
-      //resetto la richiesta
-      requestQueue.mustRestart = true;
-    }
-  };
-
-  /**
-   * Executes the request on the first layer not sent in the RequestQueue
-   * @param {boolean} visibleLayers The request will be executed only on the visibile layers
-   */
-  let getFeatureInfoRequest = function getFeatureInfoRequest() {
-    let url = "";
-    //ricavo l'url corrente dalla coda globale e setto il layer come completato
-    //TODO refactor whe IE support will drop
-    for (let i = 0; i < requestQueue.layers.length; i++) {
-      if (!requestQueue.layers[i].sent) {
-        requestQueue.layers[i].sent = true;
-        requestQueue.currentLayerIndex = i;
-        url = requestQueue.layers[i].url;
-        break;
-      }
-    }
-    if (!url) {
-      //the loop has ended
-      requestQueue.ajaxPending = false;
-      //se la query è su tutti i layer mostro i risultati in quanto non vengono mostrati automatcamente
-      if (!requestQueue.visibleLayers) {
-        if (requestQueueData.length > 0) {
-          dispatch({
-            eventName: "show-reverse-geocoding-result",
-            results: requestQueueData
-          });
-        }
-      }
-      return;
-    }
-    //adding the right callback on request
-    if (requestQueue.visibleLayers) {
-      url += "&format_options=callback:AppMap.processRequest";
-    } else {
-      url += "&format_options=callback:AppMap.processRequestAll";
-    }
-    requestQueue.ajaxPending = true;
-    dispatch("show-loader");
-    $.ajax({
-      type: "GET",
-      url: url,
-      jsonp: "callback",
-      dataType: "jsonp",
-      crossDomain: true,
-      contentType: "application/json",
-      success: function(response) {},
-      error: function(jqXHR, textStatus, errorThrown) {
-        requestQueue.ajaxPending = false;
-      }
-    });
-  };
-
-  /**
-   * Visualize the first object found
-   * @param {Object} data Request result
-   */
-  let processRequest = function processRequest(data) {
-    clearLayerInfo();
-    requestQueue.ajaxPending = false;
-    dispatch("hide-loader");
-    //se il dato è presente lo visualizzo
-    if (data && data.features.length > 0) {
-      if (data.features[0].geometry) {
-        let srid = getSRIDfromCRSName(data.crs.properties.name);
-        addFeatureInfoToMap(data.features[0].geometry, srid);
-      }
-      for (let i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-      }
-      Dispatcher.dispatch({
-        eventName: "show-info-item",
-        data: data
-      });
-    }
-
-    if (requestQueue.mustRestart) {
-      requestQueue.mustRestart = false;
-      getFeatureInfoRequest();
-    }
-    //se il dato a questo punto è nullo procedo al secondo step nella coda delle richieste
-    if (!data || data.features.length == 0) {
-      getFeatureInfoRequest();
-    }
-  };
-
-  /**
-   * Process the next step on a Request Queue
-   * @param {Array} data
-   */
-  let processRequestAll = function processRequestAll(data) {
-    clearLayerInfo();
-    dispatch("hide-loader");
-    //se il dato è presente lo aggiungo al contenitore global
-    if (data && data.features.length > 0) {
-      for (let i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-        requestQueueData.push(data.features[i]);
-      }
-    }
-
-    //se non è presente o una nuova richiesta è stata accodata procedo al passo successivo
-    if (requestQueue.mustRestart) {
-      requestQueue.mustRestart = false;
-      getFeatureInfoRequest();
-    }
-    getFeatureInfoRequest(false);
   };
 
   /**
@@ -1230,73 +1017,6 @@ let AppMap = (function() {
     return feature;
   };
 
-  let addInfoToMap = function addInfoToMap(wkt) {
-    /// <summary>
-    /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
-    /// </summary>
-    /// <param name="wkt">Geometria da caricare</param>
-    /// <returns type=""></returns>
-
-    let geometryOl = null;
-    let feature = formatWKT.readFeature(wkt);
-    /*let feature = formatWKT.readFeature(
-    'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
-
-    return feature;
-  };
-
-  let addFeatureInfoToMap = function addFeatureInfoToMap(geometry, srid) {
-    return addFeatureToMap(geometry, srid, vectorInfo);
-  };
-
-  /**
-   * Aggiunge un infopoint alla mappa
-   * @return {[type]} [description]
-   */
-  let addInfoPoint = function(lon, lat) {
-    let geometryOl = null;
-    let feature = null;
-    geometryOl = new ol.geom.Point([lon, lat]);
-    feature = new ol.Feature({
-      geometry: geometryOl
-    });
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
-    return feature;
-  };
-
-  /**
-   * Aggiunge un poligono alla mappa
-   * @param  {object} geometry geometria in formato geojson
-   * @return {object} Feature appena creata
-   */
-  let addPolygonInfo = function(geometry) {
-    let geometryOl = null;
-    let feature = null;
-    geometryOl = new ol.geom.Polygon(geometry.coordinates);
-    feature = new ol.Feature({
-      geometry: geometryOl
-    });
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
-
-    return feature;
-  };
-
-  /**
-   * Rimuove tutte le geometrie dal layer feature info
-   * @return {null} La funzione non restituisce un valore
-   */
-  let clearLayerInfo = function() {
-    vectorInfo.getSource().clear(true);
-  };
-
   let startCopyCoordinate = function() {
     copyCoordinateEvent = mainMap.on("singleclick", function(evt) {
       let pp = new ol.geom.Point([evt.coordinate[0], evt.coordinate[1]]);
@@ -1438,14 +1158,6 @@ let AppMap = (function() {
   let getPrintCenterLonLat = function() {
     let center = getPrintCenter();
     return ol.proj.transform(center, "EPSG:3857", "EPSG:4326");
-  };
-
-  /**
-   * Rimuove tutte le geometrie dal layer feature info
-   * @return {null} La funzione non restituisce un valore
-   */
-  let clearLayerPrint = function() {
-    vectorPrint.getSource().clear(true);
   };
 
   /*SEZIONE SELECTION    *************************************/
@@ -1662,25 +1374,6 @@ let AppMap = (function() {
     return kml;
   };
 
-  /**
-   * Genera un GUID
-   * @return {string} guid
-   */
-  let guid = function() {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    }
-    return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
-  };
-
-  function SortByZIndex(a, b) {
-    let aName = a.zIndex;
-    let bName = b.zIndex;
-    return aName > bName ? -1 : aName < bName ? 1 : 0;
-  }
-
   let getGeometryFromGeoJsonGeometry = function(geometry) {
     let geometryOl = null;
     switch (geometry.type.toLowerCase()) {
@@ -1798,34 +1491,6 @@ let AppMap = (function() {
     mainMap.addControl(contextmenu);
   };
 
-  //Private Classes
-
-  /**
-   * Request that is sent on map click
-   * @param {Array} coordinate X,Y of the request position
-   */
-  let RequestQueue = function(coordinate, visibleLayers) {
-    this.id = guid();
-    this.layers = []; //Array of RequestLayer
-    this.coordinate = coordinate;
-    this.visibleLayers = visibleLayers;
-    this.mustRestart = false;
-    this.currentLayerIndex = 0;
-  };
-
-  /**
-   * This class represents an HTTP request of a WFS layer to be call to inspect a feature
-   * @param {string} url Url to be invoked
-   * @param {int} zIndex Index of the layer
-   * @param {string} gid Unique id of the layer
-   */
-  let RequestLayer = function(url, zIndex, gid) {
-    this.url = url;
-    this.zIndex = zIndex;
-    this.sent = false;
-    this.gid = gid;
-  };
-
   let getCentroid = function(lonlats) {
     var latXTotal = 0;
     var latYTotal = 0;
@@ -1848,29 +1513,33 @@ let AppMap = (function() {
     return [finalLonDegrees, finalLatDegrees];
   };
 
+  /**
+   * Rimuove tutte le geometrie dal layer feature info
+   * @return {null} La funzione non restituisce un valore
+   */
+  let clearLayerPrint = function() {
+    vectorPrint.getSource().clear(true);
+  };
+
   return {
     addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
     addDrawDeleteInteraction: addDrawDeleteInteraction,
-    addFeatureInfoToMap: addFeatureInfoToMap,
     addFeatureSelectionToMap: addFeatureSelectionToMap,
+    addFeatureToMap: addFeatureToMap,
     addLayerToMap: addLayerToMap,
-    addInfoToMap: addInfoToMap,
-    addInfoPoint: addInfoPoint,
     addSelectInteraction: addSelectInteraction,
     setPrintBox: setPrintBox,
     addWKTToMap: addWKTToMap,
     aspectRatio: aspectRatio,
-    clearLayerInfo: clearLayerInfo,
     clearLayerPrint: clearLayerPrint,
     clearLayerSelection: clearLayerSelection,
     clearLayerSelectionMask: clearLayerSelectionMask,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
     getCentroid: getCentroid,
+    getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,
-    getRequestInfo: getRequestInfo,
-    getLayerInfo: getLayerInfo,
     getLegendUrl: getLegendUrl,
     getMap: getMap,
     getMapResolution: getMapResolution,
@@ -1890,8 +1559,6 @@ let AppMap = (function() {
     layerIsPresent: layerIsPresent,
     loadConfig: loadConfig,
     log: log,
-    processRequest: processRequest,
-    processRequestAll: processRequestAll,
     removeAllLayersFromMap: removeAllLayersFromMap,
     removeLayerFromMap: removeLayerFromMap,
     removeDrawInteraction: removeDrawInteraction,

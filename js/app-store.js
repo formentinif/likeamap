@@ -342,7 +342,7 @@ var AppStore = (function() {
     }
 
     html += "<div>";
-    var layer = AppMap.getLayerInfo(gid);
+    var layer = AppStore.getLayer(gid);
     var layerName = "";
     if (layer) {
       layerName = layer.layerName;
@@ -932,6 +932,19 @@ var AppStore = (function() {
     return panelContentItemSelected;
   };
 
+  /**
+   * Genera un GUID
+   * @return {string} guid
+   */
+  let guid = function() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+  };
+
   return {
     addResetToolsEvent: addResetToolsEvent,
     createShareUrl: createShareUrl,
@@ -951,6 +964,7 @@ var AppStore = (function() {
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,
     getRelation: getRelation,
+    guid: guid,
     isDrawing: isDrawing,
     isMobile: isMobile,
     mapInit: mapInit,
