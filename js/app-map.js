@@ -636,16 +636,17 @@ let AppMap = (function() {
     //     dispatch("map-zoom-end");
     // });
 
-    //mainMap.on('pointermove', function (evt) {
-    //    if (evt.dragging) {
-    //        return;
-    //    }
-    //    let pixel = mainMap.getEventPixel(evt.originalEvent);
-    //    let hit = mainMap.forEachLayerAtPixel(pixel, function (layer) {
-    //        return true;
-    //    });
-    //    mainMap.getTargetElement().style.cursor = hit ? 'pointer' : '';
-    //});
+    mainMap.on("pointermove", function(evt) {
+      // if (evt.dragging) {
+      //   return;
+      // }
+      // let pixel = mainMap.getEventPixel(evt.originalEvent);
+      // let hit = mainMap.forEachLayerAtPixel(pixel, function(layer) {
+      //   return true;
+      // });
+      // mainMap.getTargetElement().style.cursor = hit ? "pointer" : "";
+    });
+
     mainMap.addInteraction(dragInteractionPrint);
 
     // let modify = new ol.interaction.Modify({
