@@ -25,10 +25,10 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
+/**
+ * Classe per la gestione delle funzionalità di info
+ */
 let AppMapInfo = (function() {
-  /// <summary>
-  /// Classe per la gestione delle funzionalità di info
-  /// </summary>
   "use strict";
 
   //Array with the requests to elaborate
@@ -85,13 +85,26 @@ let AppMapInfo = (function() {
    * 2. getFeatureInfoRequest
    * 3. processRequest/processRequestAll based on the variable visibleLayers
    * @param {Array} coordinate Coordinate of the point clicked
+   * @param {Array} pixel pixel clicked on map
    * @param {boolean} visibleLayers Visibile Layers
    */
-  let getRequestInfo = function getRequestInfo(coordinate, visibleLayers) {
-    //verifico che non sia attivo il disegno globale
-    if (AppStore.isDrawing()) {
+  let getRequestInfo = function getRequestInfo(coordinate, pixel, visibleLayers) {
+    if (!AppStore.getInfoClickEnabled()) {
       return;
     }
+    //checking if there is a vector feature
+    let featuresClicked = [];
+    if (pixel) {
+      featuresClicked = AppMap.getMap().getFeaturesAtPixel(pixel);
+      AppMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
+        feature.set("layer_gid", layer.get("gid"));
+        featuresClicked.push(feature);
+      });
+    }
+    if (featuresClicked.length) {
+      return;
+    }
+
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
     let viewResolution = AppMap.getMap()

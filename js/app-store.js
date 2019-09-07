@@ -34,6 +34,8 @@ var AppStore = (function() {
   var panelContentItemSelected = "";
   var resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }, { eventName: "clear-layer-info" }, { eventName: "clear-layer-print" }];
 
+  let infoClickEnabled = true;
+
   var init = function() {
     //normalizing appstate
     if (!appState.currentInfoItems) {
@@ -830,14 +832,12 @@ var AppStore = (function() {
     return /Mobi/.test(navigator.userAgent);
   };
 
-  var isDrawing = function() {
-    if ($("#menu-panel").css("display") == "none") {
-      return false;
-    }
-    if (panelContentItemSelected == "draw-tools") {
-      return true;
-    }
-    return false;
+  var getInfoClickEnabled = function() {
+    return infoClickEnabled;
+  };
+
+  var setInfoClickEnabled = function(status) {
+    infoClickEnabled = status;
   };
 
   var doLogin = function(username, password) {
@@ -954,6 +954,7 @@ var AppStore = (function() {
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItems: getCurrentInfoItems,
+    getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
     getLayerArray: getLayerArray,
@@ -965,7 +966,7 @@ var AppStore = (function() {
     getRelations: getRelations,
     getRelation: getRelation,
     guid: guid,
-    isDrawing: isDrawing,
+    setInfoClickEnabled: setInfoClickEnabled,
     isMobile: isMobile,
     mapInit: mapInit,
     mapReload: mapReload,

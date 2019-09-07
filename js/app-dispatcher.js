@@ -253,7 +253,7 @@ var Dispatcher = (function() {
 
     this.bind("reverse-geocoding", function(payload) {
       //conversione coordinate
-      AppMap.getRequestInfo(payload.coordinate, false);
+      AppMap.getRequestInfo(payload.coordinate, null, false);
     });
 
     this.bind("show-reverse-geocoding-result", function(payload) {
@@ -261,6 +261,14 @@ var Dispatcher = (function() {
       AppStore.showMenuContent("search-tools", true);
       SearchTools.showSearchLayers();
       SearchTools.displayGenericResults(payload.results);
+    });
+
+    this.bind("enable-map-info", function(payload) {
+      AppStore.setInfoClickEnabled(true);
+    });
+
+    this.bind("disable-map-info", function(payload) {
+      AppStore.setInfoClickEnabled(false);
     });
 
     this.bind("log", function(payload) {

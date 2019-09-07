@@ -47,27 +47,13 @@ let AppMap = (function() {
 
   let formatWKT = new ol.format.WKT();
   let featuresWKT = new ol.Collection();
-  let vectorWKT;
   let featuresSelection = new ol.Collection();
   let featuresSelectionMask = new ol.Collection();
+  let vectorDraw;
   let vectorSelectionMask;
   let vectorSelection;
-  let styleSelection = new ol.style.Style({
-    fill: new ol.style.Fill({
-      color: [255, 216, 0, 0.2]
-    }),
-    stroke: new ol.style.Stroke({
-      color: [255, 216, 0, 1],
-      width: 2
-    }),
-    image: new ol.style.Circle({
-      radius: 7,
-      fill: new ol.style.Fill({
-        color: [255, 216, 0, 1]
-      })
-    })
-  });
 
+  //TODO eliminare questa funzione
   let getCurrentColor = function(opacity, color) {
     if (!opacity) opacity = 1;
     let resultColor = {
@@ -101,7 +87,7 @@ let AppMap = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: styleSelection
+    style: AppMapStyles.getSelectionStyle()
   });
 
   let copyCoordinateEvent; //evento per la copia coordinate
@@ -203,6 +189,26 @@ let AppMap = (function() {
     return layer;
   };
 
+  /**
+   * Add a layer to map
+   *
+   * @param {string} gid Unique layer identifier
+   * @param {string} uri Remote service Url
+   * @param {string} layerType Layer type  osm, wms, wmstiled, tms
+   * @param {string} layer Layer name as in geoserver
+   * @param {string} srs
+   * @param {string} format
+   * @param {string} params Additional parameters that will be appended to the url as querystring
+   * @param {string} tileMode (Not implemented) Additional tile type id the layerType is TMS
+   * @param {boolean} visible Layer initial visibility
+   * @param {int} zIndex Layer index in map
+   * @param {boolean} queryable Enables info (click) on the layer
+   * @param {float} opacity Layer initial opacity min 0 max 1
+   * @param {string} attribution Layer source attribuition
+   * @param {boolean} secured
+   * @param {string} apikey
+   * @param {boolean} preload Preload all layer features in a vector layer
+   */
   let addLayerToMap = function addLayerToMap(
     gid,
     uri,
@@ -218,18 +224,9 @@ let AppMap = (function() {
     opacity,
     attribution,
     secured,
-    apikey
+    apikey,
+    preload
   ) {
-    /// <summary>
-    /// Aggiunge un layer alla mappa
-    /// </summary>
-    /// <param name="gid">Codice numerico identificativo del layer</param>
-    /// <param name="uri">Url sorgente del layer</param>
-    /// <param name="layerType">Tipologia del layer  osm, wms, wmstiled, tms</param>
-    /// <param name="params">Parametri aggiuntivi da aggiungere alle chiamate (formato url querystring)</param>
-    /// <param name="tileMode">Tipo di tile in caso di layer TMS (non implementato)</param>
-    /// <param name="opacity">Opacit del layer</param>
-
     let thisLayer;
     if (!params) {
       params = "";
@@ -280,8 +277,26 @@ let AppMap = (function() {
       thisLayer.zIndex = parseInt(zIndex);
       thisLayer.setZIndex(parseInt(zIndex));
       thisLayer.setOpacity(parseFloat(opacity));
+      thisLayer.preload = preload;
     } else {
       log("Impossibile aggiungere il layer " + gid + ", " + uri + ", " + layerType + ", " + params + ", " + tileMode);
+      return;
+    }
+    if (preload) {
+      var vectorSource = new ol.source.Vector({
+        url: getWFSfromWMS(uri + "?" + params),
+        format: new ol.format.GeoJSON(),
+        strategy: ol.loadingstrategy.all
+      });
+      var vector = new ol.layer.Vector({
+        zIndex: 10000,
+        gid: gid + "_preload",
+        source: vectorSource,
+        visible: visible,
+        style: AppMapStyles.getPreloadStyle()
+      });
+      vector.gid = gid + "_preload";
+      mainMap.addLayer(vector);
     }
   };
 
@@ -425,6 +440,23 @@ let AppMap = (function() {
         break;
     }
     return result;
+  };
+
+  /**
+   * Converts the WMS Geoserver url into his WFS equivalent
+   * @param {string} wmsUrl WMS service url
+   */
+  let getWFSfromWMS = function(wmsUrl) {
+    let wfsUrlArray = wmsUrl.split("?");
+    let baseUrl = wfsUrlArray[0].replace("wms", "wfs");
+    let paramsArray = wfsUrlArray[1].split("&");
+    let url = baseUrl + "?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application%2Fjson&";
+    paramsArray.forEach(function(param) {
+      if (param.toLowerCase().split("=")[0] === "layers") {
+        url += "typeName=" + param.split("=")[1];
+      }
+    });
+    return url;
   };
 
   /**
@@ -586,8 +618,8 @@ let AppMap = (function() {
     loadConfig(mapConfig);
 
     mainMap.on("singleclick", function(evt) {
-      //interrogo solo i layer visibile
-      AppMapInfo.getRequestInfo(evt.coordinate, true);
+      //Adding click info interaction
+      AppMapInfo.getRequestInfo(evt.coordinate, evt.pixel, true);
     });
 
     mainMap.on("moveend", function() {
@@ -686,130 +718,28 @@ let AppMap = (function() {
       });
     }
     //aggiungo layer WKT alla mappa
-    vectorWKT = new ol.layer.Vector({
+    vectorDraw = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresWKT
       }),
-      style: (function() {
-        let style = new ol.style.Style({
-          fill: new ol.style.Fill({
-            color: getCurrentColor(0.2, [68, 138, 255, 0.2])
-          }),
-          stroke: new ol.style.Stroke({
-            color: getCurrentColor(1, [68, 138, 255, 1]),
-            width: 2
-          }),
-          image: new ol.style.Circle({
-            radius: 7,
-            fill: new ol.style.Fill({
-              color: getCurrentColor(1, [68, 138, 255, 1])
-            })
-          }),
-          text: new ol.style.Text({
-            text: "",
-            scale: 1.7,
-            textAlign: "Left",
-            textBaseline: "Top",
-            fill: new ol.style.Fill({
-              color: "#000000"
-            }),
-            stroke: new ol.style.Stroke({
-              color: "#FFFFFF",
-              width: 3.5
-            })
-          })
-        });
-        let styles = [style];
-        return function(feature, resolution) {
-          style.getText().setText(feature.get("name"));
-          return styles;
-        };
-      })()
+      style: AppMapStyles.getDrawStyle()
     });
 
     vectorSelectionMask = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresSelectionMask
       }),
-      style: (function() {
-        let style = new ol.style.Style({
-          fill: new ol.style.Fill({
-            color: getCurrentColor(0.2, [255, 216, 0, 0.1])
-          }),
-          stroke: new ol.style.Stroke({
-            color: getCurrentColor(1, [255, 216, 0, 0.5]),
-            width: 2
-          }),
-          image: new ol.style.Circle({
-            radius: 7,
-            fill: new ol.style.Fill({
-              color: getCurrentColor(1, [255, 216, 0, 0.5])
-            })
-          }),
-          text: new ol.style.Text({
-            text: "",
-            scale: 1.7,
-            textAlign: "Left",
-            textBaseline: "Top",
-            fill: new ol.style.Fill({
-              color: "#000000"
-            }),
-            stroke: new ol.style.Stroke({
-              color: "#FFFFFF",
-              width: 3.5
-            })
-          })
-        });
-        let styles = [style];
-        return function(feature, resolution) {
-          style.getText().setText(feature.get("name"));
-          return styles;
-        };
-      })()
+      style: AppMapStyles.getSelectionMaskStyle()
     });
 
     vectorSelection = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresSelection
       }),
-      style: (function() {
-        let style = new ol.style.Style({
-          fill: new ol.style.Fill({
-            color: getCurrentColor(0.2, [0, 255, 255, 0.2])
-          }),
-          stroke: new ol.style.Stroke({
-            color: getCurrentColor(1, [0, 255, 255, 1]),
-            width: 2
-          }),
-          image: new ol.style.Circle({
-            radius: 7,
-            fill: new ol.style.Fill({
-              color: getCurrentColor(1, [0, 255, 255, 1])
-            })
-          }),
-          text: new ol.style.Text({
-            text: "",
-            scale: 1.7,
-            textAlign: "Left",
-            textBaseline: "Top",
-            fill: new ol.style.Fill({
-              color: "#000000"
-            }),
-            stroke: new ol.style.Stroke({
-              color: "#FFFFFF",
-              width: 3.5
-            })
-          })
-        });
-        let styles = [style];
-        return function(feature, resolution) {
-          style.getText().setText(feature.get("name"));
-          return styles;
-        };
-      })()
+      style: AppMapStyles.getSelectionStyle()
     });
 
-    vectorWKT.setMap(mainMap);
+    vectorDraw.setMap(mainMap);
     vectorSelectionMask.setMap(mainMap);
     vectorSelection.setMap(mainMap);
 
@@ -822,8 +752,8 @@ let AppMap = (function() {
         });
         for (let i = 0; i < tempfeaturesWKT.length; i++) {
           let feat = tempfeaturesWKT[i].clone();
-          feat.setStyle(vectorWKT.style);
-          vectorWKT.getSource().addFeature(feat);
+          feat.setStyle(vectorDraw.style);
+          vectorDraw.getSource().addFeature(feat);
         }
       } catch (e) {
         log("Main-Map: Impossibile caricare le features KML");
@@ -853,7 +783,8 @@ let AppMap = (function() {
         layer.opacity,
         layer.attribution,
         layer.secured,
-        layer.apikey
+        layer.apikey,
+        layer.preload
       );
       if (layer.layers) {
         addLayersToMap(layer.layers);
@@ -966,6 +897,13 @@ let AppMap = (function() {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
+      debugger;
+      if (layer.preload) {
+        let layer_preload = getLayer(gid + "_preload");
+        if (layer_preload) {
+          layer_preload.setVisible(layer.getVisible());
+        }
+      }
     }
   };
 
@@ -973,6 +911,12 @@ let AppMap = (function() {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(visibility);
+      if (layer.preload) {
+        let layer_preload = getLayer(gid + "_preload");
+        if (layer_preload) {
+          layer_preload.setVisible(visibility);
+        }
+      }
     }
   };
 
@@ -1000,7 +944,7 @@ let AppMap = (function() {
     /*let feature = formatWKT.readFeature(
     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-    vectorWKT.getSource().addFeature(feature);
+    vectorDraw.getSource().addFeature(feature);
   };
 
   let addFeatureToMap = function addFeatureToMap(geometry, srid, vector) {
@@ -1182,7 +1126,7 @@ let AppMap = (function() {
     selectInteraction = new ol.interaction.Draw({
       features: featuresSelectionMask,
       type: geomType,
-      style: styleSelection
+      style: AppMapStyles.getSelectionStyle()
     });
     selectInteraction.on("drawend", function(evt) {
       let feature = evt.feature.clone();
@@ -1302,17 +1246,7 @@ let AppMap = (function() {
     });
     drawInteraction.on("drawend", function(evt) {
       //evt.feature.NAME = "pippo";
-      // evt.feature.set("name", $("#draw-tools__textarea").val());
-      // let defaultStyle = new ol.style.Style({
-      //   fill: new ol.style.Fill({
-      //     color: getCurrentColor(1)
-      //   }),
-      //   stroke: new ol.style.Stroke({
-      //     color: getCurrentColor(1),
-      //     width: 1
-      //   })
-      //});
-      //evt.feature.setStyle(defaultStyle); //$("#draw-tools__textarea").val());
+      //evt.feature.set("name", $("#draw-tools__textarea").val());
     });
     mainMap.addInteraction(drawInteraction);
   };
@@ -1320,17 +1254,7 @@ let AppMap = (function() {
   let addDrawDeleteInteraction = function(geomType) {
     deleteInteraction = new ol.interaction.Select({
       // make sure only the desired layer can be selected
-      layers: [vectorWKT]
-    });
-
-    let style_modify = new ol.style.Style({
-      stroke: new ol.style.Stroke({
-        width: 2,
-        color: getCurrentColor(1, [255, 0, 0, 1])
-      }),
-      fill: new ol.style.Stroke({
-        color: getCurrentColor(1, [255, 0, 0, 0.2])
-      })
+      layers: [vectorDraw]
     });
 
     deleteInteraction.on("select", function(evt) {
@@ -1339,9 +1263,9 @@ let AppMap = (function() {
 
       if (selected.length) {
         selected.forEach(function(feature) {
-          feature.setStyle(style_modify);
+          feature.setStyle(AppMapStyles.getModifyStyle());
           //abilita eliminazione single click
-          //vectorWKT.getSource().removeFeature(feature);
+          //vectorDraw.getSource().removeFeature(feature);
           //
           deleteDrawFeatures();
         });
@@ -1356,7 +1280,7 @@ let AppMap = (function() {
 
   let deleteDrawFeatures = function() {
     for (let i = 0; i < deleteInteraction.getFeatures().getArray().length; i++) {
-      vectorWKT.getSource().removeFeature(deleteInteraction.getFeatures().getArray()[i]);
+      vectorDraw.getSource().removeFeature(deleteInteraction.getFeatures().getArray()[i]);
     }
     deleteInteraction.getFeatures().clear();
   };
@@ -1366,7 +1290,7 @@ let AppMap = (function() {
    * @return {string} Elenco delle feature in formato KML
    */
   let getDrawFeature = function() {
-    let features = vectorWKT.getSource().getFeatures();
+    let features = vectorDraw.getSource().getFeatures();
     let kmlFormat = new ol.format.KML();
     let kml = kmlFormat.writeFeatures(features, {
       featureProjection: "EPSG:3857"

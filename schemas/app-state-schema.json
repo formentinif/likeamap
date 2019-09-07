@@ -398,6 +398,11 @@
                   "title": "Api Key del servizio",
                   "description": "Api Key del servizio",
                   "type": "string"
+                },
+                "preload": {
+                  "title": "Preload del layer",
+                  "description": "Abilita il caricamento in preload del layer",
+                  "type": "boolean"
                 }
               },
               "required": [
