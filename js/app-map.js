@@ -573,13 +573,12 @@ let AppMap = (function() {
     });
   };
 
+  /**
+   * Map initialization function
+   * @param {*} divMap Html element for the map
+   * @param {*} mapConfig AppState Config
+   */
   let render = function render(divMap, mapConfig) {
-    /// <summary>
-    /// Inizializza l'oggetto mappa
-    /// </summary>
-    /// <param name="divMap">Identificativo html in cui caricare la mappa</param>
-    /// <returns type=""></returns>
-
     log("Creazione della mappa in corso");
     ol.inherits(GetBrowserLocationControl, ol.control.Control);
     ol.inherits(GetZoomOutControl, ol.control.Control);
@@ -616,6 +615,8 @@ let AppMap = (function() {
     });
 
     loadConfig(mapConfig);
+
+    AppMapInfo.init(); //info initialization
 
     mainMap.on("singleclick", function(evt) {
       //Adding click info interaction

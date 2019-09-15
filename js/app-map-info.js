@@ -40,24 +40,12 @@ let AppMapInfo = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: AppMap.getCurrentColor(1, [255, 125, 0, 1])
-      }),
-      stroke: new ol.style.Stroke({
-        color: AppMap.getCurrentColor(1, [255, 125, 0, 1]),
-        width: 3
-      }),
-      image: new ol.style.Circle({
-        radius: 7,
-        fill: new ol.style.Fill({
-          color: AppMap.getCurrentColor(1, [255, 125, 0, 1])
-        })
-      })
-    })
+    style: AppMapStyles.getInfoStyle()
   });
 
-  vectorInfo.setMap(AppMap.getMap());
+  let init = function() {
+    vectorInfo.setMap(AppMap.getMap());
+  };
 
   /**
    * Restituisce l'url per ricavare le informazioni sulla mappa
@@ -83,7 +71,7 @@ let AppMapInfo = (function() {
    * The pipeline is
    * 1. getRequestInfo
    * 2. getFeatureInfoRequest
-   * 3. processRequest/processRequestAll based on the variable visibleLayers
+   * 3. processRequestInfo/processRequestInfoAll based on the variable visibleLayers
    * @param {Array} coordinate Coordinate of the point clicked
    * @param {Array} pixel pixel clicked on map
    * @param {boolean} visibleLayers Visibile Layers
@@ -95,13 +83,16 @@ let AppMapInfo = (function() {
     //checking if there is a vector feature
     let featuresClicked = [];
     if (pixel) {
-      featuresClicked = AppMap.getMap().getFeaturesAtPixel(pixel);
       AppMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
-        feature.set("layer_gid", layer.get("gid"));
+        feature.layerGid = layer.get("gid").replace("_preload", "");
         featuresClicked.push(feature);
       });
     }
-    if (featuresClicked.length) {
+    debugger;
+    if (featuresClicked.length > 0) {
+      processFeatureInfoClick({
+        features: featuresClicked
+      });
       return;
     }
 
@@ -173,9 +164,9 @@ let AppMapInfo = (function() {
     }
     //adding the right callback on request
     if (requestQueue.visibleLayers) {
-      url += "&format_options=callback:AppMapInfo.processRequest";
+      url += "&format_options=callback:AppMapInfo.processRequestInfo";
     } else {
-      url += "&format_options=callback:AppMapInfo.processRequestAll";
+      url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
     }
     requestQueue.ajaxPending = true;
     dispatch("show-loader");
@@ -194,25 +185,48 @@ let AppMapInfo = (function() {
   };
 
   /**
-   * Visualize the first object found
-   * @param {Object} data Request result
+   * Process the results after the click on a vector feature on the map
+   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
    */
-  let processRequest = function processRequest(data) {
+  let processFeatureInfoClick = function processFeatureInfoClick(featureCollection) {
+    debugger;
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
     //se il dato è presente lo visualizzo
-    if (data && data.features.length > 0) {
-      if (data.features[0].geometry) {
-        let srid = AppMap.getSRIDfromCRSName(data.crs.properties.name);
-        addFeatureInfoToMap(data.features[0].geometry, srid);
-      }
-      for (let i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+    if (featureCollection && featureCollection.features.length > 0) {
+      if (featureCollection.features[0].geometry) {
+        let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
+        addFeatureInfoToMap(featureCollection.features[0].geometry, srid);
       }
       Dispatcher.dispatch({
         eventName: "show-info-item",
-        data: data
+        data: featureCollection
+      });
+    }
+  };
+
+  /**
+   * Precess the results after an info click on the map
+   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
+   */
+  let processRequestInfo = function processRequestInfo(featureCollection) {
+    debugger;
+    clearLayerInfo();
+    requestQueue.ajaxPending = false;
+    dispatch("hide-loader");
+    //se il dato è presente lo visualizzo
+    if (featureCollection && featureCollection.features.length > 0) {
+      if (featureCollection.features[0].geometry) {
+        let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
+        addFeatureInfoToMap(featureCollection.features[0].geometry, srid);
+      }
+      for (let i = 0; i < featureCollection.features.length; i++) {
+        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+      }
+      Dispatcher.dispatch({
+        eventName: "show-info-item",
+        data: featureCollection
       });
     }
 
@@ -221,23 +235,25 @@ let AppMapInfo = (function() {
       getFeatureInfoRequest();
     }
     //se il dato a questo punto è nullo procedo al secondo step nella coda delle richieste
-    if (!data || data.features.length == 0) {
+    if (!featureCollection || featureCollection.features.length == 0) {
       getFeatureInfoRequest();
     }
   };
 
   /**
    * Process the next step on a Request Queue
-   * @param {Array} data
+   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
    */
-  let processRequestAll = function processRequestAll(data) {
+  let processRequestInfoAll = function processRequestInfoAll(featureCollection) {
+    debugger;
+
     clearLayerInfo();
     dispatch("hide-loader");
     //se il dato è presente lo aggiungo al contenitore global
-    if (data && data.features.length > 0) {
-      for (let i = 0; i < data.features.length; i++) {
-        data.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-        requestQueueData.push(data.features[i]);
+    if (featureCollection && featureCollection.features.length > 0) {
+      for (let i = 0; i < featureCollection.features.length; i++) {
+        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+        requestQueueData.push(featureCollection.features[i]);
       }
     }
 
@@ -249,7 +265,7 @@ let AppMapInfo = (function() {
     getFeatureInfoRequest(false);
   };
 
-  let addInfoToMap = function addInfoToMap(wkt) {
+  let addWktInfoToMap = function addWktInfoToMap(wkt) {
     /// <summary>
     /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
     /// </summary>
@@ -317,6 +333,13 @@ let AppMapInfo = (function() {
   };
 
   //Private Classes
+  let featureInfo = function() {
+    this.layerGid = "";
+    this.properties = {};
+    this.geometry = {};
+    this.geometryType = "";
+    this.SRID = "";
+  };
 
   /**
    * Request that is sent on map click
@@ -352,11 +375,12 @@ let AppMapInfo = (function() {
 
   return {
     addFeatureInfoToMap: addFeatureInfoToMap,
-    addInfoToMap: addInfoToMap,
+    addWktInfoToMap: addWktInfoToMap,
     addInfoPoint: addInfoPoint,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
-    processRequest: processRequest,
-    processRequestAll: processRequestAll
+    init: init,
+    processRequestInfo: processRequestInfo,
+    processRequestInfoAll: processRequestInfoAll
   };
 })();

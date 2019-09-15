@@ -140,11 +140,11 @@ var Dispatcher = (function() {
     this.bind("zoom-geometry", function(payload) {
       AppMap.goToGeometry(payload.geometry);
     });
-    this.bind("add-info-map", function(payload) {
-      AppMap.addInfoToMap(payload.wkt);
+    this.bind("add-wkt-info-map", function(payload) {
+      AppMapInfo.addWktInfoToMap(payload.wkt);
     });
     this.bind("add-feature-info-map", function(payload) {
-      AppMap.addFeatureInfoToMap(payload.geometry, payload.srid);
+      AppMapInfo.addFeatureInfoToMap(payload.geometry, payload.srid);
     });
     this.bind("toggle-layer", function(payload) {
       AppMap.toggleLayer(payload.gid);

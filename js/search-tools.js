@@ -301,7 +301,7 @@ var SearchTools = (function() {
       lat: parseFloat(result.lat)
     });
     dispatch({
-      eventName: "add-info-map",
+      eventName: "add-wkt-info-map",
       wkt: "POINT(" + result.lon + " " + result.lat + ")"
     });
     dispatch({ eventName: "hide-menu-mobile" });
@@ -321,7 +321,7 @@ var SearchTools = (function() {
       lat: parseFloat(lat)
     });
     dispatch({
-      eventName: "add-info-map",
+      eventName: "add-wkt-info-map",
       wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
     });
     dispatch("hide-menu-mobile");
@@ -364,7 +364,7 @@ var SearchTools = (function() {
         zoom: 18,
         lon: parseFloat(lon),
         lat: parseFloat(lat),
-        eventName: "add-info-map",
+        eventName: "add-wkt-info-map",
         wkt: "POINT(" + lon + " " + lat + ")"
       });
       dispatch("hide-menu-mobile");

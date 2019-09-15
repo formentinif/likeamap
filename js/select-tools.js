@@ -314,7 +314,7 @@ let SelectTools = (function() {
         zoom: 18,
         lon: parseFloat(lon),
         lat: parseFloat(lat),
-        eventName: "add-info-map",
+        eventName: "add-wkt-info-map",
         wkt: "POINT(" + lon + " " + lat + ")"
       });
       dispatch("hide-menu-mobile");

@@ -174,32 +174,31 @@ var AppStore = (function() {
     }
   };
 
-  var showInfoItem = function(data) {
+  var showInfoItem = function(featureInfoCollection) {
     var title = "Risultati dell'interrogazione";
     var body = "";
-    if (!data) {
+    if (!featureInfoCollection) {
       return;
     }
-    if (!data.features) {
-      data = [data];
-    } else {
-      data = data.features;
+    //single feature sent
+    if (!featureInfoCollection.features) {
+      featureInfoCollection = [featureInfoCollection];
     }
-    AppStore.getAppState().currentInfoItems = data;
-    if (data.length > 0) {
-      title += " (" + data.length + ")";
+    AppStore.getAppState().currentInfoItems = featureInfoCollection;
+    if (featureInfoCollection.length > 0) {
+      title += " (" + featureInfoCollection.length + ")";
     }
-    for (var i = 0; i < data.length; i++) {
-      var props = data[i].properties ? data[i].properties : data[i];
-      let layer = AppStore.getLayer(data[i].layerGid);
-      var template = AppTemplates.getTemplate(data[i].layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    for (var i = 0; i < featureInfoCollection.length; i++) {
+      var props = featureInfoCollection[i].properties ? featureInfoCollection[i].properties : featureInfoCollection[i];
+      let layer = AppStore.getLayer(featureInfoCollection[i].layerGid);
+      var template = AppTemplates.getTemplate(featureInfoCollection[i].layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       var tempBody = AppTemplates.processTemplate(template, props);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props);
       }
       //sezione relations
       var layerRelations = AppStore.getRelations().filter(function(relation) {
-        return $.inArray(data[i].layerGid, relation.layerGids) >= 0;
+        return $.inArray(featureInfoCollection[i].layerGid, relation.layerGids) >= 0;
       });
 
       tempBody += AppTemplates.relationsTemplate(layerRelations, props, i);
@@ -300,15 +299,18 @@ var AppStore = (function() {
   };
 
   var showInfoWindow = function(title, body) {
-    $("#info-window__title").html(title);
-    $("#info-window__body").html(body);
-    $("#info-window").show();
-    $("#info-window").animate(
-      {
-        scrollTop: 0
-      },
-      "fast"
-    );
+    $("#info-results").html(body);
+    $("#info-results").show();
+    debugger;
+    // $("#info-window__title").html(title);
+    // $("#info-window__body").html(body);
+    // $("#info-window").show();
+    // $("#info-window").animate(
+    //   {
+    //     scrollTop: 0
+    //   },
+    //   "fast"
+    // );
   };
 
   var hideInfoWindow = function() {
