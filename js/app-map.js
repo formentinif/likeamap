@@ -43,8 +43,13 @@ let AppMap = (function() {
     }
   };
 
-  let mainMap;
+  let geometryFormatsEnum = {
+    GeoJson: 1,
+    OL: 2
+  };
 
+  let mainMap;
+  let isRendered = false;
   let formatWKT = new ol.format.WKT();
   let featuresWKT = new ol.Collection();
   let featuresSelection = new ol.Collection();
@@ -52,6 +57,10 @@ let AppMap = (function() {
   let vectorDraw;
   let vectorSelectionMask;
   let vectorSelection;
+
+  let getGeometryFormats = function() {
+    return geometryFormatsEnum;
+  };
 
   //TODO eliminare questa funzione
   let getCurrentColor = function(opacity, color) {
@@ -573,6 +582,13 @@ let AppMap = (function() {
     });
   };
 
+  let init = function() {
+    //binding degli eventi
+    Dispatcher.bind("show-map-tools", function(payload) {
+      AppToolbar.toggleToolbarItem("map-tools");
+    });
+  };
+
   /**
    * Map initialization function
    * @param {*} divMap Html element for the map
@@ -580,6 +596,9 @@ let AppMap = (function() {
    */
   let render = function render(divMap, mapConfig) {
     log("Creazione della mappa in corso");
+    if (!isRendered) {
+      init();
+    }
     ol.inherits(GetBrowserLocationControl, ol.control.Control);
     ol.inherits(GetZoomOutControl, ol.control.Control);
     ol.inherits(GetZoomInControl, ol.control.Control);
@@ -685,7 +704,8 @@ let AppMap = (function() {
     let initLat = getUriParameter("lat");
     let initZoom = getUriParameter("zoom");
     let initLayers = getUriParameter("layers");
-    let initTool = getUriParameter("tool");
+    //let initTool = getUriParameter("tool");
+
     try {
       if (initLon) config.mapLon = parseFloat(initLon);
       if (initLat) config.mapLat = parseFloat(initLat);
@@ -713,12 +733,12 @@ let AppMap = (function() {
       } finally {
       }
     }
-    if (initTool) {
-      dispatch({
-        eventName: "show-tool",
-        tool: initTool
-      });
-    }
+    // if (initTool) {
+    //   dispatch({
+    //     eventName: "show-tool",
+    //     tool: initTool
+    //   });
+    // }
     //aggiungo layer WKT alla mappa
     vectorDraw = new ol.layer.Vector({
       source: new ol.source.Vector({
@@ -899,7 +919,6 @@ let AppMap = (function() {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
-      debugger;
       if (layer.preload) {
         let layer_preload = getLayer(gid + "_preload");
         if (layer_preload) {
@@ -949,16 +968,35 @@ let AppMap = (function() {
     vectorDraw.getSource().addFeature(feature);
   };
 
-  let addFeatureToMap = function addFeatureToMap(geometry, srid, vector) {
+  /**
+   * Add a geometry to the map
+   * @param {Object} geometry Feature's geometry object/arrat. The geometry type must match the given geometryFormat.
+   * @param {int} srid srid of the object
+   * @param {Ol/Vector} vector Vector layer destination
+   * @param {int} geometryFormat Geometry format as in geometryFormats
+   */
+  let addGeometryToMap = function addGeometryToMap(geometry, srid, vector, geometryFormat) {
     let feature = null;
-    if (geometry) {
-      let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
-      feature = new ol.Feature({
-        geometry: geometryOl
-      });
+    try {
+      let geometryOl = geometry;
+      switch (geometryFormat) {
+        case geometryFormatsEnum.GeoJson:
+          let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
+          feature = new ol.Feature({
+            geometry: geometryOl
+          });
+          break;
+        default:
+          feature = new ol.Feature({
+            geometry: geometry
+          });
+          break;
+      }
       feature = transform3857(feature, srid);
       //feature.getGeometry().transform(projection, 'EPSG:3857');
       vector.getSource().addFeature(feature);
+    } catch (error) {
+      log(error);
     }
     return feature;
   };
@@ -1178,7 +1216,7 @@ let AppMap = (function() {
   };
 
   let addFeatureSelectionToMap = function(geometry, srid) {
-    return addFeatureToMap(geometry, srid, vectorSelection);
+    return addGeometryToMap(geometry, srid, vectorSelection, geometryFormats.GeoJSON);
   };
 
   /* SEZIONE DRAWING    *************************************/
@@ -1385,7 +1423,12 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
+      decodeURIComponent(
+        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
+          /\+/g,
+          "%20"
+        )
+      ) || null
     );
   };
 
@@ -1404,7 +1447,10 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
+    return (
+      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
+      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
+    );
   };
 
   let addContextMenu = function(items) {
@@ -1452,7 +1498,7 @@ let AppMap = (function() {
     addDrawInteraction: addDrawInteraction,
     addDrawDeleteInteraction: addDrawDeleteInteraction,
     addFeatureSelectionToMap: addFeatureSelectionToMap,
-    addFeatureToMap: addFeatureToMap,
+    addGeometryToMap: addGeometryToMap,
     addLayerToMap: addLayerToMap,
     addSelectInteraction: addSelectInteraction,
     setPrintBox: setPrintBox,
@@ -1463,6 +1509,7 @@ let AppMap = (function() {
     clearLayerSelectionMask: clearLayerSelectionMask,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
+    getGeometryFormats: getGeometryFormats,
     getCentroid: getCentroid,
     getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,

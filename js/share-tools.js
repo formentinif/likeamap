@@ -29,7 +29,19 @@ var ShareTools = (function() {
   var isRendered = false;
 
   var init = function init() {
-    //Upgrade grafici
+    //events binding
+    Dispatcher.bind("create-share-url", function(payload) {
+      ShareTools.createShareUrl();
+    });
+
+    Dispatcher.bind("show-share-url-query", function(payload) {
+      ShareTools.createShareUrl();
+      ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
+    });
+
+    Dispatcher.bind("show-share", function(payload) {
+      AppToolbar.toggleToolbarItem("share-tools");
+    });
   };
 
   var render = function(div) {
@@ -61,11 +73,10 @@ var ShareTools = (function() {
     template += '<input type="text" class="" id="share-tools__input-query"/>';
     template += '<div class="div-20"></div>';
 
-    template += '<div class="grid">';
+    template += '<div class="row">';
+    template += '<div class="col-6"><a id="share-tools__url-query" target="_blank" >Apri</a></div>';
     template +=
-      '<div class="col-2-1"><a id="share-tools__url-query" target="_blank" >Apri</a></div>';
-    template +=
-      '<div class="col-2-1"><a id="share-tools__copy-url-query" class="fake-link" target="_blank" >Copia</a></div>';
+      '<div class="col-6"><a id="share-tools__copy-url-query" class="fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
 
     template += '<div class="div-20"></div>';
@@ -75,8 +86,7 @@ var ShareTools = (function() {
     }
     template += "'>";
     template += '<h4 class="lk-title-h4">Mappa</h4>';
-    template +=
-      "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
+    template += "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
     //template += 'Crea link da condividere con i tuoi colleghi';
     template +=
       '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
@@ -88,11 +98,9 @@ var ShareTools = (function() {
     template += '<input type="text" class="" id="share-tools__input-url"/>';
     template += '<div class="div-20"></div>';
 
-    template += '<div class="grid">';
-    template +=
-      '<div class="col-2-1"><a id="share-tools__url" target="_blank" >Apri</a></div>';
-    template +=
-      '<div class="col-2-1"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
+    template += '<div class="row">';
+    template += '<div class="col-6"><a id="share-tools__url" target="_blank" >Apri</a></div>';
+    template += '<div class="col-6"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
     template += "</div>";
 
@@ -167,13 +175,81 @@ var ShareTools = (function() {
     });
   };
 
+  var createShareUrl = function() {
+    let appState = AppStore.getAppState();
+
+    //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
+    var centerMap = AppMap.getMapCenter();
+    centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:3857", "EPSG:4326");
+
+    appState.mapLon = centerMap[0];
+    appState.mapLat = centerMap[1];
+    appState.mapZoom = AppMap.getMapZoom();
+    appState.drawFeatures = AppMap.getDrawFeature();
+
+    //invio la richiesta
+    var share = function() {
+      var deferred = Q.defer();
+      $.post(
+        appState.restAPIUrl + "/api/share/",
+        {
+          appstate: JSON.stringify(appState)
+        },
+        deferred.resolve
+      );
+      return deferred.promise;
+    };
+
+    share()
+      .then(function(data) {
+        var url = data.Url;
+        var appStateId = data.AppStateId;
+        ShareTools.displayUrl(appStateId, url);
+      })
+      .fail(function() {
+        dispatch({
+          eventName: "log",
+          message: "AppStore: create-share-url " + err
+        });
+      });
+    //invio la richiesta al servizio di print
+  };
+
+  /**
+   * Genera l'url da copiare per visualizzare lo stato dell'applicazione solo tramite querystring
+   * @return {null} Nessun valore restituito
+   */
+  var writeUrlShare = function() {
+    let appState = AppStore.getAppState();
+    //posizione
+    var qPos = "";
+    var center = AppMap.getMapCenterLonLat();
+    qPos += "lon=" + center[0] + "&lat=" + center[1];
+    qPos += "&zoom=" + AppMap.getMapZoom();
+    //layers
+    var qLayers = "";
+    for (var i = 0; i < appState.layers.length; i++) {
+      qLayers += appState.layers[i].gid + ":" + parseInt(appState.layers[i].visible) + ",";
+      if (appState.layers[i].layers) {
+        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
+          qLayers += appState.layers[i].layers[ki].gid + ":" + parseInt(appState.layers[i].layers[ki].visible) + ",";
+        }
+      }
+    }
+    var url = window.location.href;
+    var arrUrl = url.split("?");
+    return arrUrl[0] + "?" + qPos + "&layers=" + qLayers;
+  };
+
   return {
+    createShareUrl: createShareUrl,
     createUrl: createUrl,
     displayUrl: displayUrl,
     hideUrl: hideUrl,
     init: init,
     render: render,
     setShareUrlQuery: setShareUrlQuery,
-    templateShare: templateShare
+    templateShare: templateShare,
+    writeUrlShare: writeUrlShare
   };
 })();

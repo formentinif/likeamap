@@ -29,10 +29,6 @@ var AppStore = (function() {
   var appState = null;
   var initialAppState = null;
   var authToken = null;
-  var easingTime = 300;
-
-  var panelContentItemSelected = "";
-  var resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }, { eventName: "clear-layer-info" }, { eventName: "clear-layer-print" }];
 
   let infoClickEnabled = true;
 
@@ -102,79 +98,7 @@ var AppStore = (function() {
     }
   };
 
-  /**
-   * Resetta tutti i controlli mappa al cambio di menu
-   * @return {null} La funzione non restituisce un valore
-   */
-  var resetTools = function() {
-    resetToolsPayloads.forEach(function(payload) {
-      dispatch(payload);
-    });
-  };
-
-  var addResetToolsEvent = function(event) {
-    resetToolsPayloads.push(event);
-  };
-
-  var showMenu = function(content) {
-    resetTools();
-    $("#menu-panel").animate(
-      {
-        width: "show"
-      },
-      {
-        duration: easingTime,
-        complete: function() {
-          if (content) {
-            $("#" + content).show();
-          }
-        }
-      }
-    );
-  };
-
-  /**
-   * Nasconde il pannello del menu
-   */
-  var hideMenu = function() {
-    $("#menu-panel").animate(
-      {
-        width: "hide"
-      },
-      easingTime
-    );
-  };
-
-  var showMenuContent = function(content, keepOpen) {
-    //verifico se il pannello non è già selezionato
-    if (panelContentItemSelected != content) {
-      panelContentItemSelected = content;
-      $(".lk-menu-panel-content-item").hide();
-      showMenu(content);
-    } else {
-      panelContentItemSelected = "";
-      if ($("#menu-panel").css("display") == "none" || keepOpen) {
-        showMenu(content);
-      } else {
-        hideMenu();
-        $("#" + content).hide();
-      }
-    }
-    //resetto funzioni mappa
-    Dispatcher.dispatch("unset-draw");
-    switch (content) {
-      case "share-tools":
-        //resetto lo share tool
-        ShareTools.render();
-        break;
-      case "print-tools":
-        PrintTools.showPrintArea();
-        break;
-      default:
-    }
-  };
-
-  var showInfoItem = function(featureInfoCollection) {
+  var showInfoItems = function(featureInfoCollection) {
     var title = "Risultati dell'interrogazione";
     var body = "";
     if (!featureInfoCollection) {
@@ -182,41 +106,51 @@ var AppStore = (function() {
     }
     //single feature sent
     if (!featureInfoCollection.features) {
-      featureInfoCollection = [featureInfoCollection];
+      featureInfoCollection = {
+        features: [featureInfoCollection]
+      };
     }
     AppStore.getAppState().currentInfoItems = featureInfoCollection;
-    if (featureInfoCollection.length > 0) {
+    if (featureInfoCollection.features.length > 0) {
       title += " (" + featureInfoCollection.length + ")";
     }
-    for (var i = 0; i < featureInfoCollection.length; i++) {
-      var props = featureInfoCollection[i].properties ? featureInfoCollection[i].properties : featureInfoCollection[i];
-      let layer = AppStore.getLayer(featureInfoCollection[i].layerGid);
-      var template = AppTemplates.getTemplate(featureInfoCollection[i].layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
-      var tempBody = AppTemplates.processTemplate(template, props);
+    let index = 0;
+    featureInfoCollection.features.forEach(function(feature) {
+      var props = feature.properties ? feature.properties : feature;
+      let layer = AppStore.getLayer(feature.layerGid);
+      var template = AppTemplates.getTemplate(
+        feature.layerGid,
+        layer.templateUrl,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
+      var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
-        tempBody += AppTemplates.standardTemplate(props);
+        tempBody += AppTemplates.standardTemplate(props, layer);
       }
       //sezione relations
       var layerRelations = AppStore.getRelations().filter(function(relation) {
-        return $.inArray(featureInfoCollection[i].layerGid, relation.layerGids) >= 0;
+        return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
 
-      tempBody += AppTemplates.relationsTemplate(layerRelations, props, i);
-
-      //if (data.length > 0) {
-      //  tempBody += "<div class='div-10'/>";
-      //}
+      tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
       body += tempBody;
-    }
+      index++;
+    });
+
     this.showInfoWindow(title, body);
   };
 
   var showRelation = function(relationGid, resultIndex) {
-    var item = AppStore.getCurrentInfoItems()[resultIndex];
+    var item = AppStore.getCurrentInfoItems().features[resultIndex];
     var relation = AppStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",
@@ -264,44 +198,13 @@ var AppStore = (function() {
         });
       }
     });
-
-    /*
-    var ajaxRelationRequest = function() {
-      var deferred = Q.defer();
-      $.get(urlService, "", deferred.resolve);
-      return deferred.promise;
-    };
-    ajaxRelationRequest()
-      .then(function(data) {
-        var title = "Relations";
-        var body = "";
-        if (!Array.isArray(data)) {
-          data = [data];
-        }
-        for (let i = 0; i < data.length; i++) {
-          body += AppTemplates.processTemplate(template, data[i]);
-          if (!body) {
-            body += AppTemplates.standardTemplate(props);
-          }
-          if (data.length > 1) {
-            body += "<div class='div-20'></div>";
-          }
-        }
-        AppStore.showInfoWindow(title, body);
-      })
-      .fail(function() {
-        dispatch({
-          eventName: "log",
-          message: "AppStore: show-relation" + err
-        });
-      });
-      */
   };
 
   var showInfoWindow = function(title, body) {
-    $("#info-results").html(body);
+    AppToolbar.toggleToolbarItem("info-results", true);
+    $("#info-results__content").html(body);
+    $("#info-results__title").html(title);
     $("#info-results").show();
-    debugger;
     // $("#info-window__title").html(title);
     // $("#info-window__body").html(body);
     // $("#info-window").show();
@@ -369,25 +272,9 @@ var AppStore = (function() {
    * @return {null}     Nessun valore restituito
    */
   var toggleLayer = function(gid) {
-    for (var i = 0; i < appState.layers.length; i++) {
-      if (appState.layers[i].gid === gid) {
-        if (appState.layers[i].visible === 0) {
-          appState.layers[i].visible = 1;
-        } else {
-          appState.layers[i].visible = 0;
-        }
-      }
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          if (appState.layers[i].layers[ki].gid === gid) {
-            if (appState.layers[i].layers[ki].visible === 0) {
-              appState.layers[i].layers[ki].visible = 1;
-            } else {
-              appState.layers[i].layers[ki].visible = 0;
-            }
-          }
-        }
-      }
+    let layer = getLayer(gid);
+    if (layer) {
+      layer.visible = 1 - layer.visible;
     }
   };
 
@@ -398,20 +285,17 @@ var AppStore = (function() {
    * @return {null}  Nessun valore restituito
    */
   var setLayerVisibility = function(gid, visibility) {
-    for (var i = 0; i < appState.layers.length; i++) {
-      if (appState.layers[i].gid === gid) {
-        appState.layers[i].visible = visibility;
-      }
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          if (appState.layers[i].layers[ki].gid === gid) {
-            appState.layers[i].visible = visibility;
-          }
-        }
-      }
+    let layer = getLayer(gid);
+    if (layer) {
+      layer.visible = visibility;
     }
   };
 
+  /**
+   * Internal function for recursion
+   * @param {Array} layers
+   * @param {string} gid
+   */
   var getLayerArray = function(layers, gid) {
     var layerFound = null;
     layers.forEach(function(layer) {
@@ -425,6 +309,11 @@ var AppStore = (function() {
     return layerFound;
   };
 
+  /**
+   * Internal function for recursion
+   * @param {Array} layers
+   * @param {string} layerName
+   */
   var getLayerArrayByName = function(layers, layerName) {
     var layerFound = null;
     layers.forEach(function(layer) {
@@ -454,31 +343,6 @@ var AppStore = (function() {
    */
   var getLayerByName = function(layerName) {
     return AppStore.getLayerArrayByName(appState.layers, layerName);
-  };
-
-  /**
-   * Genera l'url da copiare per visualizzare lo stato dell'applicazione solo tramite querystring
-   * @return {null} Nessun valore restituito
-   */
-  var writeUrlShare = function() {
-    //posizione
-    var qPos = "";
-    var center = AppMap.getMapCenterLonLat();
-    qPos += "lon=" + center[0] + "&lat=" + center[1];
-    qPos += "&zoom=" + AppMap.getMapZoom();
-    //layers
-    var qLayers = "";
-    for (var i = 0; i < appState.layers.length; i++) {
-      qLayers += appState.layers[i].gid + ":" + parseInt(appState.layers[i].visible) + ",";
-      if (appState.layers[i].layers) {
-        for (var ki = 0; ki < appState.layers[i].layers.length; ki++) {
-          qLayers += appState.layers[i].layers[ki].gid + ":" + parseInt(appState.layers[i].layers[ki].visible) + ",";
-        }
-      }
-    }
-    var url = window.location.href;
-    var arrUrl = url.split("?");
-    return arrUrl[0] + "?" + qPos + "&layers=" + qLayers;
   };
 
   function SortByLayerName(a, b) {
@@ -532,140 +396,6 @@ var AppStore = (function() {
     });
     return layersFound;
   };
-
-  /**
-   * Stampa la mappa under contruction
-   * @param  {[type]} paper       [description]
-   * @param  {[type]} orientation [description]
-   * @param  {[type]} format      [description]
-   * @param  {[type]} template    [description]
-   * @return {[type]}             [description]
-   */
-  var printMap = function(paper, orientation, format, template) {
-    //ricavo le dimensioni di Stampa
-    appState.printPaper = paper;
-    appState.printOrientation = orientation;
-    appState.printFormat = format;
-    appState.printTemplate = template;
-    var paperDimension = PrintTools.getPaperSize(paper, orientation);
-    appState.printWidth = paperDimension.width;
-    appState.printHeight = paperDimension.height;
-
-    //ricavo i dati della mappa per la stampa
-    var resolution = AppMap.getResolutionForScale(scale);
-    var center = AppMap.getPrintCenter();
-    var centerLL = AppMap.getPrintCenterLonLat();
-    //La scala viene ricalcolata in base ad un parametero di conversione locale
-    //Questa parte è tutta rivedere
-    var scale = PrintTools.getScale() * AppMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
-
-    //
-    appState.printCenterX = center[0];
-    appState.printCenterY = center[1];
-    appState.printScale = scale;
-    appState.printDpi = 96;
-
-    appState.printParams = {};
-    appState.printParams.dummy = "null";
-
-    var print = function() {
-      var deferred = Q.defer();
-      $.post(
-        appState.restAPIUrl + "/api/print",
-        {
-          appstate: JSON.stringify(appState)
-        },
-        deferred.resolve
-      );
-      return deferred.promise;
-    };
-
-    print()
-      .then(function(pdf) {
-        window.location = appState.restAPIUrl + "/api/print/" + pdf.pdfName;
-      })
-      .fail(function() {
-        //TODO completare fail
-      });
-
-    //invio la richiesta al servizio di print
-  };
-
-  var createShareUrl = function() {
-    //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
-    var centerMap = AppMap.getMapCenter();
-    centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:900913", "EPSG:4326");
-
-    appState.mapLon = centerMap[0];
-    appState.mapLat = centerMap[1];
-    appState.mapZoom = AppMap.getMapZoom();
-    appState.drawFeatures = AppMap.getDrawFeature();
-
-    //invio la richiesta
-    var share = function() {
-      var deferred = Q.defer();
-      $.post(
-        appState.restAPIUrl + "/api/share/",
-        {
-          appstate: JSON.stringify(appState)
-        },
-        deferred.resolve
-      );
-      return deferred.promise;
-    };
-
-    share()
-      .then(function(data) {
-        var url = data.Url;
-        var appStateId = data.AppStateId;
-        ShareTools.displayUrl(appStateId, url);
-      })
-      .fail(function() {
-        dispatch({
-          eventName: "log",
-          message: "AppStore: create-share-url " + err
-        });
-      });
-    //invio la richiesta al servizio di print
-  };
-
-  /**
-   * mostra maggiori informazioni dell'oggetto selezionato
-   * @param  {[type]} gid        identificativo dell'oggetto
-   * @param  {[type]} url        parte dell'url da chiamare. La radice dell'url è sempre il sito attuale.
-   * @param  {[type]} templateId id del template da richiamare per maggiori informazioni.
-   * @return {null}            La funzione non restituisce un valore ma una promise
-   
-  var showMoreInfo = function(gid, url, layerGid) {
-    //costruisco l'url da richiemare
-    var urlArray = location.href.split("/");
-    var baseUrl = urlArray[2];
-    var urlService =
-      "http://" + baseUrl.replace("#", "") + "/" + url + "/" + gid;
-    //invio la richiesta
-    var moreInfo = function() {
-      var deferred = Q.defer();
-      $.get(urlService, "", deferred.resolve);
-      return deferred.promise;
-    };
-    moreInfo()
-      .then(function(data) {
-        var title = "Informazioni aggiuntive";
-        var body = "";
-        body = AppTemplates.processTemplate(template, data);
-        if (!body) {
-          body = AppTemplates.standardTemplate(props);
-        }
-        AppStore.showInfoWindow(title, body);
-      })
-      .fail(function() {
-        dispatch({
-          eventName: "log",
-          message: "AppStore: more-info " + err
-        });
-      });
-  };
- */
 
   var dragElement = function(elmnt) {
     var pos1 = 0,
@@ -761,28 +491,7 @@ var AppStore = (function() {
       }
     });
 
-    //eseguo degli aggiustamente in caso di browser mobile
-    if (isMobile()) {
-      $("#menu-toolbar__layer-tree").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__search-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__print-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__share-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__map-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__draw-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__gps-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar").height("50px");
-      $("#menu-toolbar").css("padding-left", "10px");
-      $(".lk-menu-toolbar-bottom button").css("margin-right", "0px");
-      easingTime = 0;
-    } else {
-      //definizione degli eventi jquery
-      dragElement(document.getElementById("info-window"));
-    }
-
-    //nascondo il draw per dimensioni piccole
-    if ($(window).width() < 640) {
-      $("#menu-toolbar__draw-tools").hide();
-    }
+    AppToolbar.init();
 
     //eseguo il callback
     callback();
@@ -930,10 +639,6 @@ var AppStore = (function() {
     return AppStore.getAppState().currentInfoItems;
   };
 
-  let getPanelContentItemSelected = function() {
-    return panelContentItemSelected;
-  };
-
   /**
    * Genera un GUID
    * @return {string} guid
@@ -948,11 +653,8 @@ var AppStore = (function() {
   };
 
   return {
-    addResetToolsEvent: addResetToolsEvent,
-    createShareUrl: createShareUrl,
     doLogin: doLogin,
     init: init,
-    hideMenu: hideMenu,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItems: getCurrentInfoItems,
@@ -962,7 +664,6 @@ var AppStore = (function() {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
-    getPanelContentItemSelected: getPanelContentItemSelected,
     getQueryLayers: getQueryLayers,
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,
@@ -974,22 +675,17 @@ var AppStore = (function() {
     mapReload: mapReload,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
-    printMap: printMap,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     showLegend: showLegend,
-    showMenu: showMenu,
-    showMenuContent: showMenuContent,
-    showInfoItem: showInfoItem,
+    showInfoItems: showInfoItems,
     showInfoWindow: showInfoWindow,
     showAppTools: showAppTools,
     showRelation: showRelation,
     toggleLoader: toggleLoader,
     resetInitialLayers: resetInitialLayers,
-    //showMoreInfo: showMoreInfo,
     hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,
-    toggleLayer: toggleLayer,
-    writeUrlShare: writeUrlShare
+    toggleLayer: toggleLayer
   };
 })();

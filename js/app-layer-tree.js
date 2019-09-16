@@ -45,6 +45,11 @@ var AppLayerTree = (function() {
       render(treeDiv, AppStore.getAppState().layers);
       callback();
     }
+
+    //events binding
+    Dispatcher.bind("show-layers", function(payload) {
+      AppToolbar.toggleToolbarItem("layer-tree");
+    });
   };
 
   var loadLayersUri = function(layer, callback) {
@@ -137,7 +142,11 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
+    output += formatString(
+      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
+      groupId,
+      groupLayer.visible ? "visible" : "hidden"
+    );
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {

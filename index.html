@@ -49,7 +49,6 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="css/materialize.css" />
-    <link rel="stylesheet" href="css/simplegrid.css" />
     <link rel="stylesheet" href="css/font-awesome.css" />
     <link rel="stylesheet" href="css/ol.css" />
     <link rel="stylesheet" href="css/ol3-contextmenu.css" />
@@ -68,25 +67,53 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
       <!--<div id="main-menu" class="lk-menu-bottom">-->
       <div id="menu-toolbar" class="lk-menu-toolbar-bottom">
-        <button id="menu-toolbar__layer-tree" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-layers')">
+        <button
+          id="menu-toolbar__layer-tree"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-layers')"
+        >
           <i class="material-icons">&#xE53B;</i>
         </button>
-        <button id="menu-toolbar__search-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-search')">
+        <button
+          id="menu-toolbar__search-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-search')"
+        >
           <i class="material-icons">&#xE8B6;</i>
         </button>
-        <button id="menu-toolbar__print-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-print')">
+        <button
+          id="menu-toolbar__print-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-print-tools')"
+        >
           <i class="material-icons">&#xE8AD;</i>
         </button>
-        <button id="menu-toolbar__share-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-share')">
+        <button
+          id="menu-toolbar__share-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-share')"
+        >
           <i class="material-icons">&#xE80D;</i>
         </button>
-        <button id="menu-toolbar__map-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-map-tools')">
+        <button
+          id="menu-toolbar__map-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-map-tools')"
+        >
           <i class="material-icons">&#xE869;</i>
         </button>
-        <button id="menu-toolbar__draw-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-draw-tools')">
+        <button
+          id="menu-toolbar__draw-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-draw-tools')"
+        >
           <i class="material-icons">&#xE254;</i>
         </button>
-        <button id="menu-toolbar__gps-tools" class="btn-floating btn-large waves-effect waves-light lk-hidden" onClick="dispatch('show-gps-tools')">
+        <button
+          id="menu-toolbar__gps-tools"
+          class="btn-floating btn-large waves-effect waves-light lk-hidden"
+          onClick="dispatch('show-gps-tools')"
+        >
           <i class="material-icons">&#xE558;</i>
         </button>
         <!--<button class="btn-floating btn-large waves-effect waves-light" onClick="dispatch('show-chart')">
@@ -100,7 +127,10 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
             <img src="" id="menu-panel__logo-img" />
           </div>
           <div id="layer-tree" class="lk-menu-panel-content-item "></div>
-          <div id="info-results" class="lk-menu-panel-content-item "></div>
+          <div id="info-results" class="lk-menu-panel-content-item ">
+            <div id="info-results__title"></div>
+            <div id="info-results__content"></div>
+          </div>
           <div id="search-tools" class="lk-menu-panel-content-item"></div>
           <div id="print-tools" class="lk-menu-panel-content-item"></div>
           <div id="map-tools" class="lk-menu-panel-content-item"></div>
@@ -123,7 +153,10 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
       <div id="info-window" class="lk-info-window">
         <div id="info-window__resize" class="">
           <div id="info-window__drag" class="lk-info-window__drag">
-            <button class="btn-floating btn-small waves-effect waves-light lk-right" onclick="Dispatcher.dispatch('hide-info-window')">
+            <button
+              class="btn-floating btn-small waves-effect waves-light lk-right"
+              onclick="Dispatcher.dispatch('hide-info-window')"
+            >
               <i class="material-icons">&#xE5CD;</i>
             </button>
           </div>
@@ -164,6 +197,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <script src="js/app-map-info.js"></script>
     <script src="js/app-map-vector.js"></script>
     <script src="js/app-store.js"></script>
+    <script src="js/app-toolbar.js"></script>
     <script src="js/app-layer-tree.js"></script>
     <script src="js/app-custom.js"></script>
     <script src="js/search-tools.js"></script>

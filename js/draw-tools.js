@@ -61,6 +61,38 @@ var DrawTools = (function() {
         type: "Delete"
       });
     });
+
+    //adding tool reset
+    AppToolbar.addResetToolsEvent({ eventName: "unset-draw" });
+
+    //Events binding
+    Dispatcher.bind("show-draw-tools", function(payload) {
+      AppToolbar.toggleToolbarItem("draw-tools");
+      if (AppToolbar.getCurrentToolbarItem() === "draw-tools") {
+        AppStore.setInfoClickEnabled(false);
+      }
+    });
+
+    Dispatcher.bind("set-draw", function(payload) {
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
+      AppMap.addDrawInteraction(payload.type);
+    });
+
+    Dispatcher.bind("unset-draw", function(payload) {
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
+    });
+
+    Dispatcher.bind("set-draw-delete", function(payload) {
+      AppMap.removeDrawInteraction();
+      AppMap.removeDrawDeleteInteraction();
+      AppMap.addDrawDeleteInteraction(payload.type);
+    });
+
+    Dispatcher.bind("delete-draw", function(payload) {
+      AppMap.deleteDrawFeatures(payload.type);
+    });
   };
 
   var render = function(div) {
@@ -98,7 +130,8 @@ var DrawTools = (function() {
 
     template += '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light">';
     template += '    <svg width="100%" height="100%">';
-    template += '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
+    template +=
+      '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
     template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="16" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="41" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -119,7 +152,8 @@ var DrawTools = (function() {
     //template += '  <div> <input id="draw-tools__color" type="text" name="draw-tools__color" value="#448AFF" /></div>';
 
     template += '  <div class="div-20" ></div>';
-    template += '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
+    template +=
+      '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
     //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="mdl-button mdl-js-button mdl-button--raised  mdl-js-ripple-effect" >Elimina</button>';
     template += "  </div>";
 

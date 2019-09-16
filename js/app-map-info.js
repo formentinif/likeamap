@@ -88,11 +88,8 @@ let AppMapInfo = (function() {
         featuresClicked.push(feature);
       });
     }
-    debugger;
     if (featuresClicked.length > 0) {
-      processFeatureInfoClick({
-        features: featuresClicked
-      });
+      showVectorResults(featuresClicked);
       return;
     }
 
@@ -186,22 +183,33 @@ let AppMapInfo = (function() {
 
   /**
    * Process the results after the click on a vector feature on the map
-   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
+   * @param {Array} featureCollection Array of OL featurs with the results. It must have a features property with the array of features
    */
-  let processFeatureInfoClick = function processFeatureInfoClick(featureCollection) {
-    debugger;
+  let showVectorResults = function showVectorResults(features) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
-    //se il dato è presente lo visualizzo
-    if (featureCollection && featureCollection.features.length > 0) {
-      if (featureCollection.features[0].geometry) {
-        let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
-        addFeatureInfoToMap(featureCollection.features[0].geometry, srid);
-      }
+
+    let featureArray = [];
+    if (features && features.length > 0) {
+      features.forEach(function(feature) {
+        addGeometryInfoToMap(feature.getGeometry(), 3857, AppMap.getGeometryFormats().OL);
+        //transform OL feature in GeoJson
+        featureArray.push({
+          layerGid: feature.layerGid,
+          geometry: feature.getGeometry(),
+          properties: feature.getProperties()
+        });
+      });
+
+      let featuresCollection = {
+        features: featureArray,
+        SRID: 3857 //TODO introduce parameter
+      };
+
       Dispatcher.dispatch({
         eventName: "show-info-item",
-        data: featureCollection
+        data: featuresCollection
       });
     }
   };
@@ -211,7 +219,6 @@ let AppMapInfo = (function() {
    * @param {object} featureCollection Object with the results. It must have a features property with the array of features
    */
   let processRequestInfo = function processRequestInfo(featureCollection) {
-    debugger;
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
@@ -219,7 +226,7 @@ let AppMapInfo = (function() {
     if (featureCollection && featureCollection.features.length > 0) {
       if (featureCollection.features[0].geometry) {
         let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
-        addFeatureInfoToMap(featureCollection.features[0].geometry, srid);
+        addGeometryInfoToMap(featureCollection.features[0].geometry, srid, AppMap.getGeometryFormats().GeoJson);
       }
       for (let i = 0; i < featureCollection.features.length; i++) {
         featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
@@ -245,8 +252,6 @@ let AppMapInfo = (function() {
    * @param {object} featureCollection Object with the results. It must have a features property with the array of features
    */
   let processRequestInfoAll = function processRequestInfoAll(featureCollection) {
-    debugger;
-
     clearLayerInfo();
     dispatch("hide-loader");
     //se il dato è presente lo aggiungo al contenitore global
@@ -284,44 +289,8 @@ let AppMapInfo = (function() {
     return feature;
   };
 
-  let addFeatureInfoToMap = function addFeatureInfoToMap(geometry, srid) {
-    return AppMap.addFeatureToMap(geometry, srid, vectorInfo);
-  };
-
-  /**
-   * Aggiunge un infopoint alla mappa
-   * @return {[type]} [description]
-   */
-  let addInfoPoint = function(lon, lat) {
-    let geometryOl = null;
-    let feature = null;
-    geometryOl = new ol.geom.Point([lon, lat]);
-    feature = new ol.Feature({
-      geometry: geometryOl
-    });
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
-    return feature;
-  };
-
-  /**
-   * Aggiunge un poligono alla mappa
-   * @param  {object} geometry geometria in formato geojson
-   * @return {object} Feature appena creata
-   */
-  let addPolygonInfo = function(geometry) {
-    let geometryOl = null;
-    let feature = null;
-    geometryOl = new ol.geom.Polygon(geometry.coordinates);
-    feature = new ol.Feature({
-      geometry: geometryOl
-    });
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
-
-    return feature;
+  let addGeometryInfoToMap = function addGeometryInfoToMap(geometry, srid, geometryFormat) {
+    return AppMap.addGeometryToMap(geometry, srid, vectorInfo, geometryFormat);
   };
 
   /**
@@ -374,9 +343,8 @@ let AppMapInfo = (function() {
   }
 
   return {
-    addFeatureInfoToMap: addFeatureInfoToMap,
+    addGeometryInfoToMap: addGeometryInfoToMap,
     addWktInfoToMap: addWktInfoToMap,
-    addInfoPoint: addInfoPoint,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
     init: init,

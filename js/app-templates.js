@@ -25,28 +25,32 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var AppTemplates = (function() {
-  var templates = [];
+let AppTemplates = (function() {
+  let templates = [];
 
-  var init = function init() {
+  let init = function init() {
     //Ciclo i livelli che non hanno un template
-    var tempLayers = AppStore.getAppState().layers;
+    let tempLayers = AppStore.getAppState().layers;
     const repoTemplatesUrl = AppStore.getAppState().templatesRepositoryUrl;
     const tempRelations = AppStore.getAppState().relations;
     loadLayersTemplates(tempLayers, repoTemplatesUrl);
     loadRelationsTemplates(tempRelations, repoTemplatesUrl);
   };
 
-  var loadLayersTemplates = function(tempLayers, repoTemplatesUrl) {
-    for (var i = 0; i < tempLayers.length; i++) {
-      var groupLayer = tempLayers[i];
+  let loadLayersTemplates = function(tempLayers, repoTemplatesUrl) {
+    for (let i = 0; i < tempLayers.length; i++) {
+      let groupLayer = tempLayers[i];
       if (groupLayer.layers) {
-        for (var li = 0; li < groupLayer.layers.length; li++) {
+        for (let li = 0; li < groupLayer.layers.length; li++) {
           //il layer deve essere selezionabile
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
+          let templateUrl = getTemplateUrl(
+            groupLayer.layers[li].gid,
+            groupLayer.layers[li].templateUrl,
+            repoTemplatesUrl
+          );
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -59,7 +63,7 @@ var AppTemplates = (function() {
     }
   };
 
-  var loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
+  let loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
     for (let i = 0; i < tempRelations.length; i++) {
       const relation = tempRelations[i];
       let templateUrl = getTemplateUrl(relation.gid, relation.templateUrl, repoTemplatesUrl);
@@ -73,7 +77,7 @@ var AppTemplates = (function() {
     }
   };
 
-  var loadTemplateAjax = function(templateUrl) {
+  let loadTemplateAjax = function(templateUrl) {
     $.ajax({
       dataType: "json",
       url: templateUrl
@@ -81,7 +85,7 @@ var AppTemplates = (function() {
       .done(function(data) {
         if (data) {
           if (data.length) {
-            for (var i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
               let thisTemplate = data[i];
               thisTemplate.templateUrl = templateUrl;
               templates.push(thisTemplate);
@@ -105,7 +109,7 @@ var AppTemplates = (function() {
    * @param {object} layer Oggetto del layer/relation
    * @param {string} repoUrl Url del repository
    */
-  var getTemplateUrl = function(gid, templateUrl, repoUrl) {
+  let getTemplateUrl = function(gid, templateUrl, repoUrl) {
     if (templateUrl) {
       if (templateUrl.toLowerCase().includes("http://")) {
         return templateUrl;
@@ -116,7 +120,7 @@ var AppTemplates = (function() {
     return repoUrl + "/" + gid + ".json";
   };
 
-  var getTemplate = function(gid, templateUrl, repoUrl) {
+  let getTemplate = function(gid, templateUrl, repoUrl) {
     let templatesFilter = templates.filter(function(el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
     });
@@ -126,12 +130,12 @@ var AppTemplates = (function() {
     return null;
   };
 
-  var processTemplate = function(template, props) {
-    var result = "";
+  let processTemplate = function(template, props, layer) {
+    let result = "";
     if (template) {
       try {
-        var hsTemplate = this.generateTemplate(template);
-        var compiledTemplate = Handlebars.compile(hsTemplate);
+        let hsTemplate = this.generateTemplate(template, layer);
+        let compiledTemplate = Handlebars.compile(hsTemplate);
         if (!template.multipleItems && Array.isArray(props)) {
           result = compiledTemplate(props[0]);
         } else {
@@ -147,22 +151,43 @@ var AppTemplates = (function() {
     return result;
   };
 
-  var standardTemplate = function(props) {
-    var body = "<table class='lk-table lk-mb-3'>";
-    for (var propertyName in props) {
-      body += "<tr><td>" + propertyName + ":</td><td>" + (props[propertyName] == null ? "" : props[propertyName]) + "</td></tr>";
+  let standardTemplate = function(props, layer) {
+    let body = "<div class='lk-feature z-depth-1'>";
+    if (layer && layer.labelField) {
+      body =
+        "<div class='lk-feature-heading row'><div class='col s12'>" +
+        getLabelFeature(props, layer.labelField) +
+        "</div></div>";
     }
-    body += "</table>";
+    for (let propertyName in props) {
+      body +=
+        "<div class='lk-feature-row row lk-mb-1'>" +
+        "<div class='lk-feature-title col s6'>" +
+        propertyName +
+        ":</div>" +
+        "<div class='lk-feature-content col s6'>" +
+        (props[propertyName] == null ? "" : props[propertyName]) +
+        "</div>" +
+        "</div>";
+    }
+    body += "</div>";
     return body;
   };
 
-  var relationsTemplate = function(relations, props, index) {
-    var result = "";
+  let relationsTemplate = function(relations, props, index) {
+    let result = "";
     if (relations.length > 0) {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lk-mb-2 col s12">';
-        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result +=
+          '<a href="#" onclick="AppStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          relation.labelTemplate +
+          "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -170,16 +195,16 @@ var AppTemplates = (function() {
     return result;
   };
 
-  var generateTemplate = function(template) {
+  let generateTemplate = function(template, layer) {
     if (template.templateType === "string") {
       return template.templateString;
     }
-    var str = "";
+    let str = "";
     if (template.templateType === "simple") {
       str += "<div class='lk-h6'>" + template.title + "</div>";
       str += "<table class='lk-table lk-mb-3'>";
-      for (var i = 0; i < template.fields.length; i++) {
-        var field = template.fields[i];
+      for (let i = 0; i < template.fields.length; i++) {
+        let field = template.fields[i];
         switch (field.type) {
           case "int":
             str += "<tr><td class='lk-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
@@ -219,6 +244,15 @@ var AppTemplates = (function() {
       str += "</table>";
     }
     return str;
+  };
+
+  let getLabelFeature = function(props, labelName) {
+    try {
+      //TODO supportare le espressioni complesse nelle label
+      return props[labelName];
+    } catch (error) {
+      dispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
+    }
   };
 
   return {

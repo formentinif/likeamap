@@ -48,8 +48,8 @@ let SelectTools = (function() {
     $("#menu-panel__content").append(divSelect);
 
     Dispatcher.bind("show-select-tools", function(payload) {
-      AppStore.showMenuContent("select-tools");
-      if (AppStore.getPanelContentItemSelected() === "select-tools") {
+      AppToolbar.toggleToolbarItem("select-tools");
+      if (AppToolbar.getCurrentToolbarItem() === "select-tools") {
         dispatch("set-select");
       } else {
         dispatch("unset-select");
@@ -87,7 +87,7 @@ let SelectTools = (function() {
       SelectTools.doSelectionLayers(coords, layerName);
     });
 
-    AppStore.addResetToolsEvent({
+    AppToolbar.addResetToolsEvent({
       eventName: "unset-select"
     });
   };

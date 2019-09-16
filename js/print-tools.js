@@ -52,8 +52,8 @@ var PrintTools = (function() {
 
   var init = function init() {
     //Upgrade grafici
-    //Aggiornamenti grafici
     M.AutoInit();
+
     //bindo la scala con solo numeri
     $("#print-tools__scale").keyup(function(event) {
       //console.log(event.which);
@@ -62,12 +62,58 @@ var PrintTools = (function() {
       }
       showPrintArea();
     });
+
     //bindo i controlli per formato e orientamento
     $("#print-tools__orientation").change(function() {
       showPrintArea();
     });
+
     $("#print-tools__paper").change(function() {
       showPrintArea();
+    });
+
+    //adding tool reset
+    AppToolbar.addResetToolsEvent({ eventName: "clear-layer-print" });
+
+    //events binding
+    Dispatcher.bind("show-print-tools", function(payload) {
+      AppToolbar.toggleToolbarItem("print-tools");
+      if (AppToolbar.getCurrentToolbarItem() === "print-tools") {
+        PrintTools.showPrintArea();
+        AppStore.setInfoClickEnabled(false);
+      }
+    });
+
+    Dispatcher.bind("print-map", function(payload) {
+      PrintTools.printMap(payload.paper, payload.orientation, payload.format, payload.template);
+    });
+
+    Dispatcher.bind("clear-layer-print", function(payload) {
+      AppMap.clearLayerPrint();
+    });
+
+    Dispatcher.bind("show-print-area", function(payload) {
+      //ricavo posizione e risoluzione
+      //Cerco il centro del rettangolo attuale di stampa o lo metto al centro della mappa
+      var printCenter = AppMap.getPrintCenter();
+      if (!printCenter) {
+        printCenter = AppMap.getMapCenter();
+      }
+      //setto la risoluzione base a quella della mappa
+      var scale = payload.scale;
+      var resolution = AppMap.getMapResolution() / 2;
+      //se la scala non è nulla setto la risoluzione in base alla Scala
+      if (scale) {
+        resolution = AppMap.getResolutionForScale(scale, "m");
+      } else {
+        //setto la scala per la stampa in ui
+        PrintTools.setScale(AppMap.getMapScale() / 2);
+      }
+      var paper = payload.paper;
+      var orientation = payload.orientation;
+      var printSize = PrintTools.getPrintMapSize(paper, orientation, resolution);
+
+      AppMap.setPrintBox(printCenter[0], printCenter[1], printSize.width, printSize.height);
     });
   };
 
@@ -105,8 +151,7 @@ var PrintTools = (function() {
     template += "</div>";
 
     template += '<div class="input-field">';
-    template +=
-      '<label class="" id="print-tools__scale-label" for="print-tools__scale">Scala...</label>';
+    template += '<label class="" id="print-tools__scale-label" for="print-tools__scale">Scala...</label>';
     template += '<input class="" type="text" id="print-tools__scale">';
     template += "</div>";
 
@@ -118,7 +163,7 @@ var PrintTools = (function() {
     template += "</div>";
 
     template +=
-      '<button id="print-tools__print-button" onclick="PrintTools.printMap(); return false;" class="waves-effect waves-light btn" >Stampa</button>';
+      '<button id="print-tools__print-button" onclick="PrintTools.printClick(); return false;" class="waves-effect waves-light btn" >Stampa</button>';
 
     template += '<div class="div-10"></div>';
 
@@ -136,7 +181,7 @@ var PrintTools = (function() {
    * Send the map print request to the Dispatcher
    * @return {void}
    */
-  var printMap = function() {
+  var printClick = function() {
     var paper = $("#print-tools__paper").val();
     var orientation = $("#print-tools__orientation").val();
     var format = "PDF";
@@ -149,6 +194,65 @@ var PrintTools = (function() {
       template: template
     };
     Dispatcher.dispatch(payload);
+  };
+
+  /**
+   * Stampa la mappa under contruction
+   * @param  {[type]} paper       [description]
+   * @param  {[type]} orientation [description]
+   * @param  {[type]} format      [description]
+   * @param  {[type]} template    [description]
+   * @return {[type]}             [description]
+   */
+  var printMap = function(paper, orientation, format, template) {
+    let appState = AppStore.getAppState();
+    //ricavo le dimensioni di Stampa
+    appState.printPaper = paper;
+    appState.printOrientation = orientation;
+    appState.printFormat = format;
+    appState.printTemplate = template;
+    var paperDimension = PrintTools.getPaperSize(paper, orientation);
+    appState.printWidth = paperDimension.width;
+    appState.printHeight = paperDimension.height;
+
+    //ricavo i dati della mappa per la stampa
+    var resolution = AppMap.getResolutionForScale(scale);
+    var center = AppMap.getPrintCenter();
+    var centerLL = AppMap.getPrintCenterLonLat();
+    //La scala viene ricalcolata in base ad un parametero di conversione locale
+    //Questa parte è tutta rivedere
+    var scale = PrintTools.getScale() * AppMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+
+    //
+    appState.printCenterX = center[0];
+    appState.printCenterY = center[1];
+    appState.printScale = scale;
+    appState.printDpi = 96;
+
+    appState.printParams = {};
+    appState.printParams.dummy = "null";
+
+    var print = function() {
+      var deferred = Q.defer();
+      $.post(
+        appState.restAPIUrl + "/api/print",
+        {
+          appstate: JSON.stringify(appState)
+        },
+        deferred.resolve
+      );
+      return deferred.promise;
+    };
+
+    print()
+      .then(function(pdf) {
+        window.location = appState.restAPIUrl + "/api/print/" + pdf.pdfName;
+      })
+      .fail(function() {
+        //TODO completare fail
+      });
+
+    //invio la richiesta al servizio di print
   };
 
   /**
@@ -262,6 +366,7 @@ var PrintTools = (function() {
     getPrintEnvelopeCenter: getPrintEnvelopeCenter,
     getScale: getScale,
     init: init,
+    printClick: printClick,
     printMap: printMap,
     render: render,
     setScale: setScale,

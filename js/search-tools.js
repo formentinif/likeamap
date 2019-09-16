@@ -43,6 +43,11 @@ var SearchTools = (function() {
       return true;
     });
 
+    //events binding
+    Dispatcher.bind("show-search", function(payload) {
+      AppToolbar.toggleToolbarItem("search-tools");
+    });
+
     try {
       M.AutoInit();
       $(".dropdown-trigger").dropdown();
@@ -51,7 +56,15 @@ var SearchTools = (function() {
     }
   };
 
-  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
+  var render = function(
+    div,
+    provider,
+    providerAddressUrl,
+    providerAddressField,
+    providerHouseNumberUrl,
+    providerHouseNumberField,
+    layers
+  ) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -124,7 +137,8 @@ var SearchTools = (function() {
    */
   var templateTopTools = function() {
     let template = '<div class="lk-bar lk-background">';
-    template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+    template +=
+      '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
     template += "</div>";
@@ -149,7 +163,8 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-layers-field" class="input-field" >';
-    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
+    template +=
+      '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
     template += '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
@@ -177,8 +192,10 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
-    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template +=
+      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
+    template +=
+      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -200,8 +217,10 @@ var SearchTools = (function() {
     template += templateTopTools();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
-    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template +=
+      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
+    template +=
+      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -219,7 +238,8 @@ var SearchTools = (function() {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
+    template +=
+      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -390,7 +410,15 @@ var SearchTools = (function() {
 
     if (via.length > 3 && comune) {
       via = via.replace("'", " ");
-      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
+      var url =
+        "http://nominatim.openstreetmap.org/search/IT/" +
+        regione +
+        "/" +
+        comune +
+        "/" +
+        via +
+        "?format=jsonv2&addressdetails=1" +
+        "&";
       console.log(url);
       currentSearchDate = new Date().getTime();
       var searchDate = new Date().getTime();

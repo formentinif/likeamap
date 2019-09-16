@@ -331,6 +331,25 @@ body {
   padding: 5px;
 }
 
+.lk-feature {
+  padding: 3px;
+}
+
+.lk-feature-row {
+  display: block;
+  width: 100%;
+}
+
+.lk-feature-title {
+  font-weight: bold;
+  padding: 2px;
+}
+
+.lk-feature-content {
+  padding: 2px;
+  overflow: auto;
+}
+
 .lk-full-height {
   height: 100%;
 }
