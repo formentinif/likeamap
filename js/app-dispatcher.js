@@ -130,6 +130,16 @@ var Dispatcher = (function() {
       AppMap.goToGeometry(payload.geometry);
     });
 
+    this.bind("zoom-feature-info", function(payload) {
+      debugger;
+      try {
+        let feature = AppStore.getCurrentInfoItems().features[payload.index];
+        dispatch({ eventName: "zoomToGeometry", geometry: feature.geometry });
+      } catch (error) {
+        dispatch({ eventName: "log", message: error });
+      }
+    });
+
     this.bind("add-wkt-info-map", function(payload) {
       AppMapInfo.addWktInfoToMap(payload.wkt);
     });

@@ -99,7 +99,7 @@ var AppStore = (function() {
   };
 
   var showInfoItems = function(featureInfoCollection) {
-    var title = "Risultati dell'interrogazione";
+    var title = "Risultati";
     var body = "";
     if (!featureInfoCollection) {
       return;
@@ -112,7 +112,7 @@ var AppStore = (function() {
     }
     AppStore.getAppState().currentInfoItems = featureInfoCollection;
     if (featureInfoCollection.features.length > 0) {
-      title += " (" + featureInfoCollection.length + ")";
+      title += " (" + featureInfoCollection.features.length + ")";
     }
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
@@ -123,6 +123,7 @@ var AppStore = (function() {
         layer.templateUrl,
         AppStore.getAppState().templatesRepositoryUrl
       );
+
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);
@@ -131,9 +132,12 @@ var AppStore = (function() {
       var layerRelations = AppStore.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
-
       tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
-      body += tempBody;
+
+      tempBody += AppTemplates.featureIconsTemplate(index);
+
+      body += "<div class='lk-feature z-depth-1'>" + tempBody;
+      +"</div>";
       index++;
     });
 

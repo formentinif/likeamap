@@ -152,12 +152,14 @@ let AppTemplates = (function() {
   };
 
   let standardTemplate = function(props, layer) {
-    let body = "<div class='lk-feature z-depth-1'>";
-    if (layer && layer.labelField) {
-      body =
-        "<div class='lk-feature-heading row'><div class='col s12'>" +
-        getLabelFeature(props, layer.labelField) +
-        "</div></div>";
+    debugger;
+    let body = "";
+    if (layer) {
+      body += "<div class='row lk-feature-heading' ><div class='col s12'>" + layer.layerName;
+      if (layer.labelField) {
+        body += " - " + getLabelFeature(props, layer.labelField);
+      }
+      body += "</div></div>";
     }
     for (let propertyName in props) {
       body +=
@@ -170,8 +172,22 @@ let AppTemplates = (function() {
         "</div>" +
         "</div>";
     }
-    body += "</div>";
+    body += "";
     return body;
+  };
+
+  let featureIconsTemplate = function(index) {
+    //icons
+    let icons =
+      "<div class='lk-feature__icons'>" +
+      '<i title="Centra sulla mappa" class="fas fa-map-marker-alt fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'zoom-feature-info\', index: \'' +
+      index +
+      "' })\"></i>" +
+      '<i title="Apri in Google" class="fab fa-google fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'open-feature-info-google\', index: \'' +
+      index +
+      "' })\"></i>" +
+      "<div>";
+    return icons;
   };
 
   let relationsTemplate = function(relations, props, index) {
@@ -260,6 +276,7 @@ let AppTemplates = (function() {
     generateTemplate: generateTemplate,
     getTemplate: getTemplate,
     getTemplateUrl: getTemplateUrl,
+    featureIconsTemplate: featureIconsTemplate,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     standardTemplate: standardTemplate,

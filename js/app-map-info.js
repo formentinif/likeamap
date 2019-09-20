@@ -65,7 +65,7 @@ let AppMapInfo = (function() {
 
   /**
    * Execute the info request on map click. The function generates a RequestQueue
-   * Object with the layer request to be executed. Ad the user can click multiple times
+   * Object with the layer request to be executed. Because the user can click multiple times
    * the RequestQueue has a pending state and an unique ID in order to keep track of the
    * requests and stop them if needed
    * The pipeline is
@@ -98,26 +98,17 @@ let AppMapInfo = (function() {
     let viewResolution = AppMap.getMap()
       .getView()
       .getResolution();
-
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
-    for (
-      let i = 0;
-      i <
-      AppMap.getMap()
-        .getLayers()
-        .getLength();
-      i++
-    ) {
-      //TODO refactor whe IE support will drop
-      let layer = AppMap.getMap()
-        .getLayers()
-        .item(i);
-      if (!layer.queryable) continue;
-      if (!requestQueue.visibleLayers || layer.getVisible()) {
-        let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-        requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
-      }
-    }
+    AppMap.getMap()
+      .getLayers()
+      .forEach(function(layer) {
+        if (layer.queryable) {
+          if (!requestQueue.visibleLayers || layer.getVisible()) {
+            let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
+            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
+          }
+        }
+      });
     requestQueue.layers = requestQueue.layers.sort(SortByZIndex);
 
     //eseguo il loop delle richieste
@@ -131,7 +122,6 @@ let AppMapInfo = (function() {
 
   /**
    * Executes the request on the first layer not sent in the RequestQueue
-   * @param {boolean} visibleLayers The request will be executed only on the visibile layers
    */
   let getFeatureInfoRequest = function getFeatureInfoRequest() {
     let url = "";
@@ -148,23 +138,26 @@ let AppMapInfo = (function() {
     if (!url) {
       //the loop has ended
       requestQueue.ajaxPending = false;
-      //se la query è su tutti i layer mostro i risultati in quanto non vengono mostrati automatcamente
-      if (!requestQueue.visibleLayers) {
-        if (requestQueueData.length > 0) {
-          dispatch({
-            eventName: "show-reverse-geocoding-result",
-            results: requestQueueData
-          });
-        }
+      AppMapInfo.clearLayerInfo();
+      debugger;
+      if (requestQueueData.length > 0) {
+        dispatch({
+          eventName: "show-info-item",
+          data: {
+            features: requestQueueData
+          }
+        });
       }
+
       return;
     }
     //adding the right callback on request
-    if (requestQueue.visibleLayers) {
-      url += "&format_options=callback:AppMapInfo.processRequestInfo";
-    } else {
-      url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
-    }
+    url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
+    //if (requestQueue.visibleLayers) {
+    //  url += "&format_options=callback:AppMapInfo.processRequestInfo";
+    //} else {
+    //  url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
+    //}
     requestQueue.ajaxPending = true;
     dispatch("show-loader");
     $.ajax({
@@ -179,6 +172,60 @@ let AppMapInfo = (function() {
         requestQueue.ajaxPending = false;
       }
     });
+  };
+
+  // /**
+  //  * Precess the results after an info click on the map
+  //  * @param {object} featureCollection Object with the results. It must have a features property with the array of features
+  //  */
+  // let processRequestInfo = function processRequestInfo(featureCollection) {
+  //   requestQueue.ajaxPending = false;
+  //   dispatch("hide-loader");
+  //   //se il dato è presente lo visualizzo
+  //   if (featureCollection && featureCollection.features.length > 0) {
+  //     if (featureCollection.features[0].geometry) {
+  //       let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
+  //       addGeometryInfoToMap(featureCollection.features[0].geometry, srid, AppMap.getGeometryFormats().GeoJson);
+  //     }
+  //     for (let i = 0; i < featureCollection.features.length; i++) {
+  //       featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+  //     }
+  //     Dispatcher.dispatch({
+  //       eventName: "show-info-item",
+  //       data: featureCollection
+  //     });
+  //   }
+
+  //   if (requestQueue.mustRestart) {
+  //     requestQueue.mustRestart = false;
+  //     getFeatureInfoRequest();
+  //   }
+  //   //se il dato a questo punto è nullo procedo al secondo step nella coda delle richieste
+  //   if (!featureCollection || featureCollection.features.length == 0) {
+  //     getFeatureInfoRequest();
+  //   }
+  // };
+
+  /**
+   * Process the next step on a Request Queue
+   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
+   */
+  let processRequestInfoAll = function processRequestInfoAll(featureCollection) {
+    dispatch("hide-loader");
+    //se il dato è presente lo aggiungo al contenitore global
+    if (featureCollection && featureCollection.features.length > 0) {
+      for (let i = 0; i < featureCollection.features.length; i++) {
+        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+        requestQueueData.push(featureCollection.features[i]);
+      }
+    }
+
+    //se non è presente o una nuova richiesta è stata accodata procedo al passo successivo
+    if (requestQueue.mustRestart) {
+      requestQueue.mustRestart = false;
+      getFeatureInfoRequest();
+    }
+    getFeatureInfoRequest(false);
   };
 
   /**
@@ -212,62 +259,6 @@ let AppMapInfo = (function() {
         data: featuresCollection
       });
     }
-  };
-
-  /**
-   * Precess the results after an info click on the map
-   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
-   */
-  let processRequestInfo = function processRequestInfo(featureCollection) {
-    clearLayerInfo();
-    requestQueue.ajaxPending = false;
-    dispatch("hide-loader");
-    //se il dato è presente lo visualizzo
-    if (featureCollection && featureCollection.features.length > 0) {
-      if (featureCollection.features[0].geometry) {
-        let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
-        addGeometryInfoToMap(featureCollection.features[0].geometry, srid, AppMap.getGeometryFormats().GeoJson);
-      }
-      for (let i = 0; i < featureCollection.features.length; i++) {
-        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-      }
-      Dispatcher.dispatch({
-        eventName: "show-info-item",
-        data: featureCollection
-      });
-    }
-
-    if (requestQueue.mustRestart) {
-      requestQueue.mustRestart = false;
-      getFeatureInfoRequest();
-    }
-    //se il dato a questo punto è nullo procedo al secondo step nella coda delle richieste
-    if (!featureCollection || featureCollection.features.length == 0) {
-      getFeatureInfoRequest();
-    }
-  };
-
-  /**
-   * Process the next step on a Request Queue
-   * @param {object} featureCollection Object with the results. It must have a features property with the array of features
-   */
-  let processRequestInfoAll = function processRequestInfoAll(featureCollection) {
-    clearLayerInfo();
-    dispatch("hide-loader");
-    //se il dato è presente lo aggiungo al contenitore global
-    if (featureCollection && featureCollection.features.length > 0) {
-      for (let i = 0; i < featureCollection.features.length; i++) {
-        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-        requestQueueData.push(featureCollection.features[i]);
-      }
-    }
-
-    //se non è presente o una nuova richiesta è stata accodata procedo al passo successivo
-    if (requestQueue.mustRestart) {
-      requestQueue.mustRestart = false;
-      getFeatureInfoRequest();
-    }
-    getFeatureInfoRequest(false);
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {
@@ -348,7 +339,7 @@ let AppMapInfo = (function() {
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
     init: init,
-    processRequestInfo: processRequestInfo,
+    //processRequestInfo: processRequestInfo,
     processRequestInfoAll: processRequestInfoAll
   };
 })();

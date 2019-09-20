@@ -332,7 +332,18 @@ body {
 }
 
 .lk-feature {
-  padding: 3px;
+  padding: 0 0 0.6rem 0;
+  background-color: #fff;
+  border-radius: 0 0 2px 2px;
+}
+
+.lk-feature-heading {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.3rem 0.1rem 0.2rem 0.1rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(160, 160, 160, 0.2);
 }
 
 .lk-feature-row {
@@ -341,13 +352,26 @@ body {
 }
 
 .lk-feature-title {
-  font-weight: bold;
   padding: 2px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .lk-feature-content {
   padding: 2px;
   overflow: auto;
+  font-size: 0.9rem;
+}
+
+.lk-feature__icons {
+  padding: 0.1rem 0.5rem;
+  font-size: 1.2rem;
+}
+
+.lk-feature__icon {
+  color: #008cba;
+  cursor: pointer;
+  margin: 0 0.2rem;
 }
 
 .lk-full-height {
