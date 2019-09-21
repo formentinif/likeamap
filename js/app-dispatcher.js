@@ -127,6 +127,7 @@ var Dispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
+      debugger;
       AppMap.goToGeometry(payload.geometry);
     });
 
@@ -134,7 +135,7 @@ var Dispatcher = (function() {
       debugger;
       try {
         let feature = AppStore.getCurrentInfoItems().features[payload.index];
-        dispatch({ eventName: "zoomToGeometry", geometry: feature.geometry });
+        dispatch({ eventName: "zoom-geometry", geometry: feature.geometry });
       } catch (error) {
         dispatch({ eventName: "log", message: error });
       }

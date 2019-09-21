@@ -46,11 +46,7 @@ let AppTemplates = (function() {
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(
-            groupLayer.layers[li].gid,
-            groupLayer.layers[li].templateUrl,
-            repoTemplatesUrl
-          );
+          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -152,7 +148,6 @@ let AppTemplates = (function() {
   };
 
   let standardTemplate = function(props, layer) {
-    debugger;
     let body = "";
     if (layer) {
       body += "<div class='row lk-feature-heading' ><div class='col s12'>" + layer.layerName;
@@ -186,7 +181,7 @@ let AppTemplates = (function() {
       '<i title="Apri in Google" class="fab fa-google fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'open-feature-info-google\', index: \'' +
       index +
       "' })\"></i>" +
-      "<div>";
+      "</div>";
     return icons;
   };
 
@@ -196,14 +191,7 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lk-mb-2 col s12">';
-        result +=
-          '<a href="#" onclick="AppStore.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          relation.labelTemplate +
-          "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";

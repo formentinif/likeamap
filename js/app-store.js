@@ -118,12 +118,7 @@ var AppStore = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       var props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(
-        feature.layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
-
+      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);
@@ -136,8 +131,7 @@ var AppStore = (function() {
 
       tempBody += AppTemplates.featureIconsTemplate(index);
 
-      body += "<div class='lk-feature z-depth-1'>" + tempBody;
-      +"</div>";
+      body += "<div class='lk-feature z-depth-1 lk-mb-3'>" + tempBody + "</div>";
       index++;
     });
 
@@ -150,11 +144,7 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(
-      relation.gid,
-      relation.templateUrl,
-      AppStore.getAppState().templatesRepositoryUrl
-    );
+    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",

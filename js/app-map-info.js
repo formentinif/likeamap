@@ -139,7 +139,6 @@ let AppMapInfo = (function() {
       //the loop has ended
       requestQueue.ajaxPending = false;
       AppMapInfo.clearLayerInfo();
-      debugger;
       if (requestQueueData.length > 0) {
         dispatch({
           eventName: "show-info-item",

@@ -150,23 +150,21 @@ let AppMap = (function() {
   /**
    * Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
    *
-   * @param {float} lon1 Longitune o X minimo
-   * @param {float} lat1 Latitudine o Y minimo
-   * @param {float} lon2 Longitune o X massimo
-   * @param {float} lat2 Latitudine o Y massimo
+   * @param {float} x1  X minimo
+   * @param {float} y1  Y minimo
+   * @param {float} x2  X massimo
+   * @param {float} y2  Y massimo
    */
-  let goToExtent = function goToExtent(lon1, lat1, lon2, lat2) {
-    let point1 = new ol.geom.Point([lon1, lat1]);
-    if (lon1 < 180) {
-      point1 = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:900913");
-    }
-    let point2 = new ol.geom.Point([lon2, lat2]);
-    if (lon2 < 180) {
-      point2 = ol.proj.transform([lon2, lat2], "EPSG:4326", "EPSG:900913");
-    }
-
-    let extent = [point1[0], point1[1], point2[0], point2[1]];
-    mainMap.getView().fit(extent, mainMap.getSize());
+  let goToExtent = function goToExtent(x1, y1, x2, y2) {
+    // let point1 = new ol.geom.Point([lon1, lat1]);
+    // if (lon1 < 180) {
+    //   point1 = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:900913");
+    // }
+    // let point2 = new ol.geom.Point([lon2, lat2]);
+    // if (lon2 < 180) {
+    //   point2 = ol.proj.transform([lon2, lat2], "EPSG:4326", "EPSG:900913");
+    // }
+    mainMap.getView().fit([x1, y1, x2, y2], mainMap.getSize());
   };
 
   let layerIsPresent = function layerIsPresent(gid) {
@@ -1423,12 +1421,7 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent(
-        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
-          /\+/g,
-          "%20"
-        )
-      ) || null
+      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
     );
   };
 
@@ -1447,10 +1440,7 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (
-      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
-      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
-    );
+    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
   let addContextMenu = function(items) {
