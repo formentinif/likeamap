@@ -132,10 +132,14 @@ let AppMap = (function() {
     );
   };
 
-  let goToGeometry = function goToGeometry(geometry, srid) {
-    let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
+  /**
+   * Pan the map to the given geometry's position
+   * @param {OL/Geometry} geometry
+   * @param {int} srid
+   */
+  let goToGeometry = function(geometry, srid) {
     let feature = new ol.Feature({
-      geometry: geometryOl
+      geometry: geometry
     });
     if (srid) {
       feature = transform3857(feature, srid);
@@ -278,6 +282,7 @@ let AppMap = (function() {
     }
     if (thisLayer) {
       thisLayer.gid = gid;
+      thisLayer.srs = srs;
       thisLayer.queryable = queryable;
       mainMap.addLayer(thisLayer);
       thisLayer.setVisible(visible);
@@ -968,28 +973,15 @@ let AppMap = (function() {
 
   /**
    * Add a geometry to the map
-   * @param {Object} geometry Feature's geometry object/arrat. The geometry type must match the given geometryFormat.
+   * @param {Object} geometry Feature's geometry object/arrat. The geometry type must be in OL format
    * @param {int} srid srid of the object
    * @param {Ol/Vector} vector Vector layer destination
-   * @param {int} geometryFormat Geometry format as in geometryFormats
    */
-  let addGeometryToMap = function addGeometryToMap(geometry, srid, vector, geometryFormat) {
-    let feature = null;
+  let addGeometryToMap = function addGeometryToMap(geometry, srid, vector) {
+    let feature = new ol.Feature({
+      geometry: geometry
+    });
     try {
-      let geometryOl = geometry;
-      switch (geometryFormat) {
-        case geometryFormatsEnum.GeoJson:
-          let geometryOl = getGeometryFromGeoJsonGeometry(geometry);
-          feature = new ol.Feature({
-            geometry: geometryOl
-          });
-          break;
-        default:
-          feature = new ol.Feature({
-            geometry: geometry
-          });
-          break;
-      }
       feature = transform3857(feature, srid);
       //feature.getGeometry().transform(projection, 'EPSG:3857');
       vector.getSource().addFeature(feature);
@@ -997,6 +989,21 @@ let AppMap = (function() {
       log(error);
     }
     return feature;
+  };
+
+  /**
+   * Converts a geometry into Ol format
+   * @param {Object} geometry Geometry to be converted
+   * @param {geometryFormat} geometryFormat Source geometry format as in geometryFormats enum
+   */
+  let convertGeometryToOl = function(geometry, geometryFormat) {
+    let geometryOl = geometry;
+    switch (geometryFormat) {
+      case geometryFormatsEnum.GeoJson:
+        geometryOl = getGeometryFromGeoJsonGeometry(geometry);
+        break;
+    }
+    return geometryOl;
   };
 
   let startCopyCoordinate = function() {
@@ -1214,7 +1221,7 @@ let AppMap = (function() {
   };
 
   let addFeatureSelectionToMap = function(geometry, srid) {
-    return addGeometryToMap(geometry, srid, vectorSelection, geometryFormats.GeoJSON);
+    return addGeometryToMap(geometry, srid, vectorSelection);
   };
 
   /* SEZIONE DRAWING    *************************************/
@@ -1391,7 +1398,7 @@ let AppMap = (function() {
       if (srid.properties) {
         srid = getSRIDfromCRSName(srid.properties.name);
       }
-      switch (srid) {
+      switch (parseInt(srid)) {
         case 3003:
           feature.getGeometry().transform("EPSG:3003", "EPSG:3857");
           break;
@@ -1421,7 +1428,12 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
+      decodeURIComponent(
+        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
+          /\+/g,
+          "%20"
+        )
+      ) || null
     );
   };
 
@@ -1440,7 +1452,10 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
+    return (
+      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
+      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
+    );
   };
 
   let addContextMenu = function(items) {
@@ -1483,6 +1498,27 @@ let AppMap = (function() {
     vectorPrint.getSource().clear(true);
   };
 
+  let getPixelFromCoordinate = function(x, y) {
+    return mainMap.getPixelFromCoordinate([x, y]);
+  };
+
+  let getCoordinateFromPixel = function(x, y) {
+    return mainMap.getCoordinateFromPixel([x, y]);
+  };
+
+  /**
+   * Returns an array from an Ol geometry
+   * @param {OL/Geometry} geometry
+   */
+  let getLabelPoint = function(geometry) {
+    debugger;
+    try {
+      let polygon = new ol.geom.Polygon(geometry.flatCoordinates);
+    } catch (error) {}
+    switch ("pippo") {
+    }
+  };
+
   return {
     addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
@@ -1497,12 +1533,15 @@ let AppMap = (function() {
     clearLayerPrint: clearLayerPrint,
     clearLayerSelection: clearLayerSelection,
     clearLayerSelectionMask: clearLayerSelectionMask,
+    convertGeometryToOl: convertGeometryToOl,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
     getGeometryFormats: getGeometryFormats,
     getCentroid: getCentroid,
+    getCoordinateFromPixel: getCoordinateFromPixel,
     getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,
+    getLabelPoint: getLabelPoint,
     getLegendUrl: getLegendUrl,
     getMap: getMap,
     getMapResolution: getMapResolution,
@@ -1510,6 +1549,7 @@ let AppMap = (function() {
     getMapCenterLonLat: getMapCenterLonLat,
     getMapScale: getMapScale,
     getMapZoom: getMapZoom,
+    getPixelFromCoordinate: getPixelFromCoordinate,
     getPrintCenter: getPrintCenter,
     getPrintCenterLonLat: getPrintCenterLonLat,
     getSelectionMask: getSelectionMask,

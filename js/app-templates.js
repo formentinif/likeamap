@@ -46,7 +46,11 @@ let AppTemplates = (function() {
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
+          let templateUrl = getTemplateUrl(
+            groupLayer.layers[li].gid,
+            groupLayer.layers[li].templateUrl,
+            repoTemplatesUrl
+          );
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -191,7 +195,14 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lk-mb-2 col s12">';
-        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result +=
+          '<a href="#" onclick="AppStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          relation.labelTemplate +
+          "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -262,6 +273,7 @@ let AppTemplates = (function() {
   return {
     init: init,
     generateTemplate: generateTemplate,
+    getLabelFeature: getLabelFeature,
     getTemplate: getTemplate,
     getTemplateUrl: getTemplateUrl,
     featureIconsTemplate: featureIconsTemplate,

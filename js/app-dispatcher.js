@@ -83,10 +83,6 @@ var Dispatcher = (function() {
     //   }
     // });
 
-    this.bind("show-info-item", function(payload) {
-      AppStore.showInfoItems(payload.data);
-    });
-
     this.bind("hide-menu-mobile", function(payload) {
       if (AppStore.isMobile()) {
         AppStore.hideMenu();
@@ -127,15 +123,20 @@ var Dispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
-      debugger;
-      AppMap.goToGeometry(payload.geometry);
+      let geometryOl = AppMap.convertGeometryToOl(payload.geometry, AppMap.getGeometryFormats().GeoJson);
+      AppMap.goToGeometry(geometryOl);
     });
 
     this.bind("zoom-feature-info", function(payload) {
-      debugger;
       try {
         let feature = AppStore.getCurrentInfoItems().features[payload.index];
+        let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
+        let layer = AppStore.getLayer(feature.layerGid);
         dispatch({ eventName: "zoom-geometry", geometry: feature.geometry });
+        let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField);
+        if (tooltip) {
+          dispatch({ eventName: "show-map-tooltip", geometry: geometryOl, tooltip: tooltip });
+        }
       } catch (error) {
         dispatch({ eventName: "log", message: error });
       }

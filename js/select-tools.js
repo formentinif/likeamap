@@ -293,7 +293,7 @@ let SelectTools = (function() {
       });
       if (showInfo) {
         dispatch({
-          eventName: "show-info-item",
+          eventName: "show-info-items",
           data: selectionResult[index].item
         });
       }

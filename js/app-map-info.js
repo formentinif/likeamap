@@ -45,6 +45,12 @@ let AppMapInfo = (function() {
 
   let init = function() {
     vectorInfo.setMap(AppMap.getMap());
+    Dispatcher.bind("show-info-items", function(payload) {
+      AppMapInfo.showRequestInfoFeatures(payload.data);
+    });
+    Dispatcher.bind("show-info-geometries", function(payload) {
+      AppMapInfo.showRequestInfoFeaturesGeometries(payload.data);
+    });
   };
 
   /**
@@ -89,7 +95,7 @@ let AppMapInfo = (function() {
       });
     }
     if (featuresClicked.length > 0) {
-      showVectorResults(featuresClicked);
+      showVectorInfoFeatures(featuresClicked);
       return;
     }
 
@@ -105,7 +111,7 @@ let AppMapInfo = (function() {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid));
+            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srs));
           }
         }
       });
@@ -141,7 +147,13 @@ let AppMapInfo = (function() {
       AppMapInfo.clearLayerInfo();
       if (requestQueueData.length > 0) {
         dispatch({
-          eventName: "show-info-item",
+          eventName: "show-info-items",
+          data: {
+            features: requestQueueData
+          }
+        });
+        dispatch({
+          eventName: "show-info-geometries",
           data: {
             features: requestQueueData
           }
@@ -190,7 +202,7 @@ let AppMapInfo = (function() {
   //       featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
   //     }
   //     Dispatcher.dispatch({
-  //       eventName: "show-info-item",
+  //       eventName: "show-info-items",
   //       data: featureCollection
   //     });
   //   }
@@ -215,6 +227,7 @@ let AppMapInfo = (function() {
     if (featureCollection && featureCollection.features.length > 0) {
       for (let i = 0; i < featureCollection.features.length; i++) {
         featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
+        featureCollection.features[i].SRID = requestQueue.layers[requestQueue.currentLayerIndex].srs;
         requestQueueData.push(featureCollection.features[i]);
       }
     }
@@ -231,7 +244,7 @@ let AppMapInfo = (function() {
    * Process the results after the click on a vector feature on the map
    * @param {Array} featureCollection Array of OL featurs with the results. It must have a features property with the array of features
    */
-  let showVectorResults = function showVectorResults(features) {
+  let showVectorInfoFeatures = function showVectorInfoFeatures(features) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
@@ -239,7 +252,7 @@ let AppMapInfo = (function() {
     let featureArray = [];
     if (features && features.length > 0) {
       features.forEach(function(feature) {
-        addGeometryInfoToMap(feature.getGeometry(), 3857, AppMap.getGeometryFormats().OL);
+        addGeometryInfoToMap(feature.getGeometry(), 3857);
         //transform OL feature in GeoJson
         featureArray.push({
           layerGid: feature.layerGid,
@@ -254,10 +267,85 @@ let AppMapInfo = (function() {
       };
 
       Dispatcher.dispatch({
-        eventName: "show-info-item",
+        eventName: "show-info-items",
         data: featuresCollection
       });
     }
+  };
+
+  /**
+   * Show the click geometries on the map
+   * @param {Object} featureInfoCollection GeoJson feature collection
+   */
+  let showRequestInfoFeaturesGeometries = function(featureInfoCollection) {
+    featureInfoCollection.features.forEach(function(feature) {
+      let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
+      addGeometryInfoToMap(geometryOl, feature.SRID);
+    });
+  };
+
+  /**
+   * Show the click info results in menu
+   * @param {Object} featureInfoCollection GeoJson feature collection
+   */
+  let showRequestInfoFeatures = function(featureInfoCollection) {
+    var title = "Risultati";
+    var body = "";
+    if (!featureInfoCollection) {
+      return;
+    }
+    //single feature sent
+    if (!featureInfoCollection.features) {
+      featureInfoCollection = {
+        features: [featureInfoCollection]
+      };
+    }
+    AppStore.getAppState().currentInfoItems = featureInfoCollection;
+    if (featureInfoCollection.features.length > 0) {
+      title += " (" + featureInfoCollection.features.length + ")";
+    }
+    let index = 0;
+    featureInfoCollection.features.forEach(function(feature) {
+      var props = feature.properties ? feature.properties : feature;
+      let layer = AppStore.getLayer(feature.layerGid);
+      var template = AppTemplates.getTemplate(
+        feature.layerGid,
+        layer.templateUrl,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
+      var tempBody = AppTemplates.processTemplate(template, props, layer);
+      if (!tempBody) {
+        tempBody += AppTemplates.standardTemplate(props, layer);
+      }
+      //sezione relations
+      var layerRelations = AppStore.getRelations().filter(function(relation) {
+        return $.inArray(feature.layerGid, relation.layerGids) >= 0;
+      });
+      tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
+
+      tempBody += AppTemplates.featureIconsTemplate(index);
+
+      body += "<div class='lk-feature z-depth-1 lk-mb-3'>" + tempBody + "</div>";
+      index++;
+    });
+
+    AppMapInfo.showInfoWindow(title, body);
+  };
+
+  let showInfoWindow = function(title, body) {
+    AppToolbar.toggleToolbarItem("info-results", true);
+    $("#info-results__content").html(body);
+    $("#info-results__title").html(title);
+    $("#info-results").show();
+    // $("#info-window__title").html(title);
+    // $("#info-window__body").html(body);
+    // $("#info-window").show();
+    // $("#info-window").animate(
+    //   {
+    //     scrollTop: 0
+    //   },
+    //   "fast"
+    // );
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {
@@ -267,7 +355,6 @@ let AppMapInfo = (function() {
     /// <param name="wkt">Geometria da caricare</param>
     /// <returns type=""></returns>
 
-    let geometryOl = null;
     let feature = formatWKT.readFeature(wkt);
     /*let feature = formatWKT.readFeature(
     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
@@ -279,8 +366,13 @@ let AppMapInfo = (function() {
     return feature;
   };
 
-  let addGeometryInfoToMap = function addGeometryInfoToMap(geometry, srid, geometryFormat) {
-    return AppMap.addGeometryToMap(geometry, srid, vectorInfo, geometryFormat);
+  /**
+   * Add a geometry info to the map
+   * @param {Ol/Geometry} geometry
+   * @param {int} srid
+   */
+  let addGeometryInfoToMap = function addGeometryInfoToMap(geometry, srid) {
+    return AppMap.addGeometryToMap(geometry, srid, vectorInfo);
   };
 
   /**
@@ -319,11 +411,12 @@ let AppMapInfo = (function() {
    * @param {int} zIndex Index of the layer
    * @param {string} gid Unique id of the layer
    */
-  let RequestLayer = function(url, zIndex, gid) {
+  let RequestLayer = function(url, zIndex, gid, srs) {
     this.url = url;
     this.zIndex = zIndex;
     this.sent = false;
     this.gid = gid;
+    this.srs = srs;
   };
 
   function SortByZIndex(a, b) {
@@ -339,6 +432,9 @@ let AppMapInfo = (function() {
     getRequestInfo: getRequestInfo,
     init: init,
     //processRequestInfo: processRequestInfo,
-    processRequestInfoAll: processRequestInfoAll
+    processRequestInfoAll: processRequestInfoAll,
+    showRequestInfoFeatures: showRequestInfoFeatures,
+    showRequestInfoFeaturesGeometries: showRequestInfoFeaturesGeometries,
+    showInfoWindow: showInfoWindow
   };
 })();
