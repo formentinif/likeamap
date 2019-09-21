@@ -363,7 +363,7 @@ var SearchTools = (function() {
       });
       if (showInfo) {
         dispatch({
-          eventName: "show-info-item",
+          eventName: "show-info-items",
           data: searchResults[index].item
         });
       }

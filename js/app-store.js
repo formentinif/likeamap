@@ -98,53 +98,17 @@ var AppStore = (function() {
     }
   };
 
-  var showInfoItems = function(featureInfoCollection) {
-    var title = "Risultati";
-    var body = "";
-    if (!featureInfoCollection) {
-      return;
-    }
-    //single feature sent
-    if (!featureInfoCollection.features) {
-      featureInfoCollection = {
-        features: [featureInfoCollection]
-      };
-    }
-    AppStore.getAppState().currentInfoItems = featureInfoCollection;
-    if (featureInfoCollection.features.length > 0) {
-      title += " (" + featureInfoCollection.features.length + ")";
-    }
-    let index = 0;
-    featureInfoCollection.features.forEach(function(feature) {
-      var props = feature.properties ? feature.properties : feature;
-      let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
-      var tempBody = AppTemplates.processTemplate(template, props, layer);
-      if (!tempBody) {
-        tempBody += AppTemplates.standardTemplate(props, layer);
-      }
-      //sezione relations
-      var layerRelations = AppStore.getRelations().filter(function(relation) {
-        return $.inArray(feature.layerGid, relation.layerGids) >= 0;
-      });
-      tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
-
-      tempBody += AppTemplates.featureIconsTemplate(index);
-
-      body += "<div class='lk-feature z-depth-1 lk-mb-3'>" + tempBody + "</div>";
-      index++;
-    });
-
-    this.showInfoWindow(title, body);
-  };
-
   var showRelation = function(relationGid, resultIndex) {
     var item = AppStore.getCurrentInfoItems().features[resultIndex];
     var relation = AppStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",
@@ -183,7 +147,7 @@ var AppStore = (function() {
         if (data.length === 0) {
           body += '<div class="lk-warning lk-mb-2 lk-p-2">' + AppResources.risultati_non_trovati + "</div>";
         }
-        AppStore.showInfoWindow(title, body);
+        AppMapInfo.showInfoWindow(title, body);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         dispatch({
@@ -192,22 +156,6 @@ var AppStore = (function() {
         });
       }
     });
-  };
-
-  var showInfoWindow = function(title, body) {
-    AppToolbar.toggleToolbarItem("info-results", true);
-    $("#info-results__content").html(body);
-    $("#info-results__title").html(title);
-    $("#info-results").show();
-    // $("#info-window__title").html(title);
-    // $("#info-window__body").html(body);
-    // $("#info-window").show();
-    // $("#info-window").animate(
-    //   {
-    //     scrollTop: 0
-    //   },
-    //   "fast"
-    // );
   };
 
   var hideInfoWindow = function() {
@@ -248,7 +196,7 @@ var AppStore = (function() {
     if (layer) {
       layerName = layer.layerName;
     }
-    showInfoWindow(layerName, html);
+    AppMapInfo.showInfoWindow(layerName, html);
     return true;
   };
 
@@ -456,9 +404,10 @@ var AppStore = (function() {
     //inizializzazione dell appstore
     AppStore.init();
     AppStore.showAppTools();
-    //inizializzazione della mappa
+    //map init
     AppMap.render("map", appState);
-    //carico i templates
+    AppMapTooltip.init();
+    //loading templates
     AppTemplates.init();
     //carico i layers
     AppLayerTree.init(function() {
@@ -629,7 +578,7 @@ var AppStore = (function() {
     }
   };
 
-  var getCurrentInfoItems = function() {
+  let getCurrentInfoItems = function() {
     return AppStore.getAppState().currentInfoItems;
   };
 
@@ -672,8 +621,6 @@ var AppStore = (function() {
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     showLegend: showLegend,
-    showInfoItems: showInfoItems,
-    showInfoWindow: showInfoWindow,
     showAppTools: showAppTools,
     showRelation: showRelation,
     toggleLoader: toggleLoader,

@@ -162,7 +162,7 @@ let AppMapStyles = (function() {
   let getInfoStyle = function() {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 125, 0, 1]
+        color: [255, 125, 0, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 125, 0, 1],
