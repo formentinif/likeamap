@@ -48,6 +48,15 @@ let AppMap = (function() {
     OL: 2
   };
 
+  let geometryTypesEnum = {
+    GeometryNull: 0,
+    Point: 1,
+    Polyline: 2,
+    Polygon: 3,
+    MultiPolyline: 4,
+    MultyPolygon: 5
+  };
+
   let mainMap;
   let isRendered = false;
   let formatWKT = new ol.format.WKT();
@@ -62,6 +71,11 @@ let AppMap = (function() {
     return geometryFormatsEnum;
   };
 
+  let getGeometryTypes = function() {
+    return geometryTypesEnum;
+  };
+
+  geometryTypesEnum;
   //TODO eliminare questa funzione
   let getCurrentColor = function(opacity, color) {
     if (!opacity) opacity = 1;
@@ -1475,12 +1489,71 @@ let AppMap = (function() {
     return [finalLonDegrees, finalLatDegrees];
   };
 
+  let getCentroid2d = function(coords) {
+    var minX, maxX, minY, maxY;
+    for (var i = 0; i < coords.length; i++) {
+      minX = coords[i][0] < minX || minX == null ? coords[i][0] : minX;
+      maxX = coords[i][0] > maxX || maxX == null ? coords[i][0] : maxX;
+      minY = coords[i][1] < minY || minY == null ? coords[i][1] : minY;
+      maxY = coords[i][1] > maxY || maxY == null ? coords[i][1] : maxY;
+    }
+    return [(minX + maxX) / 2, (minY + maxY) / 2];
+  };
+
   /**
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
   let clearLayerPrint = function() {
     vectorPrint.getSource().clear(true);
+  };
+
+  /**
+   * Get the geometry type from a coordinate array. Returns a getGeometryTypesEnum
+   * @param {Array} coordinates
+   */
+  let getGeometryType = function(coordinates) {
+    if (!Array.isArray(coordinates)) {
+      return geometryTypesEnum.GeometryNull;
+    }
+    let firstElement = coordinates[0];
+    if (!Array.isArray(firstElement)) {
+      return geometryTypesEnum.Point;
+    }
+    if (!Array.isArray(firstElement[0])) {
+      //if first and last point are the same is polygon, otherwise polyline
+      let lastElement = coordinates[coordinates.length - 1];
+      if (firstElement[0] === lastElement[0] && firstElement[1] === lastElement[1]) {
+        return geometryTypesEnum.Polygon;
+      } else {
+        return geometryTypesEnum.Polyline;
+      }
+    }
+    //multis
+    switch (getGeometryType(firstElement)) {
+      case geometryTypesEnum.Polygon:
+        return geometryTypesEnum.MultiPolygon;
+      case geometryTypesEnum.Polyline:
+        return geometryTypesEnum.MultiPolyline;
+    }
+    return geometryTypesEnum.GeometryNull;
+  };
+
+  let getLabelPoint = function(coordinates) {
+    switch (getGeometryType(coordinates)) {
+      case geometryTypesEnum.Point:
+        return coordinates;
+      case geometryTypesEnum.Polyline:
+        return coordinates[Math.floor(coordinates.length / 2)];
+      case geometryTypesEnum.Polygon:
+        return getCentroid2d(coordinates);
+      case geometryTypesEnum.MultiPolyline:
+        coordinates = coordinates[0];
+        return coordinates[Math.floor(coordinates.length / 2)];
+      case geometryTypesEnum.MultiPolygon:
+        coordinates = coordinates[0];
+        return getCentroid2d(coordinates);
+    }
   };
 
   return {
@@ -1499,10 +1572,14 @@ let AppMap = (function() {
     clearLayerSelectionMask: clearLayerSelectionMask,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
-    getGeometryFormats: getGeometryFormats,
     getCentroid: getCentroid,
+    getCentroid2d: getCentroid2d,
     getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,
+    getGeometryFormats: getGeometryFormats,
+    getGeometryType: getGeometryType,
+    getGeometryTypes: getGeometryTypes,
+    getLabelPoint: getLabelPoint,
     getLegendUrl: getLegendUrl,
     getMap: getMap,
     getMapResolution: getMapResolution,
