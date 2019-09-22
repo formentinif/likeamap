@@ -181,11 +181,34 @@ let AppTemplates = (function() {
       "<div class='lk-feature__icons'>" +
       '<i title="Centra sulla mappa" class="fas fa-map-marker-alt fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'zoom-feature-info\', index: \'' +
       index +
-      "' })\"></i>" +
-      '<i title="Apri in Google" class="fab fa-google fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'open-feature-info-google\', index: \'' +
-      index +
-      "' })\"></i>" +
-      "</div>";
+      "' })\"></i>";
+    let feature = AppStore.getCurrentInfoItem(index);
+    let centroid = AppMap.getLabelPoint(feature.geometry.coordinates);
+    let geometryOl = AppMap.convertGeometryToOl(
+      {
+        coordinates: centroid,
+        type: "Point",
+        SRID: 3857
+      },
+      AppMap.getGeometryFormats().GeoJson
+    );
+    centroid = AppMap.transformGeometrySrid(geometryOl, 3857, 4326);
+    icons +=
+      //"<a target='_blank' href='https://www.google.com/maps/@?api=1&map_action=map&center=" +
+      "<a target='_blank' href='https://www.google.com/maps/search/?api=1&query=" +
+      centroid.flatCoordinates[1] +
+      "," +
+      centroid.flatCoordinates[0] +
+      "&'><i title='Apri in Google' class='fab fa-google fa-lg lk-feature__icon'></i></a>";
+    //https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=48.857832,2.295226&heading=-45&pitch=38&fov=80
+    icons +=
+      //"<a target='_blank' href='https://www.google.com/maps/@?api=1&map_action=map&center=" +
+      "<a target='_blank' href='https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" +
+      centroid.flatCoordinates[1] +
+      "," +
+      centroid.flatCoordinates[0] +
+      "&'><i title='Apri in Google' class='fas fa-street-view fa-lg lk-feature__icon'></i></a>";
+    icons += "</div>";
     return icons;
   };
 

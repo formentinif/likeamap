@@ -582,6 +582,10 @@ var AppStore = (function() {
     return AppStore.getAppState().currentInfoItems;
   };
 
+  let getCurrentInfoItem = function(index) {
+    return AppStore.getAppState().currentInfoItems.features[index];
+  };
+
   /**
    * Genera un GUID
    * @return {string} guid
@@ -600,6 +604,7 @@ var AppStore = (function() {
     init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
+    getCurrentInfoItem: getCurrentInfoItem,
     getCurrentInfoItems: getCurrentInfoItems,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,

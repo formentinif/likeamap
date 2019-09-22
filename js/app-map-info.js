@@ -86,6 +86,7 @@ let AppMapInfo = (function() {
     if (!AppStore.getInfoClickEnabled()) {
       return;
     }
+    dispatch("hide-map-tooltip");
     //checking if there is a vector feature
     let featuresClicked = [];
     if (pixel) {
@@ -260,6 +261,18 @@ let AppMapInfo = (function() {
           properties: feature.getProperties()
         });
       });
+      //tooltip
+      if (features.length == 1) {
+        try {
+          let layer = AppStore.getLayer(features[0].layerGid);
+          let tooltip = AppTemplates.getLabelFeature(features[0].getProperties(), layer.labelField);
+          dispatch({
+            eventName: "show-map-tooltip",
+            geometry: features[0].getGeometry().flatCoordinates,
+            tooltip: tooltip
+          });
+        } catch (error) {}
+      }
 
       let featuresCollection = {
         features: featureArray,
@@ -308,7 +321,11 @@ let AppMapInfo = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       var props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+      var template = AppTemplates.getTemplate(
+        feature.layerGid,
+        layer.templateUrl,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);

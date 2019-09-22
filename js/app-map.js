@@ -1362,7 +1362,6 @@ let AppMap = (function() {
   };
 
   let getGeoJsonGeometryFromGeometry = function(geometry) {
-    debugger;
     var writer = new ol.format.GeoJSON();
     return JSON.parse(writer.writeGeometry(geometry));
   };
@@ -1416,6 +1415,10 @@ let AppMap = (function() {
     return feature;
   };
 
+  let transformGeometrySrid = function(geometryOl, sridSource, sridDest) {
+    return geometryOl.transform("EPSG:" + sridSource, "EPSG:" + sridDest);
+  };
+
   let goToBrowserLocation = function() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(AppMap.showBrowserLocation);
@@ -1427,7 +1430,12 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
+      decodeURIComponent(
+        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
+          /\+/g,
+          "%20"
+        )
+      ) || null
     );
   };
 
@@ -1446,7 +1454,10 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
+    return (
+      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
+      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
+    );
   };
 
   let addContextMenu = function(items) {
@@ -1612,6 +1623,7 @@ let AppMap = (function() {
     showBrowserLocation: showBrowserLocation,
     startCopyCoordinate: startCopyCoordinate,
     stopCopyCoordinate: stopCopyCoordinate,
-    toggleLayer: toggleLayer
+    toggleLayer: toggleLayer,
+    transformGeometrySrid: transformGeometrySrid
   };
 })();

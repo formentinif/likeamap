@@ -53,6 +53,9 @@ let AppMapTooltip = (function() {
     Dispatcher.bind("show-map-tooltip", function(payload) {
       AppMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
     });
+    Dispatcher.bind("hide-map-tooltip", function(payload) {
+      AppMapTooltip.hideMapTooltip();
+    });
   };
 
   /**
@@ -61,7 +64,6 @@ let AppMapTooltip = (function() {
    * @param {string} title
    */
   let showHtmlTooltip = function(coordinates, title) {
-    debugger;
     if (!title) {
       hideHtmlTooltip();
       return;
@@ -84,7 +86,6 @@ let AppMapTooltip = (function() {
   };
 
   let showMapTooltip = function(coordinates, title) {
-    debugger;
     if (!title) {
       hideHtmlTooltip();
       return;
@@ -97,7 +98,6 @@ let AppMapTooltip = (function() {
 
   let hideMapTooltip = function() {
     mapTooltip.setPosition(undefined);
-    closer.blur();
     return false;
   };
 

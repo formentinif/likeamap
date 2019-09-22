@@ -123,14 +123,12 @@ var Dispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
-      debugger;
       let geometryOl = AppMap.convertGeometryToOl(payload.geometry, AppMap.getGeometryFormats().GeoJson);
       AppMap.goToGeometry(geometryOl);
     });
 
     this.bind("zoom-feature-info", function(payload) {
       try {
-        debugger;
         let feature = AppStore.getCurrentInfoItems().features[payload.index];
         let layer = AppStore.getLayer(feature.layerGid);
         dispatch({ eventName: "zoom-geometry", geometry: feature.geometry });
