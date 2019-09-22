@@ -256,7 +256,7 @@ let AppMapInfo = (function() {
         //transform OL feature in GeoJson
         featureArray.push({
           layerGid: feature.layerGid,
-          geometry: feature.getGeometry(),
+          geometry: AppMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()),
           properties: feature.getProperties()
         });
       });
@@ -308,11 +308,7 @@ let AppMapInfo = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       var props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(
-        feature.layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
+      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);

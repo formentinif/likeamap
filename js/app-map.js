@@ -66,7 +66,6 @@ let AppMap = (function() {
   let vectorDraw;
   let vectorSelectionMask;
   let vectorSelection;
-
   let getGeometryFormats = function() {
     return geometryFormatsEnum;
   };
@@ -685,26 +684,6 @@ let AppMap = (function() {
     });
 
     mainMap.addInteraction(dragInteractionPrint);
-
-    // let modify = new ol.interaction.Modify({
-    //     features: featuresWKT,
-    //     // the SHIFT key must be pressed to delete vertices, so
-    //     // that new vertices can be drawn at the same position
-    //     // of existing vertices
-    //     deleteCondition: function(event) {
-    //         return ol.events.condition.shiftKeyOnly(event) &&
-    //             ol.events.condition.singleClick(event);
-    //     }
-    // });
-    // mainMap.addInteraction(modify);
-    //
-    // let draw; // global so we can remove it later
-    //
-    // draw = new ol.interaction.Draw({
-    //     features: featuresWKT,
-    //     type: "Point"
-    // });
-    // mainMap.addInteraction(draw);
 
     log("Creazione della mappa completata");
   };
@@ -1382,6 +1361,12 @@ let AppMap = (function() {
     return geometryOl;
   };
 
+  let getGeoJsonGeometryFromGeometry = function(geometry) {
+    debugger;
+    var writer = new ol.format.GeoJSON();
+    return JSON.parse(writer.writeGeometry(geometry));
+  };
+
   let getSRIDfromCRSName = function(name) {
     let srid;
     try {
@@ -1595,6 +1580,7 @@ let AppMap = (function() {
     getGeometryFormats: getGeometryFormats,
     getGeometryType: getGeometryType,
     getGeometryTypes: getGeometryTypes,
+    getGeoJsonGeometryFromGeometry: getGeoJsonGeometryFromGeometry,
     getCoordinateFromPixel: getCoordinateFromPixel,
     getLabelPoint: getLabelPoint,
     getLegendUrl: getLegendUrl,

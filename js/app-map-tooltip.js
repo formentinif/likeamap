@@ -31,7 +31,19 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 let AppMapTooltip = (function() {
   "use strict";
 
+  let mapTooltip;
+
   let init = function() {
+    mapTooltip = new ol.Overlay({
+      element: document.getElementById("map-tooltip"),
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250
+      }
+    });
+
+    AppMap.getMap().addOverlay(mapTooltip);
+
     Dispatcher.bind("show-tooltip", function(payload) {
       AppMapInfo.showTooltip(payload.x, payload.y, payload.title);
     });
@@ -39,35 +51,31 @@ let AppMapTooltip = (function() {
       AppMapTooltip.hideTooltip();
     });
     Dispatcher.bind("show-map-tooltip", function(payload) {
-      AppMapTooltip.showGeometryTooltip(payload.geometry, payload.tooltip);
+      AppMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
     });
   };
 
   /**
    * Shows the tooltip on the map
-   * @param {OL/Geometry} geometry
+   * @param {Array} coordinates
    * @param {string} title
    */
-  let showGeometryTooltip = function(geometry, title) {
+  let showHtmlTooltip = function(coordinates, title) {
     debugger;
     if (!title) {
-      hideTooltip();
+      hideHtmlTooltip();
       return;
     }
-    let labelPoint = AppMap.getLabelPoint(geometry);
-    let pixel = AppMap.getPixelFromCoordinate(labelPoint);
-    showTooltip(pixel[0], pixel[1], title);
-  };
-
-  let showTooltip = function(x, y, title) {
+    let labelPoint = AppMap.getLabelPoint(coordinates);
+    let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
     let tooltip = $("#map-tooltip");
     let tooltipTitle = $("#map-tooltip__title");
     tooltipTitle.html(title);
-    tooltip.css({ top: x, left: y });
+    tooltip.css({ top: pixel[0], left: pixel[1] });
     tooltip.show();
   };
 
-  let hideTooltip = function() {
+  let hideHtmlTooltip = function() {
     let toolTip = $("#map-tooltip");
     let toolTipTitle = $("#map-tooltip__title");
     toolTipTitle.html("");
@@ -75,11 +83,29 @@ let AppMapTooltip = (function() {
     toolTip.hide();
   };
 
+  let showMapTooltip = function(coordinates, title) {
+    debugger;
+    if (!title) {
+      hideHtmlTooltip();
+      return;
+    }
+    let labelPoint = AppMap.getLabelPoint(coordinates);
+    let tooltipTitle = $("#map-tooltip__title");
+    tooltipTitle.html(title);
+    mapTooltip.setPosition(labelPoint);
+  };
+
+  let hideMapTooltip = function() {
+    mapTooltip.setPosition(undefined);
+    closer.blur();
+    return false;
+  };
+
   return {
-    hideTooltip: hideTooltip,
+    hideHtmlTooltip: hideHtmlTooltip,
+    hideMapTooltip: hideMapTooltip,
     init: init,
-    showGeometryTooltip: showGeometryTooltip,
-    showTooltip: showTooltip,
-    showGeometryTooltip: showGeometryTooltip
+    showHtmlTooltip: showHtmlTooltip,
+    showMapTooltip: showMapTooltip
   };
 })();

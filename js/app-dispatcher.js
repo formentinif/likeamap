@@ -123,19 +123,20 @@ var Dispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
+      debugger;
       let geometryOl = AppMap.convertGeometryToOl(payload.geometry, AppMap.getGeometryFormats().GeoJson);
       AppMap.goToGeometry(geometryOl);
     });
 
     this.bind("zoom-feature-info", function(payload) {
       try {
+        debugger;
         let feature = AppStore.getCurrentInfoItems().features[payload.index];
-        let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
         let layer = AppStore.getLayer(feature.layerGid);
         dispatch({ eventName: "zoom-geometry", geometry: feature.geometry });
         let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField);
         if (tooltip) {
-          dispatch({ eventName: "show-map-tooltip", geometry: geometryOl, tooltip: tooltip });
+          dispatch({ eventName: "show-map-tooltip", geometry: feature.geometry.coordinates, tooltip: tooltip });
         }
       } catch (error) {
         dispatch({ eventName: "log", message: error });
