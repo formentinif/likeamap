@@ -48,6 +48,10 @@ var SearchTools = (function() {
       AppToolbar.toggleToolbarItem("search-tools");
     });
 
+    Dispatcher.bind("show-search-items", function(payload) {
+      SearchTools.showSearchInfoFeatures(payload.features);
+    });
+
     try {
       M.AutoInit();
       $(".dropdown-trigger").dropdown();
@@ -56,15 +60,7 @@ var SearchTools = (function() {
     }
   };
 
-  var render = function(
-    div,
-    provider,
-    providerAddressUrl,
-    providerAddressField,
-    providerHouseNumberUrl,
-    providerHouseNumberField,
-    layers
-  ) {
+  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -137,19 +133,29 @@ var SearchTools = (function() {
    */
   var templateTopTools = function() {
     let template = '<div class="lk-bar lk-background">';
+    template += '<div class="row lk-no-margin">';
     template +=
-      '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
-    template += '<i class="material-icons">more_vert</i>';
-    template += '</button> <span id="search-tools__label">Indirizzo</span>';
+      '<div class="col s6"><a class="waves-effect waves-light btn btn-small" onclick="SearchTools.showSearchAddress(); return false;" >Indirizzi</a></div>';
+    template +=
+      '<div class="col s6"><a class="waves-effect waves-light btn btn-small" onclick="SearchTools.showSearchLayers(); return false;" >Layers</a></div>';
     template += "</div>";
-    template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
-    template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
-    template += "{{#if this.length}}";
-    template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
-    template += "{{/if}}";
-    template += "</ul>";
+    template += "</div>";
     return template;
   };
+  // var templateTopTools = function() {
+  //   let template = '<div class="lk-bar lk-background">';
+  //   template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+  //   template += '<i class="material-icons">more_vert</i>';
+  //   template += '</button> <span id="search-tools__label">Indirizzo</span>';
+  //   template += "</div>";
+  //   template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
+  //   template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
+  //   template += "{{#if this.length}}";
+  //   template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
+  //   template += "{{/if}}";
+  //   template += "</ul>";
+  //   return template;
+  // };
 
   /**
    * General html code that will be injected in order to display the layer tools
@@ -163,8 +169,7 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-layers-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.doSearchLayers(event)">';
+    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.doSearchLayers(event)">';
     template += '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
@@ -192,10 +197,8 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -217,10 +220,8 @@ var SearchTools = (function() {
     template += templateTopTools();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -238,8 +239,7 @@ var SearchTools = (function() {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
+    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -327,25 +327,25 @@ var SearchTools = (function() {
     dispatch({ eventName: "hide-menu-mobile" });
   };
 
-  /**
-   * Zoom the map to the lon-lat given and add a point to the map
-   * @param {float} lon
-   * @param {float} lat
-   */
-  var zoomToItemWFSGeoserver = function(lon, lat) {
-    dispatch("remove-info");
-    dispatch({
-      eventName: "zoom-lon-lat",
-      zoom: 18,
-      lon: parseFloat(lon),
-      lat: parseFloat(lat)
-    });
-    dispatch({
-      eventName: "add-wkt-info-map",
-      wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
-    });
-    dispatch("hide-menu-mobile");
-  };
+  // /**
+  //  * Zoom the map to the lon-lat given and add a point to the map
+  //  * @param {float} lon
+  //  * @param {float} lat
+  //  */
+  // var zoomToItemWFSGeoserver = function(lon, lat) {
+  //   dispatch("remove-info");
+  //   dispatch({
+  //     eventName: "zoom-lon-lat",
+  //     zoom: 18,
+  //     lon: parseFloat(lon),
+  //     lat: parseFloat(lat)
+  //   });
+  //   dispatch({
+  //     eventName: "add-wkt-info-map",
+  //     wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
+  //   });
+  //   dispatch("hide-menu-mobile");
+  // };
 
   /**
    * Zoom the map to the lon-lat given and show the infobox of the given item index
@@ -355,7 +355,6 @@ var SearchTools = (function() {
    * @param {boolean} showInfo
    */
   var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    debugger;
     dispatch("remove-info");
     if (searchResults[index]) {
       dispatch({
@@ -412,15 +411,7 @@ var SearchTools = (function() {
 
     if (via.length > 3 && comune) {
       via = via.replace("'", " ");
-      var url =
-        "http://nominatim.openstreetmap.org/search/IT/" +
-        regione +
-        "/" +
-        comune +
-        "/" +
-        via +
-        "?format=jsonv2&addressdetails=1" +
-        "&";
+      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
       console.log(url);
       currentSearchDate = new Date().getTime();
       var searchDate = new Date().getTime();
@@ -533,7 +524,6 @@ var SearchTools = (function() {
           if (currentSearchDate > searchDate) {
             return;
           }
-          debugger;
           var results = [];
           if (data.features.length > 0) {
             var toponimi = [];
@@ -603,7 +593,6 @@ var SearchTools = (function() {
       jQuery("#search-tools__search-results").html("");
       for (li = 0; li < searchLayers.length; li++) {
         if (searchLayers[li].layer == currentLayer) {
-          debugger;
           var layer = searchLayers[li];
           var url = layer.mapUri;
           url =
@@ -627,16 +616,14 @@ var SearchTools = (function() {
               if (currentSearchDate > searchDate) {
                 return;
               }
-              debugger;
-              data.features.forEach(feature => {
+              data.features.forEach(function(feature) {
                 feature.layerGid = layer.gid;
-                feature.SRID = data.srs;
+                feature.SRID = AppMap.getSRIDfromCRSName(data.crs.properties.name);
               });
               if (data.features.length > 0) {
                 dispatch({
-                  eventName: "show-info-items",
-                  features: data,
-                  element: "search-tools__search-results"
+                  eventName: "show-search-items",
+                  features: data
                 });
                 dispatch({
                   eventName: "show-info-geometries",
@@ -659,6 +646,19 @@ var SearchTools = (function() {
         }
       }
     }
+  };
+
+  /**
+   * Show the search results in menu
+   * @param {Object} featureInfoCollection GeoJson feature collection
+   */
+  let showSearchInfoFeatures = function(featureInfoCollection) {
+    var title = "Risultati";
+    if (!featureInfoCollection) {
+      return;
+    }
+    var body = AppTemplates.renderInfoFeatures(featureInfoCollection);
+    $("#search-tools__search-results").html(body);
   };
 
   /**
@@ -727,9 +727,10 @@ var SearchTools = (function() {
     doSearchAddressWMSG: doSearchAddressWMSG,
     doSearchLayers: doSearchLayers,
     selectLayer: selectLayer,
+    showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,
     showSearchLayers: showSearchLayers,
-    zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
+    //zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
     zoomToItemLayer: zoomToItemLayer
   };
 })();

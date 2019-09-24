@@ -76,6 +76,7 @@ var AppLayerTree = (function() {
           countRequest--;
           if (countRequest === 0) {
             render(treeDiv, AppStore.getAppState().layers);
+            AppStore.setInitialAppState(AppStore.getAppState());
             AppMap.loadConfig(AppStore.getAppState()); //reloading layer state
             callback();
           }
@@ -103,6 +104,7 @@ var AppLayerTree = (function() {
     output +=
       '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
     output += "</div>";
+    output += '<div class="layertree-item layertree-item-bottom lk-menu-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);
@@ -142,11 +144,7 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString(
-      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
-      groupId,
-      groupLayer.visible ? "visible" : "hidden"
-    );
+    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {

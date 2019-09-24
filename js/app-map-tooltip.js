@@ -80,6 +80,7 @@ let AppMapTooltip = (function() {
   let hideHtmlTooltip = function() {
     let toolTip = $("#map-tooltip");
     let toolTipTitle = $("#map-tooltip__title");
+    toolTip.hide();
     toolTipTitle.html("");
     toolTip.css({ top: 0, left: 0 });
     toolTip.hide();
@@ -91,7 +92,9 @@ let AppMapTooltip = (function() {
       return;
     }
     let labelPoint = AppMap.getLabelPoint(coordinates);
+    let toolTip = $("#map-tooltip");
     let tooltipTitle = $("#map-tooltip__title");
+    toolTip.show();
     tooltipTitle.html(title);
     mapTooltip.setPosition(labelPoint);
   };

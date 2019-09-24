@@ -74,9 +74,9 @@ var ShareTools = (function() {
     template += '<div class="div-20"></div>';
 
     template += '<div class="row">';
-    template += '<div class="col-6"><a id="share-tools__url-query" target="_blank" >Apri</a></div>';
+    template += '<div class="col s6"><a id="share-tools__url-query" target="_blank" class="waves-effect waves-light btn btn-small">Apri</a></div>';
     template +=
-      '<div class="col-6"><a id="share-tools__copy-url-query" class="fake-link" target="_blank" >Copia</a></div>';
+      '<div class="col s6"><a id="share-tools__copy-url-query" class=" waves-effect waves-light btn btn-small fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
 
     template += '<div class="div-20"></div>';
@@ -88,8 +88,7 @@ var ShareTools = (function() {
     template += '<h4 class="lk-title-h4">Mappa</h4>';
     template += "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template +=
-      '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
+    template += '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
 
     template += '<div id="share-tools__content" class="lk-hidden">';
 
@@ -99,8 +98,8 @@ var ShareTools = (function() {
     template += '<div class="div-20"></div>';
 
     template += '<div class="row">';
-    template += '<div class="col-6"><a id="share-tools__url" target="_blank" >Apri</a></div>';
-    template += '<div class="col-6"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
+    template += '<div class="col s6"><a id="share-tools__url" target="_blank" >Apri</a></div>';
+    template += '<div class="col s6"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
     template += "</div>";
 
@@ -238,6 +237,7 @@ var ShareTools = (function() {
     }
     var url = window.location.href;
     var arrUrl = url.split("?");
+    debugger;
     return arrUrl[0] + "?" + qPos + "&layers=" + qLayers;
   };
 

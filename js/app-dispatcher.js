@@ -50,6 +50,7 @@ var Dispatcher = (function() {
 
     this.bind("clear-layer-info", function(payload) {
       AppMapInfo.clearLayerInfo();
+      AppMapTooltip.hideMapTooltip();
     });
 
     // this.bind("show-tool", function(payload) {
@@ -127,15 +128,22 @@ var Dispatcher = (function() {
       AppMap.goToGeometry(geometryOl);
     });
 
-    this.bind("zoom-feature-info", function(payload) {
+    this.bind("zoom-info-feature", function(payload) {
       try {
         let feature = AppStore.getCurrentInfoItems().features[payload.index];
         let layer = AppStore.getLayer(feature.layerGid);
-        dispatch({ eventName: "zoom-geometry", geometry: feature.geometry });
+        let featureOl = AppMap.convertGeoJsonFeatureToOl(feature);
+        featureOl = AppMap.transform3857(featureOl, feature.SRID);
+        AppMap.goToGeometry(featureOl.getGeometry());
         let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField);
         if (tooltip) {
-          dispatch({ eventName: "show-map-tooltip", geometry: feature.geometry.coordinates, tooltip: tooltip });
+          dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().flatCoordinates, tooltip: tooltip });
         }
+        dispatch({
+          eventName: "set-layer-visibility",
+          gid: feature.layerGid,
+          visibility: 1
+        });
       } catch (error) {
         dispatch({ eventName: "log", message: error });
       }
@@ -146,7 +154,7 @@ var Dispatcher = (function() {
     });
 
     this.bind("add-feature-info-map", function(payload) {
-      AppMapInfo.addFeatureInfoToMap(payload.geometry, payload.srid);
+      AppMapInfo.addFeatureInfoToMap(payload.geometry);
     });
 
     this.bind("toggle-layer", function(payload) {
@@ -176,7 +184,12 @@ var Dispatcher = (function() {
     });
 
     this.bind("add-info-point", function(payload) {
-      AppMap.addInfoPoint(payload.lon, payload.lat);
+      let geometryOl = new ol.geom.Point([payload.lon, payload.lat]);
+      let featureOl = new ol.Feature({
+        geometry: geometryOl
+      });
+      featureOl.SRID = 4326;
+      AppMapInfo.addFeatureInfoToMap(featureOl);
     });
 
     this.bind("init-map-app", function(payload) {

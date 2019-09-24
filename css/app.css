@@ -146,6 +146,14 @@ body {
   text-align: left;
 }
 
+.lk-menu-scroll-padding {
+  padding-bottom: 100px !important;
+}
+
+.lk-menu-scroll-margin {
+  margin-bottom: 100px !important;
+}
+
 .lk-menu-toolbar-bottom {
   position: absolute;
   z-index: 11;
@@ -194,10 +202,6 @@ body {
 .lk-menu-panel-bottom .lk-menu-panel-content .lk-menu-panel-content-item {
   display: none;
   height: 100%;
-}
-
-#info-results__content {
-  padding-bottom: 100px;
 }
 
 .lk-menu-panel-close-bottom {
@@ -430,6 +434,10 @@ body {
   border-radius: 1rem;
 }
 
+.lk-no-margin {
+  margin: 0px !important;
+}
+
 /*layer-tree*/
 
 .layertree {
@@ -446,6 +454,11 @@ body {
   padding: 4px 0px;
   transition: all 0.3s ease;
   width: 100%;
+  overflow: hidden;
+}
+
+.layertree-item-bottom {
+  margin-top: 1rem;
 }
 
 .layertree-item__title {

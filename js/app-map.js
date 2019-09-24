@@ -133,7 +133,7 @@ let AppMap = (function() {
     }
     let point = new ol.geom.Point([lon, lat]);
     if (lon < 180) {
-      point = ol.proj.transform([lon, lat], "EPSG:4326", "EPSG:900913");
+      point = ol.proj.transform([lon, lat], "EPSG:4326", "EPSG:3857");
     } else {
       point = [lon, lat];
     }
@@ -600,9 +600,6 @@ let AppMap = (function() {
 
   let init = function() {
     //binding degli eventi
-    Dispatcher.bind("show-map-tools", function(payload) {
-      AppToolbar.toggleToolbarItem("map-tools");
-    });
   };
 
   /**
@@ -1432,14 +1429,10 @@ let AppMap = (function() {
         case 25832:
           feature.getGeometry().transform("EPSG:25832", "EPSG:3857");
           break;
-        case 3857:
-          //feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
-          break;
-        default:
+        case 4326:
           feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
+          break;
       }
-    } else {
-      feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
     }
     return feature;
   };
@@ -1647,6 +1640,7 @@ let AppMap = (function() {
     startCopyCoordinate: startCopyCoordinate,
     stopCopyCoordinate: stopCopyCoordinate,
     toggleLayer: toggleLayer,
+    transform3857: transform3857,
     transformGeometrySrid: transformGeometrySrid
   };
 })();

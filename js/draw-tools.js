@@ -130,8 +130,7 @@ var DrawTools = (function() {
 
     template += '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light">';
     template += '    <svg width="100%" height="100%">';
-    template +=
-      '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
+    template += '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
     template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="16" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="41" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -140,11 +139,11 @@ var DrawTools = (function() {
     template += "  </button>";
 
     //template += '  <button id="draw-tools__text" class="btn-floating waves-effect waves-light" >';
-    //template += '    <i class="materilk-icons" style="font-size:35px !important; top:45%;  ">T</i>';
+    //template += '    <i class="material-icons" style="font-size:35px !important; top:45%;  ">T</i>';
     //template += '  </button>';
 
     template += '  <button id="draw-tools__delete" class="btn-floating btn-large waves-effect waves-light" >';
-    template += '    <i class="materilk-icons" style="font-size:35px !important; top:50%; left:40%; ">&#xE872;</i>';
+    template += '    <i class="material-icons" style="font-size:35px !important; top:50%; left:40%; ">&#xE872;</i>';
     template += "  </button>";
 
     //template += '  <div class="div-20" ></div>';
@@ -152,8 +151,7 @@ var DrawTools = (function() {
     //template += '  <div> <input id="draw-tools__color" type="text" name="draw-tools__color" value="#448AFF" /></div>';
 
     template += '  <div class="div-20" ></div>';
-    template +=
-      '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
+    template += '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
     //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="mdl-button mdl-js-button mdl-button--raised  mdl-js-ripple-effect" >Elimina</button>';
     template += "  </div>";
 

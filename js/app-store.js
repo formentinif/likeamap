@@ -192,7 +192,7 @@ var AppStore = (function() {
     if (layer) {
       layerName = layer.layerName;
     }
-    AppMapInfo.showInfoWindow(layerName, html);
+    AppMapInfo.showInfoWindow(layerName, html, "info-results");
     return true;
   };
 
@@ -459,23 +459,22 @@ var AppStore = (function() {
    * @return {null} Nessun valore restituito
    */
   var resetInitialLayers = function() {
-    AppLayerTree.render("layer-tree", initialAppState.layers);
-    for (var i = 0; i < initialAppState.layers.length; i++) {
+    if (initialAppState.layers) {
+      resetLayersArray(initialAppState.layers);
+    }
+  };
+
+  var resetLayersArray = function(layers) {
+    layers.forEach(function(layer) {
       dispatch({
         eventName: "set-layer-visibility",
-        gid: initialAppState.layers[i].gid,
-        visibility: parseInt(initialAppState.layers[i].visible)
+        gid: layer.gid,
+        visibility: parseInt(layer.visible)
       });
-      if (initialAppState.layers[i].layers) {
-        for (var ki = 0; ki < initialAppState.layers[i].layers.length; ki++) {
-          dispatch({
-            eventName: "set-layer-visibility",
-            gid: initialAppState.layers[i].layers[ki].gid,
-            visibility: parseInt(initialAppState.layers[i].layers[ki].visible)
-          });
-        }
+      if (layer.layers) {
+        resetLayersArray(layer.layers);
       }
-    }
+    });
   };
 
   var isMobile = function() {

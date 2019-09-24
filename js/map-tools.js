@@ -29,8 +29,13 @@ var MapTools = (function() {
   var isRendered = false;
 
   var init = function init() {
-    //carico la tendina dei comuni
-    //abilito l'autocomplete sulla via in base al comune
+    //Events binding
+    Dispatcher.bind("show-map-tools", function(payload) {
+      AppToolbar.toggleToolbarItem("map-tools");
+      if (AppToolbar.getCurrentToolbarItem() === "map-tools") {
+        AppStore.setInfoClickEnabled(false);
+      }
+    });
   };
 
   var render = function(div) {

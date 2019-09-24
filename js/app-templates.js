@@ -175,7 +175,7 @@ let AppTemplates = (function() {
     //icons
     let icons =
       "<div class='lk-feature__icons'>" +
-      '<i title="Centra sulla mappa" class="fas fa-map-marker-alt fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'zoom-feature-info\', index: \'' +
+      '<i title="Centra sulla mappa" class="fas fa-map-marker-alt fa-lg lk-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'zoom-info-feature\', index: \'' +
       index +
       "' })\"></i>";
     let feature = AppStore.getCurrentInfoItem(index);
@@ -285,6 +285,41 @@ let AppTemplates = (function() {
     }
   };
 
+  /**
+   * Render te given collection into HTML format
+   * @param {Object} featureInfoCollection GeoJson Collection
+   */
+  let renderInfoFeatures = function(featureInfoCollection) {
+    let body = "";
+    //single feature sent
+    if (!featureInfoCollection.features) {
+      featureInfoCollection = {
+        features: featureInfoCollection
+      };
+    }
+    AppStore.getAppState().currentInfoItems = featureInfoCollection;
+    let index = 0;
+    featureInfoCollection.features.forEach(function(feature) {
+      let props = feature.properties ? feature.properties : feature;
+      let layer = AppStore.getLayer(feature.layerGid);
+      let template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+      let tempBody = AppTemplates.processTemplate(template, props, layer);
+      if (!tempBody) {
+        tempBody += AppTemplates.standardTemplate(props, layer);
+      }
+      //sezione relations
+      let layerRelations = AppStore.getRelations().filter(function(relation) {
+        return $.inArray(feature.layerGid, relation.layerGids) >= 0;
+      });
+      tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
+      tempBody += AppTemplates.featureIconsTemplate(index);
+
+      body += "<div class='lk-feature z-depth-1 lk-mb-3'>" + tempBody + "</div>";
+      index++;
+    });
+    return body;
+  };
+
   return {
     init: init,
     generateTemplate: generateTemplate,
@@ -294,6 +329,7 @@ let AppTemplates = (function() {
     featureIconsTemplate: featureIconsTemplate,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
+    renderInfoFeatures: renderInfoFeatures,
     standardTemplate: standardTemplate,
     templates: templates
   };
