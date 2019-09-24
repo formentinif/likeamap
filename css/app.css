@@ -172,7 +172,7 @@ body {
   height: 100%;
   z-index: 10;
   display: none;
-  margin: 0px;
+  margin: 0px 0px 0px 0px;
   padding: 20px 0px 0px 0px;
   box-sizing: border-box;
 }
@@ -185,7 +185,7 @@ body {
   height: 100%;
   width: 100%;
   background-color: rgba(252, 252, 252, 0.9);
-  padding: 0.5rem 0.8rem 130px 0.8rem;
+  padding: 0.5rem 0.8rem 0.8rem 0.8rem;
   margin: 0px;
   box-sizing: border-box;
   overflow: auto;
@@ -193,7 +193,11 @@ body {
 
 .lk-menu-panel-bottom .lk-menu-panel-content .lk-menu-panel-content-item {
   display: none;
-  height: 90%;
+  height: 100%;
+}
+
+#info-results__content {
+  padding-bottom: 100px;
 }
 
 .lk-menu-panel-close-bottom {
@@ -740,6 +744,7 @@ body {
   bottom: 12px;
   left: -50px;
   min-width: 180px;
+  display: none;
 }
 .lk-tooltip:after,
 .lk-tooltip:before {

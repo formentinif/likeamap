@@ -966,7 +966,7 @@ let AppMap = (function() {
 
   /**
    * Add a geometry to the map
-   * @param {Object} geometry Feature's geometry object/arrat. The geometry type must be in OL format
+   * @param {OL/geometry} geometry Feature's geometry object. The geometry type must be in OL format
    * @param {int} srid srid of the object
    * @param {Ol/Vector} vector Vector layer destination
    */
@@ -974,6 +974,23 @@ let AppMap = (function() {
     let feature = new ol.Feature({
       geometry: geometry
     });
+    try {
+      feature = transform3857(feature, srid);
+      //feature.getGeometry().transform(projection, 'EPSG:3857');
+      vector.getSource().addFeature(feature);
+    } catch (error) {
+      log(error);
+    }
+    return feature;
+  };
+
+  /**
+   * Add a feature to the map
+   * @param {OL/Feature} feature Feature. The geometry type must be in OL format
+   * @param {int} srid srid of the object
+   * @param {Ol/Vector} vector Vector layer destination
+   */
+  let addFeatureToMap = function(feature, srid, vector) {
     try {
       feature = transform3857(feature, srid);
       //feature.getGeometry().transform(projection, 'EPSG:3857');
@@ -997,6 +1014,18 @@ let AppMap = (function() {
         break;
     }
     return geometryOl;
+  };
+
+  /**
+   * Converts a feature into Ol format from GeoJson
+   * @param {Object} feature GeoJson feature to be converted
+   */
+  let convertGeoJsonFeatureToOl = function(feature) {
+    let reader = new ol.format.GeoJSON();
+    let featureOl = reader.readFeature(feature);
+    featureOl.layerGid = feature.layerGid;
+    featureOl.SRID = feature.SRID;
+    return featureOl;
   };
 
   let startCopyCoordinate = function() {
@@ -1430,12 +1459,7 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent(
-        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
-          /\+/g,
-          "%20"
-        )
-      ) || null
+      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
     );
   };
 
@@ -1454,10 +1478,7 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (
-      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
-      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
-    );
+    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
   let addContextMenu = function(items) {
@@ -1572,6 +1593,7 @@ let AppMap = (function() {
     addDrawInteraction: addDrawInteraction,
     addDrawDeleteInteraction: addDrawDeleteInteraction,
     addFeatureSelectionToMap: addFeatureSelectionToMap,
+    addFeatureToMap: addFeatureToMap,
     addGeometryToMap: addGeometryToMap,
     addLayerToMap: addLayerToMap,
     addSelectInteraction: addSelectInteraction,
@@ -1582,6 +1604,7 @@ let AppMap = (function() {
     clearLayerSelection: clearLayerSelection,
     clearLayerSelectionMask: clearLayerSelectionMask,
     convertGeometryToOl: convertGeometryToOl,
+    convertGeoJsonFeatureToOl: convertGeoJsonFeatureToOl,
     deleteDrawFeatures: deleteDrawFeatures,
     render: render,
     getCentroid: getCentroid,

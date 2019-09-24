@@ -294,7 +294,7 @@ let SelectTools = (function() {
       if (showInfo) {
         dispatch({
           eventName: "show-info-items",
-          data: selectionResult[index].item
+          features: selectionResult[index].item
         });
       }
       let payload = {

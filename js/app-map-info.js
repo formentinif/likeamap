@@ -46,10 +46,10 @@ let AppMapInfo = (function() {
   let init = function() {
     vectorInfo.setMap(AppMap.getMap());
     Dispatcher.bind("show-info-items", function(payload) {
-      AppMapInfo.showRequestInfoFeatures(payload.data);
+      AppMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
     Dispatcher.bind("show-info-geometries", function(payload) {
-      AppMapInfo.showRequestInfoFeaturesGeometries(payload.data);
+      AppMapInfo.showRequestInfoFeaturesGeometries(payload.features);
     });
   };
 
@@ -89,11 +89,21 @@ let AppMapInfo = (function() {
     dispatch("hide-map-tooltip");
     //checking if there is a vector feature
     let featuresClicked = [];
+    let featuresInfoClicked = [];
+
     if (pixel) {
       AppMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
-        feature.layerGid = layer.get("gid").replace("_preload", "");
-        featuresClicked.push(feature);
+        if (layer === null) {
+          featuresInfoClicked.push(feature);
+        } else {
+          feature.layerGid = layer.get("gid").replace("_preload", "");
+          featuresClicked.push(feature);
+        }
       });
+    }
+    if (featuresInfoClicked.length > 0) {
+      showInfoFeatureTooltipAtPixel(featuresInfoClicked[0], pixel);
+      return;
     }
     if (featuresClicked.length > 0) {
       showVectorInfoFeatures(featuresClicked);
@@ -253,7 +263,7 @@ let AppMapInfo = (function() {
     let featureArray = [];
     if (features && features.length > 0) {
       features.forEach(function(feature) {
-        addGeometryInfoToMap(feature.getGeometry(), 3857);
+        addFeatureInfoToMap(feature, 3857);
         //transform OL feature in GeoJson
         featureArray.push({
           layerGid: feature.layerGid,
@@ -262,16 +272,8 @@ let AppMapInfo = (function() {
         });
       });
       //tooltip
-      if (features.length == 1) {
-        try {
-          let layer = AppStore.getLayer(features[0].layerGid);
-          let tooltip = AppTemplates.getLabelFeature(features[0].getProperties(), layer.labelField);
-          dispatch({
-            eventName: "show-map-tooltip",
-            geometry: features[0].getGeometry().flatCoordinates,
-            tooltip: tooltip
-          });
-        } catch (error) {}
+      if (features.length > 0) {
+        showInfoFeatureTooltip(features[0]);
       }
 
       let featuresCollection = {
@@ -281,7 +283,7 @@ let AppMapInfo = (function() {
 
       Dispatcher.dispatch({
         eventName: "show-info-items",
-        data: featuresCollection
+        features: featuresCollection
       });
     }
   };
@@ -292,8 +294,8 @@ let AppMapInfo = (function() {
    */
   let showRequestInfoFeaturesGeometries = function(featureInfoCollection) {
     featureInfoCollection.features.forEach(function(feature) {
-      let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
-      addGeometryInfoToMap(geometryOl, feature.SRID);
+      //let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
+      addFeatureInfoToMap(AppMap.convertGeoJsonFeatureToOl(feature), 3857);
     });
   };
 
@@ -301,7 +303,7 @@ let AppMapInfo = (function() {
    * Show the click info results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
-  let showRequestInfoFeatures = function(featureInfoCollection) {
+  let showRequestInfoFeatures = function(featureInfoCollection, htmlElement) {
     var title = "Risultati";
     var body = "";
     if (!featureInfoCollection) {
@@ -321,11 +323,7 @@ let AppMapInfo = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       var props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(
-        feature.layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
+      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);
@@ -342,14 +340,35 @@ let AppMapInfo = (function() {
       index++;
     });
 
-    AppMapInfo.showInfoWindow(title, body);
+    AppMapInfo.showInfoWindow(title, body, htmlElement !== null ? htmlElement : "info-results");
   };
 
-  let showInfoWindow = function(title, body) {
-    AppToolbar.toggleToolbarItem("info-results", true);
-    $("#info-results__content").html(body);
-    $("#info-results__title").html(title);
-    $("#info-results").show();
+  let showInfoFeatureTooltip = function(feature) {
+    let layer = AppStore.getLayer(feature.layerGid);
+    let tooltip = AppTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.title);
+    dispatch({
+      eventName: "show-map-tooltip",
+      geometry: feature.getGeometry().flatCoordinates,
+      tooltip: tooltip
+    });
+  };
+
+  let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
+    let coordinate = AppMap.getCoordinateFromPixel(pixel[0], pixel[1]);
+    let layer = AppStore.getLayer(feature.layerGid);
+    let tooltip = AppTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.title);
+    dispatch({
+      eventName: "show-map-tooltip",
+      geometry: coordinate,
+      tooltip: tooltip
+    });
+  };
+
+  let showInfoWindow = function(title, body, htmlElement) {
+    AppToolbar.toggleToolbarItem(htmlElement, true);
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
     // $("#info-window__title").html(title);
     // $("#info-window__body").html(body);
     // $("#info-window").show();
@@ -384,8 +403,17 @@ let AppMapInfo = (function() {
    * @param {Ol/Geometry} geometry
    * @param {int} srid
    */
-  let addGeometryInfoToMap = function addGeometryInfoToMap(geometry, srid) {
+  let addGeometryInfoToMap = function(geometry, srid) {
     return AppMap.addGeometryToMap(geometry, srid, vectorInfo);
+  };
+
+  /**
+   * Add a feature to the map
+   * @param {Ol/feature} feature
+   * @param {int} srid
+   */
+  let addFeatureInfoToMap = function(feature, srid) {
+    return AppMap.addFeatureToMap(feature, srid, vectorInfo);
   };
 
   /**
@@ -440,6 +468,7 @@ let AppMapInfo = (function() {
 
   return {
     addGeometryInfoToMap: addGeometryInfoToMap,
+    addFeatureInfoToMap: addFeatureInfoToMap,
     addWktInfoToMap: addWktInfoToMap,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,

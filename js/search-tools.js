@@ -56,15 +56,7 @@ var SearchTools = (function() {
     }
   };
 
-  var render = function(
-    div,
-    provider,
-    providerAddressUrl,
-    providerAddressField,
-    providerHouseNumberUrl,
-    providerHouseNumberField,
-    layers
-  ) {
+  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -137,8 +129,7 @@ var SearchTools = (function() {
    */
   var templateTopTools = function() {
     let template = '<div class="lk-bar lk-background">';
-    template +=
-      '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
+    template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
     template += '<i class="material-icons">more_vert</i>';
     template += '</button> <span id="search-tools__label">Indirizzo</span>';
     template += "</div>";
@@ -163,8 +154,7 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-layers-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.searchLayers(event)">';
+    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.doSearchLayers(event)">';
     template += '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
@@ -192,10 +182,8 @@ var SearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -217,10 +205,8 @@ var SearchTools = (function() {
     template += templateTopTools();
     template += '<div id="search-tools__address" class="lk-card z-depth-2">';
     template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template +=
-      '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
-    template +=
-      '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
+    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -238,8 +224,7 @@ var SearchTools = (function() {
     template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
     template += "{{#each this}}";
     template += '<li class="mdl-list__item">';
-    template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
+    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
     template += "</li>";
@@ -355,6 +340,7 @@ var SearchTools = (function() {
    * @param {boolean} showInfo
    */
   var zoomToItemLayer = function(lon, lat, index, showInfo) {
+    debugger;
     dispatch("remove-info");
     if (searchResults[index]) {
       dispatch({
@@ -364,7 +350,7 @@ var SearchTools = (function() {
       if (showInfo) {
         dispatch({
           eventName: "show-info-items",
-          data: searchResults[index].item
+          features: searchResults[index].item
         });
       }
       let payload = {
@@ -410,15 +396,7 @@ var SearchTools = (function() {
 
     if (via.length > 3 && comune) {
       via = via.replace("'", " ");
-      var url =
-        "http://nominatim.openstreetmap.org/search/IT/" +
-        regione +
-        "/" +
-        comune +
-        "/" +
-        via +
-        "?format=jsonv2&addressdetails=1" +
-        "&";
+      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
       console.log(url);
       currentSearchDate = new Date().getTime();
       var searchDate = new Date().getTime();
@@ -531,6 +509,7 @@ var SearchTools = (function() {
           if (currentSearchDate > searchDate) {
             return;
           }
+          debugger;
           var results = [];
           if (data.features.length > 0) {
             var toponimi = [];
@@ -547,7 +526,6 @@ var SearchTools = (function() {
                 } else {
                   cent = data.features[i].geometry.coordinates;
                 }
-
                 var tempItem = {
                   display_name: data.features[i].properties[searchAddressProviderField],
                   lon: cent[0],
@@ -601,6 +579,7 @@ var SearchTools = (function() {
       jQuery("#search-tools__search-results").html("");
       for (li = 0; li < searchLayers.length; li++) {
         if (searchLayers[li].layer == currentLayer) {
+          debugger;
           var layer = searchLayers[li];
           var url = layer.mapUri;
           url =
@@ -624,41 +603,26 @@ var SearchTools = (function() {
               if (currentSearchDate > searchDate) {
                 return;
               }
-              var results = [];
+              debugger;
+              data.features.forEach(feature => {
+                feature.layerGid = layer.gid;
+                feature.SRID = dara.srs;
+              });
               if (data.features.length > 0) {
-                var resultsIndex = [];
-                var results = [];
-                for (var i = 0; i < data.features.length; i++) {
-                  if ($.inArray(data.features[i].properties[layer.searchField], resultsIndex) === -1) {
-                    var cent = null;
-                    if (data.features[i].geometry.coordinates[0][0]) {
-                      cent = AppMap.getCentroid(data.features[i].geometry.coordinates[0]);
-                    } else {
-                      cent = data.features[i].geometry.coordinates;
-                    }
-                    var item = data.features[i];
-                    //salvo il crs della feature
-                    item.crs = data.crs;
-                    //item.id = currentLayer;
-                    results.push({
-                      display_name: data.features[i].properties[layer.searchField],
-                      lon: cent[0],
-                      lat: cent[1],
-                      item: item
-                    });
-                    resultsIndex.push(data.features[i].properties[layer.searchField]);
-                  }
-                }
-                searchResults = results.sort(SortByDisplayName);
-                //renderizzo i risultati
-                var templateTemp = templateSearchResultsLayers();
-                var output = templateTemp(results);
-                jQuery("#search-tools__search-results").append(output);
+                dispatch({
+                  eventName: "show-info-items",
+                  features: data.features
+                });
+                dispatch({
+                  eventName: "show-info-geometries",
+                  features: data.features
+                });
               } else {
                 var templateTemp = templateResultEmpty();
                 var output = templateTemp();
                 jQuery("#search-tools__search-results").html(output);
               }
+              return;
             },
             error: function(jqXHR, textStatus, errorThrown) {
               dispatch({
@@ -736,7 +700,7 @@ var SearchTools = (function() {
     updateComuniNominatim: updateComuniNominatim,
     zoomToItemNominatim: zoomToItemNominatim,
     doSearchAddressWMSG: doSearchAddressWMSG,
-    dosearchLayers: doSearchLayers,
+    doSearchLayers: doSearchLayers,
     selectLayer: selectLayer,
     showSearchAddress: showSearchAddress,
     showSearchLayers: showSearchLayers,
