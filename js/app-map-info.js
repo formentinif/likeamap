@@ -159,13 +159,13 @@ let AppMapInfo = (function() {
       if (requestQueueData.length > 0) {
         dispatch({
           eventName: "show-info-items",
-          data: {
+          features: {
             features: requestQueueData
           }
         });
         dispatch({
           eventName: "show-info-geometries",
-          data: {
+          features: {
             features: requestQueueData
           }
         });
@@ -197,7 +197,7 @@ let AppMapInfo = (function() {
   };
 
   // /**
-  //  * Precess the results after an info click on the map
+  //  * Process the results after an info click on the map
   //  * @param {object} featureCollection Object with the results. It must have a features property with the array of features
   //  */
   // let processRequestInfo = function processRequestInfo(featureCollection) {
@@ -304,6 +304,7 @@ let AppMapInfo = (function() {
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
   let showRequestInfoFeatures = function(featureInfoCollection, htmlElement) {
+    debugger;
     var title = "Risultati";
     var body = "";
     if (!featureInfoCollection) {
@@ -312,7 +313,7 @@ let AppMapInfo = (function() {
     //single feature sent
     if (!featureInfoCollection.features) {
       featureInfoCollection = {
-        features: [featureInfoCollection]
+        features: featureInfoCollection
       };
     }
     AppStore.getAppState().currentInfoItems = featureInfoCollection;
@@ -323,7 +324,11 @@ let AppMapInfo = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       var props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      var template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+      var template = AppTemplates.getTemplate(
+        feature.layerGid,
+        layer.templateUrl,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
       var tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);
@@ -333,14 +338,13 @@ let AppMapInfo = (function() {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
       tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
-
       tempBody += AppTemplates.featureIconsTemplate(index);
 
       body += "<div class='lk-feature z-depth-1 lk-mb-3'>" + tempBody + "</div>";
       index++;
     });
-
-    AppMapInfo.showInfoWindow(title, body, htmlElement !== null ? htmlElement : "info-results");
+    debugger;
+    AppMapInfo.showInfoWindow(title, body, htmlElement == null ? "info-results" : htmlElement);
   };
 
   let showInfoFeatureTooltip = function(feature) {
@@ -365,6 +369,7 @@ let AppMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, htmlElement) {
+    debugger;
     AppToolbar.toggleToolbarItem(htmlElement, true);
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
