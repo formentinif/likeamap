@@ -244,19 +244,33 @@ var Dispatcher = (function() {
     });
 
     this.bind("show-message", function(payload) {
-      let message = { title: payload.title, message: payload.message };
+      let msg = {
+        html: "",
+        classes: ""
+      };
+      if (payload.message) {
+        msg.html += "<div>" + payload.message + "<div>";
+      }
       switch (payload.type) {
         case "error":
-          $.growl.error(message);
+          msg.classes = "lk-error";
+          M.toast(msg);
           break;
-        case "notice":
-          $.growl.notice(message);
+        case "info":
+          msg.classes = "lk-info";
+          M.toast(msg);
           break;
         case "warning":
-          $.growl.warning(message);
+          msg.classes = "lk-warning";
+          M.toast(msg);
           break;
+        case "notice":
+          msg.classes = "lk-secondary";
+          M.toast(msg);
+          break;
+
         default:
-          $.growl(message);
+          M.toast(msg);
           break;
       }
     });

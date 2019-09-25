@@ -112,10 +112,26 @@ body {
   float: right;
 }
 
+.lk-secondary {
+  color: #383d41;
+  background-color: #e2e3e5;
+  border-color: #d6d8db;
+}
+.lk-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
 .lk-warning {
   color: #856404;
   background-color: #fff3cd;
   border-color: #ffeeba;
+}
+.lk-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 
 .lk-table {
@@ -155,6 +171,7 @@ body {
 }
 
 .lk-menu-toolbar-bottom {
+  box-sizing: border-box;
   position: absolute;
   z-index: 11;
   left: 0px;
@@ -172,17 +189,19 @@ body {
 }
 
 .lk-menu-panel-bottom {
+  box-sizing: border-box;
   position: absolute;
   z-index: 9;
   left: 0px;
   top: 0px;
   width: 330px;
-  height: 100%;
+  height: calc(100% - 70px);
   z-index: 10;
   display: none;
   margin: 0px 0px 0px 0px;
-  padding: 20px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   box-sizing: border-box;
+  resize: both;
 }
 
 .lk-menu-panel-bottom .lk-menu-panel-content {
@@ -734,7 +753,7 @@ body {
   cursor: pointer;
 }
 
-.lk-error {
+.lk-error-login {
   width: 100%;
   color: #a94442;
   background-color: #f2dede;

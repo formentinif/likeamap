@@ -237,7 +237,6 @@ var ShareTools = (function() {
     }
     var url = window.location.href;
     var arrUrl = url.split("?");
-    debugger;
     return arrUrl[0] + "?" + qPos + "&layers=" + qLayers;
   };
 

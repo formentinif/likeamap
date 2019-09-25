@@ -51,22 +51,16 @@ var AuthTools = (function() {
     template += '    <form action="#">';
     template += "        <h2>Accedi</h2>";
     template += '      <div class="input-field">';
-    template +=
-      '        <input class="" type="text" id="login-container__username">';
-    template +=
-      '        <label class="" for="login-container__username">username</label>';
+    template += '        <input class="" type="text" id="login-container__username">';
+    template += '        <label class="" for="login-container__username">username</label>';
     template += "    </div>";
     template += '    <div class="input-field">';
-    template +=
-      '        <input class="" type="password" id="login-container__password">';
-    template +=
-      '        <label class="" for="login-container__password">password</label>';
+    template += '        <input class="" type="password" id="login-container__password">';
+    template += '        <label class="" for="login-container__password">password</label>';
     template += "    </div>";
-    template +=
-      '    <div id="lk-error-message" class="lk-hidden lk-error">Autenticazione non riuscita</div>';
+    template += '    <div id="lk-error-message" class="lk-hidden lk-error-login">Autenticazione non riuscita</div>';
 
-    template +=
-      '  <button onclick="AuthTools.login();return false" class="waves-effect waves-light btn">Accedi</button>';
+    template += '  <button onclick="AuthTools.login();return false" class="waves-effect waves-light btn">Accedi</button>';
     template += "  </form>";
     template += "</div>";
 
