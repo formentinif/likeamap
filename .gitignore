@@ -1,3 +1,7 @@
+dist/states
+source/states
+source/templates
+source/templates
 node_modules
 samples
 .vs

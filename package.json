@@ -1,14 +1,19 @@
 {
-  "name": "Demo",
+  "name": "likeamap",
   "version": "1.0.0",
-  "description": "demo project.",
+  "description": "LikeAMap project.",
   "scripts": {
-    "lite": "lite-server --port 10002",
-    "start": "npm run lite"
+    "lite": "lite-server -c lite-server.json",
+    "start": "npm run lite",
+    "dist": "gulp clean copy scripts"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Filippo Formentini",
+  "license": "MIT",
   "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-strip-comments": "^2.5.2",
     "lite-server": "^2.5.3"
   },
   "dependencies": {

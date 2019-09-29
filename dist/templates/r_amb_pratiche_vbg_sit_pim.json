@@ -1,0 +1,98 @@
+{
+  "title": "Pratiche Edilizie",
+  "layer": "V_AMB_PRATICHE_VBG_SIT_PIM",
+  "layerGid": "r_v_amb_pratiche_vbg_sit_pim",
+  "templateType": "string",
+  "templateString": "<table class='lam-table'><tr><th>ID Edificio</th><th>Numero Istanza</th><th>Codice Pratica</th><th>SC Codice</th><th>Fattore Ambientale</th><th>Ramo</th><th>Data presentazione</th><th>Responsabile</th><th>Toponimo</th><th>Civico</th><th>Link Pratica</th></tr>{{#each this}}<tr><td>{{ID_EDIF}}</td><td>{{NUMERO_ISTANZA}}</td><td>{{CODICE_PRATICA}}</td><td>{{SC_CODICE}}</td><td>{{FATTORE_AMBIENTALE}}</td><td>{{RAMO}}</td><td>{{DATA_PRESENTAZIONE}}</td><td>{{RESPONSABILE}}</td><td>{{TOPONIMO}}</td><td>{{CIVICO}}</td><td><a href='{{LINK_PRATICA}}' target='_blank'>Apri</a></td></tr>{{/each}}</table>",
+  "multipleItems": true,
+  "fields": [
+    {
+      "field": "ID_EDIF",
+      "label": "Codice edificio",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "NUMERO_ISTANZA",
+      "label": "Numero Istanza",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CODICE_PRATICA",
+      "label": "Codice Pratica",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "SC_CODICE",
+      "label": "SC Codice",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "FATTORE_AMBIENTALE",
+      "label": "Fattore Ambientale",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "RAMO",
+      "label": "Ramo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "DATA_PRESENTAZIONE",
+      "label": "Data presentazione",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "RESPONSABILE",
+      "label": "Responsabile",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TOPONIMO",
+      "label": "Toponimo",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "CIVICO",
+      "label": "Civico",
+      "type": "string",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "LINK_PRATICA",
+      "label": "Link pratica",
+      "type": "link",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    }
+  ]
+}

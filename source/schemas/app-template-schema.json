@@ -1,0 +1,91 @@
+{
+  "$schema": "http://www.perspectiva.it/schemas/likeamap1",
+  "type": "object",
+  "title": "Configurazione Template LikeAMap",
+  "properties": {
+    "gid": {
+      "title": "Codice del template",
+      "description": "Codice del template",
+      "type": "string"
+    },
+    "title": {
+      "title": "Titolo",
+      "description": "Nome del template",
+      "type": "string"
+    },
+    "layer": {
+      "title": "Layer",
+      "description": "Identificativo del layer WMS, senza workspace",
+      "type": "string"
+    },
+    "layerGid": {
+      "title": "GID",
+      "description": "Identificativo del layer definito nel file di configurazione dell'applicatione. DEPRECATED",
+      "type": "string"
+    },
+    "multipleItems": {
+      "title": "Template per array di oggetti",
+      "description": "Elabora gli oggetti con un singolo template. Valido solo per gli templateType=string",
+      "enum": ["simple", "string"],
+      "type": "string"
+    },
+    "templateType": {
+      "title": "Tipologia",
+      "description": "Tipologia del template",
+      "enum": ["simple", "string"],
+      "type": "string"
+    },
+    "templateString": {
+      "title": "Stringa del template",
+      "description": "Stringa del template in formato handlebars",
+      "type": "string"
+    },
+    "fields": {
+      "propertyOrder": 11,
+      "description": "Campi da visualizzare",
+      "type": "array",
+      "title": "Campi",
+      "items": {
+        "type": "object",
+        "title": "Campo",
+        "headerTemplate": "{{ self.field }}",
+        "format": "grid",
+        "properties": {
+          "field": {
+            "title": "Nome Campo",
+            "description": "Nome del campo della tabella ",
+            "type": "string"
+          },
+          "label": {
+            "title": "Alias",
+            "description": "Etichetta del campo da visualizzare",
+            "type": "string"
+          },
+          "type": {
+            "title": "Tipologia",
+            "description": "Tipo di campo",
+            "type": "string",
+            "enum": ["string", "int", "yesno", "moreinfo", "array", "link"]
+          },
+          "header": {
+            "title": "Intestazione",
+            "description": "Intestazione del campo",
+            "type": "string"
+          },
+          "footer": {
+            "title": "Piè pagina",
+            "description": "Fine del campo",
+            "type": "string"
+          },
+          "itemTemplate": {
+            "title": "Oggetto",
+            "description": "Template handlebars del singolo oggetto. (Solo per tipologia 'array')",
+            "type": "string"
+          }
+        },
+        "required": ["field", "label", "type"]
+      }
+    }
+  },
+  "required": ["title", "layer", "layerGid", "templateType", "fields"]
+}
