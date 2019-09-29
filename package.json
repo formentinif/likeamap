@@ -4,8 +4,10 @@
   "description": "LikeAMap project.",
   "scripts": {
     "lite": "lite-server -c lite-server.json",
+    "lite-tests": "lite-server -c lite-server-tests.json",
     "start": "npm run lite",
     "dist": "gulp clean copy scripts"
+    "tests": "gulp copy_test"
   },
   "author": "Filippo Formentini",
   "license": "MIT",

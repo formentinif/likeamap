@@ -109,10 +109,10 @@ let AppMapStyles = (function() {
       }),
       stroke: new ol.style.Stroke({
         color: [255, 255, 255, 0.1],
-        width: 2
+        width: 4
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: 10,
         fill: new ol.style.Fill({
           color: [255, 255, 255, 0.1]
         })
@@ -561,6 +561,10 @@ let AppMapInfo = (function() {
       return;
     }
 
+    //disabilita le richieste globali
+    if (AppStore.getAppState().disableAjaxRequestInfo) return;
+
+    //Ajax requests
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
     let viewResolution = AppMap.getMap()
@@ -591,7 +595,7 @@ let AppMapInfo = (function() {
   /**
    * Executes the request on the first layer not sent in the RequestQueue
    */
-  let getFeatureInfoRequest = function getFeatureInfoRequest() {
+  let getFeatureInfoRequest = function() {
     let url = "";
     //ricavo l'url corrente dalla coda globale e setto il layer come completato
     //TODO refactor whe IE support will drop
@@ -607,6 +611,7 @@ let AppMapInfo = (function() {
       //the loop has ended
       requestQueue.ajaxPending = false;
       AppMapInfo.clearLayerInfo();
+      dispatch("hide-loader");
       if (requestQueueData.length > 0) {
         dispatch({
           eventName: "show-info-items",
@@ -642,7 +647,10 @@ let AppMapInfo = (function() {
       contentType: "application/json",
       success: function(response) {},
       error: function(jqXHR, textStatus, errorThrown) {
-        requestQueue.ajaxPending = false;
+        //requestQueue.ajaxPending = false;
+        //procede to next step
+        dispatch({ eventName: "log", message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid });
+        getFeatureInfoRequest();
       }
     });
   };
@@ -767,7 +775,6 @@ let AppMapInfo = (function() {
   };
 
   let showInfoFeatureTooltip = function(feature) {
-    debugger;
     let layer = AppStore.getLayer(feature.layerGid);
     let tooltip = AppTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
     dispatch({
@@ -2489,6 +2496,7 @@ let AppMap = (function() {
       }
     }
     //multis
+    debugger;
     switch (getGeometryType(firstElement)) {
       case AppMapEnums.geometryTypes().Polygon:
         return AppMapEnums.geometryTypes().MultiPolygon;
@@ -2499,7 +2507,6 @@ let AppMap = (function() {
   };
 
   let getLabelPoint = function(coordinates) {
-    debugger;
     switch (getGeometryType(coordinates)) {
       case AppMapEnums.geometryTypes().Point:
         return coordinates;

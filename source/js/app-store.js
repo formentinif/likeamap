@@ -33,9 +33,7 @@ var AppStore = (function() {
 
   var init = function() {
     //normalizing appstate
-    if (!appState.currentInfoItems) appState.currentInfoItems = [];
-    if (!appState.infoSelectBehaviour) appState.infoSelectBehaviour = 2;
-
+    appState = normalizeAppState(appState);
     //Comuni array load
     if (appState.searchProvider == "nominatim") {
       var url = appState.restAPIUrl + "/api/comuni";
@@ -83,6 +81,17 @@ var AppStore = (function() {
    */
   var setInitialAppState = function(appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
+  };
+
+  /**
+   *
+   * @param {Object} normalize the given appstate
+   */
+  let normalizeAppState = function(appstate) {
+    if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
+    if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
+    if (!appstate.relations) appstate.relations = [];
+    return appstate;
   };
 
   var showAppTools = function() {

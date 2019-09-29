@@ -38,10 +38,10 @@ let AppMapStyles = (function() {
       }),
       stroke: new ol.style.Stroke({
         color: [255, 255, 255, 0.1],
-        width: 2
+        width: 4
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: 10,
         fill: new ol.style.Fill({
           color: [255, 255, 255, 0.1]
         })

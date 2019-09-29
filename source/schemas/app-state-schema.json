@@ -78,6 +78,12 @@
       "default": 2,
       "type": "integer"
     },
+    "disableAjaxRequestInfo": {
+      "title": "Disabilita le richieste ajax al click del mouse",
+      "description": "Disabilita le richieste ajax al click del mouse",
+      "default": false,
+      "type": "boolean"
+    },
     "searchProvider": {
       "title": "Provider di ricerca",
       "description": "Valore di sistema, lasciare a 0",

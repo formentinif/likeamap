@@ -10,7 +10,7 @@ function cleanDist() {
   return gulp.src("./dist/*", { read: false }).pipe(clean());
 }
 
-function copyDist() {
+function copyTest() {
   gulp.src("./source/index.html").pipe(gulp.dest("./dist/"));
   gulp.src("./source/vendor/lib/*").pipe(gulp.dest("./dist/js"));
   gulp.src("./source/vendor/css/*").pipe(gulp.dest("./dist/css"));
@@ -20,8 +20,16 @@ function copyDist() {
   gulp.src("./source/schemas/*").pipe(gulp.dest("./dist/schemas"));
   gulp.src("./source/templates/*").pipe(gulp.dest("./dist/templates"));
   gulp.src("./source/fonts/*").pipe(gulp.dest("./dist/fonts"));
-  gulp.src("./source/states").pipe(gulp.dest("./dist/"));
-  return gulp.src("./source/templates").pipe(gulp.dest("./templates/"));
+  gulp.src("./source/states").pipe(gulp.dest("./dist/states"));
+  return gulp.src("./source/templates").pipe(gulp.dest("./dist/templates/"));
+}
+
+
+function copyTests() {
+  gulp.src("./source/vendor/lib/*").pipe(gulp.dest("./tests/js"));
+  gulp.src("./source/js/*").pipe(gulp.dest("./tests/js"));
+  gulp.src("./source/states/*").pipe(gulp.dest("./tests/states"));
+  return gulp.src("./source/templates").pipe(gulp.dest("./test/templates/"));
 }
 
 function combineScripts() {
@@ -83,5 +91,6 @@ function watchScripts() {
 exports.default = dist;
 exports.clean = cleanDist;
 exports.copy = copyDist;
+exports.copy_test = copyTest;
 exports.scripts = combineScripts;
 exports.watch = watchScripts;

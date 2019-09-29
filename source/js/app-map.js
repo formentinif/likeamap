@@ -1580,6 +1580,7 @@ let AppMap = (function() {
       }
     }
     //multis
+    debugger;
     switch (getGeometryType(firstElement)) {
       case AppMapEnums.geometryTypes().Polygon:
         return AppMapEnums.geometryTypes().MultiPolygon;
@@ -1590,7 +1591,6 @@ let AppMap = (function() {
   };
 
   let getLabelPoint = function(coordinates) {
-    debugger;
     switch (getGeometryType(coordinates)) {
       case AppMapEnums.geometryTypes().Point:
         return coordinates;
