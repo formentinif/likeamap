@@ -144,6 +144,10 @@ var Dispatcher = (function() {
           gid: feature.layerGid,
           visibility: 1
         });
+        dispatch({
+          eventName: "flash-feature",
+          feature: feature
+        });
       } catch (error) {
         dispatch({ eventName: "log", message: error });
       }

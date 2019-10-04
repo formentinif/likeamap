@@ -249,6 +249,25 @@ let AppMapStyles = (function() {
     return style;
   };
 
+  let getFlashStyle = function() {
+    let style = new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: [255, 125, 0, 1]
+      }),
+      stroke: new ol.style.Stroke({
+        color: [255, 125, 0, 1],
+        width: 3
+      }),
+      image: new ol.style.Circle({
+        radius: 7,
+        fill: new ol.style.Fill({
+          color: [255, 125, 0, 1]
+        })
+      })
+    });
+    return style;
+  };
+
   // (function() {
   //   let style = new ol.style.Style({
   //     fill: new ol.style.Fill({
@@ -285,6 +304,7 @@ let AppMapStyles = (function() {
   //   };
 
   return {
+    getFlashStyle: getFlashStyle,
     getInfoStyle: getInfoStyle,
     getModifyStyle: getModifyStyle,
     getPreloadStyle: getPreloadStyle,
@@ -487,16 +507,34 @@ let AppMapInfo = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: AppMapStyles.getInfoStyle()
+    style: AppMapStyles.getInfoStyle(),
+    zIndex: 100
+  });
+
+  let vectorFlash = new ol.layer.Vector({
+    source: new ol.source.Vector({
+      features: []
+    }),
+    style: AppMapStyles.getFlashStyle(),
+    zIndex: 101
   });
 
   let init = function() {
     vectorInfo.setMap(AppMap.getMap());
+    vectorFlash.setMap(AppMap.getMap());
     Dispatcher.bind("show-info-items", function(payload) {
       AppMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
     Dispatcher.bind("show-info-geometries", function(payload) {
       AppMapInfo.showRequestInfoFeaturesGeometries(payload.features);
+    });
+    Dispatcher.bind("flash-feature", function(payload) {
+      let featureOl = AppMap.convertGeoJsonFeatureToOl(payload.feature);
+      featureOl = AppMap.transform3857(featureOl, featureOl.srid);
+      AppMapInfo.addFeatureFlashToMap(featureOl);
+      setTimeout(function() {
+        AppMapInfo.clearLayerFlash();
+      }, 800);
     });
   };
 
@@ -839,7 +877,7 @@ let AppMapInfo = (function() {
   };
 
   /**
-   * Add a feature to the map
+   * Add a feature info to the map
    * @param {Ol/feature} feature
    * @param {int} srid
    */
@@ -848,11 +886,28 @@ let AppMapInfo = (function() {
   };
 
   /**
+   * Add a feature flash to the map
+   * @param {Ol/feature} feature
+   * @param {int} srid
+   */
+  let addFeatureFlashToMap = function(feature) {
+    return AppMap.addFeatureToMap(feature, feature.srid, vectorFlash);
+  };
+
+  /**
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
   let clearLayerInfo = function() {
     vectorInfo.getSource().clear(true);
+  };
+
+  /**
+   * Rimuove tutte le geometrie dal layer flash
+   * @return {null} La funzione non restituisce un valore
+   */
+  let clearLayerFlash = function() {
+    vectorFlash.getSource().clear(true);
   };
 
   //Private Classes
@@ -899,8 +954,10 @@ let AppMapInfo = (function() {
 
   return {
     addGeometryInfoToMap: addGeometryInfoToMap,
+    addFeatureFlashToMap: addFeatureFlashToMap,
     addFeatureInfoToMap: addFeatureInfoToMap,
     addWktInfoToMap: addWktInfoToMap,
+    clearLayerFlash: clearLayerFlash,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
     init: init,
@@ -2496,17 +2553,19 @@ let AppMap = (function() {
       }
     }
     //multis
-    debugger;
     switch (getGeometryType(firstElement)) {
       case AppMapEnums.geometryTypes().Polygon:
+      case AppMapEnums.geometryTypes().MultiPolygon:
         return AppMapEnums.geometryTypes().MultiPolygon;
       case AppMapEnums.geometryTypes().Polyline:
+      case AppMapEnums.geometryTypes().MultiPolyline:
         return AppMapEnums.geometryTypes().MultiPolyline;
     }
     return AppMapEnums.geometryTypes().GeometryNull;
   };
 
   let getLabelPoint = function(coordinates) {
+    if (coordinates.length === 1) coordinates = coordinates[0];
     switch (getGeometryType(coordinates)) {
       case AppMapEnums.geometryTypes().Point:
         return coordinates;

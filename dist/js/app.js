@@ -144,6 +144,10 @@ var Dispatcher = (function() {
           gid: feature.layerGid,
           visibility: 1
         });
+        dispatch({
+          eventName: "flash-feature",
+          feature: feature
+        });
       } catch (error) {
         dispatch({ eventName: "log", message: error });
       }
@@ -1762,10 +1766,10 @@ function appInit() {
     //call with ajax
     $.ajax({
       dataType: "json",
-      url: globalShareUrl + appStateId
+      url: "states/" + appStateId
     })
       .done(function(appState) {
-        loadState(appstate);
+        loadState(appState);
       })
       .fail(function() {
         //AppStore.mapInit();

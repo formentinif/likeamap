@@ -1580,17 +1580,19 @@ let AppMap = (function() {
       }
     }
     //multis
-    debugger;
     switch (getGeometryType(firstElement)) {
       case AppMapEnums.geometryTypes().Polygon:
+      case AppMapEnums.geometryTypes().MultiPolygon:
         return AppMapEnums.geometryTypes().MultiPolygon;
       case AppMapEnums.geometryTypes().Polyline:
+      case AppMapEnums.geometryTypes().MultiPolyline:
         return AppMapEnums.geometryTypes().MultiPolyline;
     }
     return AppMapEnums.geometryTypes().GeometryNull;
   };
 
   let getLabelPoint = function(coordinates) {
+    if (coordinates.length === 1) coordinates = coordinates[0];
     switch (getGeometryType(coordinates)) {
       case AppMapEnums.geometryTypes().Point:
         return coordinates;

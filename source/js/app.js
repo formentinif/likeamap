@@ -50,10 +50,10 @@ function appInit() {
     //call with ajax
     $.ajax({
       dataType: "json",
-      url: globalShareUrl + appStateId
+      url: "states/" + appStateId
     })
       .done(function(appState) {
-        loadState(appstate);
+        loadState(appState);
       })
       .fail(function() {
         //AppStore.mapInit();

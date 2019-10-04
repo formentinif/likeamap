@@ -1,6 +1,6 @@
 dist/states
+dist/templates
 source/states
-source/templates
 source/templates
 node_modules
 samples
