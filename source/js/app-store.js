@@ -112,7 +112,11 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",

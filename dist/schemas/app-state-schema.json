@@ -416,6 +416,16 @@
                   "description": "Abilita il caricamento in preload del layer",
                   "type": "boolean"
                 },
+                "vectorRadius": {
+                  "title": "Dimensione del punto precaricato",
+                  "description": "Dimensione del punto precaricato",
+                  "type": "integer"
+                },
+                "vectorWidth": {
+                  "title": "Dimensione della linea precaricata",
+                  "description": "Dimensione della linea precaricata",
+                  "type": "integer"
+                },
                 "hoverTooltip": {
                   "title": "Tooltip on hover",
                   "description": "Abilita il tooltip se il mouse attraversa la feature ",

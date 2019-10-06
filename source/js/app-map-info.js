@@ -69,6 +69,10 @@ let AppMapInfo = (function() {
         AppMapInfo.clearLayerFlash();
       }, 800);
     });
+    Dispatcher.bind("show-mobile-info-results", function(payload) {
+      AppToolbar.toggleToolbarItem("info-results", true);
+      $("#info-tooltip").hide();
+    });
   };
 
   /**
@@ -128,7 +132,7 @@ let AppMapInfo = (function() {
       if (AppStore.getAppState().infoSelectBehaviour == AppMapEnums.infoSelectBehaviours().SingleFeature) {
         featuresClicked = featuresClicked.slice(0, 1);
       }
-      showVectorInfoFeatures(featuresClicked);
+      showVectorInfoFeatures(featuresClicked, pixel);
       return;
     }
 
@@ -196,8 +200,13 @@ let AppMapInfo = (function() {
             features: requestQueueData
           }
         });
+        // dispatch({
+        //   eventName: "show-map-tooltip",
+        //   features: {
+        //     features: requestQueueData[0]
+        //   }
+        // });
       }
-
       return;
     }
     //adding the right callback on request
@@ -220,7 +229,10 @@ let AppMapInfo = (function() {
       error: function(jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
-        dispatch({ eventName: "log", message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid });
+        dispatch({
+          eventName: "log",
+          message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid
+        });
         getFeatureInfoRequest();
       }
     });
@@ -278,14 +290,14 @@ let AppMapInfo = (function() {
       requestQueue.mustRestart = false;
       getFeatureInfoRequest();
     }
-    getFeatureInfoRequest(false);
+    //getFeatureInfoRequest(false);
   };
 
   /**
    * Process the results after the click on a vector feature on the map
    * @param {Array} featureCollection Array of OL featurs with the results. It must have a features property with the array of features
    */
-  let showVectorInfoFeatures = function showVectorInfoFeatures(features) {
+  let showVectorInfoFeatures = function showVectorInfoFeatures(features, pixel) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
@@ -304,7 +316,11 @@ let AppMapInfo = (function() {
       });
       //tooltip
       if (features.length > 0) {
-        showInfoFeatureTooltip(features[0]);
+        if (pixel) {
+          showInfoFeatureTooltipAtPixel(features[0], pixel);
+        } else {
+          showInfoFeatureTooltip(features[0]);
+        }
       }
       let featuresCollection = {
         features: featureArray
@@ -342,7 +358,8 @@ let AppMapInfo = (function() {
       title += " (" + featureInfoCollection.features.length + ")";
     }
     var body = AppTemplates.renderInfoFeatures(featureInfoCollection);
-    AppMapInfo.showInfoWindow(title, body, "info-results");
+    var bodyMobile = AppTemplates.renderInfoFeaturesMobile(featureInfoCollection);
+    AppMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
   let showInfoFeatureTooltip = function(feature) {
@@ -366,11 +383,17 @@ let AppMapInfo = (function() {
     });
   };
 
-  let showInfoWindow = function(title, body, htmlElement) {
-    AppToolbar.toggleToolbarItem(htmlElement, true);
+  let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
     $("#" + htmlElement + "").show();
+    if (!AppStore.isMobile()) {
+      AppToolbar.toggleToolbarItem(htmlElement, true);
+    } else {
+      $("#info-tooltip").show();
+      $("#info-tooltip").html(bodyMobile);
+    }
+
     // $("#info-window__title").html(title);
     // $("#info-window__body").html(body);
     // $("#info-window").show();

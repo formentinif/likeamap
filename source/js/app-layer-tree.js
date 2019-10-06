@@ -29,8 +29,8 @@ var AppLayerTree = (function() {
   let treeDiv = "layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
-  let layerGroupItemPrefix = "lti";
-  let layerGroupItemIconPrefix = "ltic";
+  //let layerGroupItemPrefix = "lti";
+  //let layerGroupItemIconPrefix = "ltic";
   let layerUriCount = 0;
   let countRequest = 0;
 
@@ -144,7 +144,11 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
+    output += formatString(
+      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
+      groupId,
+      groupLayer.visible ? "visible" : "hidden"
+    );
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {

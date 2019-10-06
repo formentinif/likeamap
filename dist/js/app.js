@@ -484,7 +484,11 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",
@@ -1042,8 +1046,8 @@ var AppLayerTree = (function() {
   let treeDiv = "layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
-  let layerGroupItemPrefix = "lti";
-  let layerGroupItemIconPrefix = "ltic";
+  //let layerGroupItemPrefix = "lti";
+  //let layerGroupItemIconPrefix = "ltic";
   let layerUriCount = 0;
   let countRequest = 0;
 
@@ -1157,7 +1161,11 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
+    output += formatString(
+      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
+      groupId,
+      groupLayer.visible ? "visible" : "hidden"
+    );
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {
@@ -1283,7 +1291,11 @@ let AppTemplates = (function() {
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
+          let templateUrl = getTemplateUrl(
+            groupLayer.layers[li].gid,
+            groupLayer.layers[li].templateUrl,
+            repoTemplatesUrl
+          );
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -1451,7 +1463,14 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result +=
+          '<a href="#" onclick="AppStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          relation.labelTemplate +
+          "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -1539,7 +1558,11 @@ let AppTemplates = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      let template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+      let template = AppTemplates.getTemplate(
+        feature.layerGid,
+        layer.templateUrl,
+        AppStore.getAppState().templatesRepositoryUrl
+      );
       let tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);
@@ -1557,6 +1580,40 @@ let AppTemplates = (function() {
     return body;
   };
 
+  let renderInfoFeaturesMobile = function(featureInfoCollection) {
+    let body = "";
+    //single feature sent
+    if (!featureInfoCollection.features) {
+      featureInfoCollection = {
+        features: featureInfoCollection
+      };
+    }
+
+    let index = 0;
+    featureInfoCollection.features.forEach(function(feature) {
+      let props = feature.properties ? feature.properties : feature;
+      let layer = AppStore.getLayer(feature.layerGid);
+      let tempBody = "";
+      let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+      tempBody += "<div class='z-depth-2 lam-info-tooltip__content'>";
+      tempBody += "<div class='row'>";
+      tempBody += "<div class='col-12'>";
+      tempBody += tooltip;
+      tempBody += "</div>";
+      tempBody += "<div class='col-12'>";
+      tempBody +=
+        '<button class="btn-floating btn-small waves-effect waves-light lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
+      tempBody += "<i class='fas fa-chevron-up'></i>";
+      tempBody += "</button>";
+      tempBody += "</div>";
+      tempBody += "</div>";
+      tempBody += "</div>";
+      body += tempBody;
+      index++;
+    });
+    return body;
+  };
+
   return {
     init: init,
     generateTemplate: generateTemplate,
@@ -1567,6 +1624,7 @@ let AppTemplates = (function() {
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     renderInfoFeatures: renderInfoFeatures,
+    renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,
     templates: templates
   };
@@ -1613,14 +1671,6 @@ let AppToolbar = (function() {
   let init = function() {
     //eseguo degli aggiustamente in caso di browser mobile
     if (AppStore.isMobile()) {
-      $("#menu-toolbar__layer-tree").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__search-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__print-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__share-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__map-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__draw-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__gps-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar").height("50px");
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-menu-toolbar-bottom button").css("margin-right", "0px");
       easingTime = 0;
@@ -1707,9 +1757,10 @@ let AppToolbar = (function() {
 
   return {
     addResetToolsEvent: addResetToolsEvent,
-    hideMenu: hideMenu,
     getCurrentToolbarItem: getCurrentToolbarItem,
+    hideMenu: hideMenu,
     init: init,
+    showMenu: showMenu,
     toggleToolbarItem: toggleToolbarItem
   };
 })();

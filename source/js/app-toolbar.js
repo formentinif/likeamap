@@ -39,14 +39,6 @@ let AppToolbar = (function() {
   let init = function() {
     //eseguo degli aggiustamente in caso di browser mobile
     if (AppStore.isMobile()) {
-      $("#menu-toolbar__layer-tree").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__search-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__print-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__share-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__map-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__draw-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar__gps-tools").addClass("mdl-button--mini-fab");
-      $("#menu-toolbar").height("50px");
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-menu-toolbar-bottom button").css("margin-right", "0px");
       easingTime = 0;
@@ -133,9 +125,10 @@ let AppToolbar = (function() {
 
   return {
     addResetToolsEvent: addResetToolsEvent,
-    hideMenu: hideMenu,
     getCurrentToolbarItem: getCurrentToolbarItem,
+    hideMenu: hideMenu,
     init: init,
+    showMenu: showMenu,
     toggleToolbarItem: toggleToolbarItem
   };
 })();

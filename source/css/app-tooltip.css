@@ -1,0 +1,70 @@
+.lam-map-tooltip {
+  position: absolute;
+  background-color: white;
+  -webkit-filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 180px;
+  display: none;
+}
+.lam-map-tooltip:after,
+.lam-map-tooltip:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lam-map-tooltip:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -5px;
+}
+.lam-map-tooltip:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -6px;
+}
+.lam-map-tooltip-closer {
+  text-decoration: none;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+}
+.lam-map-tooltip-closer:after {
+  content: "✖";
+}
+
+.lam-info-tooltip {
+  position: absolute;
+
+  left: 0px;
+  bottom: 70px;
+  width: 100%;
+  height: 100px;
+  padding: 0.5rem;
+  margin: 0px;
+  display: none;
+  background-color: transparent;
+}
+
+.lam-info-tooltip__content {
+  padding: 0.5rem;
+  background-color: white;
+  height: 100%;
+  font-size: 1.2rem;
+}
+
+.lam-info-expander {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}

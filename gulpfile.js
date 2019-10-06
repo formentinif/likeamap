@@ -54,6 +54,8 @@ function combineScripts() {
 	gulp
     .src([
       "./source/css/app-layout.css",
+	  "./source/css/app-tooltip.css",
+	  "./source/css/app-buttons.css",
       "./source/css/app.css"
     ])
     .pipe(concat("app.css"))
@@ -72,7 +74,7 @@ function combineScripts() {
     .pipe(gulp.dest("./dist/js"));
 }
 
-function watchScripts() {
+function watchScripts(cb) {
   gulp.watch(["./source/**/*"], function(cb) {
 	copyDist();
     combineScripts();

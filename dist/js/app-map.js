@@ -102,19 +102,26 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 let AppMapStyles = (function() {
   "use strict";
 
-  let getPreloadStyle = function() {
+  /**
+   * Returns the style for the preload features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getPreloadStyle = function(width, radius) {
+    if (!width) width = 4;
+    if (!radius) radius = 10;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 255, 255, 0.1]
+        color: [255, 255, 255, 0.01]
       }),
       stroke: new ol.style.Stroke({
-        color: [255, 255, 255, 0.1],
-        width: 4
+        color: [255, 255, 255, 0.01],
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 10,
+        radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 255, 255, 0.1]
+          color: [255, 255, 255, 0.01]
         })
       }),
       text: new ol.style.Text({
@@ -230,17 +237,24 @@ let AppMapStyles = (function() {
     return style_modify;
   };
 
-  let getInfoStyle = function() {
+  /**
+   * Returns the style for the info features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getInfoStyle = function(width, radius) {
+    if (!width) width = 3;
+    if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
         color: [0, 255, 255, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [0, 255, 255, 1],
-        width: 3
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: radius,
         fill: new ol.style.Fill({
           color: [0, 255, 255, 1]
         })
@@ -249,17 +263,24 @@ let AppMapStyles = (function() {
     return style;
   };
 
-  let getFlashStyle = function() {
+  /**
+   * Returns the style for the flash features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getFlashStyle = function(width, radius) {
+    if (!width) width = 3;
+    if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
         color: [255, 125, 0, 1]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 125, 0, 1],
-        width: 3
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: radius,
         fill: new ol.style.Fill({
           color: [255, 125, 0, 1]
         })
@@ -410,37 +431,44 @@ let AppMapTooltip = (function() {
     });
   };
 
-  /**
-   * Shows the tooltip on the map
-   * @param {Array} coordinates
-   * @param {string} title
-   */
-  let showHtmlTooltip = function(coordinates, title) {
-    if (!title) {
-      hideHtmlTooltip();
-      return;
-    }
-    let labelPoint = AppMap.getLabelPoint(coordinates);
-    let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
-    let tooltip = $("#map-tooltip");
-    let tooltipTitle = $("#map-tooltip__title");
-    tooltipTitle.html(title);
-    tooltip.css({ top: pixel[0], left: pixel[1] });
-    tooltip.show();
-  };
+  // /**
+  //  * Shows an HTML tooltip on the map as an HTML positioned element
+  //  * @param {Array} coordinates
+  //  * @param {string} title
+  //  */
+  // let showMapHtmlTooltip = function(coordinates, title) {
+  //   if (!title) {
+  //     hideHtmlTooltip();
+  //     return;
+  //   }
+  //   let labelPoint = AppMap.getLabelPoint(coordinates);
+  //   let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
+  //   let tooltip = $("#map-tooltip");
+  //   let tooltipTitle = $("#map-tooltip__title");
+  //   tooltipTitle.html(title);
+  //   tooltip.css({ top: pixel[0], left: pixel[1] });
+  //   tooltip.show();
+  // };
 
-  let hideHtmlTooltip = function() {
-    let toolTip = $("#map-tooltip");
-    let toolTipTitle = $("#map-tooltip__title");
-    toolTip.hide();
-    toolTipTitle.html("");
-    toolTip.css({ top: 0, left: 0 });
-    toolTip.hide();
-  };
+  // /**
+  //  * Hides an HTML tooltip on the map as an HTML positioned element
+  //  */
+  // let hideMapHtmlTooltip = function() {
+  //   let toolTip = $("#map-tooltip");
+  //   let toolTipTitle = $("#map-tooltip__title");
+  //   toolTip.hide();
+  //   toolTipTitle.html("");
+  //   toolTip.css({ top: 0, left: 0 });
+  //   toolTip.hide();
+  // };
+
+  let showHtmlTooltip = function(coordinates, title) {};
+
+  let hideHtmlTooltip = function() {};
 
   let showMapTooltip = function(coordinates, title) {
     if (!title) {
-      hideHtmlTooltip();
+      hideMapTooltip();
       return;
     }
     let labelPoint = AppMap.getLabelPoint(coordinates);
@@ -536,6 +564,10 @@ let AppMapInfo = (function() {
         AppMapInfo.clearLayerFlash();
       }, 800);
     });
+    Dispatcher.bind("show-mobile-info-results", function(payload) {
+      AppToolbar.toggleToolbarItem("info-results", true);
+      $("#info-tooltip").hide();
+    });
   };
 
   /**
@@ -595,7 +627,7 @@ let AppMapInfo = (function() {
       if (AppStore.getAppState().infoSelectBehaviour == AppMapEnums.infoSelectBehaviours().SingleFeature) {
         featuresClicked = featuresClicked.slice(0, 1);
       }
-      showVectorInfoFeatures(featuresClicked);
+      showVectorInfoFeatures(featuresClicked, pixel);
       return;
     }
 
@@ -663,8 +695,13 @@ let AppMapInfo = (function() {
             features: requestQueueData
           }
         });
+        // dispatch({
+        //   eventName: "show-map-tooltip",
+        //   features: {
+        //     features: requestQueueData[0]
+        //   }
+        // });
       }
-
       return;
     }
     //adding the right callback on request
@@ -687,7 +724,10 @@ let AppMapInfo = (function() {
       error: function(jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
-        dispatch({ eventName: "log", message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid });
+        dispatch({
+          eventName: "log",
+          message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid
+        });
         getFeatureInfoRequest();
       }
     });
@@ -745,14 +785,14 @@ let AppMapInfo = (function() {
       requestQueue.mustRestart = false;
       getFeatureInfoRequest();
     }
-    getFeatureInfoRequest(false);
+    //getFeatureInfoRequest(false);
   };
 
   /**
    * Process the results after the click on a vector feature on the map
    * @param {Array} featureCollection Array of OL featurs with the results. It must have a features property with the array of features
    */
-  let showVectorInfoFeatures = function showVectorInfoFeatures(features) {
+  let showVectorInfoFeatures = function showVectorInfoFeatures(features, pixel) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
     dispatch("hide-loader");
@@ -771,7 +811,11 @@ let AppMapInfo = (function() {
       });
       //tooltip
       if (features.length > 0) {
-        showInfoFeatureTooltip(features[0]);
+        if (pixel) {
+          showInfoFeatureTooltipAtPixel(features[0], pixel);
+        } else {
+          showInfoFeatureTooltip(features[0]);
+        }
       }
       let featuresCollection = {
         features: featureArray
@@ -809,7 +853,8 @@ let AppMapInfo = (function() {
       title += " (" + featureInfoCollection.features.length + ")";
     }
     var body = AppTemplates.renderInfoFeatures(featureInfoCollection);
-    AppMapInfo.showInfoWindow(title, body, "info-results");
+    var bodyMobile = AppTemplates.renderInfoFeaturesMobile(featureInfoCollection);
+    AppMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
   let showInfoFeatureTooltip = function(feature) {
@@ -833,11 +878,17 @@ let AppMapInfo = (function() {
     });
   };
 
-  let showInfoWindow = function(title, body, htmlElement) {
-    AppToolbar.toggleToolbarItem(htmlElement, true);
+  let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
     $("#" + htmlElement + "").show();
+    if (!AppStore.isMobile()) {
+      AppToolbar.toggleToolbarItem(htmlElement, true);
+    } else {
+      $("#info-tooltip").show();
+      $("#info-tooltip").html(bodyMobile);
+    }
+
     // $("#info-window__title").html(title);
     // $("#info-window__body").html(body);
     // $("#info-window").show();
@@ -1203,9 +1254,11 @@ let AppMap = (function() {
     attribution,
     secured,
     apikey,
-    preload,
     hoverTooltip,
-    mapSrid
+    mapSrid,
+    preload,
+    vectorWidth,
+    vectorRadius
   ) {
     let thisLayer;
     if (!params) {
@@ -1278,7 +1331,7 @@ let AppMap = (function() {
         zIndex: parseInt(zIndex),
         source: vectorSource,
         visible: visible,
-        style: AppMapStyles.getPreloadStyle()
+        style: AppMapStyles.getPreloadStyle(vectorWidth, vectorRadius)
       });
       vector.gid = gid + "_preload";
       vector.hoverTooltip = hoverTooltip;
@@ -1663,6 +1716,7 @@ let AppMap = (function() {
 
   let mouseHoverMapTooltip = function() {
     if (!lastMousePixel) return;
+    if (AppStore.isMobile()) return;
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
@@ -1794,9 +1848,11 @@ let AppMap = (function() {
         layer.attribution,
         layer.secured,
         layer.apikey,
-        layer.preload,
         layer.hoverTooltip,
-        mapSrid
+        mapSrid,
+        layer.preload,
+        layer.vectorWidth,
+        layer.vectorRadius
       );
       if (layer.layers) {
         addLayersToMap(layer.layers, mapSrid);
@@ -2449,7 +2505,12 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
+      decodeURIComponent(
+        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
+          /\+/g,
+          "%20"
+        )
+      ) || null
     );
   };
 
@@ -2468,7 +2529,10 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
+    return (
+      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
+      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
+    );
   };
 
   let addContextMenu = function(items) {
@@ -2534,7 +2598,10 @@ let AppMap = (function() {
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
-        if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
+        if (
+          coordinates[0] === coordinates[coordinates.length - 2] &&
+          coordinates[1] === coordinates[coordinates.length - 1]
+        ) {
           return AppMapEnums.geometryTypes().Polygon;
         } else {
           AppMapEnums.geometryTypes().Polyline;

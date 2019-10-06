@@ -58,37 +58,44 @@ let AppMapTooltip = (function() {
     });
   };
 
-  /**
-   * Shows the tooltip on the map
-   * @param {Array} coordinates
-   * @param {string} title
-   */
-  let showHtmlTooltip = function(coordinates, title) {
-    if (!title) {
-      hideHtmlTooltip();
-      return;
-    }
-    let labelPoint = AppMap.getLabelPoint(coordinates);
-    let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
-    let tooltip = $("#map-tooltip");
-    let tooltipTitle = $("#map-tooltip__title");
-    tooltipTitle.html(title);
-    tooltip.css({ top: pixel[0], left: pixel[1] });
-    tooltip.show();
-  };
+  // /**
+  //  * Shows an HTML tooltip on the map as an HTML positioned element
+  //  * @param {Array} coordinates
+  //  * @param {string} title
+  //  */
+  // let showMapHtmlTooltip = function(coordinates, title) {
+  //   if (!title) {
+  //     hideHtmlTooltip();
+  //     return;
+  //   }
+  //   let labelPoint = AppMap.getLabelPoint(coordinates);
+  //   let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
+  //   let tooltip = $("#map-tooltip");
+  //   let tooltipTitle = $("#map-tooltip__title");
+  //   tooltipTitle.html(title);
+  //   tooltip.css({ top: pixel[0], left: pixel[1] });
+  //   tooltip.show();
+  // };
 
-  let hideHtmlTooltip = function() {
-    let toolTip = $("#map-tooltip");
-    let toolTipTitle = $("#map-tooltip__title");
-    toolTip.hide();
-    toolTipTitle.html("");
-    toolTip.css({ top: 0, left: 0 });
-    toolTip.hide();
-  };
+  // /**
+  //  * Hides an HTML tooltip on the map as an HTML positioned element
+  //  */
+  // let hideMapHtmlTooltip = function() {
+  //   let toolTip = $("#map-tooltip");
+  //   let toolTipTitle = $("#map-tooltip__title");
+  //   toolTip.hide();
+  //   toolTipTitle.html("");
+  //   toolTip.css({ top: 0, left: 0 });
+  //   toolTip.hide();
+  // };
+
+  let showHtmlTooltip = function(coordinates, title) {};
+
+  let hideHtmlTooltip = function() {};
 
   let showMapTooltip = function(coordinates, title) {
     if (!title) {
-      hideHtmlTooltip();
+      hideMapTooltip();
       return;
     }
     let labelPoint = AppMap.getLabelPoint(coordinates);

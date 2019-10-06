@@ -1,0 +1,56 @@
+{
+  "title": "Applicazione Geo",
+  "restAPIUrl": "http://www.perspectiva.it:8082",
+  "templatesRepositoryUrl": "templates",
+  "relationsRepositoryUrl": "relations",
+  "startMapLon": 10.63083,
+  "startMapLat": 44.69838,
+  "startMapZoom": 15,
+  "mapLon": 10.63083,
+  "mapLat": 44.69838,
+  "mapZoom": 15,
+  "searchProvider": "wms_geoserver",
+  "searchProviderAddressUrl": "https://geoserver.comune.re.it/geoserver/geo_re/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geo_re:SIT_ARCHISTRADE&maxFeatures=500&outputFormat=text%2Fjavascript",
+  "searchProviderAddressField": "TOPONIMO",
+  "searchProviderHouseNumberUrl": "https://geoserver.comune.re.it/geoserver/geo_re/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geo_re:SIT_CIVICI&maxFeatures=500&outputFormat=text%2Fjavascript",
+  "searchProviderHouseNumberField": "NUMESP_CIV",
+  "drawFeatures": "",
+  "authentication": {
+    "requireAuthentication": false
+  },
+  "modules": {
+    "layer-tree": true,
+    "search-tools": true,
+    "print-tools": true,
+    "share-tools": true,
+    "map-tools": true,
+    "draw-tools": true,
+    "select-tools": true,
+    "gps-tools": false
+  },
+  "layers": [
+    {
+      "gid": "a1",
+      "layerName": "Argomenti",
+      "layerType": "group",
+      "visible": 0,
+      "layersUri": "states/argomenti.json"
+    }
+  ],
+  "relations": [
+    {
+      "gid": "r_edifici_civici",
+      "layerGid": "g0_edifici",
+      "serviceUrlTemplate": "/sample/temp.json",
+      "templateUri": "templates/g0_civici.json",
+      "labelTemplate": "Visualizza Pratiche"
+    },
+    {
+      "gid": "r_edifici_pratiche",
+      "layerGid": "g0_edifici",
+      "serviceUrlTemplate": "/sample/temp.json",
+      "templateUri": "templates/g0_edifici.json",
+      "labelTemplate": "Visualizza Civici"
+    }
+  ]
+}

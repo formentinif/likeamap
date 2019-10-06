@@ -31,19 +31,26 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 let AppMapStyles = (function() {
   "use strict";
 
-  let getPreloadStyle = function() {
+  /**
+   * Returns the style for the preload features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getPreloadStyle = function(width, radius) {
+    if (!width) width = 4;
+    if (!radius) radius = 10;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 255, 255, 0.1]
+        color: [255, 255, 255, 0.01]
       }),
       stroke: new ol.style.Stroke({
-        color: [255, 255, 255, 0.1],
-        width: 4
+        color: [255, 255, 255, 0.01],
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 10,
+        radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 255, 255, 0.1]
+          color: [255, 255, 255, 0.01]
         })
       }),
       text: new ol.style.Text({
@@ -159,17 +166,24 @@ let AppMapStyles = (function() {
     return style_modify;
   };
 
-  let getInfoStyle = function() {
+  /**
+   * Returns the style for the info features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getInfoStyle = function(width, radius) {
+    if (!width) width = 3;
+    if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
         color: [0, 255, 255, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [0, 255, 255, 1],
-        width: 3
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: radius,
         fill: new ol.style.Fill({
           color: [0, 255, 255, 1]
         })
@@ -178,17 +192,24 @@ let AppMapStyles = (function() {
     return style;
   };
 
-  let getFlashStyle = function() {
+  /**
+   * Returns the style for the flash features
+   * @param {int} width Width of the line
+   * @param {int} radius Radius of the circle
+   */
+  let getFlashStyle = function(width, radius) {
+    if (!width) width = 3;
+    if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
         color: [255, 125, 0, 1]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 125, 0, 1],
-        width: 3
+        width: width
       }),
       image: new ol.style.Circle({
-        radius: 7,
+        radius: radius,
         fill: new ol.style.Fill({
           color: [255, 125, 0, 1]
         })

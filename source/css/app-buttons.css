@@ -1,0 +1,33 @@
+.lam-map__browser-location {
+  top: 15px;
+  right: 0.5em;
+  position: absolute;
+}
+
+.ol-touch .lam-map__browser-location {
+  /*top: 35px;*/
+  right: 1.5em;
+}
+
+.lam-map__zoom-in {
+  top: 60px;
+  right: 0.5em;
+  position: absolute;
+}
+
+.ol-touch .lam-map__zoom-in {
+  /*top: 75px;*/
+  right: 1.5em;
+}
+
+.lam-map__zoom-out {
+  top: 105px;
+  right: 0.5em;
+  position: absolute;
+}
+
+.lam-menu-panel__open {
+  top: 15px;
+  left: 0.5em;
+  position: absolute;
+}

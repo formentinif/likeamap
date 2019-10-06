@@ -230,9 +230,11 @@ let AppMap = (function() {
     attribution,
     secured,
     apikey,
-    preload,
     hoverTooltip,
-    mapSrid
+    mapSrid,
+    preload,
+    vectorWidth,
+    vectorRadius
   ) {
     let thisLayer;
     if (!params) {
@@ -305,7 +307,7 @@ let AppMap = (function() {
         zIndex: parseInt(zIndex),
         source: vectorSource,
         visible: visible,
-        style: AppMapStyles.getPreloadStyle()
+        style: AppMapStyles.getPreloadStyle(vectorWidth, vectorRadius)
       });
       vector.gid = gid + "_preload";
       vector.hoverTooltip = hoverTooltip;
@@ -690,6 +692,7 @@ let AppMap = (function() {
 
   let mouseHoverMapTooltip = function() {
     if (!lastMousePixel) return;
+    if (AppStore.isMobile()) return;
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
@@ -821,9 +824,11 @@ let AppMap = (function() {
         layer.attribution,
         layer.secured,
         layer.apikey,
-        layer.preload,
         layer.hoverTooltip,
-        mapSrid
+        mapSrid,
+        layer.preload,
+        layer.vectorWidth,
+        layer.vectorRadius
       );
       if (layer.layers) {
         addLayersToMap(layer.layers, mapSrid);
@@ -1476,7 +1481,12 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
+      decodeURIComponent(
+        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
+          /\+/g,
+          "%20"
+        )
+      ) || null
     );
   };
 
@@ -1495,7 +1505,10 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
+    return (
+      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
+      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
+    );
   };
 
   let addContextMenu = function(items) {
@@ -1561,7 +1574,10 @@ let AppMap = (function() {
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
-        if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
+        if (
+          coordinates[0] === coordinates[coordinates.length - 2] &&
+          coordinates[1] === coordinates[coordinates.length - 1]
+        ) {
           return AppMapEnums.geometryTypes().Polygon;
         } else {
           AppMapEnums.geometryTypes().Polyline;

@@ -131,7 +131,8 @@ var DrawTools = (function() {
 
     template += '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light">';
     template += '    <svg width="100%" height="100%">';
-    template += '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
+    template +=
+      '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
     template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="16" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += '      <circle cx="41" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -152,14 +153,15 @@ var DrawTools = (function() {
     //template += '  <div> <input id="draw-tools__color" type="text" name="draw-tools__color" value="#448AFF" /></div>';
 
     template += '  <div class="div-20" ></div>';
-    template += '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
-    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="mdl-button mdl-js-button mdl-button--raised  mdl-js-ripple-effect" >Elimina</button>';
+    template +=
+      '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
+    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
     template += "  </div>";
 
     template += '  <div id="draw-tools__delete-settings" class="lam-hidden" >';
     template += '  <div class="div-20" ></div>';
     template += "  Tocca una geometria per eliminarla ";
-    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="mdl-button mdl-js-button mdl-button--raised  mdl-js-ripple-effect" >Elimina</button>';
+    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
     template += "  </div>";
 
     template += "</div>";
@@ -1937,7 +1939,8 @@ var ShareTools = (function() {
     template += '<div class="div-20"></div>';
 
     template += '<div class="row">';
-    template += '<div class="col s6"><a id="share-tools__url-query" target="_blank" class="waves-effect waves-light btn btn-small">Apri</a></div>';
+    template +=
+      '<div class="col s6"><a id="share-tools__url-query" target="_blank" class="waves-effect waves-light btn btn-small">Apri</a></div>';
     template +=
       '<div class="col s6"><a id="share-tools__copy-url-query" class=" waves-effect waves-light btn btn-small fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
@@ -1951,11 +1954,11 @@ var ShareTools = (function() {
     template += '<h4 class="lam-title-h4">Mappa</h4>';
     template += "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template += '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
+    template +=
+      '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
 
     template += '<div id="share-tools__content" class="lam-hidden">';
 
-    //template += '<div class="mdl-textfield mdl-js-textfield">';
     template += '<div class="div-20"></div>';
     template += '<input type="text" class="" id="share-tools__input-url"/>';
     template += '<div class="div-20"></div>';
@@ -1966,9 +1969,6 @@ var ShareTools = (function() {
     template += "</div>";
     template += "</div>";
 
-    //template += '<button id="share-tools__copy-url"  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect lam-input-margin-right">Copia</button>';
-    //template += '<button id="share-tools__email-url" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Email</button>';
-    //template += '</div>';
     template += '<div class="div-10"></div>';
 
     template += "</div>";
