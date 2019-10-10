@@ -34,6 +34,9 @@ var AppStore = (function() {
   var init = function() {
     //normalizing appstate
     appState = normalizeAppState(appState);
+    if (isMobile() && appState.improveMobileBehaviour) {
+      appState = normalizeMobile(appState);
+    }
     //Comuni array load
     if (appState.searchProvider == "nominatim") {
       var url = appState.restAPIUrl + "/api/comuni";
@@ -84,13 +87,34 @@ var AppStore = (function() {
   };
 
   /**
-   *
+   * Set the default parameters for appstate
    * @param {Object} normalize the given appstate
    */
   let normalizeAppState = function(appstate) {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+    return appstate;
+  };
+
+  /**
+   * Improve the appstate for mobile
+   * @param {Object} normalize the given appstate
+   */
+  let normalizeMobile = function(appstate) {
+    let normalizeMobileArray = function(layers) {
+      for (let index = 0; index < layers.length; index++) {
+        if (layers[index].preload) {
+          layers[index].preload = 0;
+          layers[index].queryable = 1;
+        }
+        if (layers[index].layers) {
+          normalizeMobileArray(layers[index].layers);
+        }
+      }
+    };
+    normalizeMobileArray(appstate.layers);
+    appState.disableAjaxRequestInfo = 0;
     return appstate;
   };
 
@@ -112,11 +136,7 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(
-      relation.gid,
-      relation.templateUrl,
-      AppStore.getAppState().templatesRepositoryUrl
-    );
+    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",

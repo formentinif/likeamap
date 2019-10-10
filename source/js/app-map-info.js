@@ -83,8 +83,8 @@ let AppMapInfo = (function() {
    * @param {String} infoFormat
    * @param {int} featureCount
    */
-  let getGetFeatureInfoUrl = function(layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
-    let url = layer.getSource().getGetFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
+  let getFeatureInfoUrl = function(layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
+    let url = layer.getSource().getFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
       INFO_FORMAT: infoFormat,
       feature_count: featureCount
     });
@@ -151,7 +151,7 @@ let AppMapInfo = (function() {
       .forEach(function(layer) {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
-            let url = getGetFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
+            let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
             requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid));
           }
         }

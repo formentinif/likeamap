@@ -78,11 +78,19 @@
       "default": 2,
       "type": "integer"
     },
+    "improveMobileBehaviour": {
+      "title": "Migliora mobile UI",
+      "description": "Migliora il comportamento dell'appstate per la visualizzazione mobile. Se mobile tutti preload vengono impostati a 0 e il queryable a 1",
+      "default": 0,
+      "enum": [0, 1],
+      "type": "integer"
+    },
     "disableAjaxRequestInfo": {
       "title": "Disabilita le richieste ajax al click del mouse",
       "description": "Disabilita le richieste ajax al click del mouse",
-      "default": false,
-      "type": "boolean"
+      "default": 0,
+      "enum": [0, 1],
+      "type": "integer"
     },
     "searchProvider": {
       "title": "Provider di ricerca",
@@ -414,7 +422,8 @@
                 "preload": {
                   "title": "Preload del layer",
                   "description": "Abilita il caricamento in preload del layer",
-                  "type": "boolean"
+                  "enum": [0, 1],
+                  "type": "integer"
                 },
                 "vectorRadius": {
                   "title": "Dimensione del punto precaricato",
