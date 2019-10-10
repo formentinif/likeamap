@@ -210,6 +210,18 @@ var Dispatcher = (function() {
       ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
     });
 
+    this.bind("map-zoom-in", function(payload) {
+      AppMap.zoomIn();
+    });
+
+    this.bind("map-zoom-out", function(payload) {
+      AppMap.zoomOut();
+    });
+
+    this.bind("map-browser-location", function(payload) {
+      AppMap.goToBrowserLocation();
+    });
+
     this.bind("do-login", function(payload) {
       AppStore.doLogin(payload.username, payload.password);
     });

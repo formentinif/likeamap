@@ -210,6 +210,18 @@ var Dispatcher = (function() {
       ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
     });
 
+    this.bind("map-zoom-in", function(payload) {
+      AppMap.zoomIn();
+    });
+
+    this.bind("map-zoom-out", function(payload) {
+      AppMap.zoomOut();
+    });
+
+    this.bind("map-browser-location", function(payload) {
+      AppMap.goToBrowserLocation();
+    });
+
     this.bind("do-login", function(payload) {
       AppStore.doLogin(payload.username, payload.password);
     });
@@ -1711,6 +1723,7 @@ let AppToolbar = (function() {
           if (toolId) {
             $("#" + toolId).show();
           }
+          $("#menu-panel__open").hide();
         }
       }
     );
@@ -1724,7 +1737,10 @@ let AppToolbar = (function() {
       {
         width: "hide"
       },
-      easingTime
+      easingTime,
+      function() {
+        $("#menu-panel__open").show();
+      }
     );
   };
 
@@ -1871,13 +1887,14 @@ function appInit() {
 function customFunctions() {
   //Right click menu
   var items = [
-    {
-      text: "Cerca qui",
-      classname: "some-style-class",
-      callback: reverseGeocoding
-    }
+    //   {
+    //     text: "Cerca qui",
+    //     classname: "some-style-class",
+    //     callback: reverseGeocoding
+    //   }
   ];
-  AppMap.addContextMenu(items);
+  //TODO Revisione del context menu
+  //AppMap.addContextMenu(items);
 }
 
 function reverseGeocoding(obj) {

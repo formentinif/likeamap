@@ -79,6 +79,7 @@ let AppToolbar = (function() {
           if (toolId) {
             $("#" + toolId).show();
           }
+          $("#menu-panel__open").hide();
         }
       }
     );
@@ -92,7 +93,10 @@ let AppToolbar = (function() {
       {
         width: "hide"
       },
-      easingTime
+      easingTime,
+      function() {
+        $("#menu-panel__open").show();
+      }
     );
   };
 

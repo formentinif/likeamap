@@ -59,7 +59,7 @@
   height: 100%;
 }
 
-.lam-menu-panel-close-bottom {
+.lam-menu-panel-close {
   position: absolute;
   box-sizing: border-box;
   top: 0px;
@@ -68,9 +68,9 @@
   z-index: 11;
 }
 
-.lam-menu-panel-close-bottom .lam-menu-button-close {
+.lam-menu-panel-close .lam-menu-button-close {
   display: block;
-  margin-top: 5px;
+  margin-top: 0.5rem;
   margin-bottom: 5px;
   margin-left: 0px;
   margin-right: 0px;
@@ -130,26 +130,6 @@
 
 .lam-menu-panel .lam-menu-panel-content .lam-menu-panel-content-item {
   display: none;
-}
-
-.lam-menu-panel-close {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  height: 100%;
-  width: 30px;
-  background-color: transparent;
-  margin: 0px;
-  box-sizing: border-box;
-}
-
-.lam-menu-panel-close .lam-menu-button-close {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-left: 0px;
-  margin-right: 0px;
-  cursor: pointer;
 }
 
 .lam-menu-icon {
@@ -245,35 +225,25 @@
 }
 
 .lam-map__browser-location {
-  top: 15px;
-  right: 0.5em;
   position: absolute;
-}
-
-.ol-touch .lam-map__browser-location {
-  /*top: 35px;*/
-  right: 1.5em;
+  top: 0.5rem;
+  right: 0.5rem;
 }
 
 .lam-map__zoom-in {
-  top: 60px;
-  right: 0.5em;
   position: absolute;
-}
-
-.ol-touch .lam-map__zoom-in {
-  /*top: 75px;*/
-  right: 1.5em;
+  top: 3.5rem;
+  right: 0.5em;
 }
 
 .lam-map__zoom-out {
-  top: 105px;
-  right: 0.5em;
+  top: 6.5rem;
+  right: 0.5rem;
   position: absolute;
 }
 
 .lam-menu-panel__open {
-  top: 15px;
+  top: 0.5rem;
   left: 0.5em;
   position: absolute;
 }

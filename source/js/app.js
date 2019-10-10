@@ -104,13 +104,14 @@ function appInit() {
 function customFunctions() {
   //Right click menu
   var items = [
-    {
-      text: "Cerca qui",
-      classname: "some-style-class",
-      callback: reverseGeocoding
-    }
+    //   {
+    //     text: "Cerca qui",
+    //     classname: "some-style-class",
+    //     callback: reverseGeocoding
+    //   }
   ];
-  AppMap.addContextMenu(items);
+  //TODO Revisione del context menu
+  //AppMap.addContextMenu(items);
 }
 
 function reverseGeocoding(obj) {

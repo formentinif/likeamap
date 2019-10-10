@@ -1294,6 +1294,7 @@ let AppMap = (function() {
       case "tms": //TO DO implementare
         switch (tileMode.toLowerCase()) {
           case "tms":
+            thisLayer = getLayerTiled(gid, uri, params, attribution, secured);
             break;
           case "quadkey":
             break;
@@ -1382,7 +1383,7 @@ let AppMap = (function() {
     return otm;
   };
 
-  let getLayerWMS = function getLayerWMS(gid, uri, params, attribution) {
+  let getLayerWMS = function(gid, uri, params, attribution) {
     /// <summary>
     /// Restituisce un layer in formato WMS
     /// </summary>
@@ -1415,7 +1416,7 @@ let AppMap = (function() {
     return wms;
   };
 
-  let getLayerWMSTiled = function getLayerWMSTiled(gid, uri, params, attribution, secured) {
+  let getLayerWMSTiled = function(gid, uri, params, attribution, secured) {
     /// <summary>
     /// Restituisce un layer in formato WMS, con le chiamate tagliate a Tile
     /// </summary>
@@ -1462,6 +1463,18 @@ let AppMap = (function() {
       source: source
     });
     return wms;
+  };
+
+  let getLayerTiled = function(gid, uri, params, attribution, secured) {
+    let tms = new ol.layer.Tile({
+      //extent: [-13884991, 2870341, -7455066, 6338219],
+      source: new ol.source.TileWMS({
+        url: uri,
+        params: params,
+        serverType: "geoserver"
+      })
+    });
+    return tms;
   };
 
   /**
@@ -1555,75 +1568,22 @@ let AppMap = (function() {
     return dict;
   };
 
-  let GetBrowserLocationControl = function(opt_options) {
-    let options = opt_options || {};
-    let button = document.createElement("button");
-    button.innerHTML = '<i class="material-icons">&#xE55C;</i>';
-    let this_ = this;
-    let handleGetBrowserLocation = function() {
-      goToBrowserLocation();
-    };
-    button.id = "map__browser-location";
-    button.addEventListener("click", handleGetBrowserLocation, false);
-    button.addEventListener("touchstart", handleGetBrowserLocation, false);
-    button.className = "btn-floating btn-small waves-effect waves-light";
-    let element = document.createElement("div");
-    element.className = "lam-map__browser-location ol-unselectable ";
-    element.appendChild(button);
-    ol.control.Control.call(this, {
-      element: element,
-      target: options.target
-    });
+  let zoomIn = function() {
+    let currentView = mainMap.getView();
+    currentView.setZoom(currentView.getZoom() + 1);
+    mainMap.setView(currentView);
   };
 
-  let GetZoomInControl = function(opt_options) {
-    let options = opt_options || {};
-    let button = document.createElement("button");
-    button.innerHTML = '<i class="material-icons">&#xE145;</i>';
-    let this_ = this;
-    let handleZoomIn = function() {
-      let currentView = mainMap.getView();
-      currentView.setZoom(currentView.getZoom() + 1);
-      mainMap.setView(currentView);
-    };
-    button.addEventListener("click", handleZoomIn, false);
-    button.addEventListener("touchstart", handleZoomIn, false);
-    button.id = "map__zoom-in";
-    button.className = "btn-floating btn-small waves-effect waves-light";
-    let element = document.createElement("div");
-    element.className = "lam-map__zoom-in ol-unselectable ";
-    element.appendChild(button);
-    ol.control.Control.call(this, {
-      element: element,
-      target: options.target
-    });
-  };
-
-  let GetZoomOutControl = function(opt_options) {
-    let options = opt_options || {};
-    let button = document.createElement("button");
-    button.innerHTML = '<i class="material-icons">&#xE15B;</i>';
-    let this_ = this;
-    let handleZoomOut = function() {
-      let currentView = mainMap.getView();
-      currentView.setZoom(currentView.getZoom() - 1);
-      mainMap.setView(currentView);
-    };
-    button.addEventListener("click", handleZoomOut, false);
-    button.addEventListener("touchstart", handleZoomOut, false);
-    button.id = "map__zoom-out";
-    button.className = "btn-floating btn-small waves-effect waves-light";
-    let element = document.createElement("div");
-    element.className = "lam-map__zoom-out ol-unselectable ";
-    element.appendChild(button);
-    ol.control.Control.call(this, {
-      element: element,
-      target: options.target
-    });
+  let zoomOut = function() {
+    let currentView = mainMap.getView();
+    currentView.setZoom(currentView.getZoom() - 1);
+    mainMap.setView(currentView);
   };
 
   let init = function() {
-    //binding degli eventi
+    //events binding
+    //if mobile go to user location
+    if (AppStore.isMobile()) goToBrowserLocation();
   };
 
   /**
@@ -1636,9 +1596,6 @@ let AppMap = (function() {
     if (!isRendered) {
       init();
     }
-    ol.inherits(GetBrowserLocationControl, ol.control.Control);
-    ol.inherits(GetZoomOutControl, ol.control.Control);
-    ol.inherits(GetZoomInControl, ol.control.Control);
 
     let layers = [
       //new ol.layer.Tile({
@@ -1654,9 +1611,6 @@ let AppMap = (function() {
     let controls = new ol.Collection([]);
     mainMap = new ol.Map({
       controls: controls.extend([
-        new GetBrowserLocationControl(),
-        new GetZoomInControl(),
-        new GetZoomOutControl(),
         new ol.control.Attribution({
           collapsible: false
         })
@@ -2505,12 +2459,7 @@ let AppMap = (function() {
 
   let getUriParameter = function(parameter) {
     return (
-      decodeURIComponent(
-        (new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(
-          /\+/g,
-          "%20"
-        )
-      ) || null
+      decodeURIComponent((new RegExp("[?|&]" + parameter + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null
     );
   };
 
@@ -2529,10 +2478,7 @@ let AppMap = (function() {
    * @return {float}                Aspect Ratio
    */
   let aspectRatio = function(topLat, bottomLat) {
-    return (
-      (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) /
-      (degreesToRadians(topLat) - degreesToRadians(bottomLat))
-    );
+    return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
   let addContextMenu = function(items) {
@@ -2598,10 +2544,7 @@ let AppMap = (function() {
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
-        if (
-          coordinates[0] === coordinates[coordinates.length - 2] &&
-          coordinates[1] === coordinates[coordinates.length - 1]
-        ) {
+        if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
           return AppMapEnums.geometryTypes().Polygon;
         } else {
           AppMapEnums.geometryTypes().Polyline;
@@ -2716,6 +2659,8 @@ let AppMap = (function() {
     stopCopyCoordinate: stopCopyCoordinate,
     toggleLayer: toggleLayer,
     transform3857: transform3857,
-    transformGeometrySrid: transformGeometrySrid
+    transformGeometrySrid: transformGeometrySrid,
+    zoomIn: zoomIn,
+    zoomOut: zoomOut
   };
 })();
