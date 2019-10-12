@@ -36,7 +36,7 @@ let SelectTools = (function() {
     });
 
     let btn = $("<button/>", {
-      class: "btn-floating btn-large waves-effect waves-light ",
+      class: "btn-floating btn-large waves-effect waves-light lam-button",
       click: function(e) {
         e.preventDefault();
         dispatch("show-select-tools");
@@ -44,8 +44,8 @@ let SelectTools = (function() {
     }).append("<i class='large material-icons '>select_all</i>");
     $("#menu-toolbar").append(btn);
 
-    let divSelect = $("<div />", { id: "select-tools", class: "lam-menu-panel-content-item" });
-    $("#menu-panel__content").append(divSelect);
+    let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
+    $("#panel__content").append(divSelect);
 
     Dispatcher.bind("show-select-tools", function(payload) {
       AppToolbar.toggleToolbarItem("select-tools");

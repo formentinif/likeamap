@@ -115,13 +115,14 @@ var DrawTools = (function() {
     template += '<div class="lam-card z-depth-2">';
 
     template += "<div>";
-    template += '  <button id="draw-tools__point" class="btn-floating btn-large waves-effect waves-light">';
+    template += '  <button id="draw-tools__point" class="btn-floating btn-large waves-effect waves-light lam-button">';
     template += '    <svg width="100%" height="100%">';
     template += '      <circle cx="28" cy="28" r="6" stroke="green" stroke-width="0" fill="white" />';
     template += "    </svg>";
     template += "  </button>";
 
-    template += '  <button id="draw-tools__polyline" class="btn-floating btn-large waves-effect waves-light">';
+    template +=
+      '  <button id="draw-tools__polyline" class="btn-floating btn-large waves-effect waves-light lam-button">';
     template += '    <svg width="100%" height="100%">';
     template += '      <polyline points="16,16 40,40 " style="fill:white;stroke:white;stroke-width:3" />';
     template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
@@ -129,7 +130,8 @@ var DrawTools = (function() {
     template += "    </svg>";
     template += "  </button>";
 
-    template += '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light">';
+    template +=
+      '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light lam-button">';
     template += '    <svg width="100%" height="100%">';
     template +=
       '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
@@ -144,7 +146,8 @@ var DrawTools = (function() {
     //template += '    <i class="material-icons" style="font-size:35px !important; top:45%;  ">T</i>';
     //template += '  </button>';
 
-    template += '  <button id="draw-tools__delete" class="btn-floating btn-large waves-effect waves-light" >';
+    template +=
+      '  <button id="draw-tools__delete" class="btn-floating btn-large waves-effect waves-light lam-button" >';
     template += '    <i class="material-icons" style="font-size:35px !important; top:50%; left:40%; ">&#xE872;</i>';
     template += "  </button>";
 
@@ -1521,7 +1524,7 @@ let SelectTools = (function() {
     });
 
     let btn = $("<button/>", {
-      class: "btn-floating btn-large waves-effect waves-light ",
+      class: "btn-floating btn-large waves-effect waves-light lam-button",
       click: function(e) {
         e.preventDefault();
         dispatch("show-select-tools");
@@ -1529,8 +1532,8 @@ let SelectTools = (function() {
     }).append("<i class='large material-icons '>select_all</i>");
     $("#menu-toolbar").append(btn);
 
-    let divSelect = $("<div />", { id: "select-tools", class: "lam-menu-panel-content-item" });
-    $("#menu-panel__content").append(divSelect);
+    let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
+    $("#panel__content").append(divSelect);
 
     Dispatcher.bind("show-select-tools", function(payload) {
       AppToolbar.toggleToolbarItem("select-tools");

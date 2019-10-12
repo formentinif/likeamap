@@ -474,7 +474,7 @@ body {
 }
 
 .icon-base-info {
-  color: #009688;
+  color: var(--lam-button-color);
 }
 
 .lam-bar {
@@ -599,7 +599,7 @@ body {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #26a69a;
+  background: var(--lam-bg-color);
 }
 
 /*Margin helpers*/
@@ -1073,12 +1073,4 @@ body {
   #lam-logo img {
     max-width: 120px;
   }
-}
-
-/*Custom*/
-.lam-background {
-  background-color: #009688;
-}
-.color-violet {
-  background-color: #735ab6;
 }

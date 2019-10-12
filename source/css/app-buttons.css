@@ -1,3 +1,18 @@
+.lam-button {
+  background-color: var(--lam-button-color);
+}
+
+.lam-button:hover {
+  background-color: var(--lam-button-color);
+}
+
+.lam-button:focus {
+  background-color: var(--lam-button-color-darken);
+}
+
+/* .lam-button:hover {
+  background-color: var(--lam-button-color);
+} */
 .lam-map__browser-location {
   position: absolute;
   top: 0.5rem;
@@ -16,7 +31,7 @@
   position: absolute;
 }
 
-.lam-menu-panel__open {
+.lam-panel__open {
   top: 0.5rem;
   left: 0.5em;
   position: absolute;

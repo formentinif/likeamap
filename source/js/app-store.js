@@ -136,7 +136,11 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",
@@ -425,8 +429,8 @@ var AppStore = (function() {
       $("#lam-logo__img").attr("src", state.logoUrl);
     }
     if (state.logoPanelUrl) {
-      $("#menu-panel__logo-img").attr("src", state.logoPanelUrl);
-      $("#menu-panel__logo").removeClass("lam-hidden");
+      $("#panel__logo-img").attr("src", state.logoPanelUrl);
+      $("#panel__logo").removeClass("lam-hidden");
     }
 
     //inizializzazione dell appstore

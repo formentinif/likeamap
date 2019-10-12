@@ -1,12 +1,27 @@
-.lam-menu-scroll-padding {
+:root {
+  --lam-bg-color: rgba(252, 252, 252, 0.9);
+  --lam-bg-menu-color: #63818f;
+  --lam-button-color: #63818f;
+  --lam-button-color-darken: #455a64;
+}
+
+/*Custom*/
+.lam-background {
+  background-color: var(--lam-bg-menu-color);
+}
+.color-violet {
+  background-color: #735ab6;
+}
+
+.lam-scroll-padding {
   padding-bottom: 100px !important;
 }
 
-.lam-menu-scroll-margin {
+.lam-scroll-margin {
   margin-bottom: 100px !important;
 }
 
-.lam-menu-toolbar-bottom {
+.lam-toolbar {
   box-sizing: border-box;
   position: absolute;
   z-index: 11;
@@ -14,17 +29,16 @@
   bottom: 0px;
   width: 100%;
   height: 70px;
-  background-color: rgba(252, 252, 252, 0.9);
+  background-color: var(--lam-bg-color);
   padding: 5px 10px 10px 30px;
-  box-sizing: border-box;
   margin: 0px;
 }
 
-.lam-menu-toolbar-bottom button {
+.lam-toolbar button {
   margin-right: 10px;
 }
 
-.lam-menu-panel-bottom {
+.lam-panel {
   box-sizing: border-box;
   position: absolute;
   z-index: 9;
@@ -40,7 +54,7 @@
   resize: both;
 }
 
-.lam-menu-panel-bottom .lam-menu-panel-content {
+.lam-panel .lam-panel-content {
   position: absolute;
   z-index: 9;
   bottom: 0px;
@@ -54,12 +68,12 @@
   overflow: auto;
 }
 
-.lam-menu-panel-bottom .lam-menu-panel-content .lam-menu-panel-content-item {
+.lam-panel .lam-panel-content .lam-panel-content-item {
   display: none;
   height: 100%;
 }
 
-.lam-menu-panel-close {
+.lam-panel-close {
   position: absolute;
   box-sizing: border-box;
   top: 0px;
@@ -68,7 +82,7 @@
   z-index: 11;
 }
 
-.lam-menu-panel-close .lam-menu-button-close {
+.lam-panel-close .lam-button-close {
   display: block;
   margin-top: 0.5rem;
   margin-bottom: 5px;
@@ -77,7 +91,7 @@
   cursor: pointer;
 }
 
-.lam-menu-button-close-top {
+.lam-button-close-top {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -90,49 +104,7 @@
   z-index: 1000;
 }
 
-.lam-menu-toolbar {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  height: 100%;
-  width: 80px;
-  background-color: #008cba;
-  padding: 30px 10px 10px 12px;
-  box-sizing: border-box;
-  margin: 0px;
-}
-
-.lam-menu-panel {
-  position: absolute;
-  left: 81px;
-  top: 0px;
-  height: 100%;
-  width: 330px;
-  z-index: 10;
-  display: none;
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box;
-}
-
-.lam-menu-panel .lam-menu-panel-content {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 300px;
-  height: 100%;
-  background-color: rgba(252, 252, 252);
-  background-color: rgba(252, 252, 252, 0.5);
-  padding: 30px 10px 10px 12px;
-  margin: 0px;
-  box-sizing: border-box;
-}
-
-.lam-menu-panel .lam-menu-panel-content .lam-menu-panel-content-item {
-  display: none;
-}
-
-.lam-menu-icon {
+.lam-icon {
   display: inline-block;
   color: white;
   margin-top: 5px;
@@ -142,14 +114,14 @@
   cursor: pointer;
 }
 
-.menu-panel__logo {
+.panel__logo {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
 }
-.menu-panel__top-margin {
+.panel__top-margin {
   height: 20px;
 }
-.menu-panel__bottom-margin {
+.panel__bottom-margin {
   height: 70px;
 }
 
@@ -224,6 +196,21 @@
   top: 1rem;
 }
 
+.lam-button {
+  background-color: var(--lam-button-color);
+}
+
+.lam-button:hover {
+  background-color: var(--lam-button-color);
+}
+
+.lam-button:focus {
+  background-color: var(--lam-button-color-darken);
+}
+
+/* .lam-button:hover {
+  background-color: var(--lam-button-color);
+} */
 .lam-map__browser-location {
   position: absolute;
   top: 0.5rem;
@@ -242,7 +229,7 @@
   position: absolute;
 }
 
-.lam-menu-panel__open {
+.lam-panel__open {
   top: 0.5rem;
   left: 0.5em;
   position: absolute;
@@ -724,7 +711,7 @@ body {
 }
 
 .icon-base-info {
-  color: #009688;
+  color: var(--lam-button-color);
 }
 
 .lam-bar {
@@ -849,7 +836,7 @@ body {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #26a69a;
+  background: var(--lam-bg-color);
 }
 
 /*Margin helpers*/
@@ -1323,12 +1310,4 @@ body {
   #lam-logo img {
     max-width: 120px;
   }
-}
-
-/*Custom*/
-.lam-background {
-  background-color: #009688;
-}
-.color-violet {
-  background-color: #735ab6;
 }

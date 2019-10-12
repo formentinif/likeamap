@@ -40,7 +40,7 @@ let AppToolbar = (function() {
     //eseguo degli aggiustamente in caso di browser mobile
     if (AppStore.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
-      $(".lam-menu-toolbar-bottom button").css("margin-right", "0px");
+      $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
     }
     // else {
@@ -69,7 +69,7 @@ let AppToolbar = (function() {
   };
 
   let showMenu = function(toolId) {
-    $("#menu-panel").animate(
+    $("#panel").animate(
       {
         width: "show"
       },
@@ -79,7 +79,7 @@ let AppToolbar = (function() {
           if (toolId) {
             $("#" + toolId).show();
           }
-          $("#menu-panel__open").hide();
+          $("#panel__open").hide();
         }
       }
     );
@@ -89,13 +89,13 @@ let AppToolbar = (function() {
    * Nasconde il pannello del menu
    */
   var hideMenu = function() {
-    $("#menu-panel").animate(
+    $("#panel").animate(
       {
         width: "hide"
       },
       easingTime,
       function() {
-        $("#menu-panel__open").show();
+        $("#panel__open").show();
       }
     );
   };
@@ -107,10 +107,10 @@ let AppToolbar = (function() {
       //new tool selected
       currentToolbarItem = toolId;
       resetTools();
-      $(".lam-menu-panel-content-item").hide();
+      $(".lam-panel-content-item").hide();
       showMenu(toolId);
     } else {
-      if ($("#menu-panel").css("display") == "none" || keepOpen) {
+      if ($("#panel").css("display") == "none" || keepOpen) {
         //actual tool selected but hidden
         showMenu(toolId);
       } else {

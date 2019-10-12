@@ -55,15 +55,20 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
       <img src="img/logo.png" alt="Logo" id="lam-logo__img" />
     </div>
 
-    <div id="menu-panel__open" class="lam-menu-panel__open">
-      <button class="btn-floating btn-small waves-effect waves-light" alt="Apri contenuti" title="Apri contenuti" onClick="Dispatcher.dispatch('show-menu')">
+    <div id="panel__open" class="lam-panel__open">
+      <button
+        class="btn-floating btn-small waves-effect waves-light lam-button"
+        alt="Apri contenuti"
+        title="Apri contenuti"
+        onClick="Dispatcher.dispatch('show-menu')"
+      >
         <i class="material-icons">chevron_right</i>
       </button>
     </div>
 
-    <div id="menu-panel__open" class="lam-map__browser-location">
+    <div id="panel__open" class="lam-map__browser-location">
       <button
-        class="btn-floating btn-small waves-effect waves-light"
+        class="btn-floating btn-small waves-effect waves-light lam-button"
         alt="Posizione attuale"
         title="Posizione attuale"
         onClick="Dispatcher.dispatch('map-browser-location')"
@@ -72,14 +77,24 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
       </button>
     </div>
 
-    <div id="menu-panel__open" class="lam-map__zoom-in">
-      <button class="btn-floating btn-small waves-effect waves-light" alt="Zoom in" title="Zoom in" onClick="Dispatcher.dispatch('map-zoom-in')">
+    <div id="panel__open" class="lam-map__zoom-in">
+      <button
+        class="btn-floating btn-small waves-effect waves-light lam-button"
+        alt="Zoom in"
+        title="Zoom in"
+        onClick="Dispatcher.dispatch('map-zoom-in')"
+      >
         <i class="material-icons">add</i>
       </button>
     </div>
 
-    <div id="menu-panel__open" class="lam-map__zoom-out">
-      <button class="btn-floating btn-small waves-effect waves-light" alt="Zoom out" title="Zoom out" onClick="Dispatcher.dispatch('map-zoom-out')">
+    <div id="panel__open" class="lam-map__zoom-out">
+      <button
+        class="btn-floating btn-small waves-effect waves-light lam-button"
+        alt="Zoom out"
+        title="Zoom out"
+        onClick="Dispatcher.dispatch('map-zoom-out')"
+      >
         <i class="material-icons">remove</i>
       </button>
     </div>
@@ -88,50 +103,77 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
       <div id="map" class="lam-map"></div>
     </div>
 
-    <!--<div id="main-menu" class="lam-menu-bottom">-->
-    <div id="menu-toolbar" class="lam-menu-toolbar-bottom">
-      <button id="menu-toolbar__layer-tree" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-layers')">
+    <div id="menu-toolbar" class="lam-toolbar">
+      <button
+        id="menu-toolbar__layer-tree"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-layers')"
+      >
         <i class="material-icons">&#xE53B;</i>
       </button>
-      <button id="menu-toolbar__search-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-search')">
+      <button
+        id="menu-toolbar__search-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-search')"
+      >
         <i class="material-icons">&#xE8B6;</i>
       </button>
-      <button id="menu-toolbar__print-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-print-tools')">
+      <button
+        id="menu-toolbar__print-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-print-tools')"
+      >
         <i class="material-icons">&#xE8AD;</i>
       </button>
-      <button id="menu-toolbar__share-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-share')">
+      <button
+        id="menu-toolbar__share-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-share')"
+      >
         <i class="material-icons">&#xE80D;</i>
       </button>
-      <button id="menu-toolbar__map-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-map-tools')">
+      <button
+        id="menu-toolbar__map-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-map-tools')"
+      >
         <i class="material-icons">&#xE869;</i>
       </button>
-      <button id="menu-toolbar__draw-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-draw-tools')">
+      <button
+        id="menu-toolbar__draw-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-draw-tools')"
+      >
         <i class="material-icons">&#xE254;</i>
       </button>
-      <button id="menu-toolbar__gps-tools" class="btn-floating btn-large waves-effect waves-light lam-hidden" onClick="dispatch('show-gps-tools')">
+      <button
+        id="menu-toolbar__gps-tools"
+        class="btn-floating btn-large waves-effect waves-light lam-hidden lam-button lam-button"
+        onClick="dispatch('show-gps-tools')"
+      >
         <i class="material-icons">&#xE558;</i>
       </button>
     </div>
-    <div id="menu-panel" class="lam-menu-panel-bottom">
-      <div id="menu-panel__content" class="lam-menu-panel-content">
-        <div id="menu-panel__logo" class="lam-hidden menu-panel__logo">
-          <img src="" id="menu-panel__logo-img" />
+    <div id="panel" class="lam-panel">
+      <div id="panel__content" class="lam-panel-content">
+        <div id="panel__logo" class="lam-hidden panel__logo">
+          <img src="" id="panel__logo-img" />
         </div>
-        <div id="layer-tree" class="lam-menu-panel-content-item "></div>
+        <div id="layer-tree" class="lam-panel-content-item "></div>
 
-        <div id="info-results" class="lam-menu-panel-content-item ">
+        <div id="info-results" class="lam-panel-content-item ">
           <h4 id="info-results__title"></h4>
-          <div id="info-results__content" class="lam-menu-scroll-padding"></div>
+          <div id="info-results__content" class="lam-scroll-padding"></div>
         </div>
-        <div id="search-tools" class="lam-menu-panel-content-item"></div>
-        <div id="print-tools" class="lam-menu-panel-content-item"></div>
-        <div id="map-tools" class="lam-menu-panel-content-item"></div>
-        <div id="share-tools" class="lam-menu-panel-content-item"></div>
-        <div id="draw-tools" class="lam-menu-panel-content-item"></div>
+        <div id="search-tools" class="lam-panel-content-item"></div>
+        <div id="print-tools" class="lam-panel-content-item"></div>
+        <div id="map-tools" class="lam-panel-content-item"></div>
+        <div id="share-tools" class="lam-panel-content-item"></div>
+        <div id="draw-tools" class="lam-panel-content-item"></div>
       </div>
-      <div id="menu-panel__close" class="lam-menu-panel-close">
+      <div id="panel__close" class="lam-panel-close">
         <button
-          class="btn-floating btn-small waves-effect waves-light  lam-menu-button-close"
+          class="btn-floating btn-small waves-effect waves-light  lam-button-close lam-button"
           alt="Chiudi"
           title="Chiudi"
           onClick="Dispatcher.dispatch('hide-menu')"
@@ -144,7 +186,10 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
     <div id="info-window" class="lam-info-window">
       <div id="info-window__resize" class="">
         <div id="info-window__drag" class="lam-info-window__drag">
-          <button class="btn-floating btn-small waves-effect waves-light lam-right" onclick="Dispatcher.dispatch('hide-info-window')">
+          <button
+            class="btn-floating btn-small waves-effect waves-light lam-right lam-button"
+            onclick="Dispatcher.dispatch('hide-info-window')"
+          >
             <i class="material-icons">&#xE5CD;</i>
           </button>
         </div>

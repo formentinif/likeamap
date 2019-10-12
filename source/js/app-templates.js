@@ -357,7 +357,7 @@ let AppTemplates = (function() {
       tempBody += "</div>";
       tempBody += "<div class='col-12'>";
       tempBody +=
-        '<button class="btn-floating btn-small waves-effect waves-light lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
+        '<button class="btn-floating btn-small waves-effect waves-light lam-button lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
       tempBody += "<i class='fas fa-chevron-up'></i>";
       tempBody += "</button>";
       tempBody += "</div>";

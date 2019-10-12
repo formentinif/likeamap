@@ -102,9 +102,9 @@ var AppLayerTree = (function() {
     //sezione funzioni generali
     output += '<div class="layertree-item">';
     output +=
-      '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
     output += "</div>";
-    output += '<div class="layertree-item layertree-item-bottom lam-menu-scroll-padding"></div>'; //spaziatore
+    output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);

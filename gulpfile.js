@@ -53,6 +53,7 @@ function combineScripts() {
 	
 	gulp
     .src([
+	  "./source/css/app-variables.css",
       "./source/css/app-layout.css",
 	  "./source/css/app-tooltip.css",
 	  "./source/css/app-buttons.css",

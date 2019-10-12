@@ -520,7 +520,11 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = AppTemplates.getTemplate(
+      relation.gid,
+      relation.templateUrl,
+      AppStore.getAppState().templatesRepositoryUrl
+    );
 
     $.ajax({
       dataType: "jsonp",
@@ -809,8 +813,8 @@ var AppStore = (function() {
       $("#lam-logo__img").attr("src", state.logoUrl);
     }
     if (state.logoPanelUrl) {
-      $("#menu-panel__logo-img").attr("src", state.logoPanelUrl);
-      $("#menu-panel__logo").removeClass("lam-hidden");
+      $("#panel__logo-img").attr("src", state.logoPanelUrl);
+      $("#panel__logo").removeClass("lam-hidden");
     }
 
     //inizializzazione dell appstore
@@ -1151,9 +1155,9 @@ var AppLayerTree = (function() {
     //sezione funzioni generali
     output += '<div class="layertree-item">';
     output +=
-      '<button class="btn-floating btn-small waves-effect waves-light right" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
     output += "</div>";
-    output += '<div class="layertree-item layertree-item-bottom lam-menu-scroll-padding"></div>'; //spaziatore
+    output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);
@@ -1634,7 +1638,7 @@ let AppTemplates = (function() {
       tempBody += "</div>";
       tempBody += "<div class='col-12'>";
       tempBody +=
-        '<button class="btn-floating btn-small waves-effect waves-light lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
+        '<button class="btn-floating btn-small waves-effect waves-light lam-button lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
       tempBody += "<i class='fas fa-chevron-up'></i>";
       tempBody += "</button>";
       tempBody += "</div>";
@@ -1704,7 +1708,7 @@ let AppToolbar = (function() {
     //eseguo degli aggiustamente in caso di browser mobile
     if (AppStore.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
-      $(".lam-menu-toolbar-bottom button").css("margin-right", "0px");
+      $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
     }
     // else {
@@ -1733,7 +1737,7 @@ let AppToolbar = (function() {
   };
 
   let showMenu = function(toolId) {
-    $("#menu-panel").animate(
+    $("#panel").animate(
       {
         width: "show"
       },
@@ -1743,7 +1747,7 @@ let AppToolbar = (function() {
           if (toolId) {
             $("#" + toolId).show();
           }
-          $("#menu-panel__open").hide();
+          $("#panel__open").hide();
         }
       }
     );
@@ -1753,13 +1757,13 @@ let AppToolbar = (function() {
    * Nasconde il pannello del menu
    */
   var hideMenu = function() {
-    $("#menu-panel").animate(
+    $("#panel").animate(
       {
         width: "hide"
       },
       easingTime,
       function() {
-        $("#menu-panel__open").show();
+        $("#panel__open").show();
       }
     );
   };
@@ -1771,10 +1775,10 @@ let AppToolbar = (function() {
       //new tool selected
       currentToolbarItem = toolId;
       resetTools();
-      $(".lam-menu-panel-content-item").hide();
+      $(".lam-panel-content-item").hide();
       showMenu(toolId);
     } else {
-      if ($("#menu-panel").css("display") == "none" || keepOpen) {
+      if ($("#panel").css("display") == "none" || keepOpen) {
         //actual tool selected but hidden
         showMenu(toolId);
       } else {
