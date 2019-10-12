@@ -268,13 +268,12 @@ let AppMap = (function() {
         thisLayer = getLayerWMSTiled(gid, uri, params, attribution, secured);
         break;
       case "tms": //TO DO implementare
+        debugger;
         switch (tileMode.toLowerCase()) {
-          case "tms":
-            thisLayer = getLayerTiled(gid, uri, params, attribution, secured);
-            break;
           case "quadkey":
             break;
           case "xyz":
+            thisLayer = getLayerTiled(gid, uri, params, attribution, secured);
             break;
         }
         break;
