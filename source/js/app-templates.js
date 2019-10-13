@@ -37,26 +37,20 @@ let AppTemplates = (function() {
     loadRelationsTemplates(tempRelations, repoTemplatesUrl);
   };
 
-  let loadLayersTemplates = function(tempLayers, repoTemplatesUrl) {
-    for (let i = 0; i < tempLayers.length; i++) {
-      let groupLayer = tempLayers[i];
-      if (groupLayer.layers) {
-        for (let li = 0; li < groupLayer.layers.length; li++) {
-          //il layer deve essere selezionabile
-          if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
-            continue;
-          }
-          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
-          let template = templates.filter(function(el) {
-            return el.templateUrl === templateUrl;
-          });
-          if (template.length === 0) {
-            //aggiungo il layer vi ajax
-            loadTemplateAjax(templateUrl);
-          }
+  let loadLayersTemplates = function(layers, repoTemplatesUrl) {
+    layers.forEach(function(layer) {
+      if (layer.queryable || layer.preload || layer.searchable) {
+        let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
+        let template = templates.filter(function(el) {
+          return el.templateUrl === templateUrl;
+        });
+        if (template.length === 0) {
+          //aggiungo il layer vi ajax
+          loadTemplateAjax(templateUrl);
         }
       }
-    }
+      if (layer.layers) loadLayersTemplates(layer.layers, repoTemplatesUrl);
+    });
   };
 
   let loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
@@ -228,20 +222,25 @@ let AppTemplates = (function() {
     }
     let str = "";
     if (template.templateType === "simple") {
-      str += "<div class='lam-h6'>" + template.title + "</div>";
-      str += "<table class='lam-table lam-mb-3'>";
+      str += "<div class='row lam-feature-heading' ><div class='col s12'>" + template.title + "</div></div>";
+
       for (let i = 0; i < template.fields.length; i++) {
+        str += "<div class='lam-feature-row row lam-mb-1'>";
         let field = template.fields[i];
         switch (field.type) {
           case "int":
-            str += "<tr><td class='lam-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
+            str += "<div class='lam-feature-title col s6'>" + field.label + ":</div><div class='lam-feature-content col s6'>{{{" + field.field + "}}}</div>";
             break;
           case "string":
-            str += "<tr><td class='lam-strong'>" + field.label + "</td><td>{{{" + field.field + "}}}</td></tr>";
+            str += "<div class='lam-feature-title col s6'>" + field.label + ":</div><div class='lam-feature-content col s6'>{{{" + field.field + "}}}</div>";
             break;
           case "yesno":
-            str += "<tr><td class='lam-strong'>" + field.label + "</td>";
-            str += "<td>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</td></tr>";
+            str +=
+              "<div class='lam-feature-title col s6'>" +
+              field.label +
+              ":</div><div class='lam-feature-content col s6'>{{#if " +
+              field.field +
+              "}}Sì{{else}}No{{/if}}</div>";
             break;
           /*  case "moreinfo":
             str +=
@@ -264,11 +263,11 @@ let AppTemplates = (function() {
             str += field.footer;
             break;
           case "link":
-            str += '<tr><td colspan="2"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></td>";
+            str += '<div class="lam-feature-content col s12"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
             break;
         }
+        str += "</div>";
       }
-      str += "</table>";
     }
     return str;
   };
