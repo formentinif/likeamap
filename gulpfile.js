@@ -39,6 +39,7 @@ function combineScripts() {
     .pipe(concat("app.js"))
     //.pipe(uglify(uglifyOptions))
     .pipe(gulp.dest("./dist/js"));
+	
   gulp
     .src([
       "./source/js/draw-tools.js",
@@ -53,13 +54,18 @@ function combineScripts() {
 	
 	gulp
     .src([
-	  "./source/css/app-variables.css",
       "./source/css/app-layout.css",
 	  "./source/css/app-tooltip.css",
 	  "./source/css/app-buttons.css",
       "./source/css/app.css"
     ])
     .pipe(concat("app.css"))
+    .pipe(gulp.dest("./dist/css"));
+	
+	gulp
+    .src([
+      "./source/css/app-variables.css",
+    ])
     .pipe(gulp.dest("./dist/css"));
 	
   return gulp

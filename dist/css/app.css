@@ -1,18 +1,3 @@
-:root {
-  --lam-bg-color: rgba(252, 252, 252, 0.9);
-  --lam-bg-menu-color: #63818f;
-  --lam-button-color: #63818f;
-  --lam-button-color-darken: #455a64;
-}
-
-/*Custom*/
-.lam-background {
-  background-color: var(--lam-bg-menu-color);
-}
-.color-violet {
-  background-color: #735ab6;
-}
-
 .lam-scroll-padding {
   padding-bottom: 100px !important;
 }
