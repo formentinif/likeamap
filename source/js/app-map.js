@@ -268,7 +268,6 @@ let AppMap = (function() {
         thisLayer = getLayerWMSTiled(gid, uri, params, attribution, secured);
         break;
       case "tms": //TO DO implementare
-        debugger;
         switch (tileMode.toLowerCase()) {
           case "quadkey":
             break;
@@ -441,11 +440,12 @@ let AppMap = (function() {
   };
 
   let getLayerTiled = function(gid, uri, params, attribution, secured) {
+    let paramsLocal = queryToDictionary(params);
     let tms = new ol.layer.Tile({
       //extent: [-13884991, 2870341, -7455066, 6338219],
       source: new ol.source.TileWMS({
         url: uri,
-        params: params,
+        params: paramsLocal,
         serverType: "geoserver"
       })
     });

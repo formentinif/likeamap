@@ -167,6 +167,7 @@ var Dispatcher = (function() {
     });
 
     this.bind("set-layer-visibility", function(payload) {
+      debugger;
       AppMap.setLayerVisibility(payload.gid, payload.visibility);
       AppStore.setLayerVisibility(payload.gid, payload.visibility);
     });
@@ -520,11 +521,7 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(
-      relation.gid,
-      relation.templateUrl,
-      AppStore.getAppState().templatesRepositoryUrl
-    );
+    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",
@@ -563,7 +560,7 @@ var AppStore = (function() {
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + AppResources.risultati_non_trovati + "</div>";
         }
-        AppMapInfo.showInfoWindow(title, body);
+        AppStore.showContent(title, body);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         dispatch({
@@ -612,7 +609,7 @@ var AppStore = (function() {
     if (layer) {
       layerName = layer.layerName;
     }
-    AppMapInfo.showInfoWindow(layerName, html, "info-results");
+    AppStore.showContent(layerName, html, "", "info-results");
     return true;
   };
 
@@ -634,6 +631,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = 1 - layer.visible;
     }
+    AppLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -647,6 +645,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = visibility;
     }
+    AppLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -1014,6 +1013,20 @@ var AppStore = (function() {
     return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
+  let showContent = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-results";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+    if (!AppStore.isMobile()) {
+      AppToolbar.toggleToolbarItem(htmlElement, true);
+    } else {
+      $("#info-tooltip").show();
+      $("#info-tooltip").html(bodyMobile);
+    }
+  };
+
   return {
     doLogin: doLogin,
     init: init,
@@ -1042,6 +1055,7 @@ var AppStore = (function() {
     setInitialAppState: setInitialAppState,
     showLegend: showLegend,
     showAppTools: showAppTools,
+    showContent: showContent,
     showRelation: showRelation,
     toggleLoader: toggleLoader,
     resetInitialLayers: resetInitialLayers,
@@ -1155,7 +1169,7 @@ var AppLayerTree = (function() {
     //sezione funzioni generali
     output += '<div class="layertree-item">';
     output +=
-      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">refresh</i></button>';
     output += "</div>";
     output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
@@ -1175,7 +1189,7 @@ var AppLayerTree = (function() {
       layer.gid
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{0}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="AppLayerTree.toggleCheck(\'{0}_c\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
       layerId,
       layer.visible ? "fa-check-square" : "fa-square",
       layer.gid
@@ -1197,11 +1211,7 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString(
-      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
-      groupId,
-      groupLayer.visible ? "visible" : "hidden"
-    );
+    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {
@@ -1221,8 +1231,19 @@ var AppLayerTree = (function() {
     return output;
   };
 
-  var toggleCheck = function(iconId, groupId) {
-    const item = "#" + iconId;
+  var setCheckVisibility = function(layerGid, visibility) {
+    const item = "#" + layerGid + "_c";
+    if (visibility) {
+      $(item).removeClass("fa-square");
+      $(item).addClass("fa-check-square");
+    } else {
+      $(item).addClass("fa-square");
+      $(item).removeClass("fa-check-square");
+    }
+  };
+
+  var toggleCheck = function(layerGid, groupId) {
+    const item = "#" + layerGid + "_c";
     if ($(item).hasClass("fa-square")) {
       $(item).removeClass("fa-square");
       $(item).addClass("fa-check-square");
@@ -1270,10 +1291,16 @@ var AppLayerTree = (function() {
     return str;
   };
 
+  let setLayerVisibility = function(layerGid) {
+    $("#" + layerGid + "_c");
+  };
+
   return {
     formatString: formatString,
     render: render,
     init: init,
+    setCheckVisibility: setCheckVisibility,
+    setLayerVisibility: setLayerVisibility,
     toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };
@@ -1327,11 +1354,7 @@ let AppTemplates = (function() {
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(
-            groupLayer.layers[li].gid,
-            groupLayer.layers[li].templateUrl,
-            repoTemplatesUrl
-          );
+          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -1499,14 +1522,7 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result +=
-          '<a href="#" onclick="AppStore.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          relation.labelTemplate +
-          "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -1594,11 +1610,7 @@ let AppTemplates = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      let template = AppTemplates.getTemplate(
-        feature.layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
+      let template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       let tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);

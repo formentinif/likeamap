@@ -167,6 +167,7 @@ var Dispatcher = (function() {
     });
 
     this.bind("set-layer-visibility", function(payload) {
+      debugger;
       AppMap.setLayerVisibility(payload.gid, payload.visibility);
       AppStore.setLayerVisibility(payload.gid, payload.visibility);
     });

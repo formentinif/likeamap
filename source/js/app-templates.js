@@ -46,11 +46,7 @@ let AppTemplates = (function() {
           if (!groupLayer.layers[li].layer || !groupLayer.layers[li].queryable) {
             continue;
           }
-          let templateUrl = getTemplateUrl(
-            groupLayer.layers[li].gid,
-            groupLayer.layers[li].templateUrl,
-            repoTemplatesUrl
-          );
+          let templateUrl = getTemplateUrl(groupLayer.layers[li].gid, groupLayer.layers[li].templateUrl, repoTemplatesUrl);
           let template = templates.filter(function(el) {
             return el.templateUrl === templateUrl;
           });
@@ -218,14 +214,7 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result +=
-          '<a href="#" onclick="AppStore.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          relation.labelTemplate +
-          "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -313,11 +302,7 @@ let AppTemplates = (function() {
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
       let layer = AppStore.getLayer(feature.layerGid);
-      let template = AppTemplates.getTemplate(
-        feature.layerGid,
-        layer.templateUrl,
-        AppStore.getAppState().templatesRepositoryUrl
-      );
+      let template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
       let tempBody = AppTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += AppTemplates.standardTemplate(props, layer);

@@ -879,25 +879,7 @@ let AppMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    if (!AppStore.isMobile()) {
-      AppToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
-    }
-
-    // $("#info-window__title").html(title);
-    // $("#info-window__body").html(body);
-    // $("#info-window").show();
-    // $("#info-window").animate(
-    //   {
-    //     scrollTop: 0
-    //   },
-    //   "fast"
-    // );
+    AppStore.showContent(title, body, bodyMobile, htmlElement);
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {
@@ -1292,7 +1274,6 @@ let AppMap = (function() {
         thisLayer = getLayerWMSTiled(gid, uri, params, attribution, secured);
         break;
       case "tms": //TO DO implementare
-        debugger;
         switch (tileMode.toLowerCase()) {
           case "quadkey":
             break;
@@ -1465,11 +1446,12 @@ let AppMap = (function() {
   };
 
   let getLayerTiled = function(gid, uri, params, attribution, secured) {
+    let paramsLocal = queryToDictionary(params);
     let tms = new ol.layer.Tile({
       //extent: [-13884991, 2870341, -7455066, 6338219],
       source: new ol.source.TileWMS({
         url: uri,
-        params: params,
+        params: paramsLocal,
         serverType: "geoserver"
       })
     });

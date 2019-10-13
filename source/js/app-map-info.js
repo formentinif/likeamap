@@ -384,25 +384,7 @@ let AppMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    if (!AppStore.isMobile()) {
-      AppToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
-    }
-
-    // $("#info-window__title").html(title);
-    // $("#info-window__body").html(body);
-    // $("#info-window").show();
-    // $("#info-window").animate(
-    //   {
-    //     scrollTop: 0
-    //   },
-    //   "fast"
-    // );
+    AppStore.showContent(title, body, bodyMobile, htmlElement);
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {

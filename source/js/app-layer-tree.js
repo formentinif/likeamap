@@ -102,7 +102,7 @@ var AppLayerTree = (function() {
     //sezione funzioni generali
     output += '<div class="layertree-item">';
     output +=
-      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">close</i></button>';
+      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">refresh</i></button>';
     output += "</div>";
     output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
@@ -122,7 +122,7 @@ var AppLayerTree = (function() {
       layer.gid
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{0}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="AppLayerTree.toggleCheck(\'{0}_c\');Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
       layerId,
       layer.visible ? "fa-check-square" : "fa-square",
       layer.gid
@@ -144,11 +144,7 @@ var AppLayerTree = (function() {
     );
     output += "<span>" + groupLayer.layerName + "</span>";
     output += "</div>";
-    output += formatString(
-      '<div id="{0}_u" class="layertree-item__layers layertree--{1}">',
-      groupId,
-      groupLayer.visible ? "visible" : "hidden"
-    );
+    output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
       groupLayer.layers.forEach(function(element) {
@@ -168,8 +164,19 @@ var AppLayerTree = (function() {
     return output;
   };
 
-  var toggleCheck = function(iconId, groupId) {
-    const item = "#" + iconId;
+  var setCheckVisibility = function(layerGid, visibility) {
+    const item = "#" + layerGid + "_c";
+    if (visibility) {
+      $(item).removeClass("fa-square");
+      $(item).addClass("fa-check-square");
+    } else {
+      $(item).addClass("fa-square");
+      $(item).removeClass("fa-check-square");
+    }
+  };
+
+  var toggleCheck = function(layerGid, groupId) {
+    const item = "#" + layerGid + "_c";
     if ($(item).hasClass("fa-square")) {
       $(item).removeClass("fa-square");
       $(item).addClass("fa-check-square");
@@ -217,10 +224,16 @@ var AppLayerTree = (function() {
     return str;
   };
 
+  let setLayerVisibility = function(layerGid) {
+    $("#" + layerGid + "_c");
+  };
+
   return {
     formatString: formatString,
     render: render,
     init: init,
+    setCheckVisibility: setCheckVisibility,
+    setLayerVisibility: setLayerVisibility,
     toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };

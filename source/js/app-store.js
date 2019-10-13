@@ -136,11 +136,7 @@ var AppStore = (function() {
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(
-      relation.gid,
-      relation.templateUrl,
-      AppStore.getAppState().templatesRepositoryUrl
-    );
+    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",
@@ -179,7 +175,7 @@ var AppStore = (function() {
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + AppResources.risultati_non_trovati + "</div>";
         }
-        AppMapInfo.showInfoWindow(title, body);
+        AppStore.showContent(title, body);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         dispatch({
@@ -228,7 +224,7 @@ var AppStore = (function() {
     if (layer) {
       layerName = layer.layerName;
     }
-    AppMapInfo.showInfoWindow(layerName, html, "info-results");
+    AppStore.showContent(layerName, html, "", "info-results");
     return true;
   };
 
@@ -250,6 +246,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = 1 - layer.visible;
     }
+    AppLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -263,6 +260,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = visibility;
     }
+    AppLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -630,6 +628,20 @@ var AppStore = (function() {
     return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
+  let showContent = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-results";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+    if (!AppStore.isMobile()) {
+      AppToolbar.toggleToolbarItem(htmlElement, true);
+    } else {
+      $("#info-tooltip").show();
+      $("#info-tooltip").html(bodyMobile);
+    }
+  };
+
   return {
     doLogin: doLogin,
     init: init,
@@ -658,6 +670,7 @@ var AppStore = (function() {
     setInitialAppState: setInitialAppState,
     showLegend: showLegend,
     showAppTools: showAppTools,
+    showContent: showContent,
     showRelation: showRelation,
     toggleLoader: toggleLoader,
     resetInitialLayers: resetInitialLayers,
