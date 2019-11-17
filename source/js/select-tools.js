@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let SelectTools = (function() {
+let LamSelectTools = (function() {
   let isRendered = false;
   let selectLayers = [];
   let selectionResult = [];
@@ -36,59 +36,59 @@ let SelectTools = (function() {
     });
 
     let btn = $("<button/>", {
-      class: "btn-floating btn-large waves-effect waves-light lam-button",
+      class: "lam-btn lam-btn-floating lam-btn-large",
       click: function(e) {
         e.preventDefault();
-        dispatch("show-select-tools");
+        lamDispatch("show-select-tools");
       }
-    }).append("<i class='large material-icons '>select_all</i>");
+    }).append("<i class='large lam-icon '>select_all</i>");
     $("#menu-toolbar").append(btn);
 
     let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
     $("#panel__content").append(divSelect);
 
-    Dispatcher.bind("show-select-tools", function(payload) {
-      AppToolbar.toggleToolbarItem("select-tools");
-      if (AppToolbar.getCurrentToolbarItem() === "select-tools") {
-        dispatch("set-select");
+    LamDispatcher.bind("show-select-tools", function(payload) {
+      LamToolbar.toggleToolbarItem("select-tools");
+      if (LamToolbar.getCurrentToolbarItem() === "select-tools") {
+        lamDispatch("set-select");
       } else {
-        dispatch("unset-select");
+        lamDispatch("unset-select");
       }
-      dispatch("clear-layer-info");
+      lamDispatch("clear-layer-info");
     });
 
-    Dispatcher.bind("set-select", function(payload) {
-      AppMap.removeSelectInteraction();
-      AppMap.addSelectInteraction(payload.type);
+    LamDispatcher.bind("set-select", function(payload) {
+      LamMap.removeSelectInteraction();
+      LamMap.addSelectInteraction(payload.type);
     });
 
-    Dispatcher.bind("unset-select", function(payload) {
-      AppMap.removeSelectInteraction();
-      AppMap.clearLayerSelection();
-      AppMap.clearLayerSelectionMask();
+    LamDispatcher.bind("unset-select", function(payload) {
+      LamMap.removeSelectInteraction();
+      LamMap.clearLayerSelection();
+      LamMap.clearLayerSelectionMask();
     });
 
-    Dispatcher.bind("start-selection-search", function(payload) {
-      AppMap.clearLayerSelection();
+    LamDispatcher.bind("start-selection-search", function(payload) {
+      LamMap.clearLayerSelection();
       let coords = payload.coords;
       if (!coords) {
-        coords = AppMap.getSelectionMask();
+        coords = LamMap.getSelectionMask();
       }
       let layerName = payload.layerName;
       if (!layerName) {
         layerName = $("#select-tools__layers option:selected").val();
       }
       if (!coords || !layerName) {
-        dispatch({
+        lamDispatch({
           eventName: "log",
           message: "Parametri per la selezione non validi"
         });
         return;
       }
-      SelectTools.doSelectionLayers(coords, layerName);
+      LamSelectTools.doSelectionLayers(coords, layerName);
     });
 
-    AppToolbar.addResetToolsEvent({
+    LamToolbar.addResetToolsEvent({
       eventName: "unset-select"
     });
   };
@@ -104,13 +104,12 @@ let SelectTools = (function() {
     $("#select-tools__content").hide();
 
     $("#select-tools__layers").on("change", function() {
-      dispatch({
+      lamDispatch({
         eventName: "start-selection-search"
       });
     });
 
     try {
-      M.AutoInit();
       $(".dropdown-trigger").dropdown();
     } catch (e) {
     } finally {
@@ -123,7 +122,7 @@ let SelectTools = (function() {
     let template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Seleziona</h4>';
-    template += '<div class="lam-card z-depth-2 lam-full-height">';
+    template += '<div class="lam-card lam-depth-2 lam-full-height">';
     template += "<div class='mb-2'>";
     template += templateLayersInput(selectLayers);
     template += "</div>";
@@ -135,7 +134,7 @@ let SelectTools = (function() {
    */
   let templateLayersInput = function(selectLayers) {
     let template = "";
-    template += '<select id="select-tools__layers" class="input-field">';
+    template += '<select id="select-tools__layers" class="lam-input">';
     template += '<option value="">Seleziona layer</option>';
     selectLayers.forEach(function(layer) {
       template += '<option value="' + layer.layer + '">' + layer.layerName + "</option>";
@@ -152,18 +151,17 @@ let SelectTools = (function() {
    * @param {Object} results
    */
   let templateSelectionResults = function(results) {
-    template = '<ul class="mdl-list">';
+    template = '<div class="lam-grid lam-grid-1">';
     template += "{{#each this}}";
-    template += '<li class="mdl-list__item">';
-    template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SelectTools.zoomToItem({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
+    template += '<div class="lam-col">';
+    template += '<i class="lam-icon md-icon">&#xE55F;</i><a href="#" onclick="LamSelectTools.zoomToItem({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
     template += "{{{display_name}}}";
     template += "</a>";
-    template += "</li>";
+    template += "</div>";
     template += "{{/each}}";
-    template += "</ul>";
+    template += "</div>";
 
-    template += "<button onclick='SelectTools.exportCSVFile();'>Esporta risultati</button>";
+    template += "<button onclick='LamSelectTools.exportCSVFile();'>Esporta risultati</button>";
 
     return Handlebars.compile(template);
   };
@@ -179,7 +177,7 @@ let SelectTools = (function() {
   };
 
   let deleteFeatures = function() {
-    dispatch({
+    lamDispatch({
       eventName: "delete-selection"
     });
   };
@@ -205,7 +203,7 @@ let SelectTools = (function() {
       return layer.layer == currentLayer;
     });
     if (layers.length == 0) {
-      dispatch({ eventName: "log", message: "Layer " + currentLayer + "non valido" });
+      lamDispatch({ eventName: "log", message: "Layer " + currentLayer + "non valido" });
       return;
     }
 
@@ -235,10 +233,10 @@ let SelectTools = (function() {
           for (let i = 0; i < data.features.length; i++) {
             if ($.inArray(data.features[i].properties[layer.labelField], resultsIndex) === -1) {
               //aggiungo la feature alla mappa
-              AppMap.addFeatureSelectionToMap(data.features[i].geometry, data.crs);
+              LamMap.addFeatureSelectionToMap(data.features[i].geometry, data.crs);
               let cent = null;
               if (data.features[i].geometry.coordinates[0][0]) {
-                cent = AppMap.getCentroid(data.features[i].geometry.coordinates[0]);
+                cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
               } else {
                 cent = data.features[i].geometry.coordinates;
               }
@@ -267,11 +265,11 @@ let SelectTools = (function() {
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        dispatch({
+        lamDispatch({
           eventName: "log",
-          message: "SelectTools: unable to complete response"
+          message: "LamSelectTools: unable to complete response"
         });
-        dispatch({
+        lamDispatch({
           eventName: "show-message",
           message: "Non è stato possibile completare la richiesta."
         });
@@ -288,18 +286,18 @@ let SelectTools = (function() {
    */
   var zoomToItem = function(lon, lat, index, showInfo) {
     if (selectionResult[index]) {
-      dispatch({
+      lamDispatch({
         eventName: "zoom-geometry",
         geometry: selectionResult[index].item.geometry
       });
       if (showInfo) {
-        dispatch({
+        lamDispatch({
           eventName: "show-info-items",
           features: selectionResult[index].item
         });
       }
       let payload = {
-        eventName: "add-feature-info-map",
+        eventName: "add-geometry-info-map",
         geometry: selectionResult[index].item.geometry
       };
       try {
@@ -307,10 +305,10 @@ let SelectTools = (function() {
       } catch (e) {
         payload.srid = null;
       }
-      dispatch(payload);
-      dispatch("hide-menu-mobile");
+      lamDispatch(payload);
+      lamDispatch("hide-menu-mobile");
     } else {
-      dispatch({
+      lamDispatch({
         eventName: "zoom-lon-lat",
         zoom: 18,
         lon: parseFloat(lon),
@@ -318,7 +316,7 @@ let SelectTools = (function() {
         eventName: "add-wkt-info-map",
         wkt: "POINT(" + lon + " " + lat + ")"
       });
-      dispatch("hide-menu-mobile");
+      lamDispatch("hide-menu-mobile");
     }
   };
 
@@ -346,7 +344,7 @@ let SelectTools = (function() {
     let items = selectionResult;
     let fileName = "esportazione.csv";
     var jsonObject = JSON.stringify(items);
-    var csv = SelectTools.convertToCSV(jsonObject);
+    var csv = LamSelectTools.convertToCSV(jsonObject);
     var exportedFilenmae = fileName + ".csv";
     var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     if (navigator.msSaveBlob) {

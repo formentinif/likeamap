@@ -31,75 +31,18 @@ var tempBg = "url(img/logins/login" + numBg + ".jpg)";
 $("#login-container").css("background-image", tempBg);
 
 //Global dispatch helper
-function dispatch(payload) {
-  Dispatcher.dispatch(payload);
+function lamDispatch(payload) {
+  LamDispatcher.dispatch(payload);
 }
 
-function appInit() {
-  //appstate loader
-  //appstate with filename
-  var appStateId =
-    decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
-
-  //appstate json inline with url
-  var appStateJson =
-    decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
-    null;
-
-  if (appStateId) {
-    //call with ajax
-    $.ajax({
-      dataType: "json",
-      url: "states/" + appStateId
-    })
-      .done(function(appState) {
-        loadState(appState);
-      })
-      .fail(function() {
-        //AppStore.mapInit();
-        dispatch({
-          eventName: "log",
-          message: "Share: Impossibile caricare la mappa condivisa"
-        });
-      });
-  } else if (appStateJson) {
-    $.ajax({
-      dataType: "json",
-      url: appStateJson
-    })
-      .done(function(appstate) {
-        loadState(appstate);
-      })
-      .fail(function() {
-        dispatch({
-          eventName: "log",
-          message: "Share: Impossibile caricare la mappa condivisa"
-        });
-      });
-  } else {
-    $.ajax({
-      dataType: "json",
-      url: "states/app-state.json"
-    })
-      .done(function(appstate) {
-        loadState(appstate);
-      })
-      .fail(function() {
-        dispatch({
-          eventName: "log",
-          message: "Share: Impossibile caricare la mappa"
-        });
-      });
-  }
-
-  function loadState(appstate) {
-    if (appstate.authentication.requireAuthentication) {
-      AuthTools.render("login-container");
-    }
-    AppStore.mapInit(appstate, customFunctions);
-  }
+/**
+ * Init map function TODO it has ti bo optimized
+ * @param {string} mapDiv div for map rendering
+ * @param {*} appStateUrl optional url of the map state
+ */
+function LamInit(mapDiv, appStateUrl, isEmbedded) {
+  LamStore.lamInit(mapDiv, appStateUrl, isEmbedded);
 }
-
 /*Custom functions*/
 function customFunctions() {
   //Right click menu
@@ -111,14 +54,12 @@ function customFunctions() {
     //   }
   ];
   //TODO Revisione del context menu
-  //AppMap.addContextMenu(items);
+  //LamMap.addContextMenu(items);
 }
 
 function reverseGeocoding(obj) {
-  dispatch({
+  lamDispatch({
     eventName: "reverse-geocoding",
     coordinate: obj.coordinate
   });
 }
-//inizializzazione della mappa
-appInit();

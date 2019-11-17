@@ -25,15 +25,131 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var AppStore = (function() {
+var LamStore = (function() {
+  var mapDiv = null;
+  var isEmbedded = false;
   var appState = null;
   var initialAppState = null;
   var authToken = null;
   let infoClickEnabled = true;
 
+  var setMapDiv = function(div) {
+    mapDiv = div;
+  };
+
+  var setIsEmbedded = function(value) {
+    isEmbedded = value;
+  };
+
+  /**
+   * Init map function TODO it has ti bo optimized
+   * @param {string} mapDiv div for map rendering
+   * @param {*} appStateUrl optional url of the map state
+   */
+  function lamInit(mapDiv, appStateUrl, isEmbedded) {
+    LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
+    LamStore.setIsEmbedded(isEmbedded);
+    //appstate loader
+    //appstate with filename
+    var appStateId =
+      decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
+
+    //appstate json inline with url
+    var appStateJson =
+      decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
+      null;
+
+    if (appStateId) {
+      //call with ajax
+      $.ajax({
+        dataType: "json",
+        url: "states/" + appStateId
+      })
+        .done(function(appState) {
+          loadLamState(appState);
+        })
+        .fail(function() {
+          //LamStore.mapInit();
+          lamDispatch({
+            eventName: "log",
+            message: "Share: Impossibile caricare la mappa condivisa"
+          });
+        });
+    } else if (appStateJson) {
+      $.ajax({
+        dataType: "json",
+        url: appStateJson
+      })
+        .done(function(appstate) {
+          loadLamState(appstate);
+        })
+        .fail(function() {
+          lamDispatch({
+            eventName: "log",
+            message: "Share: Impossibile caricare la mappa condivisa"
+          });
+        });
+    } else if (appStateUrl) {
+      $.ajax({
+        dataType: "json",
+        url: appStateUrl
+      })
+        .done(function(appstate) {
+          loadLamState(appstate);
+        })
+        .fail(function() {
+          lamDispatch({
+            eventName: "log",
+            message: "Share: Impossibile caricare la mappa condivisa"
+          });
+        });
+    } else {
+      $.ajax({
+        dataType: "json",
+        url: "states/app-state.json"
+      })
+        .done(function(appstate) {
+          loadLamState(appstate);
+        })
+        .fail(function() {
+          lamDispatch({
+            eventName: "log",
+            message: "Share: Impossibile caricare la mappa"
+          });
+        });
+    }
+
+    function loadLamState(appstate) {
+      //normalizing appstate
+      appState = normalizeAppState(appstate);
+      if (appState.authentication.requireAuthentication) {
+        LamAuthTools.render("login-container");
+      }
+      lamTemplateMapinit();
+    }
+  }
+
+  var lamTemplateMapinit = function() {
+    let templateUrl = isEmbedded ? "embed.html" : "map.html";
+    if (LamStore.getAppState().urlMapTemplate != null) {
+      templateUrl = LamStore.getAppState().urlMapTemplate;
+    }
+    $.ajax({
+      dataType: "text",
+      url: templateUrl
+    })
+      .done(function(data) {
+        $("#" + mapDiv).html(data);
+        LamStore.mapInit(appState, customFunctions);
+      })
+      .fail(function(data) {
+        lamDispatch({
+          eventName: "log",
+          message: "Init Map: Unable to load map template"
+        });
+      });
+  };
   var init = function() {
-    //normalizing appstate
-    appState = normalizeAppState(appState);
     if (isMobile() && appState.improveMobileBehaviour) {
       appState = normalizeMobile(appState);
     }
@@ -45,12 +161,12 @@ var AppStore = (function() {
         url: url
       })
         .done(function(data) {
-          SearchTools.updateComuniNM(data);
+          LamSearchTools.updateComuniNM(data);
         })
         .fail(function(data) {
-          dispatch({
+          lamDispatch({
             eventName: "log",
-            message: "AppStore: Unable to load comuni from rest service"
+            message: "LamStore: Unable to load comuni from rest service"
           });
         });
     }
@@ -120,7 +236,7 @@ var AppStore = (function() {
 
   var showAppTools = function() {
     if (appState.modules) {
-      $("#menu-toolbar__layer-tree").toggle(appState.modules["layer-tree"]);
+      $("#menu-toolbar__layer-tree").toggle(appState.modules["lam-layer-tree"]);
       $("#menu-toolbar__search-tools").toggle(appState.modules["search-tools"]);
       $("#menu-toolbar__print-tools").toggle(appState.modules["print-tools"]);
       $("#menu-toolbar__share-tools").toggle(appState.modules["share-tools"]);
@@ -131,12 +247,12 @@ var AppStore = (function() {
   };
 
   var showRelation = function(relationGid, resultIndex) {
-    var item = AppStore.getCurrentInfoItems().features[resultIndex];
-    var relation = AppStore.getRelation(relationGid);
+    var item = LamStore.getCurrentInfoItems().features[resultIndex];
+    var relation = LamStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
 
-    var template = AppTemplates.getTemplate(relation.gid, relation.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
+    var template = LamTemplates.getTemplate(relation.gid, relation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
 
     $.ajax({
       dataType: "jsonp",
@@ -158,9 +274,9 @@ var AppStore = (function() {
           propsList.push(props);
           if (!template.multipleItems) {
             //single template not active by default
-            body += AppTemplates.processTemplate(template, props);
+            body += LamTemplates.processTemplate(template, props);
             if (!body) {
-              body += AppTemplates.standardTemplate(props);
+              body += LamTemplates.standardTemplate(props);
             }
             if (data.length > 1) {
               body += "<div class='div-10'></div>";
@@ -170,17 +286,17 @@ var AppStore = (function() {
 
         //single template not active by default
         if (template.multipleItems && propsList.length > 0) {
-          body += AppTemplates.processTemplate(template, propsList);
+          body += LamTemplates.processTemplate(template, propsList);
         }
         if (data.length === 0) {
-          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + AppResources.risultati_non_trovati + "</div>";
+          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
         }
-        AppStore.showContent(title, body);
+        LamStore.showContent(title, body);
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        dispatch({
+        lamDispatch({
           eventName: "log",
-          message: "SearchTools: unable to complete response"
+          message: "LamSearchTools: unable to complete response"
         });
       }
     });
@@ -200,7 +316,7 @@ var AppStore = (function() {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
       } else {
-        urlImg = AppMap.getLegendUrl(gid, scaled);
+        urlImg = LamMap.getLegendUrl(gid, scaled);
       }
 
       if (urlImg) {
@@ -213,18 +329,18 @@ var AppStore = (function() {
 
     if (scaled) {
       html +=
-        "<p class='mt-2'><a href='#' onclick=\"Dispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<p class='mt-2'><a href='#' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
         "', scaled: false })\">Visualizza legenda completa</a></p>";
     }
 
     html += "<div>";
-    var layer = AppStore.getLayer(gid);
+    var layer = LamStore.getLayer(gid);
     var layerName = "";
     if (layer) {
       layerName = layer.layerName;
     }
-    AppStore.showContent(layerName, html, "", "info-results");
+    LamStore.showContent(layerName, html, "", "info-results");
     return true;
   };
 
@@ -246,7 +362,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = 1 - layer.visible;
     }
-    AppLayerTree.setCheckVisibility(gid, layer.visible);
+    LamLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -260,7 +376,7 @@ var AppStore = (function() {
     if (layer) {
       layer.visible = visibility;
     }
-    AppLayerTree.setCheckVisibility(gid, layer.visible);
+    LamLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
   /**
@@ -275,7 +391,7 @@ var AppStore = (function() {
         layerFound = layer;
       }
       if (!layerFound && layer.layers) {
-        layerFound = AppStore.getLayerArray(layer.layers, gid);
+        layerFound = LamStore.getLayerArray(layer.layers, gid);
       }
     });
     return layerFound;
@@ -293,7 +409,7 @@ var AppStore = (function() {
         layerFound = layer;
       }
       if (!layerFound && layer.layers) {
-        layerFound = AppStore.getLayerArrayByName(layer.layers, layerName);
+        layerFound = LamStore.getLayerArrayByName(layer.layers, layerName);
       }
     });
     return layerFound;
@@ -305,7 +421,7 @@ var AppStore = (function() {
    * @return {object}     Layer
    */
   var getLayer = function(gid) {
-    return AppStore.getLayerArray(appState.layers, gid);
+    return LamStore.getLayerArray(appState.layers, gid);
   };
 
   /**
@@ -314,7 +430,7 @@ var AppStore = (function() {
    * @return {object}     Layer
    */
   var getLayerByName = function(layerName) {
-    return AppStore.getLayerArrayByName(appState.layers, layerName);
+    return LamStore.getLayerArrayByName(appState.layers, layerName);
   };
 
   function SortByLayerName(a, b) {
@@ -417,10 +533,10 @@ var AppStore = (function() {
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
   var mapInit = function(state, callback) {
-    AppStore.setInitialAppState(state);
-    AppStore.setAppState(state);
+    LamStore.setInitialAppState(state);
+    LamStore.setAppState(state);
 
-    $("#map-container").removeClass("lam-hidden");
+    $("#" + mapDiv).removeClass("lam-hidden");
 
     //definizione dei loghi
     if (state.logoUrl) {
@@ -431,18 +547,18 @@ var AppStore = (function() {
       $("#panel__logo").removeClass("lam-hidden");
     }
 
-    //inizializzazione dell appstore
-    AppStore.init();
-    AppStore.showAppTools();
+    //inizializzazione dell LamStore
+    LamStore.init();
+    LamStore.showAppTools();
     //map init
-    AppMap.render("map", appState);
-    AppMapTooltip.init();
+    LamMap.render("lam-map", appState);
+    LamMapTooltip.init();
     //loading templates
-    AppTemplates.init();
+    LamTemplates.init();
     //carico i layers
-    AppLayerTree.init(function() {
+    LamLayerTree.init(function() {
       //carico gli strumenti di ricerca
-      SearchTools.render(
+      LamSearchTools.render(
         "search-tools",
         appState.searchProvider,
         appState.searchProviderAddressUrl,
@@ -452,19 +568,19 @@ var AppStore = (function() {
         getSearchLayers()
       );
       //carico gli strumenti di share
-      ShareTools.render("share-tools", null);
+      LamShareTools.render("share-tools", null);
       //carico gli strumenti di Stampa
-      PrintTools.render("print-tools");
+      LamPrintTools.render("print-tools");
       //carico gli strumenti di mappa
-      MapTools.render("map-tools");
+      LamMapTools.render("map-tools");
       //carico gli strumenti di disegno
-      DrawTools.render("draw-tools");
+      LamDrawTools.render("draw-tools");
       if (appState.modules["select-tools"]) {
-        SelectTools.render(getQueryLayers());
+        LamSelectTools.render(getQueryLayers());
       }
     });
 
-    AppToolbar.init();
+    LamToolbar.init();
 
     //eseguo il callback
     callback();
@@ -475,17 +591,17 @@ var AppStore = (function() {
    * @return {null}
    */
   var liveReload = function(newAppState) {
-    AppStore.setAppState(newAppState);
-    AppStore.showAppTools();
-    AppLayerTree.render("layer-tree", newAppState.layers);
-    AppMap.removeAllLayersFromMap();
-    AppMap.loadConfig(newAppState);
+    LamStore.setAppState(newAppState);
+    LamStore.showAppTools();
+    LamLayerTree.render("lam-layer-tree", newAppState.layers);
+    LamMap.removeAllLayersFromMap();
+    LamMap.loadConfig(newAppState);
   };
 
   var mapReload = function() {
-    AppLayerTree.render("layer-tree", appState.layers);
-    AppMap.removeAllLayersFromMap();
-    AppMap.loadConfig(appState);
+    LamLayerTree.render("lam-layer-tree", appState.layers);
+    LamMap.removeAllLayersFromMap();
+    LamMap.loadConfig(appState);
   };
 
   /**
@@ -500,7 +616,7 @@ var AppStore = (function() {
 
   var resetLayersArray = function(layers) {
     layers.forEach(function(layer) {
-      dispatch({
+      lamDispatch({
         eventName: "set-layer-visibility",
         gid: layer.gid,
         visibility: parseInt(layer.visible)
@@ -526,12 +642,12 @@ var AppStore = (function() {
   var doLogin = function(username, password) {
     switch (appState.authentication.authType) {
       case "anonymous":
-        AuthTools.hideLogin();
+        LamAuthTools.hideLogin();
         break;
       case "basic":
         //adding the base64 token
         appState.authentication.authToken = window.btoa(username + ":" + password);
-        AuthTools.hideLogin();
+        LamAuthTools.hideLogin();
         break;
       case "form":
         var username = "";
@@ -546,7 +662,7 @@ var AppStore = (function() {
             alert("Thanks for your comment!");
           }
         });
-        AuthTools.hideLogin();
+        LamAuthTools.hideLogin();
         break;
       case "custom":
         //TODO implement custom auth url ancd object
@@ -557,13 +673,13 @@ var AppStore = (function() {
         })
           .done(function(data) {
             authToken = data;
-            AuthTools.hideLogin();
+            LamAuthTools.hideLogin();
           })
           .fail(function(data) {
-            AuthTools.showError();
-            dispatch({
+            LamAuthTools.showError();
+            lamDispatch({
               eventName: "log",
-              message: "AppStore: Unable to autheticate user"
+              message: "LamStore: Unable to autheticate user"
             });
           });
         break;
@@ -577,7 +693,7 @@ var AppStore = (function() {
     //credo delle proprietà standard
     var props = {};
     props.token = authToken.token;
-    var ll = AppMap.getMapCenterLonLat();
+    var ll = LamMap.getMapCenterLonLat();
     props.lon = ll[0];
     props.lat = ll[1];
     var template = Handlebars.compile(urlTemplate);
@@ -608,11 +724,11 @@ var AppStore = (function() {
   };
 
   let getCurrentInfoItems = function() {
-    return AppStore.getAppState().currentInfoItems;
+    return LamStore.getAppState().currentInfoItems;
   };
 
   let getCurrentInfoItem = function(index) {
-    return AppStore.getAppState().currentInfoItems.features[index];
+    return LamStore.getAppState().currentInfoItems.features[index];
   };
 
   /**
@@ -634,8 +750,8 @@ var AppStore = (function() {
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
     $("#" + htmlElement + "").show();
-    if (!AppStore.isMobile()) {
-      AppToolbar.toggleToolbarItem(htmlElement, true);
+    if (!LamStore.isMobile()) {
+      LamToolbar.toggleToolbarItem(htmlElement, true);
     } else {
       $("#info-tooltip").show();
       $("#info-tooltip").html(bodyMobile);
@@ -664,10 +780,13 @@ var AppStore = (function() {
     isMobile: isMobile,
     mapInit: mapInit,
     mapReload: mapReload,
+    lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
+    setIsEmbedded: setIsEmbedded,
+    setMapDiv: setMapDiv,
     showLegend: showLegend,
     showAppTools: showAppTools,
     showContent: showContent,

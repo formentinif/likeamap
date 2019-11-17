@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let AppMapStyles = (function() {
+let LamMapStyles = (function() {
   "use strict";
 
   /**

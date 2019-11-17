@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let AppMapInfo = (function() {
+let LamMapInfo = (function() {
   "use strict";
 
   //Array with the requests to elaborate
@@ -40,7 +40,7 @@ let AppMapInfo = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: AppMapStyles.getInfoStyle(),
+    style: LamMapStyles.getInfoStyle(),
     zIndex: 100
   });
 
@@ -48,29 +48,29 @@ let AppMapInfo = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: AppMapStyles.getFlashStyle(),
+    style: LamMapStyles.getFlashStyle(),
     zIndex: 101
   });
 
   let init = function() {
-    vectorInfo.setMap(AppMap.getMap());
-    vectorFlash.setMap(AppMap.getMap());
-    Dispatcher.bind("show-info-items", function(payload) {
-      AppMapInfo.showRequestInfoFeatures(payload.features, payload.element);
+    vectorInfo.setMap(LamMap.getMap());
+    vectorFlash.setMap(LamMap.getMap());
+    LamDispatcher.bind("show-info-items", function(payload) {
+      LamMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
-    Dispatcher.bind("show-info-geometries", function(payload) {
-      AppMapInfo.showRequestInfoFeaturesGeometries(payload.features);
+    LamDispatcher.bind("show-info-geometries", function(payload) {
+      LamMapInfo.showRequestInfoFeaturesGeometries(payload.features);
     });
-    Dispatcher.bind("flash-feature", function(payload) {
-      let featureOl = AppMap.convertGeoJsonFeatureToOl(payload.feature);
-      featureOl = AppMap.transform3857(featureOl, featureOl.srid);
-      AppMapInfo.addFeatureFlashToMap(featureOl);
+    LamDispatcher.bind("flash-feature", function(payload) {
+      let featureOl = LamMap.convertGeoJsonFeatureToOl(payload.feature);
+      featureOl = LamMap.transform3857(featureOl, featureOl.srid);
+      LamMapInfo.addFeatureFlashToMap(featureOl);
       setTimeout(function() {
-        AppMapInfo.clearLayerFlash();
+        LamMapInfo.clearLayerFlash();
       }, 800);
     });
-    Dispatcher.bind("show-mobile-info-results", function(payload) {
-      AppToolbar.toggleToolbarItem("info-results", true);
+    LamDispatcher.bind("show-mobile-info-results", function(payload) {
+      LamToolbar.toggleToolbarItem("info-results", true);
       $("#info-tooltip").hide();
     });
   };
@@ -105,16 +105,16 @@ let AppMapInfo = (function() {
    * @param {boolean} visibleLayers Visibile Layers
    */
   let getRequestInfo = function getRequestInfo(coordinate, pixel, visibleLayers) {
-    if (!AppStore.getInfoClickEnabled()) {
+    if (!LamStore.getInfoClickEnabled()) {
       return;
     }
-    dispatch("hide-map-tooltip");
+    lamDispatch("hide-map-tooltip");
     //checking if there is a vector feature
     let featuresClicked = [];
     let featuresInfoClicked = [];
 
     if (pixel) {
-      AppMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
+      LamMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
         if (layer === null) {
           featuresInfoClicked.push(feature);
         } else {
@@ -129,7 +129,7 @@ let AppMapInfo = (function() {
     // }
     if (featuresClicked.length > 0) {
       //verifing info behaviour
-      if (AppStore.getAppState().infoSelectBehaviour == AppMapEnums.infoSelectBehaviours().SingleFeature) {
+      if (LamStore.getAppState().infoSelectBehaviour == LamMapEnums.infoSelectBehaviours().SingleFeature) {
         featuresClicked = featuresClicked.slice(0, 1);
       }
       showVectorInfoFeatures(featuresClicked, pixel);
@@ -137,16 +137,16 @@ let AppMapInfo = (function() {
     }
 
     //disabilita le richieste globali
-    if (AppStore.getAppState().disableAjaxRequestInfo) return;
+    if (LamStore.getAppState().disableAjaxRequestInfo) return;
 
     //Ajax requests
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
-    let viewResolution = AppMap.getMap()
+    let viewResolution = LamMap.getMap()
       .getView()
       .getResolution();
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
-    AppMap.getMap()
+    LamMap.getMap()
       .getLayers()
       .forEach(function(layer) {
         if (layer.queryable) {
@@ -185,22 +185,22 @@ let AppMapInfo = (function() {
     if (!url) {
       //the loop has ended
       requestQueue.ajaxPending = false;
-      AppMapInfo.clearLayerInfo();
-      dispatch("hide-loader");
+      LamMapInfo.clearLayerInfo();
+      lamDispatch("hide-loader");
       if (requestQueueData.length > 0) {
-        dispatch({
+        lamDispatch({
           eventName: "show-info-items",
           features: {
             features: requestQueueData
           }
         });
-        dispatch({
+        lamDispatch({
           eventName: "show-info-geometries",
           features: {
             features: requestQueueData
           }
         });
-        // dispatch({
+        // lamDispatch({
         //   eventName: "show-map-tooltip",
         //   features: {
         //     features: requestQueueData[0]
@@ -210,14 +210,14 @@ let AppMapInfo = (function() {
       return;
     }
     //adding the right callback on request
-    url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
+    url += "&format_options=callback:LamMapInfo.processRequestInfoAll";
     //if (requestQueue.visibleLayers) {
-    //  url += "&format_options=callback:AppMapInfo.processRequestInfo";
+    //  url += "&format_options=callback:LamMapInfo.processRequestInfo";
     //} else {
-    //  url += "&format_options=callback:AppMapInfo.processRequestInfoAll";
+    //  url += "&format_options=callback:LamMapInfo.processRequestInfoAll";
     //}
     requestQueue.ajaxPending = true;
-    dispatch("show-loader");
+    lamDispatch("show-loader");
     $.ajax({
       type: "GET",
       url: url,
@@ -229,7 +229,7 @@ let AppMapInfo = (function() {
       error: function(jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
-        dispatch({
+        lamDispatch({
           eventName: "log",
           message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid
         });
@@ -244,17 +244,17 @@ let AppMapInfo = (function() {
   //  */
   // let processRequestInfo = function processRequestInfo(featureCollection) {
   //   requestQueue.ajaxPending = false;
-  //   dispatch("hide-loader");
+  //   lamDispatch("hide-loader");
   //   //se il dato è presente lo visualizzo
   //   if (featureCollection && featureCollection.features.length > 0) {
   //     if (featureCollection.features[0].geometry) {
-  //       let srid = AppMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
-  //       addGeometryInfoToMap(featureCollection.features[0].geometry, srid, AppMap.getGeometryFormats().GeoJson);
+  //       let srid = LamMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
+  //       addGeometryInfoToMap(featureCollection.features[0].geometry, srid, LamMap.getGeometryFormats().GeoJson);
   //     }
   //     for (let i = 0; i < featureCollection.features.length; i++) {
   //       featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
   //     }
-  //     Dispatcher.dispatch({
+  //     LamDispatcher.dispatch({
   //       eventName: "show-info-items",
   //       data: featureCollection
   //     });
@@ -275,7 +275,7 @@ let AppMapInfo = (function() {
    * @param {object} featureCollection Object with the results. It must have a features property with the array of features
    */
   let processRequestInfoAll = function processRequestInfoAll(featureCollection) {
-    dispatch("hide-loader");
+    lamDispatch("hide-loader");
     //se il dato è presente lo aggiungo al contenitore global
     if (featureCollection && featureCollection.features.length > 0) {
       for (let i = 0; i < featureCollection.features.length; i++) {
@@ -300,7 +300,7 @@ let AppMapInfo = (function() {
   let showVectorInfoFeatures = function showVectorInfoFeatures(features, pixel) {
     clearLayerInfo();
     requestQueue.ajaxPending = false;
-    dispatch("hide-loader");
+    lamDispatch("hide-loader");
 
     let featureArray = [];
     if (features && features.length > 0) {
@@ -310,7 +310,7 @@ let AppMapInfo = (function() {
         featureArray.push({
           type: "Feature",
           layerGid: feature.layerGid,
-          geometry: AppMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()),
+          geometry: LamMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()),
           properties: feature.getProperties()
         });
       });
@@ -325,7 +325,7 @@ let AppMapInfo = (function() {
       let featuresCollection = {
         features: featureArray
       };
-      Dispatcher.dispatch({
+      LamDispatcher.dispatch({
         eventName: "show-info-items",
         features: featuresCollection
       });
@@ -338,9 +338,9 @@ let AppMapInfo = (function() {
    */
   let showRequestInfoFeaturesGeometries = function(featureInfoCollection) {
     featureInfoCollection.features.forEach(function(feature) {
-      //let geometryOl = AppMap.convertGeometryToOl(feature.geometry, AppMap.getGeometryFormats().GeoJson);
-      let featureOl = AppMap.convertGeoJsonFeatureToOl(feature);
-      //featureOl = AppMap.transform3857(featureOl, featureOl.srid);
+      //let geometryOl = LamMap.convertGeometryToOl(feature.geometry, LamMap.getGeometryFormats().GeoJson);
+      let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+      //featureOl = LamMap.transform3857(featureOl, featureOl.srid);
       addFeatureInfoToMap(featureOl);
     });
   };
@@ -357,15 +357,15 @@ let AppMapInfo = (function() {
     if (featureInfoCollection.features.length > 0) {
       title += " (" + featureInfoCollection.features.length + ")";
     }
-    var body = AppTemplates.renderInfoFeatures(featureInfoCollection);
-    var bodyMobile = AppTemplates.renderInfoFeaturesMobile(featureInfoCollection);
-    AppMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
+    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
+    var bodyMobile = LamTemplates.renderInfoFeaturesMobile(featureInfoCollection);
+    LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
   let showInfoFeatureTooltip = function(feature) {
-    let layer = AppStore.getLayer(feature.layerGid);
-    let tooltip = AppTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
-    dispatch({
+    let layer = LamStore.getLayer(feature.layerGid);
+    let tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    lamDispatch({
       eventName: "show-map-tooltip",
       geometry: feature.getGeometry().getCoordinates(),
       tooltip: tooltip
@@ -373,10 +373,10 @@ let AppMapInfo = (function() {
   };
 
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
-    let coordinate = AppMap.getCoordinateFromPixel(pixel[0], pixel[1]);
-    let layer = AppStore.getLayer(feature.layerGid);
-    let tooltip = AppTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
-    dispatch({
+    let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
+    let layer = LamStore.getLayer(feature.layerGid);
+    let tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    lamDispatch({
       eventName: "show-map-tooltip",
       geometry: coordinate,
       tooltip: tooltip
@@ -384,7 +384,7 @@ let AppMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    AppStore.showContent(title, body, bodyMobile, htmlElement);
+    LamStore.showContent(title, body, bodyMobile, htmlElement);
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {
@@ -411,7 +411,7 @@ let AppMapInfo = (function() {
    * @param {int} srid
    */
   let addGeometryInfoToMap = function(geometry, srid) {
-    return AppMap.addGeometryToMap(geometry, srid, vectorInfo);
+    return LamMap.addGeometryToMap(geometry, srid, vectorInfo);
   };
 
   /**
@@ -420,7 +420,7 @@ let AppMapInfo = (function() {
    * @param {int} srid
    */
   let addFeatureInfoToMap = function(feature) {
-    return AppMap.addFeatureToMap(feature, feature.srid, vectorInfo);
+    return LamMap.addFeatureToMap(feature, feature.srid, vectorInfo);
   };
 
   /**
@@ -429,7 +429,7 @@ let AppMapInfo = (function() {
    * @param {int} srid
    */
   let addFeatureFlashToMap = function(feature) {
-    return AppMap.addFeatureToMap(feature, feature.srid, vectorFlash);
+    return LamMap.addFeatureToMap(feature, feature.srid, vectorFlash);
   };
 
   /**
@@ -462,7 +462,7 @@ let AppMapInfo = (function() {
    * @param {Array} coordinate X,Y of the request position
    */
   let RequestQueue = function(coordinate, visibleLayers) {
-    this.id = AppStore.guid();
+    this.id = LamStore.guid();
     this.layers = []; //Array of RequestLayer
     this.coordinate = coordinate;
     this.visibleLayers = visibleLayers;

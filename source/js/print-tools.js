@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var PrintTools = (function() {
+var LamPrintTools = (function() {
   var isRendered = false;
 
   var papersMM = {
@@ -52,7 +52,6 @@ var PrintTools = (function() {
 
   var init = function init() {
     //Upgrade grafici
-    M.AutoInit();
 
     //bindo la scala con solo numeri
     $("#print-tools__scale").keyup(function(event) {
@@ -73,48 +72,48 @@ var PrintTools = (function() {
     });
 
     //adding tool reset
-    AppToolbar.addResetToolsEvent({ eventName: "clear-layer-print" });
+    LamToolbar.addResetToolsEvent({ eventName: "clear-layer-print" });
 
     //events binding
-    Dispatcher.bind("show-print-tools", function(payload) {
-      AppToolbar.toggleToolbarItem("print-tools");
-      if (AppToolbar.getCurrentToolbarItem() === "print-tools") {
-        PrintTools.showPrintArea();
-        AppStore.setInfoClickEnabled(false);
+    LamDispatcher.bind("show-print-tools", function(payload) {
+      LamToolbar.toggleToolbarItem("print-tools");
+      if (LamToolbar.getCurrentToolbarItem() === "print-tools") {
+        LamPrintTools.showPrintArea();
+        LamStore.setInfoClickEnabled(false);
       }
-      dispatch("clear-layer-info");
+      lamDispatch("clear-layer-info");
     });
 
-    Dispatcher.bind("print-map", function(payload) {
-      PrintTools.printMap(payload.paper, payload.orientation, payload.format, payload.template);
+    LamDispatcher.bind("print-map", function(payload) {
+      LamPrintTools.printMap(payload.paper, payload.orientation, payload.format, payload.template);
     });
 
-    Dispatcher.bind("clear-layer-print", function(payload) {
-      AppMap.clearLayerPrint();
+    LamDispatcher.bind("clear-layer-print", function(payload) {
+      LamMap.clearLayerPrint();
     });
 
-    Dispatcher.bind("show-print-area", function(payload) {
+    LamDispatcher.bind("show-print-area", function(payload) {
       //ricavo posizione e risoluzione
       //Cerco il centro del rettangolo attuale di stampa o lo metto al centro della mappa
-      var printCenter = AppMap.getPrintCenter();
+      var printCenter = LamMap.getPrintCenter();
       if (!printCenter) {
-        printCenter = AppMap.getMapCenter();
+        printCenter = LamMap.getMapCenter();
       }
       //setto la risoluzione base a quella della mappa
       var scale = payload.scale;
-      var resolution = AppMap.getMapResolution() / 2;
+      var resolution = LamMap.getMapResolution() / 2;
       //se la scala non è nulla setto la risoluzione in base alla Scala
       if (scale) {
-        resolution = AppMap.getResolutionForScale(scale, "m");
+        resolution = LamMap.getResolutionForScale(scale, "m");
       } else {
         //setto la scala per la stampa in ui
-        PrintTools.setScale(AppMap.getMapScale() / 2);
+        LamPrintTools.setScale(LamMap.getMapScale() / 2);
       }
       var paper = payload.paper;
       var orientation = payload.orientation;
-      var printSize = PrintTools.getPrintMapSize(paper, orientation, resolution);
+      var printSize = LamPrintTools.getPrintMapSize(paper, orientation, resolution);
 
-      AppMap.setPrintBox(printCenter[0], printCenter[1], printSize.width, printSize.height);
+      LamMap.setPrintBox(printCenter[0], printCenter[1], printSize.width, printSize.height);
     });
   };
 
@@ -132,38 +131,41 @@ var PrintTools = (function() {
   var templatePrint = function() {
     template = "";
     //pannello ricerca via
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Stampa</h4>';
     }
-    template += '<div class="lam-card z-depth-2">';
+    template += '<div class="lam-card lam-depth-2">';
 
-    template += '<div class="input-field">';
-    template += '<select id="print-tools__paper" class="">';
+    template += '<div class="lam-mb-2">';
+    template += '<label class="lam-label" for="print-tools__paper" class="lam-label">Dimensione</label>';
+    template += '<select id="print-tools__paper" class="lam-select">';
     template += '<option value="A4">A4</option>';
     template += '<option value="A3">A3</option>';
     template += "</select>";
     template += "</div>";
 
-    template += '<div class="input-field">';
-    template += '<select id="print-tools__orientation" class="">';
+    template += '<div class="lam-mb-2">';
+    template += '<label class="lam-label" for="print-tools__orientation" class="lam-label">Orientamento</label>';
+    template += '<select id="print-tools__orientation" class="lam-select">';
     template += '<option value="portrait">Verticale</option>';
     template += '<option value="landscape">Orizzontale</option>';
     template += "</select>";
     template += "</div>";
 
-    template += '<div class="input-field">';
-    template += '<label class="" id="print-tools__scale-label" for="print-tools__scale">Scala...</label>';
-    template += '<input class="" type="text" id="print-tools__scale">';
+    template += '<div class="lam-mb-2">';
+    template += '<label class="lam-label" id="print-tools__scale-label" for="print-tools__scale">Scala</label>';
+    template += '<input class="lam-input" type="text" id="print-tools__scale">';
     template += "</div>";
 
-    template += '<div class="input-field">';
-    template += '<select id="print-tools__template" class="">';
+    template += '<div class="lam-mb-2">';
+    template += '<label class="lam-label" id="print-tools__scale-label" for="print-tools__scale">Template</label>';
+    template += '<select id="print-tools__template" class="lam-select">';
     template += '<option value="standard">Standard</option>';
     //template += '<option value="personalizzato">Personalizzato</option>';
     template += "</select>";
     template += "</div>";
 
-    template += '<button id="print-tools__print-button" onclick="PrintTools.printClick(); return false;" class="waves-effect waves-light btn" >Stampa</button>';
+    template += '<button id="print-tools__print-button" onclick="LamPrintTools.printClick(); return false;" class="lam-btn" >Stampa</button>';
 
     template += '<div class="div-10"></div>';
 
@@ -178,7 +180,7 @@ var PrintTools = (function() {
   };
 
   /**
-   * Send the map print request to the Dispatcher
+   * Send the map print request to the LamDispatcher
    * @return {void}
    */
   var printClick = function() {
@@ -193,7 +195,7 @@ var PrintTools = (function() {
       orientation: orientation,
       template: template
     };
-    Dispatcher.dispatch(payload);
+    LamDispatcher.dispatch(payload);
   };
 
   /**
@@ -205,23 +207,23 @@ var PrintTools = (function() {
    * @return {[type]}             [description]
    */
   var printMap = function(paper, orientation, format, template) {
-    let appState = AppStore.getAppState();
+    let appState = LamStore.getAppState();
     //ricavo le dimensioni di Stampa
     appState.printPaper = paper;
     appState.printOrientation = orientation;
     appState.printFormat = format;
     appState.printTemplate = template;
-    var paperDimension = PrintTools.getPaperSize(paper, orientation);
+    var paperDimension = LamPrintTools.getPaperSize(paper, orientation);
     appState.printWidth = paperDimension.width;
     appState.printHeight = paperDimension.height;
 
     //ricavo i dati della mappa per la stampa
-    var resolution = AppMap.getResolutionForScale(scale);
-    var center = AppMap.getPrintCenter();
-    var centerLL = AppMap.getPrintCenterLonLat();
+    var resolution = LamMap.getResolutionForScale(scale);
+    var center = LamMap.getPrintCenter();
+    var centerLL = LamMap.getPrintCenterLonLat();
     //La scala viene ricalcolata in base ad un parametero di conversione locale
     //Questa parte è tutta rivedere
-    var scale = PrintTools.getScale() * AppMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
+    var scale = LamPrintTools.getScale() * LamMap.aspectRatio(centerLL[1] * 1.12, centerLL[1] * 0.88);
 
     //
     appState.printCenterX = center[0];
@@ -232,27 +234,17 @@ var PrintTools = (function() {
     appState.printParams = {};
     appState.printParams.dummy = "null";
 
-    var print = function() {
-      var deferred = Q.defer();
-      $.post(
-        appState.restAPIUrl + "/api/print",
-        {
-          appstate: JSON.stringify(appState)
-        },
-        deferred.resolve
-      );
-      return deferred.promise;
-    };
+    //invio la richiesta al servizio di print
 
-    print()
-      .then(function(pdf) {
+    $.post(appState.restAPIUrl + "/api/print", {
+      appstate: JSON.stringify(appState)
+    })
+      .done(function(pdf) {
         window.location = appState.restAPIUrl + "/api/print/" + pdf.pdfName;
       })
-      .fail(function() {
+      .fail(function(err) {
         //TODO completare fail
       });
-
-    //invio la richiesta al servizio di print
   };
 
   /**
@@ -288,7 +280,7 @@ var PrintTools = (function() {
     if (!orientation) {
       orientation = $("#print-tools__orientation").val();
     }
-    dispatch({
+    lamDispatch({
       eventName: "show-print-area",
       scale: scale,
       paper: paper,

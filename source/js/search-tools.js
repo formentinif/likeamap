@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var SearchTools = (function() {
+var LamSearchTools = (function() {
   var isRendered = false;
 
   var comuni = [];
@@ -44,17 +44,16 @@ var SearchTools = (function() {
     });
 
     //events binding
-    Dispatcher.bind("show-search", function(payload) {
-      AppToolbar.toggleToolbarItem("search-tools");
-      dispatch("clear-layer-info");
+    LamDispatcher.bind("show-search", function(payload) {
+      LamToolbar.toggleToolbarItem("search-tools");
+      lamDispatch("clear-layer-info");
     });
 
-    Dispatcher.bind("show-search-items", function(payload) {
-      SearchTools.showSearchInfoFeatures(payload.features);
+    LamDispatcher.bind("show-search-items", function(payload) {
+      LamSearchTools.showSearchInfoFeatures(payload.features);
     });
 
     try {
-      M.AutoInit();
       $(".dropdown-trigger").dropdown();
     } catch (e) {
     } finally {
@@ -134,11 +133,9 @@ var SearchTools = (function() {
    */
   var templateTopTools = function() {
     let template = '<div class="lam-bar lam-background">';
-    template += '<div class="row lam-no-margin">';
-    template +=
-      '<div class="col s6"><a class="waves-effect waves-light btn btn-small" onclick="SearchTools.showSearchAddress(); return false;" >Indirizzi</a></div>';
-    template +=
-      '<div class="col s6"><a class="waves-effect waves-light btn btn-small" onclick="SearchTools.showSearchLayers(); return false;" >Layers</a></div>';
+    template += '<div class="lam-grid lam-no-margin">';
+    template += '<div class="lam-col"><a class="lam-btn lam-btn-small" onclick="LamSearchTools.showSearchAddress(); return false;" >Indirizzi</a></div>';
+    template += '<div class="lam-col"><a class="lam-btn lam-btn-small" onclick="LamSearchTools.showSearchLayers(); return false;" >Layers</a></div>';
     template += "</div>";
     template += "</div>";
     return template;
@@ -146,13 +143,13 @@ var SearchTools = (function() {
   // var templateTopTools = function() {
   //   let template = '<div class="lam-bar lam-background">';
   //   template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
-  //   template += '<i class="material-icons">more_vert</i>';
+  //   template += '<i class="lam-icon">more_vert</i>';
   //   template += '</button> <span id="search-tools__label">Indirizzo</span>';
   //   template += "</div>";
   //   template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
-  //   template += '<li onclick="SearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
+  //   template += '<li onclick="LamSearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
   //   template += "{{#if this.length}}";
-  //   template += '<li onclick="SearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
+  //   template += '<li onclick="LamSearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
   //   template += "{{/if}}";
   //   template += "</ul>";
   //   return template;
@@ -162,16 +159,16 @@ var SearchTools = (function() {
    * General html code that will be injected in order to display the layer tools
    */
   var templateLayersTools = function(searchLayers) {
-    let template = '<div id="search-tools__layers" class="lam-card z-depth-2" style="display:none;">';
-    template += '<select id="search-tools__select-layers" class="input-field">';
+    let template = '<div id="search-tools__layers" class="lam-card lam-depth-2 lam-hidden" >';
+    template += '<select id="search-tools__select-layers" class="lam-input lam-mb-2">';
     for (var i = 0; i < searchLayers.length; i++) {
       template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
-    template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-layers-field" class="input-field" >';
-    template += '<input id="search-tools__search-layers" class="input-field" type="search" onkeyup="SearchTools.doSearchLayers(event)">';
-    template += '<label class="input-field" id="search-tools__search-layers__label" for="search-tools__search-layers">';
+
+    template += '<div id="search-tools__search-layers-field" class="lam-grid" >';
+    template += '<label class="lam-label" id="search-tools__search-layers__label" for="search-tools__search-layers">';
+    template += '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
     } else {
@@ -189,22 +186,22 @@ var SearchTools = (function() {
   var templateSearchNominatim = function(searchLayers) {
     let template = "";
     //pannello ricerca via
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Ricerca</h4>';
     }
     template += templateTopTools();
-    template += '<div id="search-tools__address" class="lam-card z-depth-2">';
-    template += '<select id="search-tools__comune" class="input-field">';
+    template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
+    template += '<select id="search-tools__comune" class="lam-input">';
     template += "</select>";
     template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressNominatim(event)">';
-    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__search-via-field" class="" >';
+    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Via</label>';
+    template += '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)">';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card z-depth-2 lam-scrollable">';
+    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -215,19 +212,19 @@ var SearchTools = (function() {
   var templateSearchWFSGeoserver = function() {
     let template = "";
     //pannello ricerca via
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Ricerca</h4>';
     }
     template += templateTopTools();
-    template += '<div id="search-tools__address" class="lam-card z-depth-2">';
-    template += '<div id="search-tools__search-via-field" class="input-field" >';
-    template += '<input id="search-tools__search-via" class="input-field" type="search" onkeyup="SearchTools.doSearchAddressWMSG(event)">';
-    template += '<label class="input-field" id="search-tools__search-via__label" for="search-tools__search-via">Via...</label>';
+    template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
+    template += '<div id="search-tools__search-via-field" class="" >';
+    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Via</label>';
+    template += '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)">';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" >';
+    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -237,13 +234,17 @@ var SearchTools = (function() {
    * @param {Object} results
    */
   var templateResultsNominatim = function(results) {
-    template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
+    template = '<h5 class="lam-title-h4">Risultati della ricerca</h5>';
+    template = '<ul class="lam-grid">';
     template += "{{#each this}}";
-    template += '<li class="mdl-list__item">';
-    template += '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemNominatim({{{@index}}});return false">';
+    template += '<div class="lam-col">';
+    template +=
+      '<i class="lam-icon-primary">' +
+      LamResources.svgMarker +
+      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemNominatim({{{@index}}});return false">';
     template += "{{{display_name}}}";
     template += "</a>";
-    template += "</li>";
+    template += "</div>";
     template += "{{/each}}";
     template += "</ul>";
     return Handlebars.compile(template);
@@ -254,17 +255,20 @@ var SearchTools = (function() {
    * @param {Object} results
    */
   var templateSearchResultsWFSGeoserver = function(results) {
-    template = '<h5>Risultati della ricerca</h5><ul class="mdl-list">';
+    template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
+    template = '<div class="lam-grid lam-grid-1">';
     template += "{{#each this}}";
-    template += '<li class="mdl-list__item">';
+    template += '<div class="lam-col">';
     template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
+      '<i class="lam-icon-primary">' +
+      LamResources.svgMarker +
+      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
     template += "{{{display_name}}} ";
     template += "{{{display_name2}}} ";
     template += "</a>";
-    template += "</li>";
+    template += "</div>";
     template += "{{/each}}";
-    template += "</ul>";
+    template += "</div>";
     return Handlebars.compile(template);
   };
 
@@ -273,16 +277,18 @@ var SearchTools = (function() {
    * @param {Object} results
    */
   var templateSearchResultsLayers = function(results) {
-    template = '<ul class="mdl-list">';
+    template = '<div class="lam-grid">';
     template += "{{#each this}}";
-    template += '<li class="mdl-list__item">';
+    template += '<div class="lam-col">';
     template +=
-      '<i class="material-icons md-icon">&#xE55F;</i><a href="#" onclick="SearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
+      '<i class="lam-icon-primary">' +
+      LamResources.svgMarker +
+      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
     template += "{{{display_name}}}";
     template += "</a>";
-    template += "</li>";
+    template += "</div>";
     template += "{{/each}}";
-    template += "</ul>";
+    template += "</div>";
     return Handlebars.compile(template);
   };
 
@@ -315,17 +321,17 @@ var SearchTools = (function() {
    */
   var zoomToItemNominatim = function(index) {
     let result = searchResults[index];
-    dispatch({
+    lamDispatch({
       eventName: "zoom-lon-lat",
       zoom: 18,
       lon: parseFloat(result.lon),
       lat: parseFloat(result.lat)
     });
-    dispatch({
+    lamDispatch({
       eventName: "add-wkt-info-map",
       wkt: "POINT(" + result.lon + " " + result.lat + ")"
     });
-    dispatch({ eventName: "hide-menu-mobile" });
+    lamDispatch({ eventName: "hide-menu-mobile" });
   };
 
   // /**
@@ -334,18 +340,18 @@ var SearchTools = (function() {
   //  * @param {float} lat
   //  */
   // var zoomToItemWFSGeoserver = function(lon, lat) {
-  //   dispatch("remove-info");
-  //   dispatch({
+  //   lamDispatch("remove-info");
+  //   lamDispatch({
   //     eventName: "zoom-lon-lat",
   //     zoom: 18,
   //     lon: parseFloat(lon),
   //     lat: parseFloat(lat)
   //   });
-  //   dispatch({
+  //   lamDispatch({
   //     eventName: "add-wkt-info-map",
   //     wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
   //   });
-  //   dispatch("hide-menu-mobile");
+  //   lamDispatch("hide-menu-mobile");
   // };
 
   /**
@@ -356,32 +362,36 @@ var SearchTools = (function() {
    * @param {boolean} showInfo
    */
   var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    dispatch("remove-info");
+    lamDispatch("remove-info");
     if (searchResults[index]) {
-      dispatch({
+      lamDispatch({
         eventName: "zoom-geometry",
-        geometry: searchResults[index].item.geometry
+        geometry: searchResults[index].item.geometry,
+        srid: 4326
       });
       if (showInfo) {
-        dispatch({
+        lamDispatch({
           eventName: "show-info-items",
           features: searchResults[index].item,
-          element: search - tools__search - results
+          element: "search-tools__search-results"
         });
       }
       let payload = {
-        eventName: "add-feature-info-map",
+        eventName: "add-geometry-info-map",
         geometry: searchResults[index].item.geometry
       };
       try {
         payload.srid = searchResults[index].item.crs;
+        if (payload.srid == null) {
+          payload.srid = 4326;
+        }
       } catch (e) {
-        payload.srid = null;
+        payload.srid = 4326;
       }
-      dispatch(payload);
-      dispatch("hide-menu-mobile");
+      lamDispatch(payload);
+      lamDispatch("hide-menu-mobile");
     } else {
-      dispatch({
+      lamDispatch({
         eventName: "zoom-lon-lat",
         zoom: 18,
         lon: parseFloat(lon),
@@ -389,7 +399,7 @@ var SearchTools = (function() {
         eventName: "add-wkt-info-map",
         wkt: "POINT(" + lon + " " + lat + ")"
       });
-      dispatch("hide-menu-mobile");
+      lamDispatch("hide-menu-mobile");
     }
   };
 
@@ -445,9 +455,9 @@ var SearchTools = (function() {
           }
         })
         .fail(function(data) {
-          dispatch({
+          lamDispatch({
             eventName: "log",
-            message: "SearchTools: unable to bind comuni"
+            message: "LamSearchTools: unable to bind comuni"
           });
         });
     }
@@ -537,7 +547,7 @@ var SearchTools = (function() {
               if ($.inArray(currentAddress, toponimi) === -1) {
                 var cent = null;
                 if (data.features[i].geometry.type != "POINT") {
-                  cent = AppMap.getCentroid(data.features[i].geometry.coordinates);
+                  cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
                 } else {
                   cent = data.features[i].geometry.coordinates;
                 }
@@ -566,9 +576,9 @@ var SearchTools = (function() {
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-          dispatch({
+          lamDispatch({
             eventName: "log",
-            message: "SearchTools: unable to complete response"
+            message: "LamSearchTools: unable to complete response"
           });
         }
       });
@@ -619,14 +629,14 @@ var SearchTools = (function() {
               }
               data.features.forEach(function(feature) {
                 feature.layerGid = layer.gid;
-                feature.srid = AppMap.getSRIDfromCRSName(data.crs.properties.name);
+                feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
               });
               if (data.features.length > 0) {
-                dispatch({
+                lamDispatch({
                   eventName: "show-search-items",
                   features: data
                 });
-                dispatch({
+                lamDispatch({
                   eventName: "show-info-geometries",
                   features: data
                 });
@@ -638,9 +648,9 @@ var SearchTools = (function() {
               return;
             },
             error: function(jqXHR, textStatus, errorThrown) {
-              dispatch({
+              lamDispatch({
                 eventName: "log",
-                message: "SearchTools: unable to complete response"
+                message: "LamSearchTools: unable to complete response"
               });
             }
           });
@@ -658,7 +668,7 @@ var SearchTools = (function() {
     if (!featureInfoCollection) {
       return;
     }
-    var body = AppTemplates.renderInfoFeatures(featureInfoCollection);
+    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
     $("#search-tools__search-results").html(body);
   };
 
@@ -674,13 +684,13 @@ var SearchTools = (function() {
       var results = [];
       for (var i = 0; i < data.length; i++) {
         //ricavo il layer relativo
-        var layer = AppStore.getLayerByName(data[i].id.split(".")[0]);
+        var layer = LamStore.getLayerByName(data[i].id.split(".")[0]);
         if (layer) {
           var cent = null;
           if (data[i].geometry.coordinates[0][0]) {
-            cent = AppMap.getCentroid(data[i].geometry.coordinates[0]);
+            cent = LamMap.getCentroid(data[i].geometry.coordinates[0]);
           } else {
-            cent = AppMap.getCentroid(data[i].geometry.coordinates);
+            cent = LamMap.getCentroid(data[i].geometry.coordinates);
           }
           var item = data[i];
           //salvo il crs della feature

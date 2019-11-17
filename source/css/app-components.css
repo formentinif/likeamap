@@ -1,0 +1,128 @@
+.lam-card {
+  box-sizing: border-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: 400;
+  overflow: hidden;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  background: #fff;
+  border-radius: 2px;
+  padding: 5px;
+}
+
+.lam-feature {
+  padding: 0 0 0.6rem 0;
+  background-color: #fff;
+  border-radius: 0 0 2px 2px;
+}
+
+.lam-feature-heading {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.3rem 0.1rem 0.2rem 0.3rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+.lam-feature-title {
+  padding: 0.3rem 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.lam-feature-content {
+  padding: 0.3rem 0.3rem;
+  overflow: auto;
+  font-size: 0.9rem;
+}
+
+.lam-feature__icons {
+  padding: 0.1rem 0.5rem;
+  font-size: 1.2rem;
+}
+
+.lam-feature__icon {
+  color: var(--lam-btn-color);
+  fill: var(--lam-btn-color);
+  cursor: pointer;
+  margin: 0 0.2rem;
+}
+
+.lam-table {
+  width: 100%;
+  border: 0px solid rgba(0, 0, 0, 0.12);
+  border-collapse: collapse;
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+}
+
+.lam-table tr {
+  transition-duration: 0.28s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: background-color;
+}
+
+/* .lam-table:hover {
+    background-color: #eeeeee;
+  } */
+
+.lam-table td,
+.lam-table th {
+  vertical-align: middle;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 3px 3px;
+  text-align: left;
+}
+
+.lam-background {
+  background-color: var(--lam-bg-menu-color);
+}
+
+.lam-input {
+  border-right: 0px solid var(--lam-btn-color);
+  border-left: 0px solid var(--lam-btn-color);
+  border-top: 0px solid var(--lam-btn-color);
+  border-bottom: 1px solid var(--lam-btn-color);
+  width: 100%;
+  padding-bottom: 0.3rem;
+}
+.lam-input:focus {
+  outline: none;
+}
+
+.lam-select {
+  width: 100%;
+  padding-bottom: 0.3rem;
+  border-right: 0px solid var(--lam-btn-color);
+  border-left: 0px solid var(--lam-btn-color);
+  border-top: 0px solid var(--lam-btn-color);
+  border-bottom: 1px solid var(--lam-btn-color);
+  outline: 0px;
+}
+
+.lam-label {
+  font-weight: 500;
+}
+
+a.lam-link {
+  color: var(--lam-btn-color);
+  text-decoration: none;
+}
+
+a.lam-link:hover {
+  color: var(--lam-btn-color-darken);
+}
+
+a.lam-link:active {
+  color: var(--lam-btn-color);
+  text-decoration: none;
+}

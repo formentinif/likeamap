@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione della toolbar
  */
-let AppToolbar = (function() {
+let LamToolbar = (function() {
   "use strict";
 
   var easingTime = 300;
@@ -38,7 +38,7 @@ let AppToolbar = (function() {
 
   let init = function() {
     //eseguo degli aggiustamente in caso di browser mobile
-    if (AppStore.isMobile()) {
+    if (LamStore.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
@@ -60,7 +60,7 @@ let AppToolbar = (function() {
    */
   let resetTools = function() {
     resetToolsPayloads.forEach(function(payload) {
-      dispatch(payload);
+      lamDispatch(payload);
     });
   };
 
@@ -101,7 +101,7 @@ let AppToolbar = (function() {
   };
 
   var toggleToolbarItem = function(toolId, keepOpen) {
-    AppStore.setInfoClickEnabled(true);
+    LamStore.setInfoClickEnabled(true);
     //verifico se il pannello non è già selezionato
     if (currentToolbarItem != toolId) {
       //new tool selected

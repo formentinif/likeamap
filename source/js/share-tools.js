@@ -25,23 +25,23 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var ShareTools = (function() {
+var LamShareTools = (function() {
   var isRendered = false;
 
   var init = function init() {
     //events binding
-    Dispatcher.bind("create-share-url", function(payload) {
-      ShareTools.createShareUrl();
+    LamDispatcher.bind("create-share-url", function(payload) {
+      LamShareTools.createShareUrl();
     });
 
-    Dispatcher.bind("show-share-url-query", function(payload) {
-      ShareTools.createShareUrl();
-      ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
+    LamDispatcher.bind("show-share-url-query", function(payload) {
+      LamShareTools.createShareUrl();
+      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
-    Dispatcher.bind("show-share", function(payload) {
-      AppToolbar.toggleToolbarItem("share-tools");
-      dispatch("clear-layer-info");
+    LamDispatcher.bind("show-share", function(payload) {
+      LamToolbar.toggleToolbarItem("share-tools");
+      lamDispatch("clear-layer-info");
     });
   };
 
@@ -55,53 +55,51 @@ var ShareTools = (function() {
     //forzo che il contenuto non sia visualizzato
     $("#share-tools__content").hide();
     isRendered = true;
-    dispatch("show-share-url-query");
+    lamDispatch("show-share-url-query");
   };
 
   var templateShare = function() {
     template = "";
     //pannello ricerca via
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Condividi</h4>';
     }
-    template += '<div class="lam-card z-depth-2">';
+    template += '<div class="lam-card lam-depth-2">';
 
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template += '<div class="div-20"></div>';
-    template += '<h4 class="lam-title-h4">Link breve</h4>';
-    template += "<p>Il link breve condivide la posizione e i layer attivi.</p>";
+    template += '<h5 class="lam-title-h4">Link breve</h5>';
+    template += "<p class='lam-mt-2 lam-mb-2'>Il link breve condivide la posizione e i layer attivi.</p>";
 
-    template += '<input type="text" class="" id="share-tools__input-query"/>';
+    template += '<input type="text" class="lam-input" id="share-tools__input-query"/>';
     template += '<div class="div-20"></div>';
 
-    template += '<div class="row">';
-    template +=
-      '<div class="col s6"><a id="share-tools__url-query" target="_blank" class="waves-effect waves-light btn btn-small">Apri</a></div>';
-    template +=
-      '<div class="col s6"><a id="share-tools__copy-url-query" class=" waves-effect waves-light btn btn-small fake-link" target="_blank" >Copia</a></div>';
+    template += '<div class="lam-grid">';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col "><a id="share-tools__url-query" target="_blank" class="lam-btn lam-btn-small">Apri</a></div>';
+    template += '<div class="lam-col"><a id="share-tools__copy-url-query" class="lam-btn lam-btn-small fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
 
     template += '<div class="div-20"></div>';
     template += "<div id='share-tools__create_tool' class='";
-    if (!AppStore.getAppState().modules["map-tools-create-url"]) {
+    if (!LamStore.getAppState().modules["map-tools-create-url"]) {
       template += " lam-hidden ";
     }
     template += "'>";
     template += '<h4 class="lam-title-h4">Mappa</h4>';
-    template += "<p>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
+    template += "<p class='lam-mt-2 lam-mb-2'>La mappa condivide la posizione, i layer attivi e i tuoi disegni.</p>";
     //template += 'Crea link da condividere con i tuoi colleghi';
-    template +=
-      '<button id="share-tools__create-url" onclick="ShareTools.createUrl(); return false;" class="waves-effect waves-light btn">Crea mappa</button>';
+    template += '<button id="share-tools__create-url" onclick="LamShareTools.createUrl(); return false;" class="lam-btn">Crea mappa</button>';
 
     template += '<div id="share-tools__content" class="lam-hidden">';
-
-    template += '<div class="div-20"></div>';
-    template += '<input type="text" class="" id="share-tools__input-url"/>';
+    template += '<input type="text" class="lam-input" id="share-tools__input-url"/>';
     template += '<div class="div-20"></div>';
 
-    template += '<div class="row">';
-    template += '<div class="col s6"><a id="share-tools__url" target="_blank" >Apri</a></div>';
-    template += '<div class="col s6"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
+    template += '<div class="lam-grid">';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"><a id="share-tools__url" target="_blank" >Apri</a></div>';
+    template += '<div class="lam-col"><a id="share-tools__copy-url" class="fake-link" target="_blank" >Copia</a></div>';
     template += "</div>";
     template += "</div>";
 
@@ -122,7 +120,7 @@ var ShareTools = (function() {
    * @return {null} la funzione non restituisce valori
    */
   var createUrl = function() {
-    Dispatcher.dispatch("create-share-url");
+    LamDispatcher.dispatch("create-share-url");
   };
 
   /**
@@ -141,7 +139,7 @@ var ShareTools = (function() {
     $("#share-tools__url").attr("href", shareLink);
     $("#share-tools__input-url").val(shareLink);
 
-    var clipboard = new Clipboard("#share-tools__copy-url", {
+    var clipboard = new ClipboardJS("#share-tools__copy-url", {
       text: function(trigger) {
         return shareLink;
       }
@@ -166,7 +164,7 @@ var ShareTools = (function() {
     $("#share-tools__input-query").val(shareLink);
     $("#share-tools__url-query").attr("href", shareLink);
 
-    var clipboard = new Clipboard("#share-tools__copy-url-query", {
+    var clipboard = new ClipboardJS("#share-tools__copy-url-query", {
       text: function(trigger) {
         return shareLink;
       }
@@ -174,43 +172,32 @@ var ShareTools = (function() {
   };
 
   var createShareUrl = function() {
-    let appState = AppStore.getAppState();
+    let appState = LamStore.getAppState();
 
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
-    var centerMap = AppMap.getMapCenter();
+    var centerMap = LamMap.getMapCenter();
     centerMap = ol.proj.transform([centerMap[0], centerMap[1]], "EPSG:3857", "EPSG:4326");
 
     appState.mapLon = centerMap[0];
     appState.mapLat = centerMap[1];
-    appState.mapZoom = AppMap.getMapZoom();
-    appState.drawFeatures = AppMap.getDrawFeature();
+    appState.mapZoom = LamMap.getMapZoom();
+    appState.drawFeatures = LamMap.getDrawFeature();
 
     //invio la richiesta
-    var share = function() {
-      var deferred = Q.defer();
-      $.post(
-        appState.restAPIUrl + "/api/share/",
-        {
-          appstate: JSON.stringify(appState)
-        },
-        deferred.resolve
-      );
-      return deferred.promise;
-    };
-
-    share()
-      .then(function(data) {
+    $.post(appState.restAPIUrl + "/api/share/", {
+      appstate: JSON.stringify(appState)
+    })
+      .done(function(data) {
         var url = data.Url;
         var appStateId = data.AppStateId;
-        ShareTools.displayUrl(appStateId, url);
+        LamShareTools.displayUrl(appStateId, url);
       })
-      .fail(function() {
-        dispatch({
+      .fail(function(err) {
+        lamDispatch({
           eventName: "log",
-          message: "AppStore: create-share-url " + err
+          message: "LamStore: create-share-url " + err
         });
       });
-    //invio la richiesta al servizio di print
   };
 
   /**
@@ -218,12 +205,12 @@ var ShareTools = (function() {
    * @return {null} Nessun valore restituito
    */
   var writeUrlShare = function() {
-    let appState = AppStore.getAppState();
+    let appState = LamStore.getAppState();
     //posizione
     var qPos = "";
-    var center = AppMap.getMapCenterLonLat();
+    var center = LamMap.getMapCenterLonLat();
     qPos += "lon=" + center[0] + "&lat=" + center[1];
-    qPos += "&zoom=" + AppMap.getMapZoom();
+    qPos += "&zoom=" + LamMap.getMapZoom();
     //layers
     var qLayers = "";
     for (var i = 0; i < appState.layers.length; i++) {

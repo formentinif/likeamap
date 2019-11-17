@@ -25,17 +25,17 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var MapTools = (function() {
+var LamMapTools = (function() {
   var isRendered = false;
 
   var init = function init() {
     //Events binding
-    Dispatcher.bind("show-map-tools", function(payload) {
-      AppToolbar.toggleToolbarItem("map-tools");
-      if (AppToolbar.getCurrentToolbarItem() === "map-tools") {
-        AppStore.setInfoClickEnabled(false);
+    LamDispatcher.bind("show-map-tools", function(payload) {
+      LamToolbar.toggleToolbarItem("map-tools");
+      if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
+        LamStore.setInfoClickEnabled(false);
       }
-      dispatch("clear-layer-info");
+      lamDispatch("clear-layer-info");
     });
   };
 
@@ -50,7 +50,7 @@ var MapTools = (function() {
     //
     //aggiungo la copia nel bottone
 
-    var clipboard = new Clipboard("#search-tools__copy-url", {
+    var clipboard = new ClipboardJS("#search-tools__copy-url", {
       text: function(trigger) {
         return $("#map-tools__coordinate-textarea").val();
       }
@@ -62,32 +62,42 @@ var MapTools = (function() {
   var templateTools = function() {
     template = "";
     //pannello ricerca via
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Strumenti</h4>';
     }
-    template += '<div class="lam-card z-depth-2">';
-    template += "<h5>Vai a..</h5>";
-    template += '<div id="map-tools__lon-field" class="input-field" >';
-    template += '<input id="map-tools__lon" class="mdl-textfield__input" type="number" step="any">';
-    template += '<label class="mdl-textfield__label" for="map-tools__lon">Longitune</label>';
+    template += '<div class="lam-card lam-depth-2">';
+    template += '<h5 class="lam-title-h4">Vai a..</h5>';
+    template += '<div id="map-tools__lon-field" class="lam-mb-2" >';
+    template += '<label class="lam-label" for="map-tools__lon">Longitune</label>';
+    template += '<input id="map-tools__lon" class="lam-input" type="number" step="any">';
     template += "</div>";
-    template += '<div id="map-tools__lat-field" class="input-field" >';
-    template += '<input id="map-tools__lat" class="mdl-textfield__input" type="number" step="any">';
-    template += '<label class="mdl-textfield__label" for="map-tools__lat">Latitudine</label>';
+    template += '<div id="map-tools__lat-field" class="lam-mb-2" >';
+    template += '<label class="lam-label" for="map-tools__lat">Latitudine</label>';
+    template += '<input id="map-tools__lat" class="lam-input" type="number" step="any">';
     template += "</div>";
-    template += '<button id="search-tools__gotolonlat"  class="waves-effect waves-light btn" onclick="MapTools.goToLonLat()">Vai</button>';
-
+    template += '<div class="lam-grid ">';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col">';
+    template += '<button id="search-tools__gotolonlat"  class="lam-btn" onclick="LamMapTools.goToLonLat()">Vai</button>';
+    template += "</div>";
+    template += "</div>";
     template += '<div class="div-20"></div>';
 
     template += "<div>";
-    template += "<h5>Copia coordinate</h5>";
+    template += '<h5 class="lam-title-h4">Copia coordinate</h5>';
     template += '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
-    template +=
-      '<button id="search-tools__start-copy-url" class="waves-effect waves-light btn lam-input-margin-right" onclick="MapTools.startCopyCoordinate()">Inizia</button>';
-    template +=
-      '<button id="search-tools__stop-copy-url" class="waves-effect waves-light btn lam-input-margin-right lam-hidden" onclick="MapTools.stopCopyCoordinate()">Fine</button>';
-    template += '<button id="search-tools__copy-url"  class="waves-effect waves-light btn lam-input-margin-right" >Copia</button>';
-
+    template += '<div class="lam-grid">';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col"></div>';
+    template += '<div class="lam-col">';
+    template += '<button id="search-tools__start-copy-url" class="lam-btn" onclick="LamMapTools.startCopyCoordinate()">Inizia</button>';
+    template += '<button id="search-tools__stop-copy-url" class="lam-btn lam-hidden" onclick="LamMapTools.stopCopyCoordinate()">Fine</button>';
+    template += "</div>";
+    template += '<div class="lam-col">';
+    template += '<button id="search-tools__copy-url"  class="lam-btn " >Copia</button>';
+    template += "</div>";
     template += "</div>";
 
     template += '<div class="div-10"></div>';
@@ -112,27 +122,27 @@ var MapTools = (function() {
       payload.eventName = "zoom-lon-lat";
       payload.lon = parseFloat($("#map-tools__lon").val());
       payload.lat = parseFloat($("#map-tools__lat").val());
-      dispatch(payload);
+      lamDispatch(payload);
     } catch (e) {
-      dispatch({
+      lamDispatch({
         eventName: "log",
-        message: "AppStore: map-tools " + e
+        message: "LamStore: map-tools " + e
       });
     }
 
     try {
       payload = {};
       payload.eventName = "remove-info";
-      dispatch(payload);
+      lamDispatch(payload);
       payload = {};
       payload.eventName = "add-info-point";
       payload.lon = parseFloat($("#map-tools__lon").val());
       payload.lat = parseFloat($("#map-tools__lat").val());
-      dispatch(payload);
+      lamDispatch(payload);
     } catch (e) {
-      dispatch({
+      lamDispatch({
         eventName: "log",
-        message: "AppStore: map-tools " + e
+        message: "LamStore: map-tools " + e
       });
     }
   };
@@ -140,17 +150,17 @@ var MapTools = (function() {
   var startCopyCoordinate = function() {
     $("#search-tools__start-copy-url").hide();
     $("#search-tools__stop-copy-url").show();
-    dispatch("start-copy-coordinate");
+    lamDispatch("start-copy-coordinate");
   };
 
   var stopCopyCoordinate = function() {
     $("#search-tools__start-copy-url").show();
     $("#search-tools__stop-copy-url").hide();
-    AppMap.stopCopyCoordinate();
+    LamMap.stopCopyCoordinate();
   };
 
   var addCoordinate = function(lon, lat) {
-    dispatch({ eventName: "add-info-point", lon: lon, lat: lat }), (lon = Math.round(lon * 1000000) / 1000000);
+    lamDispatch({ eventName: "add-info-point", lon: lon, lat: lat }), (lon = Math.round(lon * 1000000) / 1000000);
     lat = Math.round(lat * 1000000) / 1000000;
     $("#map-tools__coordinate-textarea").val($("#map-tools__coordinate-textarea").val() + lon + " " + lat + ";\n");
   };

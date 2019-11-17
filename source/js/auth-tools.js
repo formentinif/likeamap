@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var AuthTools = (function() {
+var LamAuthTools = (function() {
   var isRendered = false;
   var divName = "";
   var init = function init() {};
@@ -47,7 +47,7 @@ var AuthTools = (function() {
     template = "";
     //pannello ricerca via
 
-    template += '<div id="login-container__access">';
+    template += '<div id="login-container__access" class="login-container__access">';
     template += '    <form action="#">';
     template += "        <h2>Accedi</h2>";
     template += '      <div class="input-field">';
@@ -60,7 +60,7 @@ var AuthTools = (function() {
     template += "    </div>";
     template += '    <div id="lam-error-message" class="lam-hidden lam-error-login">Autenticazione non riuscita</div>';
 
-    template += '  <button onclick="AuthTools.login();return false" class="waves-effect waves-light btn">Accedi</button>';
+    template += '  <button onclick="LamAuthTools.login();return false" class="lam-btn">Accedi</button>';
     template += "  </form>";
     template += "</div>";
 
@@ -73,7 +73,7 @@ var AuthTools = (function() {
   };
 
   var login = function() {
-    dispatch({
+    lamDispatch({
       eventName: "do-login",
       username: $("#login-container__username").val(),
       password: $("#login-container__password").val()

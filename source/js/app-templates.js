@@ -24,15 +24,17 @@ il software distribuito nei termini della Licenza è distribuito
 Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
 
 */
-
-let AppTemplates = (function() {
+/**
+ *
+ */
+let LamTemplates = (function() {
   let templates = [];
 
   let init = function init() {
     //Ciclo i livelli che non hanno un template
-    let tempLayers = AppStore.getAppState().layers;
-    const repoTemplatesUrl = AppStore.getAppState().templatesRepositoryUrl;
-    const tempRelations = AppStore.getAppState().relations;
+    let tempLayers = LamStore.getAppState().layers;
+    const repoTemplatesUrl = LamStore.getAppState().templatesRepositoryUrl;
+    const tempRelations = LamStore.getAppState().relations;
     loadLayersTemplates(tempLayers, repoTemplatesUrl);
     loadRelationsTemplates(tempRelations, repoTemplatesUrl);
   };
@@ -87,9 +89,9 @@ let AppTemplates = (function() {
         }
       })
       .fail(function(data) {
-        dispatch({
+        lamDispatch({
           eventName: "log",
-          message: "AppStore: Unable to load template"
+          message: "LamStore: Unable to load template"
         });
       });
   };
@@ -132,7 +134,7 @@ let AppTemplates = (function() {
           result = compiledTemplate(props);
         }
       } catch (e) {
-        dispatch({
+        lamDispatch({
           eventName: "log",
           message: e
         });
@@ -144,7 +146,7 @@ let AppTemplates = (function() {
   let standardTemplate = function(props, layer) {
     let body = "";
     if (layer) {
-      body += "<div class='row lam-feature-heading' ><div class='col s12'>" + layer.layerName;
+      body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + layer.layerName;
       if (layer.labelField) {
         body += " - " + getLabelFeature(props, layer.labelField);
       }
@@ -152,11 +154,11 @@ let AppTemplates = (function() {
     }
     for (let propertyName in props) {
       body +=
-        "<div class='lam-feature-row row lam-mb-1'>" +
-        "<div class='lam-feature-title col s6'>" +
+        "<div class='lam-grid lam-mb-1'>" +
+        "<div class='lam-feature-title lam-col'>" +
         propertyName +
         ":</div>" +
-        "<div class='lam-feature-content col s6'>" +
+        "<div class='lam-feature-content lam-col'>" +
         (props[propertyName] == null ? "" : props[propertyName]) +
         "</div>" +
         "</div>";
@@ -169,27 +171,31 @@ let AppTemplates = (function() {
     //icons
     let icons =
       "<div class='lam-feature__icons'>" +
-      '<i title="Centra sulla mappa" class="fas fa-map-marker-alt fa-lg lam-feature__icon" onclick="Dispatcher.dispatch({ eventName: \'zoom-info-feature\', index: \'' +
+      '<i title="Centra sulla mappa" class="lam-feature__icon" onclick="LamDispatcher.dispatch({ eventName: \'zoom-info-feature\', index: \'' +
       index +
-      "' })\"></i>";
-    let feature = AppStore.getCurrentInfoItem(index);
-    let centroid = AppMap.getLabelPoint(feature.geometry.coordinates);
-    let geometryOl = AppMap.convertGeometryToOl(
+      "' })\">" +
+      LamResources.svgMarker +
+      "</i>";
+    let feature = LamStore.getCurrentInfoItem(index);
+    let centroid = LamMap.getLabelPoint(feature.geometry.coordinates);
+    let geometryOl = LamMap.convertGeometryToOl(
       {
         coordinates: centroid,
         type: "Point",
         srid: 3857
       },
-      AppMapEnums.geometryFormats().GeoJson
+      LamMapEnums.geometryFormats().GeoJson
     );
-    centroid = AppMap.transformGeometrySrid(geometryOl, 3857, 4326);
+    centroid = LamMap.transformGeometrySrid(geometryOl, 3857, 4326);
     icons +=
       //"<a target='_blank' href='https://www.google.com/maps/@?api=1&map_action=map&center=" +
       "<a target='_blank' href='https://www.google.com/maps/search/?api=1&query=" +
       centroid.flatCoordinates[1] +
       "," +
       centroid.flatCoordinates[0] +
-      "&'><i title='Apri in Google' class='fab fa-google fa-lg lam-feature__icon'></i></a>";
+      "&'><i title='Apri in Google' class='lam-feature__icon'>" +
+      LamResources.svgGoogle +
+      "</i></a>";
     //https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=48.857832,2.295226&heading=-45&pitch=38&fov=80
     icons +=
       //"<a target='_blank' href='https://www.google.com/maps/@?api=1&map_action=map&center=" +
@@ -197,7 +203,9 @@ let AppTemplates = (function() {
       centroid.flatCoordinates[1] +
       "," +
       centroid.flatCoordinates[0] +
-      "&'><i title='Apri in Google' class='fas fa-street-view fa-lg lam-feature__icon'></i></a>";
+      "&'><i title='Apri in Google Street View' class='lam-feature__icon'>" +
+      LamResources.svgStreetView +
+      "</i></a>";
     icons += "</div>";
     return icons;
   };
@@ -208,7 +216,7 @@ let AppTemplates = (function() {
       result += '<div class="">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result += '<a href="#" onclick="AppStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result += '<a href="#" onclick="LamStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -222,29 +230,29 @@ let AppTemplates = (function() {
     }
     let str = "";
     if (template.templateType === "simple") {
-      str += "<div class='row lam-feature-heading' ><div class='col s12'>" + template.title + "</div></div>";
+      str += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
 
       for (let i = 0; i < template.fields.length; i++) {
-        str += "<div class='lam-feature-row row lam-mb-1'>";
+        str += "<div class='lam-grid lam-mb-1'>";
         let field = template.fields[i];
         switch (field.type) {
           case "int":
-            str += "<div class='lam-feature-title col s6'>" + field.label + ":</div><div class='lam-feature-content col s6'>{{{" + field.field + "}}}</div>";
+            str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
             break;
           case "string":
-            str += "<div class='lam-feature-title col s6'>" + field.label + ":</div><div class='lam-feature-content col s6'>{{{" + field.field + "}}}</div>";
+            str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
             break;
           case "yesno":
             str +=
-              "<div class='lam-feature-title col s6'>" +
+              "<div class='lam-feature-title lam-col'>" +
               field.label +
-              ":</div><div class='lam-feature-content col s6'>{{#if " +
+              ":</div><div class='lam-feature-content lam-col'>{{#if " +
               field.field +
               "}}Sì{{else}}No{{/if}}</div>";
             break;
           /*  case "moreinfo":
             str +=
-              '<tr><td colspan="2"><a href="#" onclick="dispatch({ eventName: \'more-info\', gid: \'{{' +
+              '<tr><td colspan="2"><a href="#" onclick="lamDispatch({ eventName: \'more-info\', gid: \'{{' +
               field.field +
               "}}' , layerGid: '" +
               field.layerGid +
@@ -263,7 +271,7 @@ let AppTemplates = (function() {
             str += field.footer;
             break;
           case "link":
-            str += '<div class="lam-feature-content col s12"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
+            str += '<div class="lam-feature-content lam-col"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
             break;
         }
         str += "</div>";
@@ -280,7 +288,7 @@ let AppTemplates = (function() {
       }
       return label;
     } catch (error) {
-      dispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
+      lamDispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
     }
   };
 
@@ -296,24 +304,24 @@ let AppTemplates = (function() {
         features: featureInfoCollection
       };
     }
-    AppStore.getAppState().currentInfoItems = featureInfoCollection;
+    LamStore.getAppState().currentInfoItems = featureInfoCollection;
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
-      let layer = AppStore.getLayer(feature.layerGid);
-      let template = AppTemplates.getTemplate(feature.layerGid, layer.templateUrl, AppStore.getAppState().templatesRepositoryUrl);
-      let tempBody = AppTemplates.processTemplate(template, props, layer);
+      let layer = LamStore.getLayer(feature.layerGid);
+      let template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+      let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
-        tempBody += AppTemplates.standardTemplate(props, layer);
+        tempBody += LamTemplates.standardTemplate(props, layer);
       }
       //sezione relations
-      let layerRelations = AppStore.getRelations().filter(function(relation) {
+      let layerRelations = LamStore.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
-      tempBody += AppTemplates.relationsTemplate(layerRelations, props, index);
-      tempBody += AppTemplates.featureIconsTemplate(index);
+      tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+      tempBody += LamTemplates.featureIconsTemplate(index);
 
-      body += "<div class='lam-feature z-depth-1 lam-mb-3'>" + tempBody + "</div>";
+      body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + tempBody + "</div>";
       index++;
     });
     return body;
@@ -331,18 +339,18 @@ let AppTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
-      let layer = AppStore.getLayer(feature.layerGid);
+      let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
-      let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='z-depth-2 lam-info-tooltip__content'>";
-      tempBody += "<div class='row'>";
-      tempBody += "<div class='col-12'>";
+      let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+      tempBody += "<div class='lam-depth-2 lam-info-tooltip__content'>";
+      tempBody += "<div class='lam-grid'>";
+      tempBody += "<div class='lam-col'>";
       tempBody += tooltip;
       tempBody += "</div>";
-      tempBody += "<div class='col-12'>";
+      tempBody += "<div class='lam-col'>";
       tempBody +=
-        '<button class="btn-floating btn-small waves-effect waves-light lam-button lam-info-expander" alt="Apri dettagli" title="Apri dettagli" onclick="Dispatcher.dispatch(\'show-mobile-info-results\')">';
-      tempBody += "<i class='fas fa-chevron-up'></i>";
+        '<button class="lam-btn lam-btn-floating lam-btn-small lam-info-expander lam-icon" alt="Apri dettagli" title="Apri dettagli" onclick="LamDispatcher.dispatch(\'show-mobile-info-results\')">';
+      tempBody += "<i class='lam-icon-primary'>" + LamResources.svgExpandLess + "</i>";
       tempBody += "</button>";
       tempBody += "</div>";
       tempBody += "</div>";

@@ -1,0 +1,40 @@
+.lam-info-window {
+  background-color: rgb(255, 255, 255);
+  border-radius: 3px;
+  padding: 1.2rem;
+  resize: both;
+  max-height: 80%;
+}
+
+.lam-info-window__drag {
+  cursor: pointer !important;
+}
+
+.lam-info-window__title {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  cursor: pointer !important;
+}
+
+@media screen and (min-width: 801px) {
+  .lam-info-window {
+    top: 5%;
+    left: 30%;
+    display: none;
+    position: absolute;
+    overflow: auto;
+    min-width: 350px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .lam-info-window {
+    bottom: 90px;
+    width: 98%;
+    margin: 1%;
+    display: none;
+    position: absolute;
+    overflow: auto;
+    height: 30%;
+  }
+}

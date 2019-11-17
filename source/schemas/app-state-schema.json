@@ -30,6 +30,12 @@
       "type": "string",
       "default": "templates"
     },
+    "urlMapTemplate": {
+      "title": "Url Template della mappa",
+      "description": "Url assoluto o relativo per il caricamento del template della mappa",
+      "type": "string",
+      "default": "templates"
+    },
     "relationsRepositoryUrl": {
       "title": "Url Relation repository",
       "description": "Url assoluto o relativo per il caricamento delle relation",

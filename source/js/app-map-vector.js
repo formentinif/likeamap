@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let AppMapVector = (function() {
+let LamMapVector = (function() {
   /// <summary>
   /// Classe per la gestione delle funzionalità vector
   /// </summary>

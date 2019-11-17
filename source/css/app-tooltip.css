@@ -45,13 +45,13 @@
 
 .lam-info-tooltip {
   position: absolute;
-
+  box-sizing: border-box;
   left: 0px;
-  bottom: 70px;
+  bottom: 80px;
   width: 100%;
   height: 100px;
   padding: 0.5rem;
-  margin: 0px;
+  margin: 0px 0px 0px 0px;
   display: none;
   background-color: transparent;
 }

@@ -25,14 +25,14 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var DrawTools = (function() {
+var LamDrawTools = (function() {
   var isRendered = false;
 
   var init = function init() {
     $("#draw-tools__point").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
-      dispatch({
+      lamDispatch({
         eventName: "set-draw",
         type: "Point"
       });
@@ -40,7 +40,7 @@ var DrawTools = (function() {
     $("#draw-tools__polyline").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
-      dispatch({
+      lamDispatch({
         eventName: "set-draw",
         type: "LineString"
       });
@@ -48,7 +48,7 @@ var DrawTools = (function() {
     $("#draw-tools__polygon").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
-      dispatch({
+      lamDispatch({
         eventName: "set-draw",
         type: "Polygon"
       });
@@ -56,43 +56,43 @@ var DrawTools = (function() {
     $("#draw-tools__delete").click(function() {
       $("#draw-tools__draw-settings").hide();
       $("#draw-tools__delete-settings").show();
-      dispatch({
+      lamDispatch({
         eventName: "set-draw-delete",
         type: "Delete"
       });
     });
 
     //adding tool reset
-    AppToolbar.addResetToolsEvent({ eventName: "unset-draw" });
+    LamToolbar.addResetToolsEvent({ eventName: "unset-draw" });
 
     //Events binding
-    Dispatcher.bind("show-draw-tools", function(payload) {
-      AppToolbar.toggleToolbarItem("draw-tools");
-      if (AppToolbar.getCurrentToolbarItem() === "draw-tools") {
-        AppStore.setInfoClickEnabled(false);
+    LamDispatcher.bind("show-draw-tools", function(payload) {
+      LamToolbar.toggleToolbarItem("draw-tools");
+      if (LamToolbar.getCurrentToolbarItem() === "draw-tools") {
+        LamStore.setInfoClickEnabled(false);
       }
-      dispatch("clear-layer-info");
+      lamDispatch("clear-layer-info");
     });
 
-    Dispatcher.bind("set-draw", function(payload) {
-      AppMap.removeDrawInteraction();
-      AppMap.removeDrawDeleteInteraction();
-      AppMap.addDrawInteraction(payload.type);
+    LamDispatcher.bind("set-draw", function(payload) {
+      LamMap.removeDrawInteraction();
+      LamMap.removeDrawDeleteInteraction();
+      LamMap.addDrawInteraction(payload.type);
     });
 
-    Dispatcher.bind("unset-draw", function(payload) {
-      AppMap.removeDrawInteraction();
-      AppMap.removeDrawDeleteInteraction();
+    LamDispatcher.bind("unset-draw", function(payload) {
+      LamMap.removeDrawInteraction();
+      LamMap.removeDrawDeleteInteraction();
     });
 
-    Dispatcher.bind("set-draw-delete", function(payload) {
-      AppMap.removeDrawInteraction();
-      AppMap.removeDrawDeleteInteraction();
-      AppMap.addDrawDeleteInteraction(payload.type);
+    LamDispatcher.bind("set-draw-delete", function(payload) {
+      LamMap.removeDrawInteraction();
+      LamMap.removeDrawDeleteInteraction();
+      LamMap.addDrawDeleteInteraction(payload.type);
     });
 
-    Dispatcher.bind("delete-draw", function(payload) {
-      AppMap.deleteDrawFeatures(payload.type);
+    LamDispatcher.bind("delete-draw", function(payload) {
+      LamMap.deleteDrawFeatures(payload.type);
     });
   };
 
@@ -112,43 +112,42 @@ var DrawTools = (function() {
     template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Disegna</h4>';
-    template += '<div class="lam-card z-depth-2">';
+    template += '<div class="lam-card lam-depth-2">';
 
     template += "<div>";
-    template += '  <button id="draw-tools__point" class="btn-floating btn-large waves-effect waves-light lam-button">';
-    template += '    <svg width="100%" height="100%">';
-    template += '      <circle cx="28" cy="28" r="6" stroke="green" stroke-width="0" fill="white" />';
+    template += '  <button id="draw-tools__point" class="lam-btn lam-btn-floating ">';
+    template += '    <svg width="24px" height="24px">';
+    template += '      <circle cx="12" cy="12" r="6" stroke="green" stroke-width="0" fill="white" />';
     template += "    </svg>";
     template += "  </button>";
 
-    template +=
-      '  <button id="draw-tools__polyline" class="btn-floating btn-large waves-effect waves-light lam-button">';
-    template += '    <svg width="100%" height="100%">';
-    template += '      <polyline points="16,16 40,40 " style="fill:white;stroke:white;stroke-width:3" />';
-    template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
-    template += '      <circle cx="40" cy="40" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '  <button id="draw-tools__polyline" class="lam-btn lam-btn-floating">';
+    template += '    <svg width="24px" height="24px">';
+    template += '      <polyline points="4,4 20,20" style="fill:white;stroke:white;stroke-width:3" />';
+    template += '      <circle cx="4" cy="4" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '      <circle cx="20" cy="20" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += "    </svg>";
     template += "  </button>";
 
-    template +=
-      '  <button id="draw-tools__polygon" class="btn-floating btn-large waves-effect waves-light lam-button">';
-    template += '    <svg width="100%" height="100%">';
-    template +=
-      '    <rect x="16" y="16" rx="0" ry="0" width="25" height="25"  stroke="white" stroke-width="3" fill="transparent" />';
-    template += '      <circle cx="16" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
-    template += '      <circle cx="16" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
-    template += '      <circle cx="41" cy="41" r="4" stroke="green" stroke-width="0" fill="white" />';
-    template += '      <circle cx="41" cy="16" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '  <button id="draw-tools__polygon" class="lam-btn lam-btn-floating ">';
+    template += '    <svg width="24px" height="24px">';
+    template += '    <rect x="3" y="3" rx="0" ry="0" width="18" height="18"  stroke="white" stroke-width="3" fill="transparent" />';
+    template += '      <circle cx="4" cy="4" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '      <circle cx="4" cy="20" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '      <circle cx="20" cy="4" r="4" stroke="green" stroke-width="0" fill="white" />';
+    template += '      <circle cx="20" cy="20" r="4" stroke="green" stroke-width="0" fill="white" />';
     template += "    </svg>";
     template += "  </button>";
 
-    //template += '  <button id="draw-tools__text" class="btn-floating waves-effect waves-light" >';
-    //template += '    <i class="material-icons" style="font-size:35px !important; top:45%;  ">T</i>';
+    //template += '  <button id="draw-tools__text" class="lam-btn lam-btn-floating lam-btn-large" >';
+    //template += '    <i class="lam-icon" style="font-size:35px !important; top:45%;  ">T</i>';
     //template += '  </button>';
 
+    template += '  <button id="draw-tools__delete" class="lam-btn lam-btn-floating" >';
+    template += '<i class="lam-icon">';
     template +=
-      '  <button id="draw-tools__delete" class="btn-floating btn-large waves-effect waves-light lam-button" >';
-    template += '    <i class="material-icons" style="font-size:35px !important; top:50%; left:40%; ">&#xE872;</i>';
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+    template += "</i>";
     template += "  </button>";
 
     //template += '  <div class="div-20" ></div>';
@@ -156,15 +155,14 @@ var DrawTools = (function() {
     //template += '  <div> <input id="draw-tools__color" type="text" name="draw-tools__color" value="#448AFF" /></div>';
 
     template += '  <div class="div-20" ></div>';
-    template +=
-      '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
-    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
+    template += '  <textarea  id="draw-tools__textarea" rows="6" style="width:95%" placeholder="Aggiungi label..."></textarea>';
+    //template += '  <button id="draw-tools__delete-button" onclick="LamDrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
     template += "  </div>";
 
     template += '  <div id="draw-tools__delete-settings" class="lam-hidden" >';
     template += '  <div class="div-20" ></div>';
     template += "  Tocca una geometria per eliminarla ";
-    //template += '  <button id="draw-tools__delete-button" onclick="DrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
+    //template += '  <button id="draw-tools__delete-button" onclick="LamDrawTools.deleteFeatures(); return false;" class="" >Elimina</button>';
     template += "  </div>";
 
     template += "</div>";
@@ -182,14 +180,14 @@ var DrawTools = (function() {
   };
 
   var setDraw = function(type) {
-    dispatch({
+    lamDispatch({
       eventName: "set-draw",
       type: type
     });
   };
 
   var deleteFeatures = function() {
-    dispatch({
+    lamDispatch({
       eventName: "delete-draw"
     });
   };

@@ -25,59 +25,59 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-//definizione e inizializzazione del Dispatcher
-var Dispatcher = (function() {
+//definizione e inizializzazione del LamDispatcher
+var LamDispatcher = (function() {
   var init = function functionName() {
     this.bind("log", function(payload) {
       console.log("log", payload);
     });
 
     this.bind("show-menu", function(payload) {
-      AppToolbar.showMenu();
+      LamToolbar.showMenu();
     });
 
     this.bind("hide-menu", function(payload) {
-      AppToolbar.hideMenu();
+      LamToolbar.hideMenu();
     });
 
     this.bind("reset-tools", function(payload) {
-      AppToolbar.resetTools();
+      LamToolbar.resetTools();
     });
 
     this.bind("stop-copy-coordinate", function(payload) {
-      MapTools.stopCopyCoordinate();
+      LamMapTools.stopCopyCoordinate();
     });
 
     this.bind("clear-layer-info", function(payload) {
-      AppMapInfo.clearLayerInfo();
-      AppMapTooltip.hideMapTooltip();
+      LamMapInfo.clearLayerInfo();
+      LamMapTooltip.hideMapTooltip();
     });
 
     // this.bind("show-tool", function(payload) {
     //   if (payload.tool == "layers") {
-    //     AppToolbar.toggleToolbarItem("layer-tree");
+    //     LamToolbar.toggleToolbarItem("lam-layer-tree");
     //   }
     //   if (payload.tool.indexOf("print") > -1) {
-    //     AppToolbar.toggleToolbarItem("print-tools");
+    //     LamToolbar.toggleToolbarItem("print-tools");
     //   }
     //   if (payload.tool.indexOf("share") > -1) {
-    //     AppToolbar.toggleToolbarItem("share-tools");
+    //     LamToolbar.toggleToolbarItem("share-tools");
     //   }
     //   if (payload.tool.indexOf("map") > -1) {
-    //     AppToolbar.toggleToolbarItem("map-tools");
+    //     LamToolbar.toggleToolbarItem("map-tools");
     //   }
     //   if (payload.tool.indexOf("draw") > -1) {
-    //     AppToolbar.toggleToolbarItem("draw-tools");
+    //     LamToolbar.toggleToolbarItem("draw-tools");
     //   }
     //   if (payload.tool.indexOf("search") > -1) {
-    //     AppToolbar.toggleToolbarItem("search-tools");
+    //     LamToolbar.toggleToolbarItem("search-tools");
     //     //verifica dei layers
     //     if (payload.tool.indexOf("search-layers") > -1) {
     //       var arrSearch = payload.tool.split(",");
     //       setTimeout(function() {
-    //         SearchTools.showSearchLayers();
+    //         LamSearchTools.showSearchLayers();
     //         if (arrSearch.length > 1) {
-    //           SearchTools.selectLayer(arrSearch[1]);
+    //           LamSearchTools.selectLayer(arrSearch[1]);
     //         }
     //       }, 1000);
     //     }
@@ -85,14 +85,14 @@ var Dispatcher = (function() {
     // });
 
     this.bind("hide-menu-mobile", function(payload) {
-      if (AppStore.isMobile()) {
-        AppStore.hideMenu();
+      if (LamStore.isMobile()) {
+        LamStore.hideMenu();
       }
     });
 
     this.bind("hide-info-window", function(payload) {
-      AppStore.hideInfoWindow();
-      AppMapInfo.clearLayerInfo();
+      LamStore.hideInfoWindow();
+      LamMapInfo.clearLayerInfo();
     });
 
     this.bind("hide-editor-window", function(payload) {
@@ -100,92 +100,92 @@ var Dispatcher = (function() {
     });
 
     this.bind("hide-loader", function(payload) {
-      AppStore.toggleLoader(false);
+      LamStore.toggleLoader(false);
     });
 
     this.bind("show-loader", function(payload) {
-      AppStore.toggleLoader(true);
+      LamStore.toggleLoader(true);
     });
 
     this.bind("live-reload", function(payload) {
-      AppStore.liveReload(payload.appState);
+      LamStore.liveReload(payload.appState);
     });
 
     this.bind("show-legend", function(payload) {
-      AppStore.showLegend(payload.gid, payload.scaled);
+      LamStore.showLegend(payload.gid, payload.scaled);
     });
 
     this.bind("search-address", function(payload) {
-      AppStore.searchAddress(payload.data, "AppStore.processAddress");
+      LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
     this.bind("zoom-lon-lat", function(payload) {
-      AppMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
+      LamMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
 
     this.bind("zoom-geometry", function(payload) {
-      let geometryOl = AppMap.convertGeometryToOl(payload.geometry, AppMapEnums.geometryFormats().GeoJson);
-      AppMap.goToGeometry(geometryOl);
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      LamMap.goToGeometry(geometryOl, payload.srid);
     });
 
     this.bind("zoom-info-feature", function(payload) {
       try {
-        let feature = AppStore.getCurrentInfoItems().features[payload.index];
-        let layer = AppStore.getLayer(feature.layerGid);
-        let featureOl = AppMap.convertGeoJsonFeatureToOl(feature);
-        featureOl = AppMap.transform3857(featureOl, feature.srid);
-        AppMap.goToGeometry(featureOl.getGeometry());
-        let tooltip = AppTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+        let feature = LamStore.getCurrentInfoItems().features[payload.index];
+        let layer = LamStore.getLayer(feature.layerGid);
+        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+        featureOl = LamMap.transform3857(featureOl, feature.srid);
+        LamMap.goToGeometry(featureOl.getGeometry());
+        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
         if (tooltip) {
-          dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+          lamDispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
         }
-        dispatch({
+        lamDispatch({
           eventName: "set-layer-visibility",
           gid: feature.layerGid,
           visibility: 1
         });
-        dispatch({
+        lamDispatch({
           eventName: "flash-feature",
           feature: feature
         });
       } catch (error) {
-        dispatch({ eventName: "log", message: error });
+        lamDispatch({ eventName: "log", message: error });
       }
     });
 
     this.bind("add-wkt-info-map", function(payload) {
-      AppMapInfo.addWktInfoToMap(payload.wkt);
+      LamMapInfo.addWktInfoToMap(payload.wkt);
     });
 
-    this.bind("add-feature-info-map", function(payload) {
-      AppMapInfo.addFeatureInfoToMap(payload.geometry);
+    this.bind("add-geometry-info-map", function(payload) {
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
     this.bind("toggle-layer", function(payload) {
-      AppMap.toggleLayer(payload.gid);
-      AppStore.toggleLayer(payload.gid);
+      LamMap.toggleLayer(payload.gid);
+      LamStore.toggleLayer(payload.gid);
     });
 
     this.bind("set-layer-visibility", function(payload) {
-      debugger;
-      AppMap.setLayerVisibility(payload.gid, payload.visibility);
-      AppStore.setLayerVisibility(payload.gid, payload.visibility);
+      LamMap.setLayerVisibility(payload.gid, payload.visibility);
+      LamStore.setLayerVisibility(payload.gid, payload.visibility);
     });
 
     this.bind("reset-layers", function(payload) {
-      AppStore.resetInitialLayers();
+      LamStore.resetInitialLayers();
     });
 
     this.bind("start-copy-coordinate", function(payload) {
-      AppMap.startCopyCoordinate();
+      LamMap.startCopyCoordinate();
     });
 
     this.bind("map-click", function(payload) {
-      MapTools.addCoordinate(payload.lon, payload.lat);
+      LamMapTools.addCoordinate(payload.lon, payload.lat);
     });
 
     this.bind("remove-info", function(payload) {
-      AppMapInfo.clearLayerInfo();
+      LamMapInfo.clearLayerInfo();
     });
 
     this.bind("add-info-point", function(payload) {
@@ -194,61 +194,61 @@ var Dispatcher = (function() {
         geometry: geometryOl
       });
       featureOl.srid = 4326;
-      AppMapInfo.addFeatureInfoToMap(featureOl);
+      LamMapInfo.addFeatureInfoToMap(featureOl);
     });
 
     this.bind("init-map-app", function(payload) {
-      appInit();
+      LamInit(payload.mapDiv);
     });
 
     this.bind("map-move-end", function(payload) {
-      ShareTools.hideUrl();
-      ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
+      LamShareTools.hideUrl();
+      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
     this.bind("map-zoom-end", function(payload) {
-      ShareTools.hideUrl();
-      ShareTools.setShareUrlQuery(ShareTools.writeUrlShare());
+      LamShareTools.hideUrl();
+      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
     this.bind("map-zoom-in", function(payload) {
-      AppMap.zoomIn();
+      LamMap.zoomIn();
     });
 
     this.bind("map-zoom-out", function(payload) {
-      AppMap.zoomOut();
+      LamMap.zoomOut();
     });
 
     this.bind("map-browser-location", function(payload) {
-      AppMap.goToBrowserLocation();
+      LamMap.goToBrowserLocation();
     });
 
     this.bind("do-login", function(payload) {
-      AppStore.doLogin(payload.username, payload.password);
+      LamStore.doLogin(payload.username, payload.password);
     });
 
     this.bind("open-url-location", function(payload) {
-      AppStore.openUrlTemplate(payload.urlTemplate);
+      LamStore.openUrlTemplate(payload.urlTemplate);
     });
 
     this.bind("reverse-geocoding", function(payload) {
       //conversione coordinate
-      AppMap.getRequestInfo(payload.coordinate, null, false);
+      LamMap.getRequestInfo(payload.coordinate, null, false);
     });
 
     this.bind("show-reverse-geocoding-result", function(payload) {
       //conversione coordinate
-      AppToolbar.toggleToolbarItem("search-tools", true);
-      SearchTools.showSearchLayers();
-      SearchTools.displayGenericResults(payload.results);
+      LamToolbar.toggleToolbarItem("search-tools", true);
+      LamSearchTools.showSearchLayers();
+      LamSearchTools.displayGenericResults(payload.results);
     });
 
     this.bind("enable-map-info", function(payload) {
-      AppStore.setInfoClickEnabled(true);
+      LamStore.setInfoClickEnabled(true);
     });
 
     this.bind("disable-map-info", function(payload) {
-      AppStore.setInfoClickEnabled(false);
+      LamStore.setInfoClickEnabled(false);
     });
 
     this.bind("log", function(payload) {
@@ -293,13 +293,13 @@ var Dispatcher = (function() {
     });
   };
 
-  var dispatch = function dispatch(payload) {
+  var dispatch = function lamDispatch(payload) {
     if (typeof payload == "string") {
       payload = {
         eventName: payload
       };
     }
-    Dispatcher.trigger(payload.eventName, payload);
+    LamDispatcher.trigger(payload.eventName, payload);
   };
 
   return {
@@ -308,5 +308,5 @@ var Dispatcher = (function() {
   };
 })();
 
-MicroEvent.mixin(Dispatcher);
-Dispatcher.init();
+MicroEvent.mixin(LamDispatcher);
+LamDispatcher.init();

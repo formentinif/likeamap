@@ -1,0 +1,74 @@
+.panel__logo {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+.panel__top-margin {
+  height: 20px;
+}
+.panel__bottom-margin {
+  height: 70px;
+}
+
+.lam-panel {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 9;
+  left: 0px;
+  top: 0px;
+  width: 330px;
+  height: calc(100% - 70px);
+  z-index: 10;
+  display: none;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  resize: both;
+}
+
+.lam-panel .lam-panel-content {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 9;
+  bottom: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(252, 252, 252, 0.9);
+  padding: 10px 10px;
+  margin: 0px;
+  overflow: auto;
+}
+
+.lam-panel .lam-panel-content .lam-panel-content-item {
+  display: none;
+  height: 100%;
+}
+
+.lam-panel-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 7px;
+  width: 40px;
+  z-index: 11;
+}
+
+.lam-panel-close.lam-btn-close {
+  display: block;
+  margin-top: 0.5rem;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  cursor: pointer;
+}
+
+.lam-btn-close-top {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  cursor: pointer;
+  z-index: 1000;
+}

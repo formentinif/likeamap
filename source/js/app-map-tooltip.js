@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * This Class manages the tooltip features
  */
-let AppMapTooltip = (function() {
+let LamMapTooltip = (function() {
   "use strict";
 
   let mapTooltip;
@@ -42,19 +42,19 @@ let AppMapTooltip = (function() {
       }
     });
 
-    AppMap.getMap().addOverlay(mapTooltip);
+    LamMap.getMap().addOverlay(mapTooltip);
 
-    Dispatcher.bind("show-tooltip", function(payload) {
-      AppMapInfo.showTooltip(payload.x, payload.y, payload.title);
+    LamDispatcher.bind("show-tooltip", function(payload) {
+      LamMapInfo.showTooltip(payload.x, payload.y, payload.title);
     });
-    Dispatcher.bind("hide-tooltip", function(payload) {
-      AppMapTooltip.hideTooltip();
+    LamDispatcher.bind("hide-tooltip", function(payload) {
+      LamMapTooltip.hideTooltip();
     });
-    Dispatcher.bind("show-map-tooltip", function(payload) {
-      AppMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
+    LamDispatcher.bind("show-map-tooltip", function(payload) {
+      LamMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
     });
-    Dispatcher.bind("hide-map-tooltip", function(payload) {
-      AppMapTooltip.hideMapTooltip();
+    LamDispatcher.bind("hide-map-tooltip", function(payload) {
+      LamMapTooltip.hideMapTooltip();
     });
   };
 
@@ -68,8 +68,8 @@ let AppMapTooltip = (function() {
   //     hideHtmlTooltip();
   //     return;
   //   }
-  //   let labelPoint = AppMap.getLabelPoint(coordinates);
-  //   let pixel = AppMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
+  //   let labelPoint = LamMap.getLabelPoint(coordinates);
+  //   let pixel = LamMap.getPixelFromCoordinate(labelPoint[0], labelPoint[1]);
   //   let tooltip = $("#map-tooltip");
   //   let tooltipTitle = $("#map-tooltip__title");
   //   tooltipTitle.html(title);
@@ -98,7 +98,7 @@ let AppMapTooltip = (function() {
       hideMapTooltip();
       return;
     }
-    let labelPoint = AppMap.getLabelPoint(coordinates);
+    let labelPoint = LamMap.getLabelPoint(coordinates);
     let toolTip = $("#map-tooltip");
     let tooltipTitle = $("#map-tooltip__title");
     toolTip.show();

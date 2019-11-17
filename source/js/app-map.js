@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let AppMap = (function() {
+let LamMap = (function() {
   /// <summary>
   /// Classe per la gestione delle funzionalità di mapping
   /// </summary>
@@ -89,7 +89,7 @@ let AppMap = (function() {
     source: new ol.source.Vector({
       features: []
     }),
-    style: AppMapStyles.getSelectionStyle()
+    style: LamMapStyles.getSelectionStyle()
   });
 
   let copyCoordinateEvent; //evento per la copia coordinate
@@ -306,7 +306,7 @@ let AppMap = (function() {
         zIndex: parseInt(zIndex),
         source: vectorSource,
         visible: visible,
-        style: AppMapStyles.getPreloadStyle(vectorWidth, vectorRadius)
+        style: LamMapStyles.getPreloadStyle(vectorWidth, vectorRadius)
       });
       vector.gid = gid + "_preload";
       vector.hoverTooltip = hoverTooltip;
@@ -428,7 +428,7 @@ let AppMap = (function() {
           tile.setState(3);
         });
         xhr.open("GET", src);
-        xhr.setRequestHeader("Authorization", AppStore.getAuthorizationHeader());
+        xhr.setRequestHeader("Authorization", LamStore.getAuthorizationHeader());
         xhr.send();
       });
     }
@@ -558,7 +558,7 @@ let AppMap = (function() {
   let init = function() {
     //events binding
     //if mobile go to user location
-    if (AppStore.isMobile()) goToBrowserLocation();
+    if (LamStore.isMobile()) goToBrowserLocation();
   };
 
   /**
@@ -601,15 +601,15 @@ let AppMap = (function() {
 
     loadConfig(mapConfig);
 
-    AppMapInfo.init(); //info initialization
+    LamMapInfo.init(); //info initialization
 
     mainMap.on("singleclick", function(evt) {
       //Adding click info interaction
-      AppMapInfo.getRequestInfo(evt.coordinate, evt.pixel, true);
+      LamMapInfo.getRequestInfo(evt.coordinate, evt.pixel, true);
     });
 
     mainMap.on("moveend", function() {
-      dispatch("map-move-end");
+      lamDispatch("map-move-end");
     });
 
     proj4.defs("EPSG:25832", "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -619,13 +619,13 @@ let AppMap = (function() {
     );
 
     // mainMap.on("zoomend", map, function() {
-    //     dispatch("map-zoom-end");
+    //     lamDispatch("map-zoom-end");
     // });
 
     mainMap.on("pointermove", function(evt) {
       if (evt.dragging) return;
 
-      AppMapTooltip.hideMapTooltip();
+      LamMapTooltip.hideMapTooltip();
       if (typeof lastTimeoutRequest !== "undefined") {
         clearTimeout(lastTimeoutRequest);
       }
@@ -645,7 +645,7 @@ let AppMap = (function() {
 
   let mouseHoverMapTooltip = function() {
     if (!lastMousePixel) return;
-    if (AppStore.isMobile()) return;
+    if (LamStore.isMobile()) return;
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
@@ -657,9 +657,9 @@ let AppMap = (function() {
       }
     });
     if (!featureFound) {
-      AppMapTooltip.hideMapTooltip();
+      LamMapTooltip.hideMapTooltip();
     } else {
-      AppMapInfo.showInfoFeatureTooltipAtPixel(featureFound, lastMousePixel);
+      LamMapInfo.showInfoFeatureTooltipAtPixel(featureFound, lastMousePixel);
     }
   };
 
@@ -696,7 +696,7 @@ let AppMap = (function() {
             payload.eventName = "set-layer-visibility";
             payload.gid = initLayer[0];
             payload.visibility = parseInt(initLayer[1]);
-            dispatch(payload);
+            lamDispatch(payload);
           }
         }
       } catch (e) {
@@ -705,7 +705,7 @@ let AppMap = (function() {
       }
     }
     // if (initTool) {
-    //   dispatch({
+    //   lamDispatch({
     //     eventName: "show-tool",
     //     tool: initTool
     //   });
@@ -715,21 +715,21 @@ let AppMap = (function() {
       source: new ol.source.Vector({
         features: featuresWKT
       }),
-      style: AppMapStyles.getDrawStyle()
+      style: LamMapStyles.getDrawStyle()
     });
 
     vectorSelectionMask = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresSelectionMask
       }),
-      style: AppMapStyles.getSelectionMaskStyle()
+      style: LamMapStyles.getSelectionMaskStyle()
     });
 
     vectorSelection = new ol.layer.Vector({
       source: new ol.source.Vector({
         features: featuresSelection
       }),
-      style: AppMapStyles.getSelectionStyle()
+      style: LamMapStyles.getSelectionStyle()
     });
 
     vectorDraw.setMap(mainMap);
@@ -846,7 +846,7 @@ let AppMap = (function() {
 
   let getLegendUrl = function getLegendUrl(gid, scaled) {
     let layer = getLayer(gid);
-    let layerStore = AppStore.getLayer(gid);
+    let layerStore = LamStore.getLayer(gid);
     let url = "";
     try {
       if (layer) {
@@ -880,7 +880,7 @@ let AppMap = (function() {
       log(e);
     }
     if (scaled) {
-      url += "&SCALE=" + AppMap.getMapScale();
+      url += "&SCALE=" + LamMap.getMapScale();
     }
     return url;
   };
@@ -923,7 +923,7 @@ let AppMap = (function() {
     /// <param name="str">Messaggio da scrivere</param>
     /// <returns type=""></returns>
     if (console) {
-      Dispatcher.dispatch({
+      LamDispatcher.dispatch({
         eventName: "log",
         message: str
       });
@@ -988,7 +988,7 @@ let AppMap = (function() {
   let convertGeometryToOl = function(geometry, geometryFormat) {
     let geometryOl = geometry;
     switch (geometryFormat) {
-      case AppMapEnums.geometryFormats().GeoJson:
+      case LamMapEnums.geometryFormats().GeoJson:
         geometryOl = getGeometryFromGeoJsonGeometry(geometry);
         break;
     }
@@ -1013,7 +1013,7 @@ let AppMap = (function() {
       if (evt.coordinate[0] > 180) {
         pp = ol.proj.transform([evt.coordinate[0], evt.coordinate[1]], "EPSG:900913", "EPSG:4326");
       }
-      dispatch({
+      lamDispatch({
         eventName: "map-click",
         //"lon": evt,
         lon: pp[0],
@@ -1056,7 +1056,15 @@ let AppMap = (function() {
     let x2 = x + width / 2;
     let y1 = y - height / 2;
     let y2 = y + height / 2;
-    let vertices = [[[x1, y1], [x1, y2], [x2, y2], [x2, y1], [x1, y1]]];
+    let vertices = [
+      [
+        [x1, y1],
+        [x1, y2],
+        [x2, y2],
+        [x2, y1],
+        [x1, y1]
+      ]
+    ];
     //vertices  = [[10.60009,44.703497], [10.650215,44.703131], [10.628929,44.682508],[10.60009,44.703497]];
     geometryOl = new ol.geom.Polygon(vertices);
     feature = new ol.Feature({
@@ -1172,11 +1180,11 @@ let AppMap = (function() {
     selectInteraction = new ol.interaction.Draw({
       features: featuresSelectionMask,
       type: geomType,
-      style: AppMapStyles.getSelectionStyle()
+      style: LamMapStyles.getSelectionStyle()
     });
     selectInteraction.on("drawend", function(evt) {
       let feature = evt.feature.clone();
-      dispatch({
+      lamDispatch({
         eventName: "start-selection-search",
         coords: feature
           .getGeometry()
@@ -1309,7 +1317,7 @@ let AppMap = (function() {
 
       if (selected.length) {
         selected.forEach(function(feature) {
-          feature.setStyle(AppMapStyles.getModifyStyle());
+          feature.setStyle(LamMapStyles.getModifyStyle());
           //abilita eliminazione single click
           //vectorDraw.getSource().removeFeature(feature);
           //
@@ -1425,7 +1433,7 @@ let AppMap = (function() {
 
   let goToBrowserLocation = function() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(AppMap.showBrowserLocation);
+      navigator.geolocation.getCurrentPosition(LamMap.showBrowserLocation);
     }
   };
   let showBrowserLocation = function(position) {
@@ -1456,15 +1464,15 @@ let AppMap = (function() {
     return (mercatorLatitudeToY(topLat) - mercatorLatitudeToY(bottomLat)) / (degreesToRadians(topLat) - degreesToRadians(bottomLat));
   };
 
-  let addContextMenu = function(items) {
-    //Aggiunta del menu contestuale
-    let contextmenu = new ContextMenu({
-      width: 170,
-      defaultItems: false, // defaultItems are (for now) Zoom In/Zoom Out
-      items: items
-    });
-    mainMap.addControl(contextmenu);
-  };
+  // let addContextMenu = function(items) {
+  //   //Aggiunta del menu contestuale
+  //   let contextmenu = new ContextMenu({
+  //     width: 170,
+  //     defaultItems: false, // defaultItems are (for now) Zoom In/Zoom Out
+  //     items: items
+  //   });
+  //   mainMap.addControl(contextmenu);
+  // };
 
   let getCentroid = function(lonlats) {
     var latXTotal = 0;
@@ -1513,56 +1521,56 @@ let AppMap = (function() {
    */
   let getGeometryType = function(coordinates) {
     if (!Array.isArray(coordinates)) {
-      return AppMapEnums.geometryTypes().GeometryNull;
+      return LamMapEnums.geometryTypes().GeometryNull;
     }
     let firstElement = coordinates[0];
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
         if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
-          return AppMapEnums.geometryTypes().Polygon;
+          return LamMapEnums.geometryTypes().Polygon;
         } else {
-          AppMapEnums.geometryTypes().Polyline;
+          LamMapEnums.geometryTypes().Polyline;
         }
       } else {
-        return AppMapEnums.geometryTypes().Point;
+        return LamMapEnums.geometryTypes().Point;
       }
     }
     if (!Array.isArray(firstElement[0])) {
       //if first and last point are the same is polygon, otherwise polyline
       let lastElement = coordinates[coordinates.length - 1];
       if (firstElement[0] === lastElement[0] && firstElement[1] === lastElement[1]) {
-        return AppMapEnums.geometryTypes().Polygon;
+        return LamMapEnums.geometryTypes().Polygon;
       } else {
-        return AppMapEnums.geometryTypes().Polyline;
+        return LamMapEnums.geometryTypes().Polyline;
       }
     }
     //multis
     switch (getGeometryType(firstElement)) {
-      case AppMapEnums.geometryTypes().Polygon:
-      case AppMapEnums.geometryTypes().MultiPolygon:
-        return AppMapEnums.geometryTypes().MultiPolygon;
-      case AppMapEnums.geometryTypes().Polyline:
-      case AppMapEnums.geometryTypes().MultiPolyline:
-        return AppMapEnums.geometryTypes().MultiPolyline;
+      case LamMapEnums.geometryTypes().Polygon:
+      case LamMapEnums.geometryTypes().MultiPolygon:
+        return LamMapEnums.geometryTypes().MultiPolygon;
+      case LamMapEnums.geometryTypes().Polyline:
+      case LamMapEnums.geometryTypes().MultiPolyline:
+        return LamMapEnums.geometryTypes().MultiPolyline;
     }
-    return AppMapEnums.geometryTypes().GeometryNull;
+    return LamMapEnums.geometryTypes().GeometryNull;
   };
 
   let getLabelPoint = function(coordinates) {
     if (coordinates.length === 1) coordinates = coordinates[0];
     switch (getGeometryType(coordinates)) {
-      case AppMapEnums.geometryTypes().Point:
+      case LamMapEnums.geometryTypes().Point:
         return coordinates;
-      case AppMapEnums.geometryTypes().Polyline:
+      case LamMapEnums.geometryTypes().Polyline:
         return coordinates[Math.floor(coordinates.length / 2)];
-      case AppMapEnums.geometryTypes().Polygon:
+      case LamMapEnums.geometryTypes().Polygon:
         let polygon = new ol.geom.Polygon(coordinates);
         return polygon.getInteriorPoint().getCoordinates();
-      case AppMapEnums.geometryTypes().MultiPolyline:
+      case LamMapEnums.geometryTypes().MultiPolyline:
         coordinates = coordinates[0];
         return coordinates[Math.floor(coordinates.length / 2)];
-      case AppMapEnums.geometryTypes().MultiPolygon:
+      case LamMapEnums.geometryTypes().MultiPolygon:
         let mpolygon = new ol.geom.Polygon(coordinates);
         return mpolygon.getInteriorPoint().getCoordinates();
     }
@@ -1577,7 +1585,7 @@ let AppMap = (function() {
   };
 
   return {
-    addContextMenu: addContextMenu,
+    //addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
     addDrawDeleteInteraction: addDrawDeleteInteraction,
     addFeatureSelectionToMap: addFeatureSelectionToMap,

@@ -25,8 +25,8 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var AppLayerTree = (function() {
-  let treeDiv = "layer-tree";
+var LamLayerTree = (function() {
+  let treeDiv = "lam-layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
   //let layerGroupItemPrefix = "lti";
@@ -37,18 +37,18 @@ var AppLayerTree = (function() {
   var init = function(callback) {
     //carico i layer
     countRequest = 0;
-    AppStore.getAppState().layers.forEach(function(layer) {
+    LamStore.getAppState().layers.forEach(function(layer) {
       loadLayersUri(layer, callback);
     });
     if (layerUriCount === 0) {
       //no ajax request sent, loading all json immediately
-      render(treeDiv, AppStore.getAppState().layers);
+      render(treeDiv, LamStore.getAppState().layers);
       callback();
     }
 
     //events binding
-    Dispatcher.bind("show-layers", function(payload) {
-      AppToolbar.toggleToolbarItem("layer-tree");
+    LamDispatcher.bind("show-layers", function(payload) {
+      LamToolbar.toggleToolbarItem("lam-layer-tree");
     });
   };
 
@@ -67,7 +67,7 @@ var AppLayerTree = (function() {
           });
         })
         .fail(function(data) {
-          dispatch({
+          lamDispatch({
             eventName: "log",
             message: "Layer Tree: Unable to load layers " + layer.layersUri
           });
@@ -75,9 +75,9 @@ var AppLayerTree = (function() {
         .always(function(data) {
           countRequest--;
           if (countRequest === 0) {
-            render(treeDiv, AppStore.getAppState().layers);
-            AppStore.setInitialAppState(AppStore.getAppState());
-            AppMap.loadConfig(AppStore.getAppState()); //reloading layer state
+            render(treeDiv, LamStore.getAppState().layers);
+            LamStore.setInitialAppState(LamStore.getAppState());
+            LamMap.loadConfig(LamStore.getAppState()); //reloading layer state
             callback();
           }
         });
@@ -90,7 +90,7 @@ var AppLayerTree = (function() {
 
   var render = function(div, layers) {
     var output = "";
-    if (!AppStore.getAppState().logoPanelUrl) {
+    if (!LamStore.getAppState().logoPanelUrl) {
       output += '<h4 class="lam-title">Temi</h4>';
     }
     output += '<div class="layertree">'; //generale
@@ -102,7 +102,9 @@ var AppLayerTree = (function() {
     //sezione funzioni generali
     output += '<div class="layertree-item">';
     output +=
-      '<button class="btn-floating btn-small waves-effect waves-light right lam-button" alt="Reset dei layer" title="Reset dei layer" onClick="Dispatcher.dispatch({eventName:\'reset-layers\'})"><i class="material-icons">refresh</i></button>';
+      '<button class="lam-btn lam-btn-small lam-btn-floating lam-right lam-depth-1 ripple" alt="Reset dei layer" title="Reset dei layer" onClick="LamDispatcher.dispatch({eventName:\'reset-layers\'})"><i class="lam-icon">' +
+      LamResources.svgRefreshMap +
+      "</i></button>";
     output += "</div>";
     output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
@@ -118,13 +120,14 @@ var AppLayerTree = (function() {
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
-      '<i title="Informazioni sul layer" class="fas fa-info-circle fa-lg fa-pull-right layertree-icon icon-base-info" onclick="Dispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })"></i>',
-      layer.gid
+      '<i title="Informazioni sul layer" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })">{1}</i>',
+      layer.gid,
+      LamResources.svgInfo
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{2}_c" class="far {1} fa-lg fa-fw layertree-icon icon-base-info fa-pull-right " onclick="Dispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})"></i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
       layerId,
-      layer.visible ? "fa-check-square" : "fa-square",
+      layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
     );
     output += "</div>";
@@ -136,13 +139,19 @@ var AppLayerTree = (function() {
     let output = "";
     output += '<div class="layertree-item" >';
     output += formatString(
-      '<div  class="layertree-item__title lam-background {1} {3}"><i id="{0}_i" class="fas {2} fa-fw lam-pointer" onclick="AppLayerTree.toggleGroup(\'{0}\');"></i>',
+      '<div  class="layertree-item__title lam-background {1} {2}">',
       groupId,
       groupLayer.color,
-      groupLayer.visible ? "fa-minus-square" : "fa-plus-square",
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
     );
-    output += "<span>" + groupLayer.layerName + "</span>";
+    output += formatString(
+      '<i id="{0}_i" class="layertree-item__title-icon" onclick="LamLayerTree.toggleGroup(\'{0}\');">{2}</i>',
+      groupId,
+      groupLayer.color,
+      groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore
+    );
+
+    output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
     output += "</div>";
     output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
@@ -167,25 +176,27 @@ var AppLayerTree = (function() {
   var setCheckVisibility = function(layerGid, visibility) {
     const item = "#" + layerGid + "_c";
     if (visibility) {
-      $(item).removeClass("fa-square");
-      $(item).addClass("fa-check-square");
+      $(item).html(LamResources.svgCheckbox);
+      $(item).removeClass("lam-checked");
     } else {
-      $(item).addClass("fa-square");
-      $(item).removeClass("fa-check-square");
+      $(item).html(LamResources.svgCheckboxOutline);
+      $(item).removeClass("lam-unchecked");
     }
   };
 
   var toggleCheck = function(layerGid, groupId) {
     const item = "#" + layerGid + "_c";
-    if ($(item).hasClass("fa-square")) {
-      $(item).removeClass("fa-square");
-      $(item).addClass("fa-check-square");
+    if ($(item).hasClass("lam-unchecked")) {
+      $(item).removeClass("lam-unchecked");
+      $(item).addClass("lam-checked");
+      $(item).html(LamResources.svgCheckbox);
       $("#" + groupId).addClass("layertree-layer--selected");
       return;
     }
-    if ($(item).hasClass("fa-check-square")) {
-      $(item).removeClass("fa-check-square");
-      $(item).addClass("fa-square");
+    if ($(item).hasClass("lam-checked")) {
+      $(item).removeClass("lam-checked");
+      $(item).addClass("lam-unchecked");
+      $(item).html(LamResources.svgCheckboxOutline);
       $("#" + groupId).removeClass("layertree-layer--selected");
       return;
     }
@@ -197,22 +208,21 @@ var AppLayerTree = (function() {
       $(item).removeClass("layertree--hidden");
       $(item).addClass("layertree--visible");
     } else {
-      if ($(item).hasClass("layertree--visible")) {
-        $(item).removeClass("layertree--visible");
-        $(item).addClass("layertree--hidden");
-      }
+      $(item).removeClass("layertree--visible");
+      $(item).addClass("layertree--hidden");
     }
     const icon = "#" + groupName + "_i";
-    if ($(icon).hasClass("fa-plus-square")) {
-      $(icon).removeClass("fa-plus-square");
-      $(icon).addClass("fa-minus-square");
+
+    if ($(icon).hasClass("lam-plus")) {
+      $(icon).removeClass("lam-plus");
+      $(icon).addClass("lam-minus");
+      $(icon).html(svgExpandLess);
       return;
     } else {
-      if ($(icon).hasClass("fa-minus-square")) {
-        $(icon).removeClass("fa-minus-square");
-        $(icon).addClass("fa-plus-square");
-        return;
-      }
+      $(icon).removeClass("lam-minus");
+      $(icon).addClass("lam-plus");
+      $(icon).html(LamResources.svgExpandMore);
+      return;
     }
   };
 

@@ -12,11 +12,17 @@
   "author": "Filippo Formentini",
   "license": "MIT",
   "devDependencies": {
+    "clipboard": "^2.0.4",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
+    "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
+    "gulp-sass": "^4.0.2",
     "gulp-strip-comments": "^2.5.2",
-    "lite-server": "^2.5.3"
+    "gulp-uglify": "^3.0.2",
+    "handlebars": "^4.5.2",
+    "lite-server": "^2.5.3",
+    "proj4": "^2.6.0"
   },
   "dependencies": {
     "json2csv": "^4.5.2",

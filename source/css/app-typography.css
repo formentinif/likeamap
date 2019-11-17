@@ -1,0 +1,63 @@
+.lam-strong {
+  font-weight: bold;
+}
+
+.lam-title {
+  margin-top: 0.2rem;
+  margin-bottom: 0.3rem;
+  font-size: 2rem;
+}
+
+.lam-title-h4 {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  font-size: 1.2rem;
+  line-height: 22px;
+}
+
+.lam-secondary {
+  color: #383d41;
+  background-color: #e2e3e5;
+  border-color: #d6d8db;
+}
+
+.lam-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.lam-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.lam-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.lam-icon-success {
+  color: green;
+}
+
+.lam-icon-base-info {
+  color: var(--lam-btn-color);
+}
+
+.lam-bar {
+  box-sizing: border-box;
+  color: white;
+  width: 100%;
+  padding: 8px 16px;
+}
+
+.fake-link {
+  cursor: pointer;
+}
+
+.lam-pointer {
+  cursor: pointer;
+}

@@ -1,18 +1,46 @@
-.lam-button {
-  background-color: var(--lam-button-color);
+.lam-btn {
+  background-color: var(--lam-btn-color);
+  border: none;
+  border-radius: 2px;
+  padding: 6px 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  outline: none;
 }
 
-.lam-button:hover {
-  background-color: var(--lam-button-color);
+.lam-btn-floating {
+  border-radius: 100%;
+  width: 52px;
+  height: 52px;
+  line-height: 52px;
+  padding: 6px;
+  font-size: 14px;
 }
 
-.lam-button:focus {
-  background-color: var(--lam-button-color-darken);
+.lam-btn-floating.lam-btn-small {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  padding: 5px 5px;
 }
 
-/* .lam-button:hover {
-  background-color: var(--lam-button-color);
-} */
+.lam-btn-large {
+  font-size: 0.7rem;
+}
+
+.lam-btn-large {
+  font-size: 1.6rem;
+}
+
+.lam-btn:hover {
+  background-color: var(--lam-btn-color);
+}
+
+.lam-btn:focus {
+  background-color: var(--lam-btn-color-darken);
+}
+
 .lam-map__browser-location {
   position: absolute;
   top: 0.5rem;
@@ -35,4 +63,26 @@
   top: 0.5rem;
   left: 0.5em;
   position: absolute;
+}
+
+.lam-icon {
+  fill: white;
+}
+
+.lam-icon-primary {
+  fill: var(--lam-btn-color);
+}
+
+/* Ripple effect */
+.lam-ripple {
+  background-position: center;
+  transition: background 1s;
+}
+.lam-ripple:hover {
+  background: var(--lam-btn-color-darken) radial-gradient(circle, transparent 1%, var(--lam-btn-color-darken) 1%) center/15000%;
+}
+.lam-ripple:active {
+  background-color: var(--lam-btn-color);
+  background-size: 100%;
+  transition: background 0s;
 }

@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Map Eumerations
  */
-let AppMapEnums = (function() {
+let LamMapEnums = (function() {
   "use strict";
 
   let infoSelectBehaviourEnum = {
