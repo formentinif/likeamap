@@ -9,14 +9,14 @@ Per includere la mappa in un div includere:
 	JQuery 3+
 		
     <link rel="stylesheet" href="css/lam.css" />
-	<link rel="stylesheet" href="css/lam-variables.css" /> //(css per colori e impostazioni custom)
-    <script src="js/lam-libs.js"></script> //(comprende openlayers e handlebars)
+	<link rel="stylesheet" href="css/lam-variables.css" /> //(css per colori e impostazioni custom può essere inserito in linea)
+    <script src="js/lam-libs.js"></script> //(include openlayers e handlebars)
     <script src="js/lam.js"></script>
 	
 	//lo script per inizializzare la mappa è il seguente
 	<script>
-      //LamInit({id del div mappa}, {url dell'appstate}, true);
-      LamInit("lam-app", null, true);
+      //LamInit({id del div mappa}, {embedded}, {url dell'appstate}, {url del template mappa});
+      LamInit("lam-app", true, null, null);
     </script>
 
 RoadMap

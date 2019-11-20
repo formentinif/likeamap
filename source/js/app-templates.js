@@ -350,7 +350,7 @@ let LamTemplates = (function() {
       tempBody += "<div class='lam-col'>";
       tempBody +=
         '<button class="lam-btn lam-btn-floating lam-btn-small lam-info-expander lam-icon" alt="Apri dettagli" title="Apri dettagli" onclick="LamDispatcher.dispatch(\'show-mobile-info-results\')">';
-      tempBody += "<i class='lam-icon-primary'>" + LamResources.svgExpandLess + "</i>";
+      tempBody += "<i class='lam-icon'>" + LamResources.svgExpandLess + "</i>";
       tempBody += "</button>";
       tempBody += "</div>";
       tempBody += "</div>";

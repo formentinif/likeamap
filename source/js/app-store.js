@@ -27,6 +27,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 var LamStore = (function() {
   var mapDiv = null;
+  var mapTemplateUrl = null;
   var isEmbedded = false;
   var appState = null;
   var initialAppState = null;
@@ -37,18 +38,33 @@ var LamStore = (function() {
     mapDiv = div;
   };
 
+  var setMapTemplateUrl = function(url) {
+    mapTemplateUrl = url;
+  };
+
+  var getMapTemplateUrl = function() {
+    let tempTemplateUrl = isEmbedded ? "embed.html" : "map.html";
+    if (LamStore.getAppState().urlMapTemplate != null) {
+      tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
+    }
+    return mapTemplateUrl ? mapTemplateUrl : tempTemplateUrl;
+  };
+
   var setIsEmbedded = function(value) {
     isEmbedded = value;
   };
 
   /**
-   * Init map function TODO it has ti bo optimized
-   * @param {string} mapDiv div for map rendering
-   * @param {*} appStateUrl optional url of the map state
+   * Init map function
+   * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
+   * @param {bool} isEmbedded Declare wheter the map is embedded or standalone.  Optional
+   * @param {*} appStateUrl Url of the appstate. Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
+   * @param {*} mapTemplateUrl Url of the map template to load.
    */
-  function lamInit(mapDiv, appStateUrl, isEmbedded) {
+  function lamInit(mapDiv, isEmbedded, appStateUrl, mapTemplateUrl) {
     LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
     LamStore.setIsEmbedded(isEmbedded);
+    LamStore.setMapTemplateUrl(mapTemplateUrl);
     //appstate loader
     //appstate with filename
     var appStateId =
@@ -130,13 +146,9 @@ var LamStore = (function() {
   }
 
   var lamTemplateMapinit = function() {
-    let templateUrl = isEmbedded ? "embed.html" : "map.html";
-    if (LamStore.getAppState().urlMapTemplate != null) {
-      templateUrl = LamStore.getAppState().urlMapTemplate;
-    }
     $.ajax({
       dataType: "text",
-      url: templateUrl
+      url: LamStore.getMapTemplateUrl()
     })
       .done(function(data) {
         $("#" + mapDiv).html(data);
@@ -772,6 +784,7 @@ var LamStore = (function() {
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
     getQueryLayers: getQueryLayers,
+    getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
     getRelations: getRelations,
     getRelation: getRelation,
@@ -787,6 +800,7 @@ var LamStore = (function() {
     setInitialAppState: setInitialAppState,
     setIsEmbedded: setIsEmbedded,
     setMapDiv: setMapDiv,
+    setMapTemplateUrl: setMapTemplateUrl,
     showLegend: showLegend,
     showAppTools: showAppTools,
     showContent: showContent,

@@ -145,10 +145,11 @@ var LamLayerTree = (function() {
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
     );
     output += formatString(
-      '<i id="{0}_i" class="layertree-item__title-icon" onclick="LamLayerTree.toggleGroup(\'{0}\');">{2}</i>',
+      '<i id="{0}_i" class="layertree-item__title-icon {3}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{2}</i>',
       groupId,
       groupLayer.color,
-      groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore
+      groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore,
+      groupLayer.visible ? "lam-plus" : "lam-minus"
     );
 
     output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
@@ -203,6 +204,7 @@ var LamLayerTree = (function() {
   };
 
   var toggleGroup = function(groupName) {
+    debugger;
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
       $(item).removeClass("layertree--hidden");
