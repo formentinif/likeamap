@@ -15,8 +15,8 @@ Per includere la mappa in un div includere:
 	
 	//lo script per inizializzare la mappa è il seguente
 	<script>
-      //LamInit({id del div mappa}, {embedded}, {url dell'appstate}, {url del template mappa});
-      LamInit("lam-app", true, null, null);
+      //LamInit({id del div mappa}, {url dell'appstate}, {url del template mappa});
+      LamInit("lam-app", null, null);
     </script>
 
 RoadMap

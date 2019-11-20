@@ -198,7 +198,7 @@ var LamDispatcher = (function() {
     });
 
     this.bind("init-map-app", function(payload) {
-      LamInit(payload.mapDiv, payload.isEmbedded, payload.appStateUrl, payload.mapTemplateUrl);
+      LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
 
     this.bind("map-move-end", function(payload) {

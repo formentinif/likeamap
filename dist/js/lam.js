@@ -4975,7 +4975,7 @@ var LamDispatcher = (function() {
     });
 
     this.bind("init-map-app", function(payload) {
-      LamInit(payload.mapDiv, payload.isEmbedded, payload.appStateUrl, payload.mapTemplateUrl);
+      LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
 
     this.bind("map-move-end", function(payload) {
@@ -5213,7 +5213,6 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 var LamStore = (function() {
   var mapDiv = null;
   var mapTemplateUrl = null;
-  var isEmbedded = false;
   var appState = null;
   var initialAppState = null;
   var authToken = null;
@@ -5228,27 +5227,21 @@ var LamStore = (function() {
   };
 
   var getMapTemplateUrl = function() {
-    let tempTemplateUrl = isEmbedded ? "embed.html" : "map.html";
+    let tempTemplateUrl = "map.html";
     if (LamStore.getAppState().urlMapTemplate != null) {
       tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
     }
     return mapTemplateUrl ? mapTemplateUrl : tempTemplateUrl;
   };
 
-  var setIsEmbedded = function(value) {
-    isEmbedded = value;
-  };
-
   /**
    * Init map function
    * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
-   * @param {bool} isEmbedded Declare wheter the map is embedded or standalone.  Optional
    * @param {*} appStateUrl Url of the appstate. Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
    * @param {*} mapTemplateUrl Url of the map template to load.
    */
-  function lamInit(mapDiv, isEmbedded, appStateUrl, mapTemplateUrl) {
+  function lamInit(mapDiv, appStateUrl, mapTemplateUrl) {
     LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
-    LamStore.setIsEmbedded(isEmbedded);
     LamStore.setMapTemplateUrl(mapTemplateUrl);
     //appstate loader
     //appstate with filename
@@ -5983,7 +5976,6 @@ var LamStore = (function() {
     openUrlTemplate: openUrlTemplate,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
-    setIsEmbedded: setIsEmbedded,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
     showLegend: showLegend,
@@ -6810,12 +6802,11 @@ function lamDispatch(payload) {
 /**
  * Init map function
  * @param {string} mapDiv Target Id of the div where the map will be rendered in. Default is lam-app
- * @param {bool} isEmbedded Declare wheter the map is embedded or standalone.  Optional
  * @param {*} appStateUrl Url of the appstate. Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
  * @param {*} mapTemplateUrl Url of the map template to load.
  */
-function LamInit(mapDiv, isEmbedded, appStateUrl, mapTemplateUrl) {
-  LamStore.lamInit(mapDiv, isEmbedded, appStateUrl, mapTemplateUrl);
+function LamInit(mapDiv, appStateUrl, mapTemplateUrl) {
+  LamStore.lamInit(mapDiv, appStateUrl, mapTemplateUrl);
 }
 /*Custom functions*/
 function customFunctions() {
