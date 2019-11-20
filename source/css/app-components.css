@@ -6,7 +6,6 @@
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
-  font-size: 16px;
   font-weight: 400;
   overflow: hidden;
   width: 100%;
@@ -88,20 +87,23 @@
 }
 
 .lam-input {
+  font-size: 1rem;
   border-right: 0px solid var(--lam-btn-color);
   border-left: 0px solid var(--lam-btn-color);
   border-top: 0px solid var(--lam-btn-color);
   border-bottom: 1px solid var(--lam-btn-color);
   width: 100%;
-  padding-bottom: 0.3rem;
+  padding: 0.3rem 0px;
 }
+
 .lam-input:focus {
   outline: none;
 }
 
 .lam-select {
   width: 100%;
-  padding-bottom: 0.3rem;
+  font-size: 1rem;
+  padding: 0.3rem 0px;
   border-right: 0px solid var(--lam-btn-color);
   border-left: 0px solid var(--lam-btn-color);
   border-top: 0px solid var(--lam-btn-color);
@@ -109,8 +111,14 @@
   outline: 0px;
 }
 
+.lam-option {
+  padding: 0px;
+}
+
 .lam-label {
   font-weight: 500;
+  font-size: 1rem;
+  padding: 0.3rem 0;
 }
 
 a.lam-link {

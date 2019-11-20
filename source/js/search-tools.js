@@ -134,8 +134,9 @@ var LamSearchTools = (function() {
   var templateTopTools = function() {
     let template = '<div class="lam-bar lam-background">';
     template += '<div class="lam-grid lam-no-margin">';
-    template += '<div class="lam-col"><a class="lam-btn lam-btn-small" onclick="LamSearchTools.showSearchAddress(); return false;" >Indirizzi</a></div>';
-    template += '<div class="lam-col"><a class="lam-btn lam-btn-small" onclick="LamSearchTools.showSearchLayers(); return false;" >Layers</a></div>';
+    template +=
+      '<div class="lam-col"><button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
+    template += '<button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Layers</button></div>';
     template += "</div>";
     template += "</div>";
     return template;
@@ -160,22 +161,24 @@ var LamSearchTools = (function() {
    */
   var templateLayersTools = function(searchLayers) {
     let template = '<div id="search-tools__layers" class="lam-card lam-depth-2 lam-hidden" >';
-    template += '<select id="search-tools__select-layers" class="lam-input lam-mb-2">';
+    template += '<select id="search-tools__select-layers" class="lam-select lam-mb-2">';
     for (var i = 0; i < searchLayers.length; i++) {
-      template += '<option value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
+      template += '<option class="lam-option" value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
 
     template += '<div id="search-tools__search-layers-field" class="lam-grid" >';
     template += '<label class="lam-label" id="search-tools__search-layers__label" for="search-tools__search-layers">';
-    template += '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
     } else {
       template += "Layers...";
     }
     template += "</label>";
+    template += '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)">';
+
     template += "</div>";
+
     template += "</div>";
     return template;
   };
@@ -195,8 +198,9 @@ var LamSearchTools = (function() {
     template += "</select>";
     template += '<div class="div-5"></div>';
     template += '<div id="search-tools__search-via-field" class="" >';
-    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Via</label>';
-    template += '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)">';
+    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
+    template +=
+      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);
@@ -218,8 +222,9 @@ var LamSearchTools = (function() {
     template += templateTopTools();
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<div id="search-tools__search-via-field" class="" >';
-    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Via</label>';
-    template += '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)">';
+    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
+    template +=
+      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
     template += templateLayersTools(searchLayers);

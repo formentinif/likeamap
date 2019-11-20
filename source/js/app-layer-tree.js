@@ -216,12 +216,12 @@ var LamLayerTree = (function() {
     if ($(icon).hasClass("lam-plus")) {
       $(icon).removeClass("lam-plus");
       $(icon).addClass("lam-minus");
-      $(icon).html(svgExpandLess);
+      $(icon).html(LamResources.svgExpandMore);
       return;
     } else {
       $(icon).removeClass("lam-minus");
       $(icon).addClass("lam-plus");
-      $(icon).html(LamResources.svgExpandMore);
+      $(icon).html(LamResources.svgExpandLess);
       return;
     }
   };

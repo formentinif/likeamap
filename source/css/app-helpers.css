@@ -30,6 +30,10 @@
   margin-left: auto;
 }
 
+.lam-visible {
+  display: block !important;
+}
+
 .lam-hidden {
   display: none;
 }

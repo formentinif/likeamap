@@ -475,7 +475,7 @@ var LamStore = (function() {
   var getSearchLayersArray = function(layers) {
     var layersFound = [];
     layers.forEach(function(layer) {
-      if (layer.searchable) {
+      if (layer.searchable && layer.searchField) {
         layersFound.push(layer);
       }
       if (layer.layers) {

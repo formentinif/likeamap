@@ -1,20 +1,22 @@
 /*layer-tree*/
 
 .layertree {
+  box-sizing: border-box;
   margin: 0px;
   padding: 0px;
   width: 100%;
   min-height: 300px;
   display: flex;
   flex-flow: column;
+  flex-shrink: 0;
 }
 
 .layertree-item {
   margin: 0px;
-  padding: 4px 0px;
+  padding: 2px 0px;
   transition: all 0.3s ease;
   width: 100%;
-  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .layertree-item-bottom {
@@ -22,7 +24,7 @@
 }
 
 .layertree-item__title {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
   border-bottom: 1px solid rgb(251, 251, 251);
@@ -47,27 +49,31 @@
 }
 
 .layertree-item__title--sub1 {
-  font-size: 1.3rem;
+  box-sizing: border-box;
+  font-size: 1.2rem;
   filter: brightness(110%);
   padding: 0.1rem 0.1rem 0.1rem 0.1rem;
   width: 100%;
 }
 
 .layertree-item__title--sub2 {
-  font-size: 1.2rem;
+  box-sizing: border-box;
+  font-size: 1.1rem;
   filter: brightness(130%);
   padding: 0.1rem 0.1rem 0.1rem 0.1rem;
   width: 100%;
 }
 
 .layertree-item__title--sub3 {
-  font-size: 1.1rem;
+  box-sizing: border-box;
+  font-size: 1rem;
   filter: brightness(150%);
   padding: 0.1rem 0.1rem 0.1rem 0.1rem;
   width: 100%;
 }
 
 .layertree-item__title--sub4 {
+  box-sizing: border-box;
   font-size: 1.1rem;
   filter: brightness(170%);
   padding: 0.1rem 0.1rem 0.1rem 0.1rem;

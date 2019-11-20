@@ -108,6 +108,7 @@ let LamToolbar = (function() {
       currentToolbarItem = toolId;
       resetTools();
       $(".lam-panel-content-item").hide();
+      $(".lam-panel-content-item").removeClass("lam-visible");
       showMenu(toolId);
     } else {
       if ($("#panel").css("display") == "none" || keepOpen) {
