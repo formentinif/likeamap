@@ -5743,8 +5743,6 @@ var LamStore = (function() {
     //map init
     LamMap.render("lam-map", appState);
     LamMapTooltip.init();
-    //loading templates
-    LamTemplates.init();
     //carico i layers
     LamLayerTree.init(function() {
       //carico gli strumenti di ricerca
@@ -5768,6 +5766,8 @@ var LamStore = (function() {
       if (appState.modules["select-tools"]) {
         LamSelectTools.render(getQueryLayers());
       }
+      //loading templates
+      LamTemplates.init();
     });
 
     LamToolbar.init();
@@ -6196,7 +6196,6 @@ var LamLayerTree = (function() {
   };
 
   var toggleGroup = function(groupName) {
-    debugger;
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
       $(item).removeClass("layertree--hidden");
@@ -6315,6 +6314,7 @@ let LamTemplates = (function() {
   };
 
   let loadTemplateAjax = function(templateUrl) {
+    debugger;
     $.ajax({
       dataType: "json",
       url: templateUrl

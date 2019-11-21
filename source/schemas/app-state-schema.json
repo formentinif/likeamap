@@ -44,37 +44,37 @@
     },
     "startMapLon": {
       "title": "Longitudine",
-      "description": "Longitudine iniziale",
+      "description": "Longitudine della posizione home",
       "default": 0,
       "type": "number"
     },
     "startMapLat": {
       "title": "Latitudine",
-      "description": "Latitudine iniziale",
+      "description": "Latitudine della posizione home",
       "default": 0,
       "type": "number"
     },
     "startMapZoom": {
       "title": "Zoom",
-      "description": "Zoom iniziale",
+      "description": "Zoom della posizione home",
       "default": 13,
       "type": "integer"
     },
     "mapLon": {
       "title": "",
-      "description": "Valore di sistema, lasciare a 0",
+      "description": "Longitudine della posizione iniziale/attuale",
       "default": 0,
       "type": "number"
     },
     "mapLat": {
       "title": "",
-      "description": "Valore di sistema, lasciare a 0",
+      "description": "Latitudine della posizione iniziale/attuale",
       "default": 0,
       "type": "number"
     },
     "mapZoom": {
       "title": "",
-      "description": "Valore di sistema, lasciare a 0",
+      "description": "Zoom della posizione iniziale/attuale",
       "default": 0,
       "type": "integer"
     },

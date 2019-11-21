@@ -204,7 +204,6 @@ var LamLayerTree = (function() {
   };
 
   var toggleGroup = function(groupName) {
-    debugger;
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
       $(item).removeClass("layertree--hidden");

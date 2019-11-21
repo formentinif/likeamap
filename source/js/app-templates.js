@@ -70,6 +70,7 @@ let LamTemplates = (function() {
   };
 
   let loadTemplateAjax = function(templateUrl) {
+    debugger;
     $.ajax({
       dataType: "json",
       url: templateUrl
