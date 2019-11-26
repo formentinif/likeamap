@@ -6347,7 +6347,7 @@ let LamTemplates = (function() {
    */
   let getTemplateUrl = function(gid, templateUrl, repoUrl) {
     if (templateUrl) {
-      if (templateUrl.toLowerCase().includes("http://")) {
+      if (templateUrl.toLowerCase().includes("http://") || templateUrl.toLowerCase().includes("https://")) {
         return templateUrl;
       } else {
         return repoUrl + "/" + templateUrl;
