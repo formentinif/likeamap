@@ -42,11 +42,10 @@ let LamToolbar = (function() {
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
+    } else {
+      //definizione degli eventi jquery
+      LamStore.dragElement(document.getElementById("info-window"));
     }
-    // else {
-    //   //definizione degli eventi jquery
-    //   dragElement(document.getElementById("info-window"));
-    // }
 
     //nascondo il draw per dimensioni piccole
     if ($(window).width() < 640) {

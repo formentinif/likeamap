@@ -96,13 +96,17 @@
   flex-direction: row;
 }
 
+.layertree-layer-border {
+  border-bottom: 1px solid var(--lam-btn-color);
+}
+
 .layertree-layer--selected {
   background-color: #ebebeb;
 }
 
 .layertree-layer__title {
   padding: 0rem 0rem 0rem 0rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   order: 0;
   flex-grow: 1;
 }
@@ -117,9 +121,15 @@
 .layertree-icon {
   cursor: pointer;
   fill: var(--lam-btn-color);
-  display: inline;
+  display: inline-block;
   line-height: 0rem;
   font-size: 0pt;
+}
+
+.layertree-icon-empty {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
 }
 
 .layertree--hidden {

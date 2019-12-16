@@ -115,8 +115,7 @@ var LamLayerTree = (function() {
 
   var renderLayer = function(layer, layerId) {
     let output = "";
-    //--------------
-    output += formatString('<div id="{0}" class="layertree-layer">', layerId);
+    output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border">', layerId);
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
@@ -125,7 +124,7 @@ var LamLayerTree = (function() {
       LamResources.svgInfo
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\', refreshGroup: true})">{1}</i>',
       layerId,
       layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
@@ -135,11 +134,30 @@ var LamLayerTree = (function() {
     return output;
   };
 
+  var renderLayerTools = function(groupLayer, groupId) {
+    let output = "";
+    //--------------
+    output += formatString('<div id="" class="layertree-layer">');
+    output += formatString('<div class="layertree-layer__title"></div>');
+    output += '<div class="layertree-layer__icons">';
+    //placeholder
+    output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
+    output += formatString(
+      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+      groupLayer.gid,
+      groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+    );
+
+    output += "</div>";
+    output += "</div>";
+    return output;
+  };
+
   var renderGroup = function(groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
     output += formatString(
-      '<div  class="layertree-item__title lam-background {1} {2}">',
+      '<div class="layertree-item__title lam-background {1} {2}">',
       groupId,
       groupLayer.color,
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
@@ -153,7 +171,9 @@ var LamLayerTree = (function() {
     );
 
     output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
+
     output += "</div>";
+
     output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
@@ -169,6 +189,16 @@ var LamLayerTree = (function() {
         index++;
       });
     }
+
+    //tools section
+    if (groupLayer.layers) {
+      let geoLayers = groupLayer.layers.filter(function(el) {
+        return el.layerType !== "group";
+      });
+      if (geoLayers.length) {
+        output += renderLayerTools(groupLayer, groupId);
+      }
+    }
     output += "</div>";
     output += "</div>";
     return output;
@@ -178,10 +208,12 @@ var LamLayerTree = (function() {
     const item = "#" + layerGid + "_c";
     if (visibility) {
       $(item).html(LamResources.svgCheckbox);
-      $(item).removeClass("lam-checked");
+      $(item).addClass("lam-checked");
+      $(item).removeClass("lam-unchecked");
     } else {
       $(item).html(LamResources.svgCheckboxOutline);
-      $(item).removeClass("lam-unchecked");
+      $(item).removeClass("lam-checked");
+      $(item).addClass("lam-unchecked");
     }
   };
 
@@ -239,12 +271,33 @@ var LamLayerTree = (function() {
     $("#" + layerGid + "_c");
   };
 
+  /**
+   * Set the group layer parent visibility by layer gid
+   * @param {string} layerGid Layer gid
+   */
+  let setGropupCheckVisibility = function(layerGid) {
+    var groupLayer = LamStore.getGroupLayerByLayerGid(layerGid);
+    //TO DO replace with filter
+    if (groupLayer && groupLayer.layers) {
+      let allVisible = true;
+      groupLayer.layers.forEach(function(layer) {
+        if (layer.layerType != "group" && !layer.visible) {
+          allVisible = false;
+        }
+      });
+      LamLayerTree.setCheckVisibility(groupLayer.gid, allVisible);
+    } else {
+      LamLayerTree.setCheckVisibility(groupLayer.gid, false);
+    }
+  };
+
   return {
     formatString: formatString,
     render: render,
     init: init,
     setCheckVisibility: setCheckVisibility,
     setLayerVisibility: setLayerVisibility,
+    setGropupCheckVisibility: setGropupCheckVisibility,
     toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };

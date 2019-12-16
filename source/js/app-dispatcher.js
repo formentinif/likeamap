@@ -92,7 +92,6 @@ var LamDispatcher = (function() {
 
     this.bind("hide-info-window", function(payload) {
       LamStore.hideInfoWindow();
-      LamMapInfo.clearLayerInfo();
     });
 
     this.bind("hide-editor-window", function(payload) {
@@ -162,9 +161,20 @@ var LamDispatcher = (function() {
       LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
+    /**
+     * {string} paylod.gid Layer Gid
+     * {bool} paylod.refreshGroup Refresh the group layer state
+     */
     this.bind("toggle-layer", function(payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
+      if (payload.refreshGroup) {
+        LamLayerTree.setGropupCheckVisibility(payload.gid);
+      }
+    });
+
+    this.bind("toggle-layer-group", function(payload) {
+      LamStore.toggleLayersInGroup(payload.gid);
     });
 
     this.bind("set-layer-visibility", function(payload) {

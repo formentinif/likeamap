@@ -8,6 +8,14 @@ Open source under the MIT License.
   flex-wrap: wrap;
 }
 
+.lam-grid:nth-child(even) {
+  background: #e8ecf0;
+}
+
+.lam-grid:nth-child(odd) {
+  background: #fff;
+}
+
 .lam-col {
   box-sizing: border-box;
   flex: 1;

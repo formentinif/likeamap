@@ -885,12 +885,11 @@ let LamMap = (function() {
     return url;
   };
 
-  let toggleLayer = function toggleLayer(gid) {
-    /// <summary>
-    /// Cambia lo stato di visibilità (acceso/spento) di un layer
-    /// </summary>
-    /// <param name="gid">Codice numerico identificativo del layer</param>
-    /// <returns type=""></returns>
+  /**
+   * Cambia lo stato di visibilità (acceso/spento) di un layer
+   * @param {string} gid Codice numerico identificativo del layer
+   */
+  let toggleLayer = function(gid) {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());

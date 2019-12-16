@@ -213,10 +213,20 @@ let LamTemplates = (function() {
   let relationsTemplate = function(relations, props, index) {
     let result = "";
     if (relations.length > 0) {
-      result += '<div class="">';
+      result += '<div class="lam-feature__relations">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result += '<a href="#" onclick="LamStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result +=
+          '<a href="#" class="lam-link" onclick="LamStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          '<i class="lam-feature__icon">' +
+          LamResources.svgOpen16 +
+          "</i>" +
+          relation.labelTemplate +
+          "</a>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";

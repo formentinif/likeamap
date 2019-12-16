@@ -252,6 +252,7 @@ var LamStore = (function() {
   };
 
   var showRelation = function(relationGid, resultIndex) {
+    lamDispatch("show-loader");
     var item = LamStore.getCurrentInfoItems().features[resultIndex];
     var relation = LamStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
@@ -296,13 +297,15 @@ var LamStore = (function() {
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
         }
-        LamStore.showContent(title, body);
+        LamStore.showContentInfoWindow(title, body);
+        lamDispatch("hide-loader");
       },
       error: function(jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
           message: "LamSearchTools: unable to complete response"
         });
+        lamDispatch("hide-loader");
       }
     });
   };
@@ -368,6 +371,19 @@ var LamStore = (function() {
       layer.visible = 1 - layer.visible;
     }
     LamLayerTree.setCheckVisibility(gid, layer.visible);
+  };
+
+  let toggleLayersInGroup = function(gid) {
+    let groupLayer = getLayer(gid);
+    let icon = $("#" + gid + "_c");
+    let visibility = !icon.hasClass("lam-checked");
+    if (groupLayer && groupLayer.layers) {
+      groupLayer.layers.forEach(function(layer) {
+        LamMap.setLayerVisibility(layer.gid, visibility);
+        LamStore.setLayerVisibility(layer.gid, visibility);
+      });
+    }
+    LamLayerTree.setCheckVisibility(gid, visibility);
   };
 
   /**
@@ -438,6 +454,11 @@ var LamStore = (function() {
     return LamStore.getLayerArrayByName(appState.layers, layerName);
   };
 
+  /**
+   * Sorting functionby layer name
+   * @param {object} a
+   * @param {object} b
+   */
   function SortByLayerName(a, b) {
     var aName = a.layerName.toLowerCase();
     var bName = b.layerName.toLowerCase();
@@ -454,6 +475,10 @@ var LamStore = (function() {
     return layers;
   };
 
+  /**
+   * Function needed for getting query layers recursively
+   * @param {Object} layers
+   */
   var getQueryLayersArray = function(layers) {
     var layersFound = [];
     layers.forEach(function(layer) {
@@ -477,6 +502,10 @@ var LamStore = (function() {
     return layers;
   };
 
+  /**
+   * Function needed for getting search layers recursively
+   * @param {Object} layers
+   */
   var getSearchLayersArray = function(layers) {
     var layersFound = [];
     layers.forEach(function(layer) {
@@ -490,6 +519,45 @@ var LamStore = (function() {
     return layersFound;
   };
 
+  /**
+   * Get Group Layer bu Layer Gid
+   * @param {string} gid Layer gid
+   */
+  var getGroupLayerByLayerGid = function(gid) {
+    var layerGroupsFound = [];
+    debugger;
+    appState.layers.forEach(function(layer) {
+      var layerGroup = getGroupLayerByLayerGidArray(layer, gid);
+      if (layerGroup) {
+        layerGroupsFound.push(layerGroup);
+      }
+    });
+    return layerGroupsFound.length ? layerGroupsFound[0] : null;
+  };
+
+  /**
+   * Function needed for getting group layer recursively
+   * @param {Object} layerGroup
+   * @param {string} gid
+   */
+  var getGroupLayerByLayerGidArray = function(layerGroup, gid) {
+    var layerFound = null;
+    layerGroup.layers.forEach(function(layer) {
+      if (layer.gid === gid) {
+        layerFound = layer;
+      }
+      if (!layerFound && layer.layers) {
+        layerFound = getGroupLayerByLayerGidArray(layer, gid);
+      }
+    });
+    if (layerFound && layerFound.layerType === "group") return layerFound;
+    return layerFound ? layerGroup : null;
+  };
+
+  /**
+   * Dragging helper
+   * @param {Object} elmnt
+   */
   var dragElement = function(elmnt) {
     var pos1 = 0,
       pos2 = 0,
@@ -763,13 +831,29 @@ var LamStore = (function() {
     }
   };
 
+  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-window";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+    // if (!LamStore.isMobile()) {
+    //   LamToolbar.toggleToolbarItem(htmlElement, true);
+    // } else {
+    //   $("#info-tooltip").show();
+    //   $("#info-tooltip").html(bodyMobile);
+    // }
+  };
+
   return {
     doLogin: doLogin,
+    dragElement: dragElement,
     init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItem: getCurrentInfoItem,
     getCurrentInfoItems: getCurrentInfoItems,
+    getGroupLayerByLayerGid: getGroupLayerByLayerGid,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
@@ -796,8 +880,10 @@ var LamStore = (function() {
     showLegend: showLegend,
     showAppTools: showAppTools,
     showContent: showContent,
+    showContentInfoWindow: showContentInfoWindow,
     showRelation: showRelation,
     toggleLoader: toggleLoader,
+    toggleLayersInGroup: toggleLayersInGroup,
     resetInitialLayers: resetInitialLayers,
     hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,

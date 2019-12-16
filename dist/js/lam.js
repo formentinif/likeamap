@@ -1891,12 +1891,11 @@ let LamMap = (function() {
     return url;
   };
 
-  let toggleLayer = function toggleLayer(gid) {
-    /// <summary>
-    /// Cambia lo stato di visibilità (acceso/spento) di un layer
-    /// </summary>
-    /// <param name="gid">Codice numerico identificativo del layer</param>
-    /// <returns type=""></returns>
+  /**
+   * Cambia lo stato di visibilità (acceso/spento) di un layer
+   * @param {string} gid Codice numerico identificativo del layer
+   */
+  let toggleLayer = function(gid) {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
@@ -4869,7 +4868,6 @@ var LamDispatcher = (function() {
 
     this.bind("hide-info-window", function(payload) {
       LamStore.hideInfoWindow();
-      LamMapInfo.clearLayerInfo();
     });
 
     this.bind("hide-editor-window", function(payload) {
@@ -4939,9 +4937,20 @@ var LamDispatcher = (function() {
       LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
+    /**
+     * {string} paylod.gid Layer Gid
+     * {bool} paylod.refreshGroup Refresh the group layer state
+     */
     this.bind("toggle-layer", function(payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
+      if (payload.refreshGroup) {
+        LamLayerTree.setGropupCheckVisibility(payload.gid);
+      }
+    });
+
+    this.bind("toggle-layer-group", function(payload) {
+      LamStore.toggleLayersInGroup(payload.gid);
     });
 
     this.bind("set-layer-visibility", function(payload) {
@@ -5112,7 +5121,11 @@ var LamResources = {
   svgExpandLess:
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
   svgExpandMore:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
+  svgOpen:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
+  svgOpen16:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>'
 };
 
 /*
@@ -5437,6 +5450,7 @@ var LamStore = (function() {
   };
 
   var showRelation = function(relationGid, resultIndex) {
+    lamDispatch("show-loader");
     var item = LamStore.getCurrentInfoItems().features[resultIndex];
     var relation = LamStore.getRelation(relationGid);
     var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
@@ -5481,13 +5495,15 @@ var LamStore = (function() {
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
         }
-        LamStore.showContent(title, body);
+        LamStore.showContentInfoWindow(title, body);
+        lamDispatch("hide-loader");
       },
       error: function(jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
           message: "LamSearchTools: unable to complete response"
         });
+        lamDispatch("hide-loader");
       }
     });
   };
@@ -5553,6 +5569,19 @@ var LamStore = (function() {
       layer.visible = 1 - layer.visible;
     }
     LamLayerTree.setCheckVisibility(gid, layer.visible);
+  };
+
+  let toggleLayersInGroup = function(gid) {
+    let groupLayer = getLayer(gid);
+    let icon = $("#" + gid + "_c");
+    let visibility = !icon.hasClass("lam-checked");
+    if (groupLayer && groupLayer.layers) {
+      groupLayer.layers.forEach(function(layer) {
+        LamMap.setLayerVisibility(layer.gid, visibility);
+        LamStore.setLayerVisibility(layer.gid, visibility);
+      });
+    }
+    LamLayerTree.setCheckVisibility(gid, visibility);
   };
 
   /**
@@ -5623,6 +5652,11 @@ var LamStore = (function() {
     return LamStore.getLayerArrayByName(appState.layers, layerName);
   };
 
+  /**
+   * Sorting functionby layer name
+   * @param {object} a
+   * @param {object} b
+   */
   function SortByLayerName(a, b) {
     var aName = a.layerName.toLowerCase();
     var bName = b.layerName.toLowerCase();
@@ -5639,6 +5673,10 @@ var LamStore = (function() {
     return layers;
   };
 
+  /**
+   * Function needed for getting query layers recursively
+   * @param {Object} layers
+   */
   var getQueryLayersArray = function(layers) {
     var layersFound = [];
     layers.forEach(function(layer) {
@@ -5662,6 +5700,10 @@ var LamStore = (function() {
     return layers;
   };
 
+  /**
+   * Function needed for getting search layers recursively
+   * @param {Object} layers
+   */
   var getSearchLayersArray = function(layers) {
     var layersFound = [];
     layers.forEach(function(layer) {
@@ -5675,6 +5717,45 @@ var LamStore = (function() {
     return layersFound;
   };
 
+  /**
+   * Get Group Layer bu Layer Gid
+   * @param {string} gid Layer gid
+   */
+  var getGroupLayerByLayerGid = function(gid) {
+    var layerGroupsFound = [];
+    debugger;
+    appState.layers.forEach(function(layer) {
+      var layerGroup = getGroupLayerByLayerGidArray(layer, gid);
+      if (layerGroup) {
+        layerGroupsFound.push(layerGroup);
+      }
+    });
+    return layerGroupsFound.length ? layerGroupsFound[0] : null;
+  };
+
+  /**
+   * Function needed for getting group layer recursively
+   * @param {Object} layerGroup
+   * @param {string} gid
+   */
+  var getGroupLayerByLayerGidArray = function(layerGroup, gid) {
+    var layerFound = null;
+    layerGroup.layers.forEach(function(layer) {
+      if (layer.gid === gid) {
+        layerFound = layer;
+      }
+      if (!layerFound && layer.layers) {
+        layerFound = getGroupLayerByLayerGidArray(layer, gid);
+      }
+    });
+    if (layerFound && layerFound.layerType === "group") return layerFound;
+    return layerFound ? layerGroup : null;
+  };
+
+  /**
+   * Dragging helper
+   * @param {Object} elmnt
+   */
   var dragElement = function(elmnt) {
     var pos1 = 0,
       pos2 = 0,
@@ -5948,13 +6029,29 @@ var LamStore = (function() {
     }
   };
 
+  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-window";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+    // if (!LamStore.isMobile()) {
+    //   LamToolbar.toggleToolbarItem(htmlElement, true);
+    // } else {
+    //   $("#info-tooltip").show();
+    //   $("#info-tooltip").html(bodyMobile);
+    // }
+  };
+
   return {
     doLogin: doLogin,
+    dragElement: dragElement,
     init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItem: getCurrentInfoItem,
     getCurrentInfoItems: getCurrentInfoItems,
+    getGroupLayerByLayerGid: getGroupLayerByLayerGid,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
     getLayer: getLayer,
@@ -5981,8 +6078,10 @@ var LamStore = (function() {
     showLegend: showLegend,
     showAppTools: showAppTools,
     showContent: showContent,
+    showContentInfoWindow: showContentInfoWindow,
     showRelation: showRelation,
     toggleLoader: toggleLoader,
+    toggleLayersInGroup: toggleLayersInGroup,
     resetInitialLayers: resetInitialLayers,
     hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,
@@ -6107,8 +6206,7 @@ var LamLayerTree = (function() {
 
   var renderLayer = function(layer, layerId) {
     let output = "";
-    //--------------
-    output += formatString('<div id="{0}" class="layertree-layer">', layerId);
+    output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border">', layerId);
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
@@ -6117,7 +6215,7 @@ var LamLayerTree = (function() {
       LamResources.svgInfo
     );
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\', refreshGroup: true})">{1}</i>',
       layerId,
       layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
@@ -6127,11 +6225,30 @@ var LamLayerTree = (function() {
     return output;
   };
 
+  var renderLayerTools = function(groupLayer, groupId) {
+    let output = "";
+    //--------------
+    output += formatString('<div id="" class="layertree-layer">');
+    output += formatString('<div class="layertree-layer__title"></div>');
+    output += '<div class="layertree-layer__icons">';
+    //placeholder
+    output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
+    output += formatString(
+      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+      groupLayer.gid,
+      groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+    );
+
+    output += "</div>";
+    output += "</div>";
+    return output;
+  };
+
   var renderGroup = function(groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
     output += formatString(
-      '<div  class="layertree-item__title lam-background {1} {2}">',
+      '<div class="layertree-item__title lam-background {1} {2}">',
       groupId,
       groupLayer.color,
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
@@ -6145,7 +6262,9 @@ var LamLayerTree = (function() {
     );
 
     output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
+
     output += "</div>";
+
     output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
@@ -6161,6 +6280,16 @@ var LamLayerTree = (function() {
         index++;
       });
     }
+
+    //tools section
+    if (groupLayer.layers) {
+      let geoLayers = groupLayer.layers.filter(function(el) {
+        return el.layerType !== "group";
+      });
+      if (geoLayers.length) {
+        output += renderLayerTools(groupLayer, groupId);
+      }
+    }
     output += "</div>";
     output += "</div>";
     return output;
@@ -6170,10 +6299,12 @@ var LamLayerTree = (function() {
     const item = "#" + layerGid + "_c";
     if (visibility) {
       $(item).html(LamResources.svgCheckbox);
-      $(item).removeClass("lam-checked");
+      $(item).addClass("lam-checked");
+      $(item).removeClass("lam-unchecked");
     } else {
       $(item).html(LamResources.svgCheckboxOutline);
-      $(item).removeClass("lam-unchecked");
+      $(item).removeClass("lam-checked");
+      $(item).addClass("lam-unchecked");
     }
   };
 
@@ -6231,12 +6362,33 @@ var LamLayerTree = (function() {
     $("#" + layerGid + "_c");
   };
 
+  /**
+   * Set the group layer parent visibility by layer gid
+   * @param {string} layerGid Layer gid
+   */
+  let setGropupCheckVisibility = function(layerGid) {
+    var groupLayer = LamStore.getGroupLayerByLayerGid(layerGid);
+    //TO DO replace with filter
+    if (groupLayer && groupLayer.layers) {
+      let allVisible = true;
+      groupLayer.layers.forEach(function(layer) {
+        if (layer.layerType != "group" && !layer.visible) {
+          allVisible = false;
+        }
+      });
+      LamLayerTree.setCheckVisibility(groupLayer.gid, allVisible);
+    } else {
+      LamLayerTree.setCheckVisibility(groupLayer.gid, false);
+    }
+  };
+
   return {
     formatString: formatString,
     render: render,
     init: init,
     setCheckVisibility: setCheckVisibility,
     setLayerVisibility: setLayerVisibility,
+    setGropupCheckVisibility: setGropupCheckVisibility,
     toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };
@@ -6457,10 +6609,20 @@ let LamTemplates = (function() {
   let relationsTemplate = function(relations, props, index) {
     let result = "";
     if (relations.length > 0) {
-      result += '<div class="">';
+      result += '<div class="lam-feature__relations">';
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
-        result += '<a href="#" onclick="LamStore.showRelation(\'' + relation.gid + "', " + index + ')">' + relation.labelTemplate + "</option>"; //' + relation.gid + ' //relation.labelTemplate
+        result +=
+          '<a href="#" class="lam-link" onclick="LamStore.showRelation(\'' +
+          relation.gid +
+          "', " +
+          index +
+          ')">' +
+          '<i class="lam-feature__icon">' +
+          LamResources.svgOpen16 +
+          "</i>" +
+          relation.labelTemplate +
+          "</a>"; //' + relation.gid + ' //relation.labelTemplate
         result += "</div>";
       });
       result += "</div>";
@@ -6665,11 +6827,10 @@ let LamToolbar = (function() {
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
+    } else {
+      //definizione degli eventi jquery
+      LamStore.dragElement(document.getElementById("info-window"));
     }
-    // else {
-    //   //definizione degli eventi jquery
-    //   dragElement(document.getElementById("info-window"));
-    // }
 
     //nascondo il draw per dimensioni piccole
     if ($(window).width() < 640) {

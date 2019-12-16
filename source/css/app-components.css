@@ -32,19 +32,24 @@
 }
 
 .lam-feature-title {
-  padding: 0.3rem 0.3rem;
-  font-size: 0.9rem;
+  padding: 0.15rem 0.3rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
 .lam-feature-content {
-  padding: 0.3rem 0.3rem;
+  padding: 0.15rem 0.3rem;
   overflow: auto;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+}
+
+.lam-feature__relations {
+  padding: 0.1rem 0.3rem;
+  font-size: 1rem;
 }
 
 .lam-feature__icons {
-  padding: 0.1rem 0.5rem;
+  padding: 0.1rem 0.3rem;
   font-size: 1.2rem;
 }
 
@@ -61,12 +66,20 @@
   border-collapse: collapse;
   background-color: rgb(255, 255, 255);
   border-radius: 5px;
+  font-size: 0.8rem;
 }
 
 .lam-table tr {
   transition-duration: 0.28s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color;
+}
+
+.lam-table tr:nth-child(even) {
+  background: #e8ecf0;
+}
+.lam-table tr:nth-child(odd) {
+  background: #fff;
 }
 
 /* .lam-table:hover {
@@ -124,6 +137,7 @@
 a.lam-link {
   color: var(--lam-btn-color);
   text-decoration: none;
+  display: inline-block;
 }
 
 a.lam-link:hover {
