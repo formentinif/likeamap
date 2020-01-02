@@ -1868,7 +1868,7 @@ let LamMap = (function() {
             .getSource()
             .getParams()
             .LAYERS.trim() +
-          "&format=image/jpeg&legend_options=fontAntiAliasing:true;dpi:180";
+          "&format=image/png&legend_options=fontAntiAliasing:true;dpi:120;forceLabels:on";
         if (layerStore.params) {
           let arrParams = layerStore.params.split("&");
           for (let index = 0; index < arrParams.length; index++) {
