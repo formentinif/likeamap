@@ -326,7 +326,6 @@ var LamStore = (function() {
       } else {
         urlImg = LamMap.getLegendUrl(gid, scaled);
       }
-
       if (urlImg) {
         html += "<img src='" + urlImg + "'>";
       }

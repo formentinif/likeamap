@@ -7,9 +7,6 @@ const gulp = require("gulp"),
   {series} = require('gulp');
 sass.compiler = require('node-sass');
 
-
-
-
 function dist(callback) {
   callback();
 }

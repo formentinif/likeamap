@@ -46,6 +46,7 @@
 .layertree-item__title-text {
   display: inline-block;
   order: 2;
+  flex-grow: 2;
 }
 
 .layertree-item__title--sub1 {
@@ -109,6 +110,13 @@
   font-size: 1rem;
   order: 0;
   flex-grow: 1;
+}
+
+.layertree-layer__title-icons {
+  padding: 0rem 0rem 0rem 0rem;
+  font-size: 1.2rem;
+  order: 3;
+  min-width: 35px;
 }
 
 .layertree-layer__icons {

@@ -119,16 +119,19 @@ var LamLayerTree = (function() {
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
-      '<i title="Informazioni sul layer" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })">{1}</i>',
-      layer.gid,
-      LamResources.svgInfo
-    );
-    output += formatString(
       '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\', refreshGroup: true})">{1}</i>',
       layerId,
       layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
     );
+    if (!layer.hideLegend) {
+      output += formatString(
+        '<i title="Informazioni sul layer" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })">{1}</i>',
+        layer.gid,
+        LamResources.svgInfo
+      );
+    }
+
     output += "</div>";
     output += "</div>";
     return output;
@@ -142,11 +145,6 @@ var LamLayerTree = (function() {
     output += '<div class="layertree-layer__icons">';
     //placeholder
     output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
-    output += formatString(
-      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
-      groupLayer.gid,
-      groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
-    );
 
     output += "</div>";
     output += "</div>";
@@ -171,6 +169,14 @@ var LamLayerTree = (function() {
     );
 
     output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
+
+    output += '<div class="layertree-layer__title-icons">';
+    output += formatString(
+      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-item__title-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+      groupLayer.gid,
+      groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+    );
+    output += "</div>";
 
     output += "</div>";
 
