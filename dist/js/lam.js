@@ -6168,7 +6168,7 @@ var LamLayerTree = (function() {
         .done(function(data) {
           layer.layers = data;
           layer.layers.forEach(function(e) {
-            loadLayersUri(e);
+            loadLayersUri(e, callback);
           });
         })
         .fail(function(data) {
@@ -6188,7 +6188,7 @@ var LamLayerTree = (function() {
         });
     } else if (layer.layers) {
       layer.layers.forEach(function(e) {
-        loadLayersUri(e);
+        loadLayersUri(e, callback);
       });
     }
   };
