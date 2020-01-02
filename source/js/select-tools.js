@@ -219,6 +219,7 @@ let LamSelectTools = (function() {
     $.ajax({
       dataType: "jsonp",
       url: url,
+      cache: false,
       jsonp: true,
       jsonpCallback: "parseResponse",
       success: function(data) {

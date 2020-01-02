@@ -225,6 +225,7 @@ let LamMapInfo = (function() {
       dataType: "jsonp",
       crossDomain: true,
       contentType: "application/json",
+      cache: false,
       success: function(response) {},
       error: function(jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;

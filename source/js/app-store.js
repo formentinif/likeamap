@@ -72,7 +72,8 @@ var LamStore = (function() {
       //call with ajax
       $.ajax({
         dataType: "json",
-        url: "states/" + appStateId
+        url: "states/" + appStateId,
+        cache: false
       })
         .done(function(appState) {
           loadLamState(appState);
@@ -87,7 +88,8 @@ var LamStore = (function() {
     } else if (appStateJson) {
       $.ajax({
         dataType: "json",
-        url: appStateJson
+        url: appStateJson,
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -101,7 +103,8 @@ var LamStore = (function() {
     } else if (appStateUrl) {
       $.ajax({
         dataType: "json",
-        url: appStateUrl
+        url: appStateUrl,
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -115,7 +118,8 @@ var LamStore = (function() {
     } else {
       $.ajax({
         dataType: "json",
-        url: "states/app-state.json"
+        url: "states/app-state.json",
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -141,7 +145,8 @@ var LamStore = (function() {
   var lamTemplateMapinit = function() {
     $.ajax({
       dataType: "text",
-      url: LamStore.getMapTemplateUrl()
+      url: LamStore.getMapTemplateUrl(),
+      cache: false
     })
       .done(function(data) {
         $("#" + mapDiv).html(data);
@@ -163,7 +168,8 @@ var LamStore = (function() {
       var url = appState.restAPIUrl + "/api/comuni";
       $.ajax({
         dataType: "json",
-        url: url
+        url: url,
+        cache: false
       })
         .done(function(data) {
           LamSearchTools.updateComuniNM(data);
@@ -264,6 +270,7 @@ var LamStore = (function() {
       dataType: "jsonp",
       url: urlService,
       jsonp: true,
+      cache: false,
       jsonpCallback: "parseResponse",
       success: function(data) {
         if (data.features) {
@@ -729,6 +736,7 @@ var LamStore = (function() {
           url: "",
           dataType: "html",
           async: false,
+          cache: false,
           data: '{"username": "' + username + '", "password" : "' + password + '"}',
           success: function() {
             alert("Thanks for your comment!");
@@ -741,7 +749,8 @@ var LamStore = (function() {
         var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
         $.ajax({
           dataType: "json",
-          url: url
+          url: url,
+          cache: false
         })
           .done(function(data) {
             authToken = data;

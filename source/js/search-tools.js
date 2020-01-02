@@ -433,7 +433,8 @@ var LamSearchTools = (function() {
       var searchDate = new Date().getTime();
       $.ajax({
         dataType: "json",
-        url: url
+        url: url,
+        cache: false
       })
         .done(function(data) {
           //verifica che la ricerca sia ancora valida
@@ -533,6 +534,7 @@ var LamSearchTools = (function() {
       $.ajax({
         dataType: "jsonp",
         url: url,
+        cache: false,
         jsonp: true,
         jsonpCallback: "parseResponse",
         success: function(data) {
@@ -626,6 +628,7 @@ var LamSearchTools = (function() {
             dataType: "jsonp",
             url: url,
             jsonp: true,
+            cache: false,
             jsonpCallback: "parseResponse",
             success: function(data) {
               //verifica che la ricerca sia ancora valida

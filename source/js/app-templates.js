@@ -72,7 +72,8 @@ let LamTemplates = (function() {
   let loadTemplateAjax = function(templateUrl) {
     $.ajax({
       dataType: "json",
-      url: templateUrl
+      url: templateUrl,
+      cache: false
     })
       .done(function(data) {
         if (data) {

@@ -58,7 +58,8 @@ var LamLayerTree = (function() {
       layerUriCount++;
       $.ajax({
         dataType: "json",
-        url: layer.layersUri
+        url: layer.layersUri,
+        cache: false
       })
         .done(function(data) {
           layer.layers = data;
@@ -144,7 +145,7 @@ var LamLayerTree = (function() {
     output += formatString('<div class="layertree-layer__title"></div>');
     output += '<div class="layertree-layer__icons">';
     //placeholder
-    output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
+    //output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
 
     output += "</div>";
     output += "</div>";

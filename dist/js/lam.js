@@ -720,6 +720,7 @@ let LamMapInfo = (function() {
       dataType: "jsonp",
       crossDomain: true,
       contentType: "application/json",
+      cache: false,
       success: function(response) {},
       error: function(jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
@@ -3838,7 +3839,8 @@ var LamSearchTools = (function() {
       var searchDate = new Date().getTime();
       $.ajax({
         dataType: "json",
-        url: url
+        url: url,
+        cache: false
       })
         .done(function(data) {
           //verifica che la ricerca sia ancora valida
@@ -3938,6 +3940,7 @@ var LamSearchTools = (function() {
       $.ajax({
         dataType: "jsonp",
         url: url,
+        cache: false,
         jsonp: true,
         jsonpCallback: "parseResponse",
         success: function(data) {
@@ -4031,6 +4034,7 @@ var LamSearchTools = (function() {
             dataType: "jsonp",
             url: url,
             jsonp: true,
+            cache: false,
             jsonpCallback: "parseResponse",
             success: function(data) {
               //verifica che la ricerca sia ancora valida
@@ -4377,6 +4381,7 @@ let LamSelectTools = (function() {
     $.ajax({
       dataType: "jsonp",
       url: url,
+      cache: false,
       jsonp: true,
       jsonpCallback: "parseResponse",
       success: function(data) {
@@ -5270,7 +5275,8 @@ var LamStore = (function() {
       //call with ajax
       $.ajax({
         dataType: "json",
-        url: "states/" + appStateId
+        url: "states/" + appStateId,
+        cache: false
       })
         .done(function(appState) {
           loadLamState(appState);
@@ -5285,7 +5291,8 @@ var LamStore = (function() {
     } else if (appStateJson) {
       $.ajax({
         dataType: "json",
-        url: appStateJson
+        url: appStateJson,
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -5299,7 +5306,8 @@ var LamStore = (function() {
     } else if (appStateUrl) {
       $.ajax({
         dataType: "json",
-        url: appStateUrl
+        url: appStateUrl,
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -5313,7 +5321,8 @@ var LamStore = (function() {
     } else {
       $.ajax({
         dataType: "json",
-        url: "states/app-state.json"
+        url: "states/app-state.json",
+        cache: false
       })
         .done(function(appstate) {
           loadLamState(appstate);
@@ -5339,7 +5348,8 @@ var LamStore = (function() {
   var lamTemplateMapinit = function() {
     $.ajax({
       dataType: "text",
-      url: LamStore.getMapTemplateUrl()
+      url: LamStore.getMapTemplateUrl(),
+      cache: false
     })
       .done(function(data) {
         $("#" + mapDiv).html(data);
@@ -5361,7 +5371,8 @@ var LamStore = (function() {
       var url = appState.restAPIUrl + "/api/comuni";
       $.ajax({
         dataType: "json",
-        url: url
+        url: url,
+        cache: false
       })
         .done(function(data) {
           LamSearchTools.updateComuniNM(data);
@@ -5462,6 +5473,7 @@ var LamStore = (function() {
       dataType: "jsonp",
       url: urlService,
       jsonp: true,
+      cache: false,
       jsonpCallback: "parseResponse",
       success: function(data) {
         if (data.features) {
@@ -5927,6 +5939,7 @@ var LamStore = (function() {
           url: "",
           dataType: "html",
           async: false,
+          cache: false,
           data: '{"username": "' + username + '", "password" : "' + password + '"}',
           success: function() {
             alert("Thanks for your comment!");
@@ -5939,7 +5952,8 @@ var LamStore = (function() {
         var url = getAppState().restAPIUrl + "/api/auth?username=" + username + "&password=" + password;
         $.ajax({
           dataType: "json",
-          url: url
+          url: url,
+          cache: false
         })
           .done(function(data) {
             authToken = data;
@@ -6148,7 +6162,8 @@ var LamLayerTree = (function() {
       layerUriCount++;
       $.ajax({
         dataType: "json",
-        url: layer.layersUri
+        url: layer.layersUri,
+        cache: false
       })
         .done(function(data) {
           layer.layers = data;
@@ -6234,7 +6249,7 @@ var LamLayerTree = (function() {
     output += formatString('<div class="layertree-layer__title"></div>');
     output += '<div class="layertree-layer__icons">';
     //placeholder
-    output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
+    //output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
 
     output += "</div>";
     output += "</div>";
@@ -6473,7 +6488,8 @@ let LamTemplates = (function() {
   let loadTemplateAjax = function(templateUrl) {
     $.ajax({
       dataType: "json",
-      url: templateUrl
+      url: templateUrl,
+      cache: false
     })
       .done(function(data) {
         if (data) {
