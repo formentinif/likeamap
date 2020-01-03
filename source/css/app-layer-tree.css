@@ -12,24 +12,26 @@
 }
 
 .layertree-item {
-  margin: 0px;
-  padding: 2px 0px;
+  box-sizing: border-box;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px;
   transition: all 0.3s ease;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .layertree-item-bottom {
-  margin-top: 1rem;
+  margin-top: 5px;
 }
 
 .layertree-item__title {
+  box-sizing: border-box;
   font-size: 1.2rem;
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
-  border-bottom: 1px solid rgb(251, 251, 251);
+  border-bottom: 0px solid rgb(251, 251, 251);
   color: white;
-  padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+  padding: 2px;
+  margin-bottom: 2px;
   display: flex;
   flex-direction: row;
 }
@@ -53,7 +55,7 @@
   box-sizing: border-box;
   font-size: 1.2rem;
   filter: brightness(110%);
-  padding: 4px;
+  padding: 2px;
   width: 100%;
 }
 
@@ -61,7 +63,7 @@
   box-sizing: border-box;
   font-size: 1.1rem;
   filter: brightness(130%);
-  padding: 4px;
+  padding: 2px;
   width: 100%;
 }
 
@@ -69,7 +71,7 @@
   box-sizing: border-box;
   font-size: 1rem;
   filter: brightness(150%);
-  padding: 4px;
+  padding: 2px;
   width: 100%;
 }
 
@@ -77,12 +79,12 @@
   box-sizing: border-box;
   font-size: 1.1rem;
   filter: brightness(170%);
-  padding: 4px;
+  padding: 2px;
   width: 100%;
 }
 
 .layertree-item__layers {
-  margin: 0px;
+  margin: 0px 0px 0px 0px;
   padding: 0px;
   width: 100%;
   display: flex;
@@ -91,7 +93,7 @@
 
 .layertree-layer {
   margin: 0px;
-  padding: 0.2rem 0.3rem;
+  padding: 2px 3px;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: row;
@@ -120,7 +122,7 @@
 }
 
 .layertree-layer__icons {
-  padding: 0rem 0rem 0rem 0rem;
+  padding: 0px;
   font-size: 1.2rem;
   order: 2;
   min-width: 70px;

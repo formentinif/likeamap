@@ -6207,13 +6207,13 @@ var LamLayerTree = (function() {
       index++;
     });
     //sezione funzioni generali
-    output += '<div class="layertree-item">';
+    output += '<div class="layertree-item-bottom">';
     output +=
       '<button class="lam-btn lam-btn-small lam-btn-floating lam-right lam-depth-1 ripple" alt="Reset dei layer" title="Reset dei layer" onClick="LamDispatcher.dispatch({eventName:\'reset-layers\'})"><i class="lam-icon">' +
       LamResources.svgRefreshMap +
       "</i></button>";
     output += "</div>";
-    output += '<div class="layertree-item layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
+    output += '<div class="layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);
