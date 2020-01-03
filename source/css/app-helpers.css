@@ -42,6 +42,10 @@
   margin: 0px !important;
 }
 
+.lam-no-bg {
+  background-color: transparent !important;
+}
+
 .lam-w-25 {
   width: 25% !important;
 }

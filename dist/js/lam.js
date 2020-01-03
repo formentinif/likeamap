@@ -3539,10 +3539,10 @@ var LamSearchTools = (function() {
    */
   var templateTopTools = function() {
     let template = '<div class="lam-bar lam-background">';
-    template += '<div class="lam-grid lam-no-margin">';
+    template += '<div class="lam-grid lam-no-margin lam-no-bg">';
     template +=
-      '<div class="lam-col"><button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
-    template += '<button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Layers</button></div>';
+      '<div class="lam-col "><button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
+    template += '<button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Temi</button></div>';
     template += "</div>";
     template += "</div>";
     return template;
@@ -3578,7 +3578,7 @@ var LamSearchTools = (function() {
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchField;
     } else {
-      template += "Layers...";
+      template += "Temi...";
     }
     template += "</label>";
     template += '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)">';
