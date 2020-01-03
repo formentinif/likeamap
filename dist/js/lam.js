@@ -1869,7 +1869,7 @@ let LamMap = (function() {
             .getSource()
             .getParams()
             .LAYERS.trim() +
-          "&format=image/png&legend_options=fontAntiAliasing:true;dpi:120;forceLabels:on";
+          "&TRANSPARENT=true&format=image/png&legend_options=fontAntiAliasing:true;dpi:120;forceLabels:on";
         if (layerStore.params) {
           let arrParams = layerStore.params.split("&");
           for (let index = 0; index < arrParams.length; index++) {
@@ -4892,7 +4892,7 @@ var LamDispatcher = (function() {
     });
 
     this.bind("show-legend", function(payload) {
-      LamStore.showLegend(payload.gid, payload.scaled);
+      LamStore.showLegend(payload.gid, payload.scaled, payload.showInfoWindow);
     });
 
     this.bind("search-address", function(payload) {
@@ -5524,11 +5524,11 @@ var LamStore = (function() {
     $("#info-window").hide();
   };
 
-  var showLegend = function(gid, scaled) {
+  var showLegend = function(gid, scaled, showInfoWindow) {
+    debugger;
     var html = "<div>";
     var urlImg = "";
-
-    //verifico che non ci sia un url custom
+    //checking custom url
     var thisLayer = getLayer(gid);
     if (!thisLayer.hideLegend) {
       if (thisLayer.legendUrl) {
@@ -5537,27 +5537,29 @@ var LamStore = (function() {
         urlImg = LamMap.getLegendUrl(gid, scaled);
       }
       if (urlImg) {
-        html += "<img src='" + urlImg + "'>";
+        html += "<img class='lam-legend' src='" + urlImg + "' />";
       }
     }
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
-
     if (scaled) {
       html +=
-        "<p class='mt-2'><a href='#' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<p class='mt-2'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
-        "', scaled: false })\">Visualizza legenda completa</a></p>";
+        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></p>";
     }
-
     html += "<div>";
     var layer = LamStore.getLayer(gid);
-    var layerName = "";
+    var layerName = "Legenda ";
     if (layer) {
-      layerName = layer.layerName;
+      layerName += " - " + layer.layerName;
     }
-    LamStore.showContent(layerName, html, "", "info-results");
+    if (showInfoWindow) {
+      LamStore.showContentInfoWindow(layerName, html, "");
+    } else {
+      LamStore.showContent(layerName, html, "");
+    }
     return true;
   };
 

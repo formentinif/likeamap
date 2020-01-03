@@ -111,7 +111,7 @@ var LamDispatcher = (function() {
     });
 
     this.bind("show-legend", function(payload) {
-      LamStore.showLegend(payload.gid, payload.scaled);
+      LamStore.showLegend(payload.gid, payload.scaled, payload.showInfoWindow);
     });
 
     this.bind("search-address", function(payload) {
