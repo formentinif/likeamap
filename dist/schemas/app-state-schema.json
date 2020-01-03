@@ -84,6 +84,12 @@
       "default": 2,
       "type": "integer"
     },
+    "openResultInInfoWindow": {
+      "title": "Apri informazioni nella info window",
+      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "enum": [0, 1],
+      "type": "integer"
+    },
     "improveMobileBehaviour": {
       "title": "Migliora mobile UI",
       "description": "Migliora il comportamento dell'appstate per la visualizzazione mobile. Se mobile tutti preload vengono impostati a 0 e il queryable a 1",
@@ -369,7 +375,7 @@
                 },
                 "queryable": {
                   "title": "Layer interrogabile",
-                  "description": "Definire se il layer è interrogabile tramite click, se visibile.",
+                  "description": "Imposta se il layer è interrogabile tramite click, se visibile.",
                   "enum": [0, 1],
                   "type": "integer"
                 },

@@ -322,7 +322,6 @@ var LamStore = (function() {
   };
 
   var showLegend = function(gid, scaled, showInfoWindow) {
-    debugger;
     var html = "<div>";
     var urlImg = "";
     //checking custom url
@@ -533,7 +532,6 @@ var LamStore = (function() {
    */
   var getGroupLayerByLayerGid = function(gid) {
     var layerGroupsFound = [];
-    debugger;
     appState.layers.forEach(function(layer) {
       var layerGroup = getGroupLayerByLayerGidArray(layer, gid);
       if (layerGroup) {
@@ -855,6 +853,10 @@ var LamStore = (function() {
     // }
   };
 
+  let openResultInInfoWindow = function() {
+    return LamStore.getAppState().openResultInInfoWindow;
+  };
+
   return {
     doLogin: doLogin,
     dragElement: dragElement,
@@ -883,6 +885,7 @@ var LamStore = (function() {
     lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
+    openResultInInfoWindow: openResultInInfoWindow,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     setMapDiv: setMapDiv,

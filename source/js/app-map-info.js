@@ -385,7 +385,11 @@ let LamMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    LamStore.showContent(title, body, bodyMobile, htmlElement);
+    if (LamStore.openResultInInfoWindow()) {
+      LamStore.showContentInfoWindow(title, body, bodyMobile);
+    } else {
+      LamStore.showContent(title, body, bodyMobile, htmlElement);
+    }
   };
 
   let addWktInfoToMap = function addWktInfoToMap(wkt) {
