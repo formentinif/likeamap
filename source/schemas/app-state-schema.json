@@ -390,6 +390,11 @@
                   "description": "Campo su cui effettuare la ricerca. Deve essere un campo di tipo string",
                   "type": "string"
                 },
+                "searchFieldLabel": {
+                  "title": "Etichetta del campo di ricerca",
+                  "description": "Etichetta del campo su cui effettuare la ricerca",
+                  "type": "string"
+                },
                 "labelField": {
                   "title": "Campo etichetta",
                   "description": "Campo da utilizzare come etichetta. Deve essere un campo di tipo string",

@@ -99,6 +99,10 @@
   background-color: var(--lam-bg-menu-color);
 }
 
+.lam-background-darken {
+  background-color: var(--lam-btn-color-darken);
+}
+
 .lam-input {
   font-size: 1rem;
   border-right: 0px solid var(--lam-btn-color);

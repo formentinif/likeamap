@@ -76,9 +76,11 @@ var LamSearchTools = (function() {
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
             if (searchLayers[li].layer == currentLayer) {
-              $("#search-tools__search-layers__label").text(searchLayers[li].searchField);
+              $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
             }
           }
+          $("#search-tools__search-layers").val("");
+          showSearchInfoFeatures(null);
         });
         break;
       case "nominatim":
@@ -131,12 +133,16 @@ var LamSearchTools = (function() {
   /**
    * General html code that will be injected in the panel as the main tools
    */
-  var templateTopTools = function() {
+  var templateTopTools = function(layersNum) {
     let template = '<div class="lam-bar lam-background">';
     template += '<div class="lam-grid lam-no-margin lam-no-bg">';
     template +=
-      '<div class="lam-col "><button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
-    template += '<button class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Temi</button></div>';
+      '<div class="lam-col"><button id="search-tools__button-address" class="lam-btn lam-btn-small lam-ripple lam-background-darken" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
+    if (layersNum) {
+      template +=
+        '<button id="search-tools__button-layers" class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Temi</button>';
+    }
+    template += "</div>";
     template += "</div>";
     template += "</div>";
     return template;
@@ -166,19 +172,17 @@ var LamSearchTools = (function() {
       template += '<option class="lam-option" value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
-
     template += '<div id="search-tools__search-layers-field" class="lam-grid" >';
     template += '<label class="lam-label" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
-      template += searchLayers[0].searchField;
+      template += searchLayers[0].searchFieldLabel || searchLayers[0].searchField;
     } else {
-      template += "Temi...";
+      template += "Seleziona un tema...";
     }
     template += "</label>";
-    template += '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)">';
-
+    template +=
+      '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)" placeholder="Ricerca...">';
     template += "</div>";
-
     template += "</div>";
     return template;
   };
@@ -192,7 +196,7 @@ var LamSearchTools = (function() {
     if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Ricerca</h4>';
     }
-    template += templateTopTools();
+    template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<select id="search-tools__comune" class="lam-input">';
     template += "</select>";
@@ -203,7 +207,9 @@ var LamSearchTools = (function() {
       '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
-    template += templateLayersTools(searchLayers);
+    if (searchLayers.length > 0) {
+      template += templateLayersTools(searchLayers);
+    }
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
@@ -219,7 +225,7 @@ var LamSearchTools = (function() {
     if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Ricerca</h4>';
     }
-    template += templateTopTools();
+    template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<div id="search-tools__search-via-field" class="" >';
     template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
@@ -227,7 +233,9 @@ var LamSearchTools = (function() {
       '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
-    template += templateLayersTools(searchLayers);
+    if (searchLayers.length > 0) {
+      template += templateLayersTools(searchLayers);
+    }
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
@@ -315,6 +323,8 @@ var LamSearchTools = (function() {
    * Switch the address/layers tools
    */
   var showSearchLayers = function() {
+    $("#search-tools__button-address").removeClass("lam-background-darken");
+    $("#search-tools__label").text("Layers");
     $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
     $("#search-tools__layers").show();
@@ -674,6 +684,7 @@ var LamSearchTools = (function() {
   let showSearchInfoFeatures = function(featureInfoCollection) {
     var title = "Risultati";
     if (!featureInfoCollection) {
+      $("#search-tools__search-results").html("");
       return;
     }
     var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
