@@ -139,20 +139,22 @@ let LamMap = (function() {
     }
     if (feature.getGeometry().getType() === "Point") {
       goToLonLat(feature.getGeometry().getCoordinates()[0], feature.getGeometry().getCoordinates()[1], 17);
-    } else {
-      let extent = feature.getGeometry().getExtent();
-      goToExtent(extent[0], extent[1], extent[2], extent[3]);
+      return;
     }
+    let extent = feature.getGeometry().getExtent();
+    let area = Math.abs(extent[2] - extent[0]) * Math.abs(extent[3] - extent[1]);
+    if (area < 100000) {
+      goToLonLat((extent[2] + extent[0]) / 2, (extent[3] + extent[1]) / 2, 17);
+      return;
+    }
+    goToExtent(extent);
   };
   /**
    * Posiziona la mappa per bounding box in Longitudine, Latitudine o X,Y con EPSG:3857
    *
-   * @param {float} x1  X minimo
-   * @param {float} y1  Y minimo
-   * @param {float} x2  X massimo
-   * @param {float} y2  Y massimo
+   * @param {array} extent  X minimo Y minimo X massimo Y massimo
    */
-  let goToExtent = function goToExtent(x1, y1, x2, y2) {
+  let goToExtent = function goToExtent(extent) {
     // let point1 = new ol.geom.Point([lon1, lat1]);
     // if (lon1 < 180) {
     //   point1 = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:900913");
@@ -161,7 +163,12 @@ let LamMap = (function() {
     // if (lon2 < 180) {
     //   point2 = ol.proj.transform([lon2, lat2], "EPSG:4326", "EPSG:900913");
     // }
-    mainMap.getView().fit([x1, y1, x2, y2], mainMap.getSize());
+    //mainMap.getView().fit([x1, y1, x2, y2], mainMap.getSize());
+    mainMap.getView().fit(extent, mainMap.getSize());
+  };
+
+  let goToExtentGeometry = function goToExtentGeometry(geometry) {
+    mainMap.getView().fit(geometry);
   };
 
   let layerIsPresent = function layerIsPresent(gid) {
@@ -1565,7 +1572,12 @@ let LamMap = (function() {
         return coordinates[Math.floor(coordinates.length / 2)];
       case LamMapEnums.geometryTypes().Polygon:
         let polygon = new ol.geom.Polygon(coordinates);
-        return polygon.getInteriorPoint().getCoordinates();
+        let ppoint = polygon.getInteriorPoint().getCoordinates();
+        if (isNaN(ppoint[0])) {
+          polygon = new ol.geom.Polygon([coordinates]);
+          ppoint = polygon.getInteriorPoint().getCoordinates();
+        }
+        return ppoint;
       case LamMapEnums.geometryTypes().MultiPolyline:
         coordinates = coordinates[0];
         return coordinates[Math.floor(coordinates.length / 2)];

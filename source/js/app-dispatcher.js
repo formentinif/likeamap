@@ -131,13 +131,6 @@ var LamDispatcher = (function() {
       try {
         let feature = LamStore.getCurrentInfoItems().features[payload.index];
         let layer = LamStore.getLayer(feature.layerGid);
-        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
-        featureOl = LamMap.transform3857(featureOl, feature.srid);
-        LamMap.goToGeometry(featureOl.getGeometry());
-        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-        if (tooltip) {
-          lamDispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
-        }
         lamDispatch({
           eventName: "set-layer-visibility",
           gid: feature.layerGid,
@@ -147,6 +140,15 @@ var LamDispatcher = (function() {
           eventName: "flash-feature",
           feature: feature
         });
+
+        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+        featureOl = LamMap.transform3857(featureOl, feature.srid);
+        LamMap.goToGeometry(featureOl.getGeometry());
+        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+        if (tooltip) {
+          lamDispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+        }
+        return;
       } catch (error) {
         lamDispatch({ eventName: "log", message: error });
       }

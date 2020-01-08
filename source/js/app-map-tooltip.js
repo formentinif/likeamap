@@ -44,12 +44,12 @@ let LamMapTooltip = (function() {
 
     LamMap.getMap().addOverlay(mapTooltip);
 
-    LamDispatcher.bind("show-tooltip", function(payload) {
-      LamMapInfo.showTooltip(payload.x, payload.y, payload.title);
-    });
-    LamDispatcher.bind("hide-tooltip", function(payload) {
-      LamMapTooltip.hideTooltip();
-    });
+    // LamDispatcher.bind("show-tooltip", function(payload) {
+    //   LamMapInfo.showTooltip(payload.x, payload.y, payload.title);
+    // });
+    // LamDispatcher.bind("hide-tooltip", function(payload) {
+    //   LamMapTooltip.hideTooltip();
+    // });
     LamDispatcher.bind("show-map-tooltip", function(payload) {
       LamMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
     });
