@@ -1282,6 +1282,9 @@ let LamMap = (function() {
       case "wms":
         thisLayer = getLayerWMS(gid, uri, params, attribution, secured);
         break;
+      case "wmts":
+        thisLayer = getLayerWMTS(gid, uri, params, attribution, secured);
+        break;
       case "wmstiled":
         thisLayer = getLayerWMSTiled(gid, uri, params, attribution, secured);
         break;
@@ -1384,15 +1387,6 @@ let LamMap = (function() {
     /// <param name="params">Parametri aggiuntivi da aggiungere alle chiamate (formato url querystring)</param>
     let paramsLocal = queryToDictionary(params);
     let serverType = "geoserver";
-    // if (!params.format) {
-    //     params.format = "PNG";
-    // }
-    // if (params.format === 'none') {
-    //     params.format = null;
-    // } else {
-    //     params.format = wmsImageFormat(params.format);
-    //
-    // }
     if (paramsLocal.serverType) {
       serverType = paramsLocal.serverType;
     }
@@ -1450,11 +1444,45 @@ let LamMap = (function() {
         xhr.send();
       });
     }
+
     let wms = new ol.layer.Tile({
-      //extent: [-13884991, 2870341, -7455066, 6338219],
+      //extent: [1160414, 5564111, 1205283, 5590252],
       source: source
     });
     return wms;
+  };
+
+  let getLayerWMTS = function(gid, uri, params, attribution, secured) {
+    var projection = ol.proj.get("EPSG:3857");
+    var projectionExtent = projection.getExtent();
+    var size = ol.extent.getWidth(projectionExtent) / 256;
+    var resolutions = new Array(14);
+    var matrixIds = new Array(14);
+    for (var z = 0; z < 14; ++z) {
+      // generate resolutions and matrixIds arrays for this WMTS
+      resolutions[z] = size / Math.pow(2, z);
+      matrixIds[z] = z;
+    }
+
+    var layer = new ol.layer.Tile({
+      opacity: 0.7,
+      source: new ol.source.WMTS({
+        attributions: attribution,
+        url: uri,
+        layer: "0",
+        matrixSet: "EPSG:3857",
+        format: "image/png",
+        projection: projection,
+        tileGrid: new ol.tilegrid.WMTS({
+          origin: ol.extent.getTopLeft(projectionExtent),
+          resolutions: resolutions,
+          matrixIds: matrixIds
+        }),
+        style: "default",
+        wrapX: true
+      })
+    });
+    return layer;
   };
 
   let getLayerTiled = function(gid, uri, params, attribution, secured) {
