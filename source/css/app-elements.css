@@ -46,6 +46,12 @@
   margin: 0px;
 }
 
+@media print {
+  .lam-toolbar {
+    display: none;
+  }
+}
+
 .lam-toolbar button {
   margin-right: 10px;
 }

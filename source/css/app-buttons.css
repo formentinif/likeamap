@@ -10,6 +10,11 @@
   text-decoration: none;
 }
 
+@media print {
+  .lam-btn {
+    display: none;
+  }
+}
 .lam-btn-floating {
   border-radius: 100%;
   width: 52px;
@@ -17,6 +22,12 @@
   line-height: 52px;
   padding: 6px;
   font-size: 14px;
+}
+
+@media print {
+  .lam-btn-floating {
+    display: none;
+  }
 }
 
 .lam-btn-floating.lam-btn-small {
