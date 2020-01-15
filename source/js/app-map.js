@@ -249,7 +249,7 @@ let LamMap = (function() {
     }
     params += "LAYERS=" + layer;
     //params += "&QUERY_LAYERS=" + layer;
-    params += "&SRS=EPSG:" + srid;
+    //params += "&SRS=EPSG:" + srid;
     if (format) {
       if (format !== "none") {
         params += "&FORMAT=" + wmsImageFormat(format);
@@ -410,6 +410,7 @@ let LamMap = (function() {
         params: paramsLocal,
         serverType: serverType,
         //crossOrigin: "Anonymous",
+        //tiled: true,
         attributions: attribution
       })
     );
@@ -433,12 +434,20 @@ let LamMap = (function() {
         xhr.send();
       });
     }
-
-    let wms = new ol.layer.Tile({
-      //extent: [1160414, 5564111, 1205283, 5590252],
-      source: source
-    });
-    return wms;
+    // return new ol.layer.Tile({
+    //   extent: [1160414, 5574111, 1205283, 5590252],
+    //   source: source
+    // });
+    if (LamStore.getAppState().mapExtent) {
+      return new ol.layer.Tile({
+        extent: LamStore.getAppState().mapExtent,
+        source: source
+      });
+    } else {
+      return new ol.layer.Tile({
+        source: source
+      });
+    }
   };
 
   let getLayerWMTS = function(gid, uri, params, attribution, secured) {
@@ -625,7 +634,7 @@ let LamMap = (function() {
           collapsible: false
         })
       ]),
-
+      pixelRatio: 1,
       target: divMap,
       layers: layers,
       view: new ol.View({
@@ -720,6 +729,7 @@ let LamMap = (function() {
       log("Main-Map: Impossibile caricare la posizione iniziale dall'url");
     }
     goToLonLat(config.mapLon, config.mapLat, config.mapZoom);
+    mainMap.setLayerGroup(new ol.layer.Group());
     addLayersToMap(config.layers, config.srid);
     if (initLayers) {
       try {
@@ -925,6 +935,7 @@ let LamMap = (function() {
    * @param {string} gid Codice numerico identificativo del layer
    */
   let toggleLayer = function(gid) {
+    debugger;
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());

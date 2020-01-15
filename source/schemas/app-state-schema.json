@@ -78,6 +78,12 @@
       "default": 0,
       "type": "integer"
     },
+    "mapExtent": {
+      "title": "",
+      "description": "Extent della mappa. Le coordinate devono essere nello srid della mappa",
+      "type": "array",
+      "items": {}
+    },
     "infoSelectBehaviour": {
       "title": "Modalità di selezione",
       "description": "Definisce la modalità di selezione delle feature 1 Single 2 Multiple",
