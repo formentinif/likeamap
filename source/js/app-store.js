@@ -254,6 +254,7 @@ var LamStore = (function() {
       $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
       $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
       $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
+      $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
     }
   };
 
@@ -655,6 +656,9 @@ var LamStore = (function() {
       if (appState.modules["select-tools"]) {
         LamSelectTools.render(getQueryLayers());
       }
+      if (appState.modules["links-tools"]) {
+        LamLinksTools.init();
+      }
       //loading templates
       LamTemplates.init();
     });
@@ -857,6 +861,13 @@ var LamStore = (function() {
     return LamStore.getAppState().openResultInInfoWindow;
   };
 
+  let getLinks = function() {
+    if (!LamStore.getAppState().links) {
+      LamStore.getAppState().links = [];
+    }
+    return LamStore.getAppState().links;
+  };
+
   return {
     doLogin: doLogin,
     dragElement: dragElement,
@@ -872,6 +883,7 @@ var LamStore = (function() {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLinks: getLinks,
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,

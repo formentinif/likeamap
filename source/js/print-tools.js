@@ -130,7 +130,6 @@ var LamPrintTools = (function() {
 
   var templatePrint = function() {
     template = "";
-    //pannello ricerca via
     if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Stampa</h4>';
     }

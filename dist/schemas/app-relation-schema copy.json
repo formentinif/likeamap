@@ -1,0 +1,45 @@
+{
+  "$schema": "http://www.perspectiva.it/schemas/likeamap_relations",
+  "type": "object",
+  "title": "Configurazione Relations LikeAMap",
+  "properties": {
+    "properties": {
+      "gid": {
+        "title": "Gid della relation",
+        "propertyOrder": 1,
+        "description": "Gid della relation",
+        "type": "string"
+      },
+      "title": {
+        "title": "Titolo della relation",
+        "propertyOrder": 1,
+        "description": "Titolo della relation",
+        "type": "string"
+      },
+      "layerGids": {
+        "title": "Gid dei layer di origine",
+        "propertyOrder": 1,
+        "description": "Gid dei layer di origine",
+        "type": "array"
+      },
+      "serviceUrlTemplate": {
+        "title": "Url del servizio",
+        "propertyOrder": 2,
+        "description": "Url del servizio",
+        "type": "string"
+      },
+      "templateUrl": {
+        "title": "Uri del template da visualizzare",
+        "propertyOrder": 4,
+        "description": "Uri del template da visualizzare",
+        "type": "string"
+      },
+      "labelTemplate": {
+        "title": "Template del link da visualizzare",
+        "propertyOrder": 3,
+        "description": "Template del link da visualizzare",
+        "type": "string"
+      }
+    }
+  }
+}

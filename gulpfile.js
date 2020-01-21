@@ -47,6 +47,7 @@ function combineAppJs() {
       "./source/js/print-tools.js",
       "./source/js/search-tools.js",
       "./source/js/select-tools.js",
+      "./source/js/links-tools.js",
       "./source/js/share-tools.js",
       "./source/js/app-dispatcher.js",
       "./source/js/app-resources.js",

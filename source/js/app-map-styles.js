@@ -157,10 +157,10 @@ let LamMapStyles = (function() {
     let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
-        color: getCurrentColor(1, [255, 0, 0, 1])
+        color: [255, 0, 0, 1]
       }),
       fill: new ol.style.Stroke({
-        color: getCurrentColor(1, [255, 0, 0, 0.2])
+        color: [255, 0, 0, 0.2]
       })
     });
     return style_modify;

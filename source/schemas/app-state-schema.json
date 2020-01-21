@@ -84,6 +84,12 @@
       "type": "array",
       "items": {}
     },
+    "showMapScale": {
+      "title": "Scala della mappa",
+      "description": "Mostra la scala della mappa",
+      "default": false,
+      "type": "boolean"
+    },
     "infoSelectBehaviour": {
       "title": "Modalità di selezione",
       "description": "Definisce la modalità di selezione delle feature 1 Single 2 Multiple",
@@ -220,6 +226,11 @@
         "draw-tools": {
           "title": "Disegno",
           "description": "Strumenti di disegno",
+          "type": "boolean"
+        },
+        "links-tools": {
+          "title": "Links",
+          "description": "Elenco link",
           "type": "boolean"
         },
         "select-tools": {
@@ -489,6 +500,14 @@
       "description": "Elenco delle relations dell'applicazione. Vedere lo schema dedicato",
       "type": "array",
       "title": "Relazioni",
+      "items": {
+        "type": "object"
+      }
+    },
+    "link": {
+      "description": "Elenco dei link dell'applicazione",
+      "type": "array",
+      "title": "Links",
       "items": {
         "type": "object"
       }

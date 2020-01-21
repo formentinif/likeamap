@@ -55,36 +55,6 @@ let LamMap = (function() {
   let lastTimeoutRequest;
   let lastMousePixel;
 
-  //TODO eliminare questa funzione
-  let getCurrentColor = function(opacity, color) {
-    if (!opacity) opacity = 1;
-    let resultColor = {
-      r: 68,
-      g: 138,
-      b: 255,
-      opacity: opacity
-    };
-    if (color) {
-      return color;
-    }
-    try {
-      if ($("#draw-tools__color").val()) {
-        resultColor = $("#draw-tools__color").val();
-        let rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(resultColor);
-        resultColor = rgb
-          ? {
-              r: parseInt(rgb[1], 16),
-              g: parseInt(rgb[2], 16),
-              b: parseInt(rgb[3], 16)
-            }
-          : null;
-      }
-    } catch (e) {
-      log(e);
-    }
-    return [resultColor.r, resultColor.g, resultColor.b, opacity];
-  };
-
   let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: []
@@ -627,13 +597,41 @@ let LamMap = (function() {
     //         collapsible: false
     //     })
     // }).
+
+    let scaleControl = function() {
+      let control = new ol.control.ScaleLine({
+        units: "metric",
+        bar: false,
+        steps: 4,
+        text: "",
+        minWidth: 140
+      });
+      return control;
+    };
+
     let controls = new ol.Collection([]);
+    controls.extend([
+      new ol.control.Attribution({
+        collapsible: false
+      })
+    ]);
+
+    if (LamStore.getAppState().showMapScale) {
+      let scaleControl = function() {
+        let control = new ol.control.ScaleLine({
+          units: "metric",
+          bar: false,
+          steps: 4,
+          text: "",
+          minWidth: 140
+        });
+        return control;
+      };
+      controls.extend([scaleControl()]);
+    }
+
     mainMap = new ol.Map({
-      controls: controls.extend([
-        new ol.control.Attribution({
-          collapsible: false
-        })
-      ]),
+      controls: controls,
       pixelRatio: 1,
       target: divMap,
       layers: layers,
@@ -935,7 +933,6 @@ let LamMap = (function() {
    * @param {string} gid Codice numerico identificativo del layer
    */
   let toggleLayer = function(gid) {
-    debugger;
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
@@ -1655,7 +1652,6 @@ let LamMap = (function() {
     render: render,
     getCentroid: getCentroid,
     getCentroid2d: getCentroid2d,
-    getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,
     getGeometryType: getGeometryType,
     getGeoJsonGeometryFromGeometry: getGeoJsonGeometryFromGeometry,

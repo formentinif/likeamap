@@ -1,0 +1,33 @@
+{
+  "$schema": "http://www.perspectiva.it/schemas/likeamap_links",
+  "type": "object",
+  "title": "Configurazione Links LikeAMap",
+  "properties": {
+    "properties": {
+      "gid": {
+        "title": "Gid del link",
+        "propertyOrder": 1,
+        "description": "Gid del link",
+        "type": "string"
+      },
+      "title": {
+        "title": "Titolo del link",
+        "propertyOrder": 1,
+        "description": "Titolo del link",
+        "type": "string"
+      },
+      "url": {
+        "title": "Url del Link",
+        "propertyOrder": 1,
+        "description": "Url del link completo di HTTP",
+        "type": "string"
+      },
+      "callback": {
+        "title": "Callback da eseguire sul click",
+        "propertyOrder": 1,
+        "description": "Callback da eseguire sul click",
+        "type": "string"
+      }
+    }
+  }
+}

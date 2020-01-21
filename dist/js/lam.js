@@ -228,10 +228,10 @@ let LamMapStyles = (function() {
     let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
-        color: getCurrentColor(1, [255, 0, 0, 1])
+        color: [255, 0, 0, 1]
       }),
       fill: new ol.style.Stroke({
-        color: getCurrentColor(1, [255, 0, 0, 0.2])
+        color: [255, 0, 0, 0.2]
       })
     });
     return style_modify;
@@ -1066,36 +1066,6 @@ let LamMap = (function() {
   let lastTimeoutRequest;
   let lastMousePixel;
 
-  //TODO eliminare questa funzione
-  let getCurrentColor = function(opacity, color) {
-    if (!opacity) opacity = 1;
-    let resultColor = {
-      r: 68,
-      g: 138,
-      b: 255,
-      opacity: opacity
-    };
-    if (color) {
-      return color;
-    }
-    try {
-      if ($("#draw-tools__color").val()) {
-        resultColor = $("#draw-tools__color").val();
-        let rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(resultColor);
-        resultColor = rgb
-          ? {
-              r: parseInt(rgb[1], 16),
-              g: parseInt(rgb[2], 16),
-              b: parseInt(rgb[3], 16)
-            }
-          : null;
-      }
-    } catch (e) {
-      log(e);
-    }
-    return [resultColor.r, resultColor.g, resultColor.b, opacity];
-  };
-
   let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: []
@@ -1638,13 +1608,41 @@ let LamMap = (function() {
     //         collapsible: false
     //     })
     // }).
+
+    let scaleControl = function() {
+      let control = new ol.control.ScaleLine({
+        units: "metric",
+        bar: false,
+        steps: 4,
+        text: "",
+        minWidth: 140
+      });
+      return control;
+    };
+
     let controls = new ol.Collection([]);
+    controls.extend([
+      new ol.control.Attribution({
+        collapsible: false
+      })
+    ]);
+
+    if (LamStore.getAppState().showMapScale) {
+      let scaleControl = function() {
+        let control = new ol.control.ScaleLine({
+          units: "metric",
+          bar: false,
+          steps: 4,
+          text: "",
+          minWidth: 140
+        });
+        return control;
+      };
+      controls.extend([scaleControl()]);
+    }
+
     mainMap = new ol.Map({
-      controls: controls.extend([
-        new ol.control.Attribution({
-          collapsible: false
-        })
-      ]),
+      controls: controls,
       pixelRatio: 1,
       target: divMap,
       layers: layers,
@@ -1946,7 +1944,6 @@ let LamMap = (function() {
    * @param {string} gid Codice numerico identificativo del layer
    */
   let toggleLayer = function(gid) {
-    debugger;
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
@@ -2666,7 +2663,6 @@ let LamMap = (function() {
     render: render,
     getCentroid: getCentroid,
     getCentroid2d: getCentroid2d,
-    getCurrentColor: getCurrentColor,
     getDrawFeature: getDrawFeature,
     getGeometryType: getGeometryType,
     getGeoJsonGeometryFromGeometry: getGeoJsonGeometryFromGeometry,
@@ -3222,7 +3218,6 @@ var LamPrintTools = (function() {
 
   var templatePrint = function() {
     template = "";
-    //pannello ricerca via
     if (!LamStore.getAppState().logoPanelUrl) {
       template += '<h4 class="lam-title">Stampa</h4>';
     }
@@ -4631,6 +4626,74 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
+var LamLinksTools = (function() {
+  var isRendered = false;
+
+  var init = function init() {
+    //events binding
+    LamDispatcher.bind("show-links", function(payload) {
+      var templateTemp = templateLinks();
+      var output = templateTemp(LamStore.getLinks());
+      LamStore.showContentInfoWindow("Links", output);
+    });
+  };
+
+  var render = function(div) {
+    if (!isRendered) {
+      init();
+    }
+    isRendered = true;
+  };
+
+  var templateLinks = function() {
+    template = "<ul class='lam-group-list'>";
+    //pannello ricerca via
+    template += "{{#each this}}";
+    template += "<li><a class='lam-link' href='{{url}}' target='_blank'>{{title}} <i class='lam-feature__icon'>" + LamResources.svgOpen16 + "</i></a></li>";
+    template += "{{/each}}";
+    template += "</ul>";
+    return Handlebars.compile(template);
+  };
+
+  var templateEmpty = function(results) {
+    var template = "<p></p>";
+    return Handlebars.compile(template);
+  };
+
+  return {
+    init: init,
+    render: render,
+    templateLinks: templateLinks
+  };
+})();
+
+/*
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
 var LamShareTools = (function() {
   var isRendered = false;
 
@@ -5525,6 +5588,7 @@ var LamStore = (function() {
       $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
       $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
       $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
+      $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
     }
   };
 
@@ -5926,6 +5990,9 @@ var LamStore = (function() {
       if (appState.modules["select-tools"]) {
         LamSelectTools.render(getQueryLayers());
       }
+      if (appState.modules["links-tools"]) {
+        LamLinksTools.init();
+      }
       //loading templates
       LamTemplates.init();
     });
@@ -6128,6 +6195,13 @@ var LamStore = (function() {
     return LamStore.getAppState().openResultInInfoWindow;
   };
 
+  let getLinks = function() {
+    if (!LamStore.getAppState().links) {
+      LamStore.getAppState().links = [];
+    }
+    return LamStore.getAppState().links;
+  };
+
   return {
     doLogin: doLogin,
     dragElement: dragElement,
@@ -6143,6 +6217,7 @@ var LamStore = (function() {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLinks: getLinks,
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
