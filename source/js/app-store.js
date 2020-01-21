@@ -32,6 +32,7 @@ var LamStore = (function() {
   var initialAppState = null;
   var authToken = null;
   let infoClickEnabled = true;
+  let relationsResults = {};
 
   var setMapDiv = function(div) {
     mapDiv = div;
@@ -254,8 +255,8 @@ var LamStore = (function() {
       $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
       $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
       $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
-      $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
-      $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
+      if (appState.modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
+      if (appState.modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
     }
   };
 
@@ -278,6 +279,7 @@ var LamStore = (function() {
         if (data.features) {
           data = data.features;
         }
+        LamStore.setRelationResults({ data: data, template: template });
         var title = relation.title;
         var body = "";
         if (!Array.isArray(data)) {
@@ -303,6 +305,9 @@ var LamStore = (function() {
         if (template.multipleItems && propsList.length > 0) {
           body += LamTemplates.processTemplate(template, propsList);
         }
+        //download
+        body +=
+          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
         }
@@ -654,6 +659,7 @@ var LamStore = (function() {
       }
       //loading templates
       LamTemplates.init();
+      LamDownloadTools.init();
     });
 
     LamToolbar.init();
@@ -792,6 +798,18 @@ var LamStore = (function() {
     return relationResult[0];
   };
 
+  var getRelationResults = function() {
+    return relationsResults;
+  };
+
+  /**
+   * Sets the last relation result.
+   * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
+   */
+  var setRelationResults = function(results) {
+    relationsResults = results;
+  };
+
   var getAuthorizationHeader = function() {
     switch (appState.authentication.authType) {
       case "basic":
@@ -883,6 +901,8 @@ var LamStore = (function() {
     getVisibleLayers: getVisibleLayers,
     getRelations: getRelations,
     getRelation: getRelation,
+    getRelationResults: getRelationResults,
+    setRelationResults: setRelationResults,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
     isMobile: isMobile,

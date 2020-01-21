@@ -4810,6 +4810,84 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
+var LamDownloadTools = (function() {
+  var isRendered = false;
+
+  var init = function init() {
+    //events binding
+    LamDispatcher.bind("download-relation-results", function(payload) {
+      LamDownloadTools.downloadResults();
+    });
+  };
+
+  var render = function(div) {
+    if (!isRendered) {
+      init();
+    }
+    isRendered = true;
+  };
+
+  let downloadResults = function() {
+    var results = LamStore.getRelationResults();
+    if (!results.data || !results.template) return;
+    let propsList = [];
+    var csv = "";
+    for (let i = 0; i < results.data.length; i++) {
+      propsList.push(results.data[i].properties ? results.data[i].properties : results.data[i]);
+    }
+    results.template.fields.forEach(function(field) {
+      csv += '"' + field.label + '";';
+    });
+    csv += "\n";
+    propsList.forEach(function(row) {
+      results.template.fields.forEach(function(field) {
+        csv += '"' + row[field.field] + '";';
+      });
+      csv += "\n";
+    });
+
+    console.log(csv);
+    var hiddenElement = document.createElement("a");
+    hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+    hiddenElement.target = "_blank";
+    hiddenElement.download = results.template.title + ".csv";
+    hiddenElement.click();
+  };
+
+  return {
+    init: init,
+    render: render,
+    downloadResults: downloadResults
+  };
+})();
+
+/*
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
 var LamShareTools = (function() {
   var isRendered = false;
 
@@ -5478,6 +5556,7 @@ var LamStore = (function() {
   var initialAppState = null;
   var authToken = null;
   let infoClickEnabled = true;
+  let relationsResults = {};
 
   var setMapDiv = function(div) {
     mapDiv = div;
@@ -5700,8 +5779,8 @@ var LamStore = (function() {
       $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
       $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
       $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
-      $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
-      $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
+      if (appState.modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
+      if (appState.modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
     }
   };
 
@@ -5724,6 +5803,7 @@ var LamStore = (function() {
         if (data.features) {
           data = data.features;
         }
+        LamStore.setRelationResults({ data: data, template: template });
         var title = relation.title;
         var body = "";
         if (!Array.isArray(data)) {
@@ -5749,6 +5829,9 @@ var LamStore = (function() {
         if (template.multipleItems && propsList.length > 0) {
           body += LamTemplates.processTemplate(template, propsList);
         }
+        //download
+        body +=
+          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
         if (data.length === 0) {
           body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
         }
@@ -6100,6 +6183,7 @@ var LamStore = (function() {
       }
       //loading templates
       LamTemplates.init();
+      LamDownloadTools.init();
     });
 
     LamToolbar.init();
@@ -6238,6 +6322,18 @@ var LamStore = (function() {
     return relationResult[0];
   };
 
+  var getRelationResults = function() {
+    return relationsResults;
+  };
+
+  /**
+   * Sets the last relation result.
+   * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
+   */
+  var setRelationResults = function(results) {
+    relationsResults = results;
+  };
+
   var getAuthorizationHeader = function() {
     switch (appState.authentication.authType) {
       case "basic":
@@ -6329,6 +6425,8 @@ var LamStore = (function() {
     getVisibleLayers: getVisibleLayers,
     getRelations: getRelations,
     getRelation: getRelation,
+    getRelationResults: getRelationResults,
+    setRelationResults: setRelationResults,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
     isMobile: isMobile,
