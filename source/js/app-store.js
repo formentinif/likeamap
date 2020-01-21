@@ -255,6 +255,7 @@ var LamStore = (function() {
       $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
       $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
       $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
+      $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
     }
   };
 
@@ -320,44 +321,6 @@ var LamStore = (function() {
 
   var hideInfoWindow = function() {
     $("#info-window").hide();
-  };
-
-  var showLegend = function(gid, scaled, showInfoWindow) {
-    var html = "<div>";
-    var urlImg = "";
-    //checking custom url
-    var thisLayer = getLayer(gid);
-    if (!thisLayer.hideLegend) {
-      if (thisLayer.legendUrl) {
-        urlImg = thisLayer.legendUrl;
-      } else {
-        urlImg = LamMap.getLegendUrl(gid, scaled);
-      }
-      if (urlImg) {
-        html += "<img class='lam-legend' src='" + urlImg + "' />";
-      }
-    }
-    if (thisLayer.attribution) {
-      html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
-    }
-    if (scaled) {
-      html +=
-        "<p class='mt-2'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
-        gid +
-        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></p>";
-    }
-    html += "<div>";
-    var layer = LamStore.getLayer(gid);
-    var layerName = "Legenda ";
-    if (layer) {
-      layerName += " - " + layer.layerName;
-    }
-    if (showInfoWindow) {
-      LamStore.showContentInfoWindow(layerName, html, "");
-    } else {
-      LamStore.showContent(layerName, html, "");
-    }
-    return true;
   };
 
   var toggleLoader = function(visibility) {
@@ -528,6 +491,33 @@ var LamStore = (function() {
   };
 
   /**
+   * Restituisce tutti i layer visibili
+   * @return {array} Array dei layer ricercarbili
+   */
+  var getVisibleLayers = function() {
+    let layers = getVisibleLayersArray(appState.layers);
+    layers.sort(SortByLayerName);
+    return layers;
+  };
+
+  /**
+   * Function needed for getting search layers recursively
+   * @param {Object} layers
+   */
+  var getVisibleLayersArray = function(layers) {
+    var layersFound = [];
+    layers.forEach(function(layer) {
+      if (layer.visible) {
+        layersFound.push(layer);
+      }
+      if (layer.layers) {
+        layersFound = layersFound.concat(getVisibleLayersArray(layer.layers));
+      }
+    });
+    return layersFound;
+  };
+
+  /**
    * Get Group Layer bu Layer Gid
    * @param {string} gid Layer gid
    */
@@ -658,6 +648,9 @@ var LamStore = (function() {
       }
       if (appState.modules["links-tools"]) {
         LamLinksTools.init();
+      }
+      if (appState.modules["legend-tools"]) {
+        LamLegendTools.init();
       }
       //loading templates
       LamTemplates.init();
@@ -887,6 +880,7 @@ var LamStore = (function() {
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
+    getVisibleLayers: getVisibleLayers,
     getRelations: getRelations,
     getRelation: getRelation,
     guid: guid,
@@ -902,7 +896,6 @@ var LamStore = (function() {
     setInitialAppState: setInitialAppState,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
-    showLegend: showLegend,
     showAppTools: showAppTools,
     showContent: showContent,
     showContentInfoWindow: showContentInfoWindow,
