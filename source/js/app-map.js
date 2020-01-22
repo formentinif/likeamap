@@ -936,6 +936,7 @@ let LamMap = (function() {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(!layer.getVisible());
+      if (!layer.getVisible()) LamDispatcher.dispatch({ eventName: "clear-layer-info", layerGid: gid });
       if (layer.preload) {
         let layer_preload = getLayer(gid + "_preload");
         if (layer_preload) {
@@ -949,6 +950,9 @@ let LamMap = (function() {
     let layer = getLayer(gid);
     if (layer) {
       layer.setVisible(visibility);
+      if (!visibility) {
+        LamDispatcher.dispatch({ eventName: "clear-layer-info", layerGid: gid });
+      }
       if (layer.preload) {
         let layer_preload = getLayer(gid + "_preload");
         if (layer_preload) {
@@ -991,12 +995,15 @@ let LamMap = (function() {
    * @param {int} srid srid of the object
    * @param {Ol/Vector} vector Vector layer destination
    */
-  let addGeometryToMap = function addGeometryToMap(geometry, srid, vector) {
+  let addGeometryToMap = function addGeometryToMap(geometry, srid, vector, layerGid) {
     let feature = new ol.Feature({
       geometry: geometry
     });
     try {
       feature = transform3857(feature, srid);
+      if (layerGid) {
+        feature.layerGid = layerGid;
+      }
       //feature.getGeometry().transform(projection, 'EPSG:3857');
       vector.getSource().addFeature(feature);
     } catch (error) {
@@ -1256,6 +1263,19 @@ let LamMap = (function() {
     vectorSelectionMask.getSource().clear(true);
   };
 
+  let clearVectorLayer = function(vectorLayer, layerGid) {
+    debugger;
+    if (!layerGid) {
+      vectorLayer.getSource().clear(true);
+      return;
+    }
+    vectorLayer.getSource().forEachFeature(function(feature) {
+      debugger;
+      if (feature.layerGid === layerGid) vectorLayer.getSource().removeFeature(feature);
+    });
+    return;
+  };
+
   let getSelectionMask = function() {
     let result = null;
     vectorSelectionMask
@@ -1271,8 +1291,8 @@ let LamMap = (function() {
     return result;
   };
 
-  let addFeatureSelectionToMap = function(geometry, srid) {
-    return addGeometryToMap(geometry, srid, vectorSelection);
+  let addFeatureSelectionToMap = function(geometry, srid, layerGid) {
+    return addGeometryToMap(geometry, srid, vectorSelection, layerGid);
   };
 
   /* SEZIONE DRAWING    *************************************/
@@ -1643,6 +1663,7 @@ let LamMap = (function() {
     setPrintBox: setPrintBox,
     addWKTToMap: addWKTToMap,
     aspectRatio: aspectRatio,
+    clearVectorLayer: clearVectorLayer,
     clearLayerPrint: clearLayerPrint,
     clearLayerSelection: clearLayerSelection,
     clearLayerSelectionMask: clearLayerSelectionMask,

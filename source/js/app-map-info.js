@@ -73,6 +73,11 @@ let LamMapInfo = (function() {
       LamToolbar.toggleToolbarItem("info-results", true);
       $("#info-tooltip").hide();
     });
+
+    LamDispatcher.bind("clear-layer-info", function(payload) {
+      clearLayerInfo(payload.layerGid);
+      LamMapTooltip.hideMapTooltip();
+    });
   };
 
   /**
@@ -415,8 +420,8 @@ let LamMapInfo = (function() {
    * @param {Ol/Geometry} geometry
    * @param {int} srid
    */
-  let addGeometryInfoToMap = function(geometry, srid) {
-    return LamMap.addGeometryToMap(geometry, srid, vectorInfo);
+  let addGeometryInfoToMap = function(geometry, srid, layerGid) {
+    return LamMap.addGeometryToMap(geometry, srid, vectorInfo, layerGid);
   };
 
   /**
@@ -441,8 +446,8 @@ let LamMapInfo = (function() {
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
-  let clearLayerInfo = function() {
-    vectorInfo.getSource().clear(true);
+  let clearLayerInfo = function(layerGid) {
+    LamMap.clearVectorLayer(vectorInfo, layerGid);
   };
 
   /**

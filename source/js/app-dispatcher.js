@@ -48,11 +48,6 @@ var LamDispatcher = (function() {
       LamMapTools.stopCopyCoordinate();
     });
 
-    this.bind("clear-layer-info", function(payload) {
-      LamMapInfo.clearLayerInfo();
-      LamMapTooltip.hideMapTooltip();
-    });
-
     // this.bind("show-tool", function(payload) {
     //   if (payload.tool == "layers") {
     //     LamToolbar.toggleToolbarItem("lam-layer-tree");
