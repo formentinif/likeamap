@@ -687,6 +687,8 @@ var LamStore = (function() {
     return LamStore.getAppState().links;
   };
 
+  let parseResponse = function(e) {};
+
   return {
     doLogin: doLogin,
     init: init,
@@ -714,6 +716,7 @@ var LamStore = (function() {
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
     getOpenResultInInfoWindow: getOpenResultInInfoWindow,
+    parseResponse: parseResponse,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     setMapDiv: setMapDiv,

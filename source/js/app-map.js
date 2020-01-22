@@ -691,8 +691,14 @@ let LamMap = (function() {
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
+        //se il layer non esiste verifico il campo tooltip
+        if (feature.tooltip && !featureFound) {
+          featureFound = feature.clone();
+          featureFound.tooltip = feature.tooltip;
+        }
       } else {
         if (layer.hoverTooltip && !featureFound) {
+          //se il layer esiste è un preload
           featureFound = feature.clone();
           featureFound.layerGid = layer.gid.replace("_preload", "");
         }

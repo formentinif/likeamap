@@ -115,6 +115,11 @@ let LamMapInfo = (function() {
       LamMapInfo.addFeatureInfoToMap(featureOl);
     });
 
+    LamDispatcher.bind("add-geometry-info-map", function(payload) {
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
+    });
+
     LamDispatcher.bind("enable-map-info", function(payload) {
       LamStore.setInfoClickEnabled(true);
     });
@@ -424,8 +429,13 @@ let LamMapInfo = (function() {
 
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
-    let layer = LamStore.getLayer(feature.layerGid);
-    let tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    let tooltip = "";
+    if (feature.tooltip) {
+      tooltip = feature.tooltip;
+    } else {
+      let layer = LamStore.getLayer(feature.layerGid);
+      tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    }
     lamDispatch({
       eventName: "show-map-tooltip",
       geometry: coordinate,
@@ -474,6 +484,10 @@ let LamMapInfo = (function() {
    * @param {int} srid
    */
   let addFeatureInfoToMap = function(feature) {
+    if (feature.layerGid) {
+      let layer = LamStore.getLayer(feature.layerGid);
+      feature.tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    }
     return LamMap.addFeatureToMap(feature, feature.srid, vectorInfo);
   };
 

@@ -59,7 +59,6 @@ var LamSearchToolsNominatim = (function() {
     });
 
     try {
-      $(".dropdown-trigger").dropdown();
     } catch (e) {
     } finally {
     }
@@ -518,7 +517,6 @@ var LamSearchToolsNominatim = (function() {
         url: url,
         cache: false,
         jsonp: true,
-        jsonpCallback: "parseResponse",
         success: function(data) {
           //verifica che la ricerca sia ancora valida
           if (currentSearchDate > searchDate) {
@@ -611,7 +609,6 @@ var LamSearchToolsNominatim = (function() {
             url: url,
             jsonp: true,
             cache: false,
-            jsonpCallback: "parseResponse",
             success: function(data) {
               //verifica che la ricerca sia ancora valida
               if (currentSearchDate > searchDate) {

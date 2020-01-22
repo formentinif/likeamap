@@ -34,8 +34,9 @@ var LamSearchTools = (function() {
   var searchAddressProviderField = "";
   var searchHouseNumberProviderUrl = "";
   var searchHouseNumberProviderField = "";
-  var currentSearchDate = "";
   var searchLayers = [];
+  var timeout = 1000;
+  var timer;
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function(options) {
@@ -50,6 +51,10 @@ var LamSearchTools = (function() {
       lamDispatch("reset-search");
     });
 
+    LamDispatcher.bind("reset-search", function(payload) {
+      LamSearchTools.resetSearch();
+    });
+
     LamDispatcher.bind("show-search-items", function(payload) {
       LamSearchTools.showSearchInfoFeatures(payload.features);
     });
@@ -59,7 +64,6 @@ var LamSearchTools = (function() {
     });
 
     try {
-      $(".dropdown-trigger").dropdown();
     } catch (e) {
     } finally {
     }
@@ -103,6 +107,12 @@ var LamSearchTools = (function() {
     isRendered = true;
   };
 
+  let resetSearch = function() {
+    $("#search-tools__search-layers").val("");
+    $("#search-tools__search-address").val("");
+    $("#search-tools__search-results").html("");
+  };
+
   /**
    * Aggiorna la dimensione dello scroll dei contenuti
    * @return {null} La funzione non restituisce un valore
@@ -138,7 +148,7 @@ var LamSearchTools = (function() {
     let template = '<div id="search-tools__layers" class="lam-card lam-depth-2 lam-hidden" >';
     template += '<select id="search-tools__select-layers" class="lam-select lam-mb-2">';
     for (var i = 0; i < searchLayers.length; i++) {
-      template += '<option class="lam-option" value="' + searchLayers[i].layer + '">' + searchLayers[i].layerName + "</option>";
+      template += '<option class="lam-option" value="' + searchLayers[i].gid + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
     template += '<div id="search-tools__search-layers-field" class="lam-grid" >';
@@ -150,7 +160,7 @@ var LamSearchTools = (function() {
     }
     template += "</label>";
     template +=
-      '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchLayers(event)" placeholder="Ricerca...">';
+      '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.searchLayersKeyup(event)" placeholder="Ricerca...">';
     template += "</div>";
     template += "</div>";
     return template;
@@ -167,10 +177,10 @@ var LamSearchTools = (function() {
     }
     template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
-    template += '<div id="search-tools__search-via-field" class="" >';
-    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
+    template += '<div id="search-tools__search-address-field" class="" >';
+    template += '<label class="lam-label" id="search-tools__search-address__label" for="search-tools__search-address">Indirizzo</label>';
     template +=
-      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddress(event)" placeholder="Via o civico">';
+      '<input id="search-tools__search-address" class="lam-input" type="search" onkeyup="LamSearchTools.searchAddressKeyup(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
     if (searchLayers.length > 0) {
@@ -236,6 +246,8 @@ var LamSearchTools = (function() {
     $("#search-tools__label").text("Indirizzo");
     $("#search-tools__address").show();
     $("#search-tools__layers").hide();
+    lamDispatch("clear-layer-info");
+    lamDispatch("reset-search");
   };
 
   /**
@@ -247,6 +259,8 @@ var LamSearchTools = (function() {
     $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
     $("#search-tools__layers").show();
+    lamDispatch("clear-layer-info");
+    lamDispatch("reset-search");
   };
 
   /**
@@ -298,15 +312,31 @@ var LamSearchTools = (function() {
     }
   };
 
+  var searchAddressKeyup = function(ev) {
+    LamDispatcher.dispatch("show-loader");
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      doSearchAddress(ev);
+    }, timeout);
+  };
+
+  var searchLayersKeyup = function(ev) {
+    LamDispatcher.dispatch("show-loader");
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      doSearchLayers(ev);
+    }, timeout);
+  };
+
   /**
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
   var doSearchAddress = function(ev) {
     if (ev.keyCode == 13) {
-      $("#search-tools__search-via").blur();
+      $("#search-tools__search-address").blur();
     }
-    var via = $("#search-tools__search-via").val();
+    var via = $("#search-tools__search-address").val();
     var cql = "";
     var arrTerms = via.split(" ");
     var street = "";
@@ -358,59 +388,10 @@ var LamSearchTools = (function() {
 
     if (via.length > 2) {
       via = via.replace("'", " ");
-      currentSearchDate = new Date().getTime();
-      var searchDate = new Date().getTime();
       $.ajax({
         dataType: "jsonp",
-        url: url,
-        cache: false,
-        jsonp: true,
-        jsonpCallback: "parseResponse",
-        success: function(data) {
-          //verifica che la ricerca sia ancora valida
-          if (currentSearchDate > searchDate) {
-            return;
-          }
-          var results = [];
-          if (data.features.length > 0) {
-            var toponimi = [];
-            var results = [];
-            for (var i = 0; i < data.features.length; i++) {
-              var currentAddress = data.features[i].properties[searchAddressProviderField];
-              if (data.features[i].properties[searchHouseNumberProviderField]) {
-                currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
-              }
-              if ($.inArray(currentAddress, toponimi) === -1) {
-                var cent = null;
-                if (data.features[i].geometry.type != "POINT") {
-                  cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
-                } else {
-                  cent = data.features[i].geometry.coordinates;
-                }
-                var tempItem = {
-                  display_name: data.features[i].properties[searchAddressProviderField],
-                  lon: cent[0],
-                  lat: cent[1],
-                  item: data.features[i]
-                };
-                if (searchHouseNumberProviderField) {
-                  tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
-                }
-                results.push(tempItem);
-                toponimi.push(data.features[i].properties[searchAddressProviderField]);
-              }
-            }
-            searchResults = results.sort(SortByDisplayName);
-            //renderizzo i risultati
-            var templateTemp = templateSearchResultsWFSGeoserver();
-            var output = templateTemp(results);
-            jQuery("#search-tools__search-results").html(output);
-          } else {
-            var templateTemp = templateResultEmpty();
-            var output = templateTemp();
-            jQuery("#search-tools__search-results").html(output);
-          }
-        },
+        url: url + "&format_options=callback:LamSearchTools.parseResponseAddress",
+        //jsonpCallback: "LamStore.parseResponse",
         error: function(jqXHR, textStatus, errorThrown) {
           lamDispatch({
             eventName: "log",
@@ -418,6 +399,49 @@ var LamSearchTools = (function() {
           });
         }
       });
+    }
+  };
+
+  let parseResponseAddress = function(data) {
+    LamDispatcher.dispatch("hide-loader");
+    var results = [];
+    if (data.features.length > 0) {
+      var toponimi = [];
+      var results = [];
+      for (var i = 0; i < data.features.length; i++) {
+        var currentAddress = data.features[i].properties[searchAddressProviderField];
+        if (data.features[i].properties[searchHouseNumberProviderField]) {
+          currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
+        }
+        if ($.inArray(currentAddress, toponimi) === -1) {
+          var cent = null;
+          if (data.features[i].geometry.type != "POINT") {
+            cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
+          } else {
+            cent = data.features[i].geometry.coordinates;
+          }
+          var tempItem = {
+            display_name: data.features[i].properties[searchAddressProviderField],
+            lon: cent[0],
+            lat: cent[1],
+            item: data.features[i]
+          };
+          if (searchHouseNumberProviderField) {
+            tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
+          }
+          results.push(tempItem);
+          toponimi.push(data.features[i].properties[searchAddressProviderField]);
+        }
+      }
+      searchResults = results.sort(SortByDisplayName);
+      //renderizzo i risultati
+      var templateTemp = templateSearchResultsWFSGeoserver();
+      var output = templateTemp(results);
+      jQuery("#search-tools__search-results").html(output);
+    } else {
+      var templateTemp = templateResultEmpty();
+      var output = templateTemp();
+      jQuery("#search-tools__search-results").html(output);
     }
   };
 
@@ -432,68 +456,64 @@ var LamSearchTools = (function() {
     var itemStr = $("#search-tools__search-layers").val();
     var cql = "";
     //ricavo l'elenco dei layer da interrogare
-    currentSearchDate = new Date().getTime();
-    var searchDate = new Date().getTime();
     var currentLayer = $("#search-tools__select-layers option:selected").val();
-
     if (itemStr.length > 2) {
       jQuery("#search-tools__search-results").html("");
-      for (li = 0; li < searchLayers.length; li++) {
-        if (searchLayers[li].layer == currentLayer) {
-          var layer = searchLayers[li];
-          var url = layer.mapUri;
-          url =
-            url.replace("/wms", "/") +
-            "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" +
-            layer.layer +
-            "&maxFeatures=50&outputFormat=text%2Fjavascript&cql_filter=[" +
-            layer.searchField +
-            "]ilike%27%25" +
-            itemStr.trim() +
-            "%25%27";
-          itemStr = itemStr.replace("'", " ");
+      let layer = searchLayers.filter(function(element) {
+        return element.gid == currentLayer;
+      })[0];
+      var url = layer.mapUri;
+      url =
+        url.replace("/wms", "/") +
+        "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" +
+        layer.layer +
+        "&maxFeatures=50&outputFormat=text%2Fjavascript&cql_filter=[" +
+        layer.searchField +
+        "]ilike%27%25" +
+        itemStr.trim() +
+        "%25%27";
+      itemStr = itemStr.replace("'", " ");
 
-          $.ajax({
-            dataType: "jsonp",
-            url: url,
-            jsonp: true,
-            cache: false,
-            jsonpCallback: "parseResponse",
-            success: function(data) {
-              //verifica che la ricerca sia ancora valida
-              if (currentSearchDate > searchDate) {
-                return;
-              }
-              data.features.forEach(function(feature) {
-                feature.layerGid = layer.gid;
-                feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
-              });
-              if (data.features.length > 0) {
-                lamDispatch({
-                  eventName: "show-search-items",
-                  features: data
-                });
-                lamDispatch({
-                  eventName: "show-info-geometries",
-                  features: data
-                });
-              } else {
-                var templateTemp = templateResultEmpty();
-                var output = templateTemp();
-                jQuery("#search-tools__search-results").html(output);
-              }
-              return;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-              lamDispatch({
-                eventName: "log",
-                message: "LamSearchTools: unable to complete response"
-              });
-            }
+      $.ajax({
+        dataType: "jsonp",
+        url: url + "&format_options=callback:LamSearchTools.parseResponseLayers",
+        cache: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamSearchTools: unable to complete response"
           });
         }
-      }
+      });
     }
+  };
+
+  let parseResponseLayers = function(data) {
+    var currentLayer = $("#search-tools__select-layers option:selected").val();
+    let layer = searchLayers.filter(function(element) {
+      return element.gid == currentLayer;
+    })[0];
+    LamDispatcher.dispatch("hide-loader");
+    console.log("parse");
+    data.features.forEach(function(feature) {
+      feature.layerGid = layer.gid;
+      feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
+    });
+    if (data.features.length > 0) {
+      lamDispatch({
+        eventName: "show-search-items",
+        features: data
+      });
+      lamDispatch({
+        eventName: "show-info-geometries",
+        features: data
+      });
+    } else {
+      var templateTemp = templateResultEmpty();
+      var output = templateTemp();
+      jQuery("#search-tools__search-results").html(output);
+    }
+    return;
   };
 
   /**
@@ -525,6 +545,11 @@ var LamSearchTools = (function() {
     init: init,
     doSearchAddress: doSearchAddress,
     doSearchLayers: doSearchLayers,
+    parseResponseAddress: parseResponseAddress,
+    parseResponseLayers: parseResponseLayers,
+    resetSearch: resetSearch,
+    searchAddressKeyup: searchAddressKeyup,
+    searchLayersKeyup: searchLayersKeyup,
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,

@@ -110,7 +110,6 @@ let LamSelectTools = (function() {
     });
 
     try {
-      $(".dropdown-trigger").dropdown();
     } catch (e) {
     } finally {
     }
@@ -221,7 +220,6 @@ let LamSelectTools = (function() {
       url: url,
       cache: false,
       jsonp: true,
-      jsonpCallback: "parseResponse",
       success: function(data) {
         //verifica che la ricerca sia ancora valida
         if (currentSearchDate > searchDate) {

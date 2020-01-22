@@ -42,7 +42,6 @@ var LamRelations = (function() {
       url: urlService,
       jsonp: true,
       cache: false,
-      jsonpCallback: "parseResponse",
       success: function(data) {
         if (data.features) {
           data = data.features;

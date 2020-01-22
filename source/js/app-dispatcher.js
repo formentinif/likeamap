@@ -67,11 +67,6 @@ var LamDispatcher = (function() {
       LamMapInfo.addWktInfoToMap(payload.wkt);
     });
 
-    this.bind("add-geometry-info-map", function(payload) {
-      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
-      LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
-    });
-
     /**
      * {string} paylod.gid Layer Gid
      * {bool} paylod.refreshGroup Refresh the group layer state
