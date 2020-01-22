@@ -35,6 +35,11 @@ var LamMapTools = (function() {
       if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
         LamStore.setInfoClickEnabled(false);
       }
+
+      LamDispatcher.bind("stop-copy-coordinate", function(payload) {
+        LamMapTools.stopCopyCoordinate();
+      });
+
       lamDispatch("clear-layer-info");
     });
   };
@@ -132,7 +137,7 @@ var LamMapTools = (function() {
 
     try {
       payload = {};
-      payload.eventName = "remove-info";
+      payload.eventName = "clear-layer-info";
       lamDispatch(payload);
       payload = {};
       payload.eventName = "add-info-point";

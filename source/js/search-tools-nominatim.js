@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamSearchTools = (function() {
+var LamSearchToolsNominatim = (function() {
   var isRendered = false;
 
   var comuni = [];
@@ -47,7 +47,7 @@ var LamSearchTools = (function() {
     LamDispatcher.bind("show-search", function(payload) {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
-      lamDispatch("reset-search");
+      lamDispatch("");
     });
 
     LamDispatcher.bind("show-search-items", function(payload) {
@@ -89,6 +89,11 @@ var LamSearchTools = (function() {
           showSearchInfoFeatures(null);
         });
         break;
+      case "nominatim":
+      default:
+        var templateTemp = templateSearchNominatim(searchLayers);
+        var output = templateTemp(searchLayers);
+        jQuery("#" + div).html(output);
     }
 
     updateScroll(220);
@@ -111,6 +116,24 @@ var LamSearchTools = (function() {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#search-tools__search-results").offset();
     $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
+  };
+
+  var updateComuniNominatim = function(comuni) {
+    $.each(comuni, function(i, comune) {
+      var nomeComune = comune.nomeComune;
+      if (nomeComune) {
+        nomeComune = nomeComune.replace(/_/g, " ");
+        if (nomeComune.indexOf("Reggio") >= 0) {
+          nomeComune = nomeComune.replace("nell Emilia", "nell'Emilia");
+        }
+      }
+      $("#search-tools__comune").append(
+        $("<option>", {
+          value: comune.istat,
+          text: nomeComune
+        })
+      );
+    });
   };
 
   /**
@@ -157,6 +180,35 @@ var LamSearchTools = (function() {
   };
 
   /**
+   * Initialize the panel if Nominatim is selected as default address provider
+   */
+  var templateSearchNominatim = function(searchLayers) {
+    let template = "";
+    //pannello ricerca via
+    if (!LamStore.getAppState().logoPanelUrl) {
+      template += '<h4 class="lam-title">Ricerca</h4>';
+    }
+    template += templateTopTools(searchLayers.length);
+    template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
+    template += '<select id="search-tools__comune" class="lam-input">';
+    template += "</select>";
+    template += '<div class="div-5"></div>';
+    template += '<div id="search-tools__search-via-field" class="" >';
+    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
+    template +=
+      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)" placeholder="Via o civico">';
+    template += "</div>";
+    template += "</div>";
+    if (searchLayers.length > 0) {
+      template += templateLayersTools(searchLayers);
+    }
+    template += '<div class="div-10"></div>';
+    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
+    template += "</div>";
+    return Handlebars.compile(template);
+  };
+
+  /**
    * Initialize the panel if Geoserver is selected as default address provider
    */
   var templateSearchWFSGeoserver = function() {
@@ -170,7 +222,7 @@ var LamSearchTools = (function() {
     template += '<div id="search-tools__search-via-field" class="" >';
     template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
     template +=
-      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddress(event)" placeholder="Via o civico">';
+      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
     if (searchLayers.length > 0) {
@@ -179,6 +231,27 @@ var LamSearchTools = (function() {
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
+    return Handlebars.compile(template);
+  };
+
+  /**
+   * Display the list of the nominatim results in the left panel
+   * @param {Object} results
+   */
+  var templateResultsNominatim = function(results) {
+    template = '<h5 class="lam-title-h4">Risultati della ricerca</h5>';
+    template = '<ul class="lam-grid">';
+    template += "{{#each this}}";
+    template += '<div class="lam-col">';
+    template +=
+      '<i class="lam-icon-primary">' +
+      LamResources.svgMarker +
+      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemNominatim({{{@index}}});return false">';
+    template += "{{{display_name}}}";
+    template += "</a>";
+    template += "</div>";
+    template += "{{/each}}";
+    template += "</ul>";
     return Handlebars.compile(template);
   };
 
@@ -250,6 +323,25 @@ var LamSearchTools = (function() {
   };
 
   /**
+   * Zoom the map to the item provided
+   * @param {int} index  Item's index in the Nominatim array result
+   */
+  var zoomToItemNominatim = function(index) {
+    let result = searchResults[index];
+    lamDispatch({
+      eventName: "zoom-lon-lat",
+      zoom: 18,
+      lon: parseFloat(result.lon),
+      lat: parseFloat(result.lat)
+    });
+    lamDispatch({
+      eventName: "add-wkt-info-map",
+      wkt: "POINT(" + result.lon + " " + result.lat + ")"
+    });
+    lamDispatch({ eventName: "hide-menu-mobile" });
+  };
+
+  /**
    * Zoom the map to the lon-lat given and show the infobox of the given item index
    * @param {float} lon
    * @param {float} lat
@@ -298,11 +390,72 @@ var LamSearchTools = (function() {
     }
   };
 
+  var getRegioneFromComuneNominatim = function(idcomune) {
+    return "Emilia-Romagna";
+  };
+
+  /**
+   * Start the search in the Nominatim Provider
+   * @param {Object} ev key click event result
+   */
+  var doSearchAddressNominatim = function(ev) {
+    if (ev.keyCode == 13) {
+      $("#search-tools__search-via").blur();
+    }
+    var comune = $("#search-tools__comune option:selected").text();
+    var idcomune = $("#search-tools__comune option:selected").val();
+    var regione = getRegioneFromComuneNominatim(idcomune);
+    var via = $("#search-tools__search-via").val();
+
+    if (via.length > 3 && comune) {
+      via = via.replace("'", " ");
+      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
+      console.log(url);
+      currentSearchDate = new Date().getTime();
+      var searchDate = new Date().getTime();
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false
+      })
+        .done(function(data) {
+          //verifica che la ricerca sia ancora valida
+          if (currentSearchDate > searchDate) {
+            return;
+          }
+          var results = [];
+          if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+              if (data[i].osm_type == "way") {
+                results.push(data[i]);
+              }
+            }
+            searchResults = results;
+            //renderizzo i risultati
+
+            var templateTemp = templateResultsNominatim();
+            var output = templateTemp(results);
+            jQuery("#search-tools__search-results").html(output);
+          } else {
+            var templateTemp = templateResultEmpty();
+            var output = templateTemp();
+            jQuery("#search-tools__search-results").html(output);
+          }
+        })
+        .fail(function(data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamSearchTools: unable to bind comuni"
+          });
+        });
+    }
+  };
+
   /**
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
-  var doSearchAddress = function(ev) {
+  var doSearchAddressWMSG = function(ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-via").blur();
     }
@@ -510,6 +663,51 @@ var LamSearchTools = (function() {
     $("#search-tools__search-results").html(body);
   };
 
+  /**
+   * Mostra dei risultati generici ricavati ad esempio da un reverseGeocoding
+   * @param  {object} data Elenco di oggetti
+   * @return {null}
+   */
+  var displayGenericResults = function(data) {
+    var results = [];
+    if (data.length > 0) {
+      var resultsIndex = [];
+      var results = [];
+      for (var i = 0; i < data.length; i++) {
+        //ricavo il layer relativo
+        var layer = LamStore.getLayerByName(data[i].id.split(".")[0]);
+        if (layer) {
+          var cent = null;
+          if (data[i].geometry.coordinates[0][0]) {
+            cent = LamMap.getCentroid(data[i].geometry.coordinates[0]);
+          } else {
+            cent = LamMap.getCentroid(data[i].geometry.coordinates);
+          }
+          var item = data[i];
+          //salvo il crs della feature
+          item.crs = data.crs;
+          //item.id = currentLayer;
+          results.push({
+            display_name: layer.layerName + "-" + data[i].properties[layer.labelField],
+            lon: cent[0],
+            lat: cent[1],
+            item: item
+          });
+          resultsIndex.push(data[i].properties[layer.labelField]);
+        }
+      }
+      searchResults = results;
+      //renderizzo i risultati
+      var templateTemp = templateSearchResultsLayers();
+      var output = templateTemp(results);
+      jQuery("#search-tools__search-results").html(output);
+    } else {
+      var templateTemp = templateResultEmpty();
+      var output = templateTemp();
+      jQuery("#search-tools__search-results").html(output);
+    }
+  };
+
   var selectLayer = function(layer) {
     $("#search-tools__select-layers").val(layer);
   };
@@ -521,9 +719,14 @@ var LamSearchTools = (function() {
   }
 
   return {
+    displayGenericResults: displayGenericResults,
     render: render,
+    templateSearchNominatim: templateSearchNominatim,
     init: init,
-    doSearchAddress: doSearchAddress,
+    doSearchAddressNominatim: doSearchAddressNominatim,
+    updateComuniNominatim: updateComuniNominatim,
+    zoomToItemNominatim: zoomToItemNominatim,
+    doSearchAddressWMSG: doSearchAddressWMSG,
     doSearchLayers: doSearchLayers,
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,

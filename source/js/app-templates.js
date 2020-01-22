@@ -218,7 +218,7 @@ let LamTemplates = (function() {
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
         result +=
-          '<a href="#" class="lam-link" onclick="LamStore.showRelation(\'' +
+          '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
           relation.gid +
           "', " +
           index +
@@ -326,7 +326,7 @@ let LamTemplates = (function() {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
       //sezione relations
-      let layerRelations = LamStore.getRelations().filter(function(relation) {
+      let layerRelations = LamRelations.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
       tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);

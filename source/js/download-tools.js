@@ -43,7 +43,7 @@ var LamDownloadTools = (function() {
   };
 
   let downloadResults = function() {
-    var results = LamStore.getRelationResults();
+    var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
     var csv = "";

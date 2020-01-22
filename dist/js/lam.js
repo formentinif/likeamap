@@ -573,6 +573,50 @@ let LamMapInfo = (function() {
       clearLayerInfo(payload.layerGid);
       LamMapTooltip.hideMapTooltip();
     });
+
+    LamDispatcher.bind("zoom-info-feature", function(payload) {
+      try {
+        let feature = LamStore.getCurrentInfoItems().features[payload.index];
+        let layer = LamStore.getLayer(feature.layerGid);
+        LamDispatcher.dispatch({
+          eventName: "set-layer-visibility",
+          gid: feature.layerGid,
+          visibility: 1
+        });
+        LamDispatcher.dispatch({
+          eventName: "flash-feature",
+          feature: feature
+        });
+
+        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+        featureOl = LamMap.transform3857(featureOl, feature.srid);
+        LamMap.goToGeometry(featureOl.getGeometry());
+        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+        if (tooltip) {
+          LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+        }
+        return;
+      } catch (error) {
+        LamDispatcher.dispatch({ eventName: "log", message: error });
+      }
+    });
+
+    LamDispatcher.bind("add-info-point", function(payload) {
+      let geometryOl = new ol.geom.Point([payload.lon, payload.lat]);
+      let featureOl = new ol.Feature({
+        geometry: geometryOl
+      });
+      featureOl.srid = 4326;
+      LamMapInfo.addFeatureInfoToMap(featureOl);
+    });
+
+    LamDispatcher.bind("enable-map-info", function(payload) {
+      LamStore.setInfoClickEnabled(true);
+    });
+
+    LamDispatcher.bind("disable-map-info", function(payload) {
+      LamStore.setInfoClickEnabled(false);
+    });
   };
 
   /**
@@ -885,10 +929,10 @@ let LamMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (LamStore.openResultInInfoWindow()) {
-      LamStore.showContentInfoWindow(title, body, bodyMobile);
+    if (LamStore.getOpenResultInInfoWindow()) {
+      LamDom.showContentInfoWindow(title, body, bodyMobile);
     } else {
-      LamStore.showContent(title, body, bodyMobile, htmlElement);
+      LamDom.showContent(title, body, bodyMobile, htmlElement);
     }
   };
 
@@ -1588,7 +1632,7 @@ let LamMap = (function() {
   let init = function() {
     //events binding
     //if mobile go to user location
-    if (LamStore.isMobile()) goToBrowserLocation();
+    if (LamDom.isMobile()) goToBrowserLocation();
   };
 
   /**
@@ -1703,7 +1747,7 @@ let LamMap = (function() {
 
   let mouseHoverMapTooltip = function() {
     if (!lastMousePixel) return;
-    if (LamStore.isMobile()) return;
+    if (LamDom.isMobile()) return;
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
@@ -2280,13 +2324,11 @@ let LamMap = (function() {
   };
 
   let clearVectorLayer = function(vectorLayer, layerGid) {
-    debugger;
     if (!layerGid) {
       vectorLayer.getSource().clear(true);
       return;
     }
     vectorLayer.getSource().forEachFeature(function(feature) {
-      debugger;
       if (feature.layerGid === layerGid) vectorLayer.getSource().removeFeature(feature);
     });
     return;
@@ -2971,6 +3013,11 @@ var LamMapTools = (function() {
       if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
         LamStore.setInfoClickEnabled(false);
       }
+
+      LamDispatcher.bind("stop-copy-coordinate", function(payload) {
+        LamMapTools.stopCopyCoordinate();
+      });
+
       lamDispatch("clear-layer-info");
     });
   };
@@ -3068,7 +3115,7 @@ var LamMapTools = (function() {
 
     try {
       payload = {};
-      payload.eventName = "remove-info";
+      payload.eventName = "clear-layer-info";
       lamDispatch(payload);
       payload = {};
       payload.eventName = "add-info-point";
@@ -3529,10 +3576,15 @@ var LamSearchTools = (function() {
     LamDispatcher.bind("show-search", function(payload) {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
+      lamDispatch("reset-search");
     });
 
     LamDispatcher.bind("show-search-items", function(payload) {
       LamSearchTools.showSearchInfoFeatures(payload.features);
+    });
+
+    LamDispatcher.bind("search-address", function(payload) {
+      LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
     try {
@@ -3555,6 +3607,7 @@ var LamSearchTools = (function() {
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function() {
+          LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
             if (searchLayers[li].layer == currentLayer) {
@@ -3565,11 +3618,6 @@ var LamSearchTools = (function() {
           showSearchInfoFeatures(null);
         });
         break;
-      case "nominatim":
-      default:
-        var templateTemp = templateSearchNominatim(searchLayers);
-        var output = templateTemp(searchLayers);
-        jQuery("#" + div).html(output);
     }
 
     updateScroll(220);
@@ -3594,24 +3642,6 @@ var LamSearchTools = (function() {
     $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
   };
 
-  var updateComuniNominatim = function(comuni) {
-    $.each(comuni, function(i, comune) {
-      var nomeComune = comune.nomeComune;
-      if (nomeComune) {
-        nomeComune = nomeComune.replace(/_/g, " ");
-        if (nomeComune.indexOf("Reggio") >= 0) {
-          nomeComune = nomeComune.replace("nell Emilia", "nell'Emilia");
-        }
-      }
-      $("#search-tools__comune").append(
-        $("<option>", {
-          value: comune.istat,
-          text: nomeComune
-        })
-      );
-    });
-  };
-
   /**
    * General html code that will be injected in the panel as the main tools
    */
@@ -3629,20 +3659,6 @@ var LamSearchTools = (function() {
     template += "</div>";
     return template;
   };
-  // var templateTopTools = function() {
-  //   let template = '<div class="lam-bar lam-background">';
-  //   template += '<button id="search-tools__menu" class="dropdown-trigger btn" value="Indirizzo" data-target="search-tools__menu-items">';
-  //   template += '<i class="lam-icon">more_vert</i>';
-  //   template += '</button> <span id="search-tools__label">Indirizzo</span>';
-  //   template += "</div>";
-  //   template += '<ul id="search-tools__menu-items" class="dropdown-content" >';
-  //   template += '<li onclick="LamSearchTools.showSearchAddress(); return false;"><span >Indirizzo</span></li>';
-  //   template += "{{#if this.length}}";
-  //   template += '<li onclick="LamSearchTools.showSearchLayers(); return false;"><span >Layer</span></li>';
-  //   template += "{{/if}}";
-  //   template += "</ul>";
-  //   return template;
-  // };
 
   /**
    * General html code that will be injected in order to display the layer tools
@@ -3670,35 +3686,6 @@ var LamSearchTools = (function() {
   };
 
   /**
-   * Initialize the panel if Nominatim is selected as default address provider
-   */
-  var templateSearchNominatim = function(searchLayers) {
-    let template = "";
-    //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Ricerca</h4>';
-    }
-    template += templateTopTools(searchLayers.length);
-    template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
-    template += '<select id="search-tools__comune" class="lam-input">';
-    template += "</select>";
-    template += '<div class="div-5"></div>';
-    template += '<div id="search-tools__search-via-field" class="" >';
-    template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
-    template +=
-      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressNominatim(event)" placeholder="Via o civico">';
-    template += "</div>";
-    template += "</div>";
-    if (searchLayers.length > 0) {
-      template += templateLayersTools(searchLayers);
-    }
-    template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
-    template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  /**
    * Initialize the panel if Geoserver is selected as default address provider
    */
   var templateSearchWFSGeoserver = function() {
@@ -3712,7 +3699,7 @@ var LamSearchTools = (function() {
     template += '<div id="search-tools__search-via-field" class="" >';
     template += '<label class="lam-label" id="search-tools__search-via__label" for="search-tools__search-via">Indirizzo</label>';
     template +=
-      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddressWMSG(event)" placeholder="Via o civico">';
+      '<input id="search-tools__search-via" class="lam-input" type="search" onkeyup="LamSearchTools.doSearchAddress(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
     if (searchLayers.length > 0) {
@@ -3721,27 +3708,6 @@ var LamSearchTools = (function() {
     template += '<div class="div-10"></div>';
     template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  /**
-   * Display the list of the nominatim results in the left panel
-   * @param {Object} results
-   */
-  var templateResultsNominatim = function(results) {
-    template = '<h5 class="lam-title-h4">Risultati della ricerca</h5>';
-    template = '<ul class="lam-grid">';
-    template += "{{#each this}}";
-    template += '<div class="lam-col">';
-    template +=
-      '<i class="lam-icon-primary">' +
-      LamResources.svgMarker +
-      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemNominatim({{{@index}}});return false">';
-    template += "{{{display_name}}}";
-    template += "</a>";
-    template += "</div>";
-    template += "{{/each}}";
-    template += "</ul>";
     return Handlebars.compile(template);
   };
 
@@ -3813,45 +3779,6 @@ var LamSearchTools = (function() {
   };
 
   /**
-   * Zoom the map to the item provided
-   * @param {int} index  Item's index in the Nominatim array result
-   */
-  var zoomToItemNominatim = function(index) {
-    let result = searchResults[index];
-    lamDispatch({
-      eventName: "zoom-lon-lat",
-      zoom: 18,
-      lon: parseFloat(result.lon),
-      lat: parseFloat(result.lat)
-    });
-    lamDispatch({
-      eventName: "add-wkt-info-map",
-      wkt: "POINT(" + result.lon + " " + result.lat + ")"
-    });
-    lamDispatch({ eventName: "hide-menu-mobile" });
-  };
-
-  // /**
-  //  * Zoom the map to the lon-lat given and add a point to the map
-  //  * @param {float} lon
-  //  * @param {float} lat
-  //  */
-  // var zoomToItemWFSGeoserver = function(lon, lat) {
-  //   lamDispatch("remove-info");
-  //   lamDispatch({
-  //     eventName: "zoom-lon-lat",
-  //     zoom: 18,
-  //     lon: parseFloat(lon),
-  //     lat: parseFloat(lat)
-  //   });
-  //   lamDispatch({
-  //     eventName: "add-wkt-info-map",
-  //     wkt: "POINT(" + payload.lon + " " + payload.lat + ")"
-  //   });
-  //   lamDispatch("hide-menu-mobile");
-  // };
-
-  /**
    * Zoom the map to the lon-lat given and show the infobox of the given item index
    * @param {float} lon
    * @param {float} lat
@@ -3859,7 +3786,7 @@ var LamSearchTools = (function() {
    * @param {boolean} showInfo
    */
   var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    lamDispatch("remove-info");
+    lamDispatch("clear-layer-info");
     if (searchResults[index]) {
       lamDispatch({
         eventName: "zoom-geometry",
@@ -3900,72 +3827,11 @@ var LamSearchTools = (function() {
     }
   };
 
-  var getRegioneFromComuneNominatim = function(idcomune) {
-    return "Emilia-Romagna";
-  };
-
-  /**
-   * Start the search in the Nominatim Provider
-   * @param {Object} ev key click event result
-   */
-  var doSearchAddressNominatim = function(ev) {
-    if (ev.keyCode == 13) {
-      $("#search-tools__search-via").blur();
-    }
-    var comune = $("#search-tools__comune option:selected").text();
-    var idcomune = $("#search-tools__comune option:selected").val();
-    var regione = getRegioneFromComuneNominatim(idcomune);
-    var via = $("#search-tools__search-via").val();
-
-    if (via.length > 3 && comune) {
-      via = via.replace("'", " ");
-      var url = "http://nominatim.openstreetmap.org/search/IT/" + regione + "/" + comune + "/" + via + "?format=jsonv2&addressdetails=1" + "&";
-      console.log(url);
-      currentSearchDate = new Date().getTime();
-      var searchDate = new Date().getTime();
-      $.ajax({
-        dataType: "json",
-        url: url,
-        cache: false
-      })
-        .done(function(data) {
-          //verifica che la ricerca sia ancora valida
-          if (currentSearchDate > searchDate) {
-            return;
-          }
-          var results = [];
-          if (data.length > 0) {
-            for (var i = 0; i < data.length; i++) {
-              if (data[i].osm_type == "way") {
-                results.push(data[i]);
-              }
-            }
-            searchResults = results;
-            //renderizzo i risultati
-
-            var templateTemp = templateResultsNominatim();
-            var output = templateTemp(results);
-            jQuery("#search-tools__search-results").html(output);
-          } else {
-            var templateTemp = templateResultEmpty();
-            var output = templateTemp();
-            jQuery("#search-tools__search-results").html(output);
-          }
-        })
-        .fail(function(data) {
-          lamDispatch({
-            eventName: "log",
-            message: "LamSearchTools: unable to bind comuni"
-          });
-        });
-    }
-  };
-
   /**
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
-  var doSearchAddressWMSG = function(ev) {
+  var doSearchAddress = function(ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-via").blur();
     }
@@ -4173,51 +4039,6 @@ var LamSearchTools = (function() {
     $("#search-tools__search-results").html(body);
   };
 
-  /**
-   * Mostra dei risultati generici ricavati ad esempio da un reverseGeocoding
-   * @param  {object} data Elenco di oggetti
-   * @return {null}
-   */
-  var displayGenericResults = function(data) {
-    var results = [];
-    if (data.length > 0) {
-      var resultsIndex = [];
-      var results = [];
-      for (var i = 0; i < data.length; i++) {
-        //ricavo il layer relativo
-        var layer = LamStore.getLayerByName(data[i].id.split(".")[0]);
-        if (layer) {
-          var cent = null;
-          if (data[i].geometry.coordinates[0][0]) {
-            cent = LamMap.getCentroid(data[i].geometry.coordinates[0]);
-          } else {
-            cent = LamMap.getCentroid(data[i].geometry.coordinates);
-          }
-          var item = data[i];
-          //salvo il crs della feature
-          item.crs = data.crs;
-          //item.id = currentLayer;
-          results.push({
-            display_name: layer.layerName + "-" + data[i].properties[layer.labelField],
-            lon: cent[0],
-            lat: cent[1],
-            item: item
-          });
-          resultsIndex.push(data[i].properties[layer.labelField]);
-        }
-      }
-      searchResults = results;
-      //renderizzo i risultati
-      var templateTemp = templateSearchResultsLayers();
-      var output = templateTemp(results);
-      jQuery("#search-tools__search-results").html(output);
-    } else {
-      var templateTemp = templateResultEmpty();
-      var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
-    }
-  };
-
   var selectLayer = function(layer) {
     $("#search-tools__select-layers").val(layer);
   };
@@ -4229,14 +4050,9 @@ var LamSearchTools = (function() {
   }
 
   return {
-    displayGenericResults: displayGenericResults,
     render: render,
-    templateSearchNominatim: templateSearchNominatim,
     init: init,
-    doSearchAddressNominatim: doSearchAddressNominatim,
-    updateComuniNominatim: updateComuniNominatim,
-    zoomToItemNominatim: zoomToItemNominatim,
-    doSearchAddressWMSG: doSearchAddressWMSG,
+    doSearchAddress: doSearchAddress,
     doSearchLayers: doSearchLayers,
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,
@@ -4660,7 +4476,7 @@ var LamLinksTools = (function() {
     LamDispatcher.bind("show-links", function(payload) {
       var templateTemp = templateLinks();
       var output = templateTemp(LamStore.getLinks());
-      LamStore.showContentInfoWindow("Links", output);
+      LamDom.showContentInfoWindow("Links", output);
     });
   };
 
@@ -4772,9 +4588,9 @@ var LamLegendTools = (function() {
       layerName += " - " + thisLayer.layerName;
     }
     if (showInfoWindow) {
-      LamStore.showContentInfoWindow(layerName, html, "");
+      LamDom.showContentInfoWindow(layerName, html, "");
     } else {
-      LamStore.showContent(layerName, html, "");
+      LamDom.showContent(layerName, html, "");
     }
     return true;
   };
@@ -4794,9 +4610,9 @@ var LamLegendTools = (function() {
       }
       let title = "Legenda";
       if (showInfoWindow) {
-        LamStore.showContentInfoWindow(title, html, "");
+        LamDom.showContentInfoWindow(title, html, "");
       } else {
-        LamStore.showContent(title, html, "");
+        LamDom.showContent(title, html, "");
       }
     });
   };
@@ -4854,7 +4670,7 @@ var LamDownloadTools = (function() {
   };
 
   let downloadResults = function() {
-    var results = LamStore.getRelationResults();
+    var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
     var csv = "";
@@ -5173,69 +4989,14 @@ var LamDispatcher = (function() {
       LamToolbar.resetTools();
     });
 
-    this.bind("stop-copy-coordinate", function(payload) {
-      LamMapTools.stopCopyCoordinate();
-    });
-
-    // this.bind("show-tool", function(payload) {
-    //   if (payload.tool == "layers") {
-    //     LamToolbar.toggleToolbarItem("lam-layer-tree");
-    //   }
-    //   if (payload.tool.indexOf("print") > -1) {
-    //     LamToolbar.toggleToolbarItem("print-tools");
-    //   }
-    //   if (payload.tool.indexOf("share") > -1) {
-    //     LamToolbar.toggleToolbarItem("share-tools");
-    //   }
-    //   if (payload.tool.indexOf("map") > -1) {
-    //     LamToolbar.toggleToolbarItem("map-tools");
-    //   }
-    //   if (payload.tool.indexOf("draw") > -1) {
-    //     LamToolbar.toggleToolbarItem("draw-tools");
-    //   }
-    //   if (payload.tool.indexOf("search") > -1) {
-    //     LamToolbar.toggleToolbarItem("search-tools");
-    //     //verifica dei layers
-    //     if (payload.tool.indexOf("search-layers") > -1) {
-    //       var arrSearch = payload.tool.split(",");
-    //       setTimeout(function() {
-    //         LamSearchTools.showSearchLayers();
-    //         if (arrSearch.length > 1) {
-    //           LamSearchTools.selectLayer(arrSearch[1]);
-    //         }
-    //       }, 1000);
-    //     }
-    //   }
-    // });
-
     this.bind("hide-menu-mobile", function(payload) {
-      if (LamStore.isMobile()) {
+      if (LamDom.isMobile()) {
         LamStore.hideMenu();
       }
     });
 
-    this.bind("hide-info-window", function(payload) {
-      LamStore.hideInfoWindow();
-    });
-
-    this.bind("hide-editor-window", function(payload) {
-      EditorTools.hideEditorWindow();
-    });
-
-    this.bind("hide-loader", function(payload) {
-      LamStore.toggleLoader(false);
-    });
-
-    this.bind("show-loader", function(payload) {
-      LamStore.toggleLoader(true);
-    });
-
     this.bind("live-reload", function(payload) {
       LamStore.liveReload(payload.appState);
-    });
-
-    this.bind("search-address", function(payload) {
-      LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
     this.bind("zoom-lon-lat", function(payload) {
@@ -5245,33 +5006,6 @@ var LamDispatcher = (function() {
     this.bind("zoom-geometry", function(payload) {
       let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
-    });
-
-    this.bind("zoom-info-feature", function(payload) {
-      try {
-        let feature = LamStore.getCurrentInfoItems().features[payload.index];
-        let layer = LamStore.getLayer(feature.layerGid);
-        lamDispatch({
-          eventName: "set-layer-visibility",
-          gid: feature.layerGid,
-          visibility: 1
-        });
-        lamDispatch({
-          eventName: "flash-feature",
-          feature: feature
-        });
-
-        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
-        featureOl = LamMap.transform3857(featureOl, feature.srid);
-        LamMap.goToGeometry(featureOl.getGeometry());
-        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-        if (tooltip) {
-          lamDispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
-        }
-        return;
-      } catch (error) {
-        lamDispatch({ eventName: "log", message: error });
-      }
     });
 
     this.bind("add-wkt-info-map", function(payload) {
@@ -5316,19 +5050,6 @@ var LamDispatcher = (function() {
       LamMapTools.addCoordinate(payload.lon, payload.lat);
     });
 
-    this.bind("remove-info", function(payload) {
-      LamMapInfo.clearLayerInfo();
-    });
-
-    this.bind("add-info-point", function(payload) {
-      let geometryOl = new ol.geom.Point([payload.lon, payload.lat]);
-      let featureOl = new ol.Feature({
-        geometry: geometryOl
-      });
-      featureOl.srid = 4326;
-      LamMapInfo.addFeatureInfoToMap(featureOl);
-    });
-
     this.bind("init-map-app", function(payload) {
       LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
@@ -5361,26 +5082,6 @@ var LamDispatcher = (function() {
 
     this.bind("open-url-location", function(payload) {
       LamStore.openUrlTemplate(payload.urlTemplate);
-    });
-
-    this.bind("reverse-geocoding", function(payload) {
-      //conversione coordinate
-      LamMap.getRequestInfo(payload.coordinate, null, false);
-    });
-
-    this.bind("show-reverse-geocoding-result", function(payload) {
-      //conversione coordinate
-      LamToolbar.toggleToolbarItem("search-tools", true);
-      LamSearchTools.showSearchLayers();
-      LamSearchTools.displayGenericResults(payload.results);
-    });
-
-    this.bind("enable-map-info", function(payload) {
-      LamStore.setInfoClickEnabled(true);
-    });
-
-    this.bind("disable-map-info", function(payload) {
-      LamStore.setInfoClickEnabled(false);
     });
 
     this.bind("log", function(payload) {
@@ -5542,6 +5243,239 @@ var AppCustom = (function() {
   };
 })();
 
+var LamRelations = (function() {
+  let relationsResults = {};
+
+  var init = function init() {
+    //events binding
+  };
+
+  var getRelations = function() {
+    return LamStore.getAppState().relations;
+  };
+
+  var getRelation = function(gid) {
+    let relationResult = LamStore.getAppState().relations.filter(function(el) {
+      return el.gid == gid;
+    });
+    return relationResult[0];
+  };
+
+  var getRelationResults = function() {
+    return relationsResults;
+  };
+
+  /**
+   * Sets the last relation result.
+   * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
+   */
+  var setRelationResults = function(results) {
+    relationsResults = results;
+  };
+
+  var showRelation = function(relationGid, resultIndex) {
+    lamDispatch("show-loader");
+    var item = LamStore.getCurrentInfoItems().features[resultIndex];
+    var relation = LamRelations.getRelation(relationGid);
+    var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
+    var urlService = templateUrl(item.properties);
+
+    var template = LamTemplates.getTemplate(relation.gid, relation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+
+    $.ajax({
+      dataType: "jsonp",
+      url: urlService,
+      jsonp: true,
+      cache: false,
+      jsonpCallback: "parseResponse",
+      success: function(data) {
+        if (data.features) {
+          data = data.features;
+        }
+        LamRelations.setRelationResults({ data: data, template: template });
+        var title = relation.title;
+        var body = "";
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
+        let propsList = [];
+        for (let i = 0; i < data.length; i++) {
+          var props = data[i].properties ? data[i].properties : data[i];
+          propsList.push(props);
+          if (!template.multipleItems) {
+            //single template not active by default
+            body += LamTemplates.processTemplate(template, props);
+            if (!body) {
+              body += LamTemplates.standardTemplate(props);
+            }
+            if (data.length > 1) {
+              body += "<div class='div-10'></div>";
+            }
+          }
+        }
+
+        //single template not active by default
+        if (template.multipleItems && propsList.length > 0) {
+          body += LamTemplates.processTemplate(template, propsList);
+        }
+        //download
+        body +=
+          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
+        if (data.length === 0) {
+          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
+        }
+        LamDom.showContentInfoWindow(title, body);
+        lamDispatch("hide-loader");
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        lamDispatch({
+          eventName: "log",
+          message: "LamSearchTools: unable to complete response"
+        });
+        lamDispatch("hide-loader");
+      }
+    });
+  };
+
+  return {
+    init: init,
+    getRelations: getRelations,
+    getRelation: getRelation,
+    getRelationResults: getRelationResults,
+    setRelationResults: setRelationResults,
+    showRelation: showRelation
+  };
+})();
+
+var LamDom = (function() {
+  var init = function init() {
+    //events binding
+    LamDispatcher.bind("hide-info-window", function(payload) {
+      LamDom.hideInfoWindow();
+    });
+
+    LamDispatcher.bind("hide-loader", function(payload) {
+      LamDom.toggleLoader(false);
+    });
+
+    LamDispatcher.bind("show-loader", function(payload) {
+      LamDom.toggleLoader(true);
+    });
+  };
+
+  let hideInfoWindow = function() {
+    $("#info-window").hide();
+  };
+
+  let toggleLoader = function(visibility) {
+    if (visibility) {
+      $("#app-loader").removeClass("lam-hidden");
+    } else {
+      $("#app-loader").addClass("lam-hidden");
+    }
+  };
+
+  var showAppTools = function() {
+    var modules = LamStore.getAppState().modules;
+    if (modules) {
+      $("#menu-toolbar__layer-tree").toggle(modules["lam-layer-tree"]);
+      $("#menu-toolbar__search-tools").toggle(modules["search-tools"]);
+      $("#menu-toolbar__print-tools").toggle(modules["print-tools"]);
+      $("#menu-toolbar__share-tools").toggle(modules["share-tools"]);
+      $("#menu-toolbar__map-tools").toggle(modules["map-tools"]);
+      $("#menu-toolbar__draw-tools").toggle(modules["draw-tools"]);
+      $("#menu-toolbar__gps-tools").toggle(modules["gps-tools"]);
+      if (modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(modules["links-tools"]);
+      if (modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(modules["legend-tools"]);
+    }
+  };
+
+  var isMobile = function() {
+    return /Mobi/.test(navigator.userAgent);
+  };
+
+  /**
+   * Dragging helper
+   * @param {Object} elmnt
+   */
+  var dragElement = function(elmnt) {
+    var pos1 = 0,
+      pos2 = 0,
+      pos3 = 0,
+      pos4 = 0;
+    if (document.getElementById(elmnt.id + "__resize")) {
+      // if present, the header is where you move the DIV from:
+      document.getElementById(elmnt.id + "__resize").onmousedown = dragMouseDown;
+    } else {
+      // otherwise, move the DIV from anywhere inside the DIV:
+      elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+      elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+    }
+
+    function closeDragElement() {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  };
+
+  let showContent = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-results";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+    if (!LamDom.isMobile()) {
+      LamToolbar.toggleToolbarItem(htmlElement, true);
+    } else {
+      $("#info-tooltip").show();
+      $("#info-tooltip").html(bodyMobile);
+    }
+  };
+
+  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
+    if (!htmlElement) htmlElement = "info-window";
+    if (!bodyMobile) bodyMobile = body;
+    $("#" + htmlElement + "__content").html(body);
+    $("#" + htmlElement + "__title").html(title);
+    $("#" + htmlElement + "").show();
+  };
+
+  return {
+    dragElement: dragElement,
+    init: init,
+    isMobile: isMobile,
+    hideInfoWindow: hideInfoWindow,
+    showAppTools: showAppTools,
+    showContent: showContent,
+    showContentInfoWindow: showContentInfoWindow,
+    toggleLoader: toggleLoader
+  };
+})();
+
 /*
 Copyright 2015-2019 Perspectiva di Formentini Filippo
 
@@ -5576,7 +5510,6 @@ var LamStore = (function() {
   var initialAppState = null;
   var authToken = null;
   let infoClickEnabled = true;
-  let relationsResults = {};
 
   var setMapDiv = function(div) {
     mapDiv = div;
@@ -5705,7 +5638,7 @@ var LamStore = (function() {
       });
   };
   var init = function() {
-    if (isMobile() && appState.improveMobileBehaviour) {
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
       appState = normalizeMobile(appState);
     }
     //Comuni array load
@@ -5788,96 +5721,6 @@ var LamStore = (function() {
     normalizeMobileArray(appstate.layers);
     appState.disableAjaxRequestInfo = 0;
     return appstate;
-  };
-
-  var showAppTools = function() {
-    if (appState.modules) {
-      $("#menu-toolbar__layer-tree").toggle(appState.modules["lam-layer-tree"]);
-      $("#menu-toolbar__search-tools").toggle(appState.modules["search-tools"]);
-      $("#menu-toolbar__print-tools").toggle(appState.modules["print-tools"]);
-      $("#menu-toolbar__share-tools").toggle(appState.modules["share-tools"]);
-      $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
-      $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
-      $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
-      if (appState.modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
-      if (appState.modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
-    }
-  };
-
-  var showRelation = function(relationGid, resultIndex) {
-    lamDispatch("show-loader");
-    var item = LamStore.getCurrentInfoItems().features[resultIndex];
-    var relation = LamStore.getRelation(relationGid);
-    var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
-    var urlService = templateUrl(item.properties);
-
-    var template = LamTemplates.getTemplate(relation.gid, relation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
-
-    $.ajax({
-      dataType: "jsonp",
-      url: urlService,
-      jsonp: true,
-      cache: false,
-      jsonpCallback: "parseResponse",
-      success: function(data) {
-        if (data.features) {
-          data = data.features;
-        }
-        LamStore.setRelationResults({ data: data, template: template });
-        var title = relation.title;
-        var body = "";
-        if (!Array.isArray(data)) {
-          data = [data];
-        }
-        let propsList = [];
-        for (let i = 0; i < data.length; i++) {
-          var props = data[i].properties ? data[i].properties : data[i];
-          propsList.push(props);
-          if (!template.multipleItems) {
-            //single template not active by default
-            body += LamTemplates.processTemplate(template, props);
-            if (!body) {
-              body += LamTemplates.standardTemplate(props);
-            }
-            if (data.length > 1) {
-              body += "<div class='div-10'></div>";
-            }
-          }
-        }
-
-        //single template not active by default
-        if (template.multipleItems && propsList.length > 0) {
-          body += LamTemplates.processTemplate(template, propsList);
-        }
-        //download
-        body +=
-          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
-        if (data.length === 0) {
-          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
-        }
-        LamStore.showContentInfoWindow(title, body);
-        lamDispatch("hide-loader");
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        lamDispatch({
-          eventName: "log",
-          message: "LamSearchTools: unable to complete response"
-        });
-        lamDispatch("hide-loader");
-      }
-    });
-  };
-
-  var hideInfoWindow = function() {
-    $("#info-window").hide();
-  };
-
-  var toggleLoader = function(visibility) {
-    if (visibility) {
-      $("#app-loader").removeClass("lam-hidden");
-    } else {
-      $("#app-loader").addClass("lam-hidden");
-    }
   };
 
   /**
@@ -6100,54 +5943,6 @@ var LamStore = (function() {
     return layerFound ? layerGroup : null;
   };
 
-  /**
-   * Dragging helper
-   * @param {Object} elmnt
-   */
-  var dragElement = function(elmnt) {
-    var pos1 = 0,
-      pos2 = 0,
-      pos3 = 0,
-      pos4 = 0;
-    if (document.getElementById(elmnt.id + "__resize")) {
-      // if present, the header is where you move the DIV from:
-      document.getElementById(elmnt.id + "__resize").onmousedown = dragMouseDown;
-    } else {
-      // otherwise, move the DIV from anywhere inside the DIV:
-      elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-      elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-    }
-
-    function closeDragElement() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-  };
-
   /*
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
@@ -6167,8 +5962,10 @@ var LamStore = (function() {
     }
 
     //inizializzazione dell LamStore
+    LamDom.init();
     LamStore.init();
-    LamStore.showAppTools();
+    LamRelations.init();
+    LamDom.showAppTools();
     //map init
     LamMap.render("lam-map", appState);
     LamMapTooltip.init();
@@ -6218,7 +6015,7 @@ var LamStore = (function() {
    */
   var liveReload = function(newAppState) {
     LamStore.setAppState(newAppState);
-    LamStore.showAppTools();
+    LamDom.showAppTools();
     LamLayerTree.render("lam-layer-tree", newAppState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(newAppState);
@@ -6251,10 +6048,6 @@ var LamStore = (function() {
         resetLayersArray(layer.layers);
       }
     });
-  };
-
-  var isMobile = function() {
-    return /Mobi/.test(navigator.userAgent);
   };
 
   var getInfoClickEnabled = function() {
@@ -6331,29 +6124,6 @@ var LamStore = (function() {
     win.focus();
   };
 
-  var getRelations = function() {
-    return appState.relations;
-  };
-
-  var getRelation = function(gid) {
-    let relationResult = appState.relations.filter(function(el) {
-      return el.gid == gid;
-    });
-    return relationResult[0];
-  };
-
-  var getRelationResults = function() {
-    return relationsResults;
-  };
-
-  /**
-   * Sets the last relation result.
-   * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
-   */
-  var setRelationResults = function(results) {
-    relationsResults = results;
-  };
-
   var getAuthorizationHeader = function() {
     switch (appState.authentication.authType) {
       case "basic":
@@ -6384,35 +6154,7 @@ var LamStore = (function() {
     return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
-  let showContent = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-results";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    if (!LamStore.isMobile()) {
-      LamToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
-    }
-  };
-
-  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-window";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    // if (!LamStore.isMobile()) {
-    //   LamToolbar.toggleToolbarItem(htmlElement, true);
-    // } else {
-    //   $("#info-tooltip").show();
-    //   $("#info-tooltip").html(bodyMobile);
-    // }
-  };
-
-  let openResultInInfoWindow = function() {
+  let getOpenResultInInfoWindow = function() {
     return LamStore.getAppState().openResultInInfoWindow;
   };
 
@@ -6425,7 +6167,6 @@ var LamStore = (function() {
 
   return {
     doLogin: doLogin,
-    dragElement: dragElement,
     init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
@@ -6443,31 +6184,20 @@ var LamStore = (function() {
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
     getVisibleLayers: getVisibleLayers,
-    getRelations: getRelations,
-    getRelation: getRelation,
-    getRelationResults: getRelationResults,
-    setRelationResults: setRelationResults,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
-    isMobile: isMobile,
     mapInit: mapInit,
     mapReload: mapReload,
     lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
-    openResultInInfoWindow: openResultInInfoWindow,
+    getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
-    showAppTools: showAppTools,
-    showContent: showContent,
-    showContentInfoWindow: showContentInfoWindow,
-    showRelation: showRelation,
-    toggleLoader: toggleLoader,
     toggleLayersInGroup: toggleLayersInGroup,
     resetInitialLayers: resetInitialLayers,
-    hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,
     toggleLayer: toggleLayer
   };
@@ -7005,7 +6735,7 @@ let LamTemplates = (function() {
       relations.map(function(relation) {
         result += '<div class="lam-mb-2 col s12">';
         result +=
-          '<a href="#" class="lam-link" onclick="LamStore.showRelation(\'' +
+          '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
           relation.gid +
           "', " +
           index +
@@ -7113,7 +6843,7 @@ let LamTemplates = (function() {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
       //sezione relations
-      let layerRelations = LamStore.getRelations().filter(function(relation) {
+      let layerRelations = LamRelations.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
       tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
@@ -7215,13 +6945,13 @@ let LamToolbar = (function() {
 
   let init = function() {
     //eseguo degli aggiustamente in caso di browser mobile
-    if (LamStore.isMobile()) {
+    if (LamDom.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
       $(".lam-toolbar button").css("margin-right", "0px");
       easingTime = 0;
     } else {
       //definizione degli eventi jquery
-      LamStore.dragElement(document.getElementById("info-window"));
+      LamDom.dragElement(document.getElementById("info-window"));
     }
 
     //nascondo il draw per dimensioni piccole

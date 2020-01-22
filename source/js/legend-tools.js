@@ -77,9 +77,9 @@ var LamLegendTools = (function() {
       layerName += " - " + thisLayer.layerName;
     }
     if (showInfoWindow) {
-      LamStore.showContentInfoWindow(layerName, html, "");
+      LamDom.showContentInfoWindow(layerName, html, "");
     } else {
-      LamStore.showContent(layerName, html, "");
+      LamDom.showContent(layerName, html, "");
     }
     return true;
   };
@@ -99,9 +99,9 @@ var LamLegendTools = (function() {
       }
       let title = "Legenda";
       if (showInfoWindow) {
-        LamStore.showContentInfoWindow(title, html, "");
+        LamDom.showContentInfoWindow(title, html, "");
       } else {
-        LamStore.showContent(title, html, "");
+        LamDom.showContent(title, html, "");
       }
     });
   };

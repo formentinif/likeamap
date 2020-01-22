@@ -78,6 +78,50 @@ let LamMapInfo = (function() {
       clearLayerInfo(payload.layerGid);
       LamMapTooltip.hideMapTooltip();
     });
+
+    LamDispatcher.bind("zoom-info-feature", function(payload) {
+      try {
+        let feature = LamStore.getCurrentInfoItems().features[payload.index];
+        let layer = LamStore.getLayer(feature.layerGid);
+        LamDispatcher.dispatch({
+          eventName: "set-layer-visibility",
+          gid: feature.layerGid,
+          visibility: 1
+        });
+        LamDispatcher.dispatch({
+          eventName: "flash-feature",
+          feature: feature
+        });
+
+        let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+        featureOl = LamMap.transform3857(featureOl, feature.srid);
+        LamMap.goToGeometry(featureOl.getGeometry());
+        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+        if (tooltip) {
+          LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+        }
+        return;
+      } catch (error) {
+        LamDispatcher.dispatch({ eventName: "log", message: error });
+      }
+    });
+
+    LamDispatcher.bind("add-info-point", function(payload) {
+      let geometryOl = new ol.geom.Point([payload.lon, payload.lat]);
+      let featureOl = new ol.Feature({
+        geometry: geometryOl
+      });
+      featureOl.srid = 4326;
+      LamMapInfo.addFeatureInfoToMap(featureOl);
+    });
+
+    LamDispatcher.bind("enable-map-info", function(payload) {
+      LamStore.setInfoClickEnabled(true);
+    });
+
+    LamDispatcher.bind("disable-map-info", function(payload) {
+      LamStore.setInfoClickEnabled(false);
+    });
   };
 
   /**
@@ -390,10 +434,10 @@ let LamMapInfo = (function() {
   };
 
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (LamStore.openResultInInfoWindow()) {
-      LamStore.showContentInfoWindow(title, body, bodyMobile);
+    if (LamStore.getOpenResultInInfoWindow()) {
+      LamDom.showContentInfoWindow(title, body, bodyMobile);
     } else {
-      LamStore.showContent(title, body, bodyMobile, htmlElement);
+      LamDom.showContent(title, body, bodyMobile, htmlElement);
     }
   };
 

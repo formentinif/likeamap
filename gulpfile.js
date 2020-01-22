@@ -54,6 +54,8 @@ function combineAppJs() {
       "./source/js/app-dispatcher.js",
       "./source/js/app-resources.js",
       "./source/js/app-custom.js",
+	  "./source/js/app-relations.js",
+	  "./source/js/app-dom.js",
       "./source/js/app-store.js",
       "./source/js/app-layer-tree.js",
       "./source/js/app-templates.js",

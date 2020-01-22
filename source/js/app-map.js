@@ -572,7 +572,7 @@ let LamMap = (function() {
   let init = function() {
     //events binding
     //if mobile go to user location
-    if (LamStore.isMobile()) goToBrowserLocation();
+    if (LamDom.isMobile()) goToBrowserLocation();
   };
 
   /**
@@ -687,7 +687,7 @@ let LamMap = (function() {
 
   let mouseHoverMapTooltip = function() {
     if (!lastMousePixel) return;
-    if (LamStore.isMobile()) return;
+    if (LamDom.isMobile()) return;
     let featureFound = null;
     mainMap.forEachFeatureAtPixel(lastMousePixel, function(feature, layer) {
       if (layer === null) {
@@ -1264,13 +1264,11 @@ let LamMap = (function() {
   };
 
   let clearVectorLayer = function(vectorLayer, layerGid) {
-    debugger;
     if (!layerGid) {
       vectorLayer.getSource().clear(true);
       return;
     }
     vectorLayer.getSource().forEachFeature(function(feature) {
-      debugger;
       if (feature.layerGid === layerGid) vectorLayer.getSource().removeFeature(feature);
     });
     return;

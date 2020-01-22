@@ -32,7 +32,6 @@ var LamStore = (function() {
   var initialAppState = null;
   var authToken = null;
   let infoClickEnabled = true;
-  let relationsResults = {};
 
   var setMapDiv = function(div) {
     mapDiv = div;
@@ -161,7 +160,7 @@ var LamStore = (function() {
       });
   };
   var init = function() {
-    if (isMobile() && appState.improveMobileBehaviour) {
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
       appState = normalizeMobile(appState);
     }
     //Comuni array load
@@ -244,96 +243,6 @@ var LamStore = (function() {
     normalizeMobileArray(appstate.layers);
     appState.disableAjaxRequestInfo = 0;
     return appstate;
-  };
-
-  var showAppTools = function() {
-    if (appState.modules) {
-      $("#menu-toolbar__layer-tree").toggle(appState.modules["lam-layer-tree"]);
-      $("#menu-toolbar__search-tools").toggle(appState.modules["search-tools"]);
-      $("#menu-toolbar__print-tools").toggle(appState.modules["print-tools"]);
-      $("#menu-toolbar__share-tools").toggle(appState.modules["share-tools"]);
-      $("#menu-toolbar__map-tools").toggle(appState.modules["map-tools"]);
-      $("#menu-toolbar__draw-tools").toggle(appState.modules["draw-tools"]);
-      $("#menu-toolbar__gps-tools").toggle(appState.modules["gps-tools"]);
-      if (appState.modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(appState.modules["links-tools"]);
-      if (appState.modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(appState.modules["legend-tools"]);
-    }
-  };
-
-  var showRelation = function(relationGid, resultIndex) {
-    lamDispatch("show-loader");
-    var item = LamStore.getCurrentInfoItems().features[resultIndex];
-    var relation = LamStore.getRelation(relationGid);
-    var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
-    var urlService = templateUrl(item.properties);
-
-    var template = LamTemplates.getTemplate(relation.gid, relation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
-
-    $.ajax({
-      dataType: "jsonp",
-      url: urlService,
-      jsonp: true,
-      cache: false,
-      jsonpCallback: "parseResponse",
-      success: function(data) {
-        if (data.features) {
-          data = data.features;
-        }
-        LamStore.setRelationResults({ data: data, template: template });
-        var title = relation.title;
-        var body = "";
-        if (!Array.isArray(data)) {
-          data = [data];
-        }
-        let propsList = [];
-        for (let i = 0; i < data.length; i++) {
-          var props = data[i].properties ? data[i].properties : data[i];
-          propsList.push(props);
-          if (!template.multipleItems) {
-            //single template not active by default
-            body += LamTemplates.processTemplate(template, props);
-            if (!body) {
-              body += LamTemplates.standardTemplate(props);
-            }
-            if (data.length > 1) {
-              body += "<div class='div-10'></div>";
-            }
-          }
-        }
-
-        //single template not active by default
-        if (template.multipleItems && propsList.length > 0) {
-          body += LamTemplates.processTemplate(template, propsList);
-        }
-        //download
-        body +=
-          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
-        if (data.length === 0) {
-          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
-        }
-        LamStore.showContentInfoWindow(title, body);
-        lamDispatch("hide-loader");
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        lamDispatch({
-          eventName: "log",
-          message: "LamSearchTools: unable to complete response"
-        });
-        lamDispatch("hide-loader");
-      }
-    });
-  };
-
-  var hideInfoWindow = function() {
-    $("#info-window").hide();
-  };
-
-  var toggleLoader = function(visibility) {
-    if (visibility) {
-      $("#app-loader").removeClass("lam-hidden");
-    } else {
-      $("#app-loader").addClass("lam-hidden");
-    }
   };
 
   /**
@@ -556,54 +465,6 @@ var LamStore = (function() {
     return layerFound ? layerGroup : null;
   };
 
-  /**
-   * Dragging helper
-   * @param {Object} elmnt
-   */
-  var dragElement = function(elmnt) {
-    var pos1 = 0,
-      pos2 = 0,
-      pos3 = 0,
-      pos4 = 0;
-    if (document.getElementById(elmnt.id + "__resize")) {
-      // if present, the header is where you move the DIV from:
-      document.getElementById(elmnt.id + "__resize").onmousedown = dragMouseDown;
-    } else {
-      // otherwise, move the DIV from anywhere inside the DIV:
-      elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-      elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-    }
-
-    function closeDragElement() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-  };
-
   /*
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
@@ -623,8 +484,10 @@ var LamStore = (function() {
     }
 
     //inizializzazione dell LamStore
+    LamDom.init();
     LamStore.init();
-    LamStore.showAppTools();
+    LamRelations.init();
+    LamDom.showAppTools();
     //map init
     LamMap.render("lam-map", appState);
     LamMapTooltip.init();
@@ -674,7 +537,7 @@ var LamStore = (function() {
    */
   var liveReload = function(newAppState) {
     LamStore.setAppState(newAppState);
-    LamStore.showAppTools();
+    LamDom.showAppTools();
     LamLayerTree.render("lam-layer-tree", newAppState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(newAppState);
@@ -707,10 +570,6 @@ var LamStore = (function() {
         resetLayersArray(layer.layers);
       }
     });
-  };
-
-  var isMobile = function() {
-    return /Mobi/.test(navigator.userAgent);
   };
 
   var getInfoClickEnabled = function() {
@@ -787,29 +646,6 @@ var LamStore = (function() {
     win.focus();
   };
 
-  var getRelations = function() {
-    return appState.relations;
-  };
-
-  var getRelation = function(gid) {
-    let relationResult = appState.relations.filter(function(el) {
-      return el.gid == gid;
-    });
-    return relationResult[0];
-  };
-
-  var getRelationResults = function() {
-    return relationsResults;
-  };
-
-  /**
-   * Sets the last relation result.
-   * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
-   */
-  var setRelationResults = function(results) {
-    relationsResults = results;
-  };
-
   var getAuthorizationHeader = function() {
     switch (appState.authentication.authType) {
       case "basic":
@@ -840,35 +676,7 @@ var LamStore = (function() {
     return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
-  let showContent = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-results";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    if (!LamStore.isMobile()) {
-      LamToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
-    }
-  };
-
-  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-window";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    // if (!LamStore.isMobile()) {
-    //   LamToolbar.toggleToolbarItem(htmlElement, true);
-    // } else {
-    //   $("#info-tooltip").show();
-    //   $("#info-tooltip").html(bodyMobile);
-    // }
-  };
-
-  let openResultInInfoWindow = function() {
+  let getOpenResultInInfoWindow = function() {
     return LamStore.getAppState().openResultInInfoWindow;
   };
 
@@ -881,7 +689,6 @@ var LamStore = (function() {
 
   return {
     doLogin: doLogin,
-    dragElement: dragElement,
     init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
@@ -899,31 +706,20 @@ var LamStore = (function() {
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
     getVisibleLayers: getVisibleLayers,
-    getRelations: getRelations,
-    getRelation: getRelation,
-    getRelationResults: getRelationResults,
-    setRelationResults: setRelationResults,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
-    isMobile: isMobile,
     mapInit: mapInit,
     mapReload: mapReload,
     lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
-    openResultInInfoWindow: openResultInInfoWindow,
+    getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
-    showAppTools: showAppTools,
-    showContent: showContent,
-    showContentInfoWindow: showContentInfoWindow,
-    showRelation: showRelation,
-    toggleLoader: toggleLoader,
     toggleLayersInGroup: toggleLayersInGroup,
     resetInitialLayers: resetInitialLayers,
-    hideInfoWindow: hideInfoWindow,
     setLayerVisibility: setLayerVisibility,
     toggleLayer: toggleLayer
   };
