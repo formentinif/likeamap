@@ -5540,29 +5540,9 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamStore = (function() {
-  var mapDiv = null;
-  var mapTemplateUrl = null;
-  var appState = null;
-  var initialAppState = null;
-  var authToken = null;
-  let infoClickEnabled = true;
-
-  var setMapDiv = function(div) {
-    mapDiv = div;
-  };
-
-  var setMapTemplateUrl = function(url) {
-    mapTemplateUrl = url;
-  };
-
-  var getMapTemplateUrl = function() {
-    let tempTemplateUrl = "map.html";
-    if (LamStore.getAppState().urlMapTemplate != null) {
-      tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
-    }
-    return mapTemplateUrl ? mapTemplateUrl : tempTemplateUrl;
-  };
+var LamLoader = (function() {
+  let layerUriCount = 0;
+  let countRequest = 0;
 
   /**
    * Init map function
@@ -5594,7 +5574,6 @@ var LamStore = (function() {
           loadLamState(appState);
         })
         .fail(function() {
-          //LamStore.mapInit();
           lamDispatch({
             eventName: "log",
             message: "Share: Impossibile caricare la mappa condivisa"
@@ -5649,8 +5628,8 @@ var LamStore = (function() {
 
     function loadLamState(appstate) {
       //normalizing appstate
-      appState = normalizeAppState(appstate);
-      if (appState.authentication.requireAuthentication) {
+      LamStore.setAppState(appstate);
+      if (LamStore.getAppState().authentication.requireAuthentication) {
         LamAuthTools.render("login-container");
       }
       lamTemplateMapinit();
@@ -5664,8 +5643,9 @@ var LamStore = (function() {
       cache: false
     })
       .done(function(data) {
-        $("#" + mapDiv).html(data);
-        LamStore.mapInit(appState, customFunctions);
+        $("#" + LamStore.getMapDiv()).html(data);
+        //loading all remote layers
+        loadRemoteLayers(LamLoader.mapInit);
       })
       .fail(function(data) {
         lamDispatch({
@@ -5674,28 +5654,181 @@ var LamStore = (function() {
         });
       });
   };
-  var init = function() {
-    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
-      appState = normalizeMobile(appState);
+
+  /*
+  Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
+  */
+  var mapInit = function(callback) {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    //definizione dei loghi
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", state.logoUrl);
     }
-    //Comuni array load
-    if (appState.searchProvider == "nominatim") {
-      var url = appState.restAPIUrl + "/api/comuni";
+    if (LamStore.getAppState().logoPanelUrl) {
+      $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
+      $("#panel__logo").removeClass("lam-hidden");
+    }
+
+    //inizializzazione globale
+    LamDom.init();
+    LamRelations.init();
+    LamDom.showAppTools();
+    //map init
+    LamMap.render("lam-map", LamStore.getAppState());
+    LamMapTooltip.init();
+    //carico i layers
+    LamLayerTree.init();
+
+    //carico gli strumenti di ricerca
+    LamSearchTools.render(
+      "search-tools",
+      appState.searchProvider,
+      appState.searchProviderAddressUrl,
+      appState.searchProviderAddressField,
+      appState.searchProviderHouseNumberUrl,
+      appState.searchProviderHouseNumberField,
+      getSearchLayers()
+    );
+    //carico gli strumenti di share
+    LamShareTools.render("share-tools", null);
+    //carico gli strumenti di Stampa
+    LamPrintTools.render("print-tools");
+    //carico gli strumenti di mappa
+    LamMapTools.render("map-tools");
+    //carico gli strumenti di disegno
+    LamDrawTools.render("draw-tools");
+    if (appState.modules["select-tools"]) {
+      LamSelectTools.render(getQueryLayers());
+    }
+    if (appState.modules["links-tools"]) {
+      LamLinksTools.init();
+    }
+    if (appState.modules["legend-tools"]) {
+      LamLegendTools.init();
+    }
+    //loading templates
+    LamTemplates.init();
+    LamDownloadTools.init();
+    LamToolbar.init();
+    //eseguo il callback
+    callback();
+  };
+
+  /**
+   * Load the remote layers nested in the appstate
+   */
+  let loadRemoteLayers = function(callback) {
+    LamStore.getAppState().layers.forEach(function(layer) {
+      loadLayersUri(layer, callback);
+    });
+    if (layerUriCount === 0) {
+      //no ajax request sent, loading all json immediately
+      callback();
+    }
+  };
+
+  /**
+   * Loads the remote layers recursively
+   * @param {Object} layer layer to load
+   * @param {string} callback function to call at the end
+   */
+  var loadLayersUri = function(layer, callback) {
+    if (layer.layersUri) {
+      countRequest++;
+      layerUriCount++;
       $.ajax({
         dataType: "json",
-        url: url,
+        url: layer.layersUri,
         cache: false
       })
         .done(function(data) {
-          LamSearchTools.updateComuniNM(data);
+          layer.layers = data;
+          layer.layers.forEach(function(e) {
+            loadLayersUri(e, callback);
+          });
         })
         .fail(function(data) {
           lamDispatch({
             eventName: "log",
-            message: "LamStore: Unable to load comuni from rest service"
+            message: "Layer Tree: Unable to load layers " + layer.layersUri
           });
+        })
+        .always(function(data) {
+          countRequest--;
+          if (countRequest === 0) {
+            LamStore.setInitialAppState(LamStore.getAppState());
+            mapInit();
+            callback();
+          }
         });
+    } else if (layer.layers) {
+      layer.layers.forEach(function(e) {
+        loadLayersUri(e, callback);
+      });
     }
+  };
+
+  return {
+    lamInit: lamInit,
+    loadLayersUri: loadLayersUri,
+    loadRemoteLayers: loadRemoteLayers,
+    mapInit: mapInit
+  };
+})();
+
+/*
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
+var LamStore = (function() {
+  var mapDiv = null;
+  var mapTemplateUrl = null;
+  var appState = null;
+  var initialAppState = null;
+  var authToken = null;
+  let infoClickEnabled = true;
+
+  var setMapDiv = function(div) {
+    mapDiv = div;
+  };
+
+  var getMapDiv = function() {
+    return mapDiv;
+  };
+
+  var setMapTemplateUrl = function(url) {
+    mapTemplateUrl = url;
+  };
+
+  var getMapTemplateUrl = function() {
+    let tempTemplateUrl = "map.html";
+    if (LamStore.getAppState().urlMapTemplate != null) {
+      tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
+    }
+    return mapTemplateUrl ? mapTemplateUrl : tempTemplateUrl;
   };
 
   /**
@@ -5718,7 +5851,10 @@ var LamStore = (function() {
    * Imposta l'appstate corrente
    */
   var setAppState = function(currentAppState) {
-    appState = currentAppState;
+    appState = normalizeAppState(currentAppState);
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
+      appState = normalizeMobile(appState);
+    }
   };
 
   /**
@@ -5726,6 +5862,10 @@ var LamStore = (function() {
    */
   var setInitialAppState = function(appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
+    initialAppState = normalizeAppState(initialAppState);
+    if (LamDom.isMobile() && initialAppState.improveMobileBehaviour) {
+      initialAppState = normalizeMobile(initialAppState);
+    }
   };
 
   /**
@@ -5773,10 +5913,23 @@ var LamStore = (function() {
     LamLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
+  /**
+   * Toggle all layers within a group
+   * @param {string} gid Layer global id
+   */
   let toggleLayersInGroup = function(gid) {
+    let icon = $("#" + gid + "_c"); //TODO convention better to gain name from parameter
+    let visibility = !icon.hasClass("lam-checked");
+    setLayersVisibilityInGroup(gid, visibility);
+  };
+
+  /**
+   * Set visibility of all layers within a group
+   * @param {string} gid Layer global id
+   */
+  let setLayersVisibilityInGroup = function(gid, visibility) {
     let groupLayer = getLayer(gid);
     let icon = $("#" + gid + "_c");
-    let visibility = !icon.hasClass("lam-checked");
     if (groupLayer && groupLayer.layers) {
       groupLayer.layers.forEach(function(layer) {
         LamMap.setLayerVisibility(layer.gid, visibility);
@@ -5980,72 +6133,6 @@ var LamStore = (function() {
     return layerFound ? layerGroup : null;
   };
 
-  /*
-  Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
-  */
-  var mapInit = function(state, callback) {
-    LamStore.setInitialAppState(state);
-    LamStore.setAppState(state);
-
-    $("#" + mapDiv).removeClass("lam-hidden");
-
-    //definizione dei loghi
-    if (state.logoUrl) {
-      $("#lam-logo__img").attr("src", state.logoUrl);
-    }
-    if (state.logoPanelUrl) {
-      $("#panel__logo-img").attr("src", state.logoPanelUrl);
-      $("#panel__logo").removeClass("lam-hidden");
-    }
-
-    //inizializzazione dell LamStore
-    LamDom.init();
-    LamStore.init();
-    LamRelations.init();
-    LamDom.showAppTools();
-    //map init
-    LamMap.render("lam-map", appState);
-    LamMapTooltip.init();
-    //carico i layers
-    LamLayerTree.init(function() {
-      //carico gli strumenti di ricerca
-      LamSearchTools.render(
-        "search-tools",
-        appState.searchProvider,
-        appState.searchProviderAddressUrl,
-        appState.searchProviderAddressField,
-        appState.searchProviderHouseNumberUrl,
-        appState.searchProviderHouseNumberField,
-        getSearchLayers()
-      );
-      //carico gli strumenti di share
-      LamShareTools.render("share-tools", null);
-      //carico gli strumenti di Stampa
-      LamPrintTools.render("print-tools");
-      //carico gli strumenti di mappa
-      LamMapTools.render("map-tools");
-      //carico gli strumenti di disegno
-      LamDrawTools.render("draw-tools");
-      if (appState.modules["select-tools"]) {
-        LamSelectTools.render(getQueryLayers());
-      }
-      if (appState.modules["links-tools"]) {
-        LamLinksTools.init();
-      }
-      if (appState.modules["legend-tools"]) {
-        LamLegendTools.init();
-      }
-      //loading templates
-      LamTemplates.init();
-      LamDownloadTools.init();
-    });
-
-    LamToolbar.init();
-
-    //eseguo il callback
-    callback();
-  };
-
   /**
    * Ricarica i livelli della mappa
    * @return {null}
@@ -6206,7 +6293,6 @@ var LamStore = (function() {
 
   return {
     doLogin: doLogin,
-    init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItem: getCurrentInfoItem,
@@ -6219,27 +6305,27 @@ var LamStore = (function() {
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
     getLinks: getLinks,
+    getMapDiv: getMapDiv,
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
     getVisibleLayers: getVisibleLayers,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
-    mapInit: mapInit,
     mapReload: mapReload,
-    lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
     getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     parseResponse: parseResponse,
+    resetInitialLayers: resetInitialLayers,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
+    setLayersVisibilityInGroup: setLayersVisibilityInGroup,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
-    toggleLayersInGroup: toggleLayersInGroup,
-    resetInitialLayers: resetInitialLayers,
     setLayerVisibility: setLayerVisibility,
-    toggleLayer: toggleLayer
+    toggleLayer: toggleLayer,
+    toggleLayersInGroup: toggleLayersInGroup
   };
 })();
 
@@ -6276,62 +6362,15 @@ var LamLayerTree = (function() {
   let layerGroupPrefix = "lt";
   //let layerGroupItemPrefix = "lti";
   //let layerGroupItemIconPrefix = "ltic";
-  let layerUriCount = 0;
-  let countRequest = 0;
+  //let layerUriCount = 0;
+  //let countRequest = 0;
 
-  var init = function(callback) {
-    //carico i layer
-    countRequest = 0;
-    LamStore.getAppState().layers.forEach(function(layer) {
-      loadLayersUri(layer, callback);
-    });
-    if (layerUriCount === 0) {
-      //no ajax request sent, loading all json immediately
-      render(treeDiv, LamStore.getAppState().layers);
-      callback();
-    }
-
+  var init = function() {
+    render(treeDiv, LamStore.getAppState().layers);
     //events binding
     LamDispatcher.bind("show-layers", function(payload) {
       LamToolbar.toggleToolbarItem("lam-layer-tree");
     });
-  };
-
-  var loadLayersUri = function(layer, callback) {
-    if (layer.layersUri) {
-      countRequest++;
-      layerUriCount++;
-      $.ajax({
-        dataType: "json",
-        url: layer.layersUri,
-        cache: false
-      })
-        .done(function(data) {
-          layer.layers = data;
-          layer.layers.forEach(function(e) {
-            loadLayersUri(e, callback);
-          });
-        })
-        .fail(function(data) {
-          lamDispatch({
-            eventName: "log",
-            message: "Layer Tree: Unable to load layers " + layer.layersUri
-          });
-        })
-        .always(function(data) {
-          countRequest--;
-          if (countRequest === 0) {
-            render(treeDiv, LamStore.getAppState().layers);
-            LamStore.setInitialAppState(LamStore.getAppState());
-            LamMap.loadConfig(LamStore.getAppState()); //reloading layer state
-            callback();
-          }
-        });
-    } else if (layer.layers) {
-      layer.layers.forEach(function(e) {
-        loadLayersUri(e, callback);
-      });
-    }
   };
 
   var render = function(div, layers) {
@@ -6356,6 +6395,8 @@ var LamLayerTree = (function() {
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);
+
+    checkInitialVisibility(LamStore.getAppState().layers);
     isRendered = true;
   };
 
@@ -6469,24 +6510,6 @@ var LamLayerTree = (function() {
     }
   };
 
-  var toggleCheck = function(layerGid, groupId) {
-    const item = "#" + layerGid + "_c";
-    if ($(item).hasClass("lam-unchecked")) {
-      $(item).removeClass("lam-unchecked");
-      $(item).addClass("lam-checked");
-      $(item).html(LamResources.svgCheckbox);
-      $("#" + groupId).addClass("layertree-layer--selected");
-      return;
-    }
-    if ($(item).hasClass("lam-checked")) {
-      $(item).removeClass("lam-checked");
-      $(item).addClass("lam-unchecked");
-      $(item).html(LamResources.svgCheckboxOutline);
-      $("#" + groupId).removeClass("layertree-layer--selected");
-      return;
-    }
-  };
-
   var toggleGroup = function(groupName) {
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
@@ -6543,6 +6566,32 @@ var LamLayerTree = (function() {
     }
   };
 
+  /**
+   * Sets the initial grouplayer check, based on the children visibility
+   */
+  let checkInitialVisibility = function(layers) {
+    layers.forEach(function(groupLayer) {
+      if (groupLayer.layerType != "group") return;
+      countLayerGroupChildrenVisibility(groupLayer);
+      if (groupLayer.layers) {
+        checkInitialVisibility(groupLayer.layers);
+      }
+    });
+
+    function countLayerGroupChildrenVisibility(groupLayer) {
+      if (!groupLayer.layers) return;
+      let layerCount = 0;
+      let layerVisibile = 0;
+      groupLayer.layers.forEach(function(layer) {
+        layerCount++;
+        if (layer.visible) layerVisibile++;
+        debugger;
+        countLayerGroupChildrenVisibility(layer);
+      });
+      setCheckVisibility(groupLayer.gid, layerVisibile === layerCount);
+    }
+  };
+
   return {
     formatString: formatString,
     render: render,
@@ -6550,7 +6599,6 @@ var LamLayerTree = (function() {
     setCheckVisibility: setCheckVisibility,
     setLayerVisibility: setLayerVisibility,
     setGropupCheckVisibility: setGropupCheckVisibility,
-    toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };
 })();
@@ -7128,20 +7176,7 @@ function lamDispatch(payload) {
  * @param {*} mapTemplateUrl Url of the map template to load.
  */
 function LamInit(mapDiv, appStateUrl, mapTemplateUrl) {
-  LamStore.lamInit(mapDiv, appStateUrl, mapTemplateUrl);
-}
-/*Custom functions*/
-function customFunctions() {
-  //Right click menu
-  var items = [
-    //   {
-    //     text: "Cerca qui",
-    //     classname: "some-style-class",
-    //     callback: reverseGeocoding
-    //   }
-  ];
-  //TODO Revisione del context menu
-  //LamMap.addContextMenu(items);
+  LamLoader.lamInit(mapDiv, appStateUrl, mapTemplateUrl);
 }
 
 function reverseGeocoding(obj) {

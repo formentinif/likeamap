@@ -37,6 +37,10 @@ var LamStore = (function() {
     mapDiv = div;
   };
 
+  var getMapDiv = function() {
+    return mapDiv;
+  };
+
   var setMapTemplateUrl = function(url) {
     mapTemplateUrl = url;
   };
@@ -47,140 +51,6 @@ var LamStore = (function() {
       tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
     }
     return mapTemplateUrl ? mapTemplateUrl : tempTemplateUrl;
-  };
-
-  /**
-   * Init map function
-   * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
-   * @param {*} appStateUrl Url of the appstate. Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
-   * @param {*} mapTemplateUrl Url of the map template to load.
-   */
-  function lamInit(mapDiv, appStateUrl, mapTemplateUrl) {
-    LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
-    LamStore.setMapTemplateUrl(mapTemplateUrl);
-    //appstate loader
-    //appstate with filename
-    var appStateId =
-      decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
-
-    //appstate json inline with url
-    var appStateJson =
-      decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
-      null;
-
-    if (appStateId) {
-      //call with ajax
-      $.ajax({
-        dataType: "json",
-        url: "states/" + appStateId,
-        cache: false
-      })
-        .done(function(appState) {
-          loadLamState(appState);
-        })
-        .fail(function() {
-          //LamStore.mapInit();
-          lamDispatch({
-            eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
-          });
-        });
-    } else if (appStateJson) {
-      $.ajax({
-        dataType: "json",
-        url: appStateJson,
-        cache: false
-      })
-        .done(function(appstate) {
-          loadLamState(appstate);
-        })
-        .fail(function() {
-          lamDispatch({
-            eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
-          });
-        });
-    } else if (appStateUrl) {
-      $.ajax({
-        dataType: "json",
-        url: appStateUrl,
-        cache: false
-      })
-        .done(function(appstate) {
-          loadLamState(appstate);
-        })
-        .fail(function() {
-          lamDispatch({
-            eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
-          });
-        });
-    } else {
-      $.ajax({
-        dataType: "json",
-        url: "states/app-state.json",
-        cache: false
-      })
-        .done(function(appstate) {
-          loadLamState(appstate);
-        })
-        .fail(function() {
-          lamDispatch({
-            eventName: "log",
-            message: "Share: Impossibile caricare la mappa"
-          });
-        });
-    }
-
-    function loadLamState(appstate) {
-      //normalizing appstate
-      appState = normalizeAppState(appstate);
-      if (appState.authentication.requireAuthentication) {
-        LamAuthTools.render("login-container");
-      }
-      lamTemplateMapinit();
-    }
-  }
-
-  var lamTemplateMapinit = function() {
-    $.ajax({
-      dataType: "text",
-      url: LamStore.getMapTemplateUrl(),
-      cache: false
-    })
-      .done(function(data) {
-        $("#" + mapDiv).html(data);
-        LamStore.mapInit(appState, customFunctions);
-      })
-      .fail(function(data) {
-        lamDispatch({
-          eventName: "log",
-          message: "Init Map: Unable to load map template"
-        });
-      });
-  };
-  var init = function() {
-    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
-      appState = normalizeMobile(appState);
-    }
-    //Comuni array load
-    if (appState.searchProvider == "nominatim") {
-      var url = appState.restAPIUrl + "/api/comuni";
-      $.ajax({
-        dataType: "json",
-        url: url,
-        cache: false
-      })
-        .done(function(data) {
-          LamSearchTools.updateComuniNM(data);
-        })
-        .fail(function(data) {
-          lamDispatch({
-            eventName: "log",
-            message: "LamStore: Unable to load comuni from rest service"
-          });
-        });
-    }
   };
 
   /**
@@ -203,7 +73,10 @@ var LamStore = (function() {
    * Imposta l'appstate corrente
    */
   var setAppState = function(currentAppState) {
-    appState = currentAppState;
+    appState = normalizeAppState(currentAppState);
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
+      appState = normalizeMobile(appState);
+    }
   };
 
   /**
@@ -211,6 +84,10 @@ var LamStore = (function() {
    */
   var setInitialAppState = function(appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
+    initialAppState = normalizeAppState(initialAppState);
+    if (LamDom.isMobile() && initialAppState.improveMobileBehaviour) {
+      initialAppState = normalizeMobile(initialAppState);
+    }
   };
 
   /**
@@ -258,10 +135,23 @@ var LamStore = (function() {
     LamLayerTree.setCheckVisibility(gid, layer.visible);
   };
 
+  /**
+   * Toggle all layers within a group
+   * @param {string} gid Layer global id
+   */
   let toggleLayersInGroup = function(gid) {
+    let icon = $("#" + gid + "_c"); //TODO convention better to gain name from parameter
+    let visibility = !icon.hasClass("lam-checked");
+    setLayersVisibilityInGroup(gid, visibility);
+  };
+
+  /**
+   * Set visibility of all layers within a group
+   * @param {string} gid Layer global id
+   */
+  let setLayersVisibilityInGroup = function(gid, visibility) {
     let groupLayer = getLayer(gid);
     let icon = $("#" + gid + "_c");
-    let visibility = !icon.hasClass("lam-checked");
     if (groupLayer && groupLayer.layers) {
       groupLayer.layers.forEach(function(layer) {
         LamMap.setLayerVisibility(layer.gid, visibility);
@@ -465,72 +355,6 @@ var LamStore = (function() {
     return layerFound ? layerGroup : null;
   };
 
-  /*
-  Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
-  */
-  var mapInit = function(state, callback) {
-    LamStore.setInitialAppState(state);
-    LamStore.setAppState(state);
-
-    $("#" + mapDiv).removeClass("lam-hidden");
-
-    //definizione dei loghi
-    if (state.logoUrl) {
-      $("#lam-logo__img").attr("src", state.logoUrl);
-    }
-    if (state.logoPanelUrl) {
-      $("#panel__logo-img").attr("src", state.logoPanelUrl);
-      $("#panel__logo").removeClass("lam-hidden");
-    }
-
-    //inizializzazione dell LamStore
-    LamDom.init();
-    LamStore.init();
-    LamRelations.init();
-    LamDom.showAppTools();
-    //map init
-    LamMap.render("lam-map", appState);
-    LamMapTooltip.init();
-    //carico i layers
-    LamLayerTree.init(function() {
-      //carico gli strumenti di ricerca
-      LamSearchTools.render(
-        "search-tools",
-        appState.searchProvider,
-        appState.searchProviderAddressUrl,
-        appState.searchProviderAddressField,
-        appState.searchProviderHouseNumberUrl,
-        appState.searchProviderHouseNumberField,
-        getSearchLayers()
-      );
-      //carico gli strumenti di share
-      LamShareTools.render("share-tools", null);
-      //carico gli strumenti di Stampa
-      LamPrintTools.render("print-tools");
-      //carico gli strumenti di mappa
-      LamMapTools.render("map-tools");
-      //carico gli strumenti di disegno
-      LamDrawTools.render("draw-tools");
-      if (appState.modules["select-tools"]) {
-        LamSelectTools.render(getQueryLayers());
-      }
-      if (appState.modules["links-tools"]) {
-        LamLinksTools.init();
-      }
-      if (appState.modules["legend-tools"]) {
-        LamLegendTools.init();
-      }
-      //loading templates
-      LamTemplates.init();
-      LamDownloadTools.init();
-    });
-
-    LamToolbar.init();
-
-    //eseguo il callback
-    callback();
-  };
-
   /**
    * Ricarica i livelli della mappa
    * @return {null}
@@ -691,7 +515,6 @@ var LamStore = (function() {
 
   return {
     doLogin: doLogin,
-    init: init,
     getAppState: getAppState,
     getAuthorizationHeader: getAuthorizationHeader,
     getCurrentInfoItem: getCurrentInfoItem,
@@ -704,26 +527,26 @@ var LamStore = (function() {
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
     getLinks: getLinks,
+    getMapDiv: getMapDiv,
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
     getVisibleLayers: getVisibleLayers,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,
-    mapInit: mapInit,
     mapReload: mapReload,
-    lamInit: lamInit,
     liveReload: liveReload,
     openUrlTemplate: openUrlTemplate,
     getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     parseResponse: parseResponse,
+    resetInitialLayers: resetInitialLayers,
     setAppState: setAppState,
     setInitialAppState: setInitialAppState,
+    setLayersVisibilityInGroup: setLayersVisibilityInGroup,
     setMapDiv: setMapDiv,
     setMapTemplateUrl: setMapTemplateUrl,
-    toggleLayersInGroup: toggleLayersInGroup,
-    resetInitialLayers: resetInitialLayers,
     setLayerVisibility: setLayerVisibility,
-    toggleLayer: toggleLayer
+    toggleLayer: toggleLayer,
+    toggleLayersInGroup: toggleLayersInGroup
   };
 })();

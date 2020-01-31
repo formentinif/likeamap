@@ -31,62 +31,15 @@ var LamLayerTree = (function() {
   let layerGroupPrefix = "lt";
   //let layerGroupItemPrefix = "lti";
   //let layerGroupItemIconPrefix = "ltic";
-  let layerUriCount = 0;
-  let countRequest = 0;
+  //let layerUriCount = 0;
+  //let countRequest = 0;
 
-  var init = function(callback) {
-    //carico i layer
-    countRequest = 0;
-    LamStore.getAppState().layers.forEach(function(layer) {
-      loadLayersUri(layer, callback);
-    });
-    if (layerUriCount === 0) {
-      //no ajax request sent, loading all json immediately
-      render(treeDiv, LamStore.getAppState().layers);
-      callback();
-    }
-
+  var init = function() {
+    render(treeDiv, LamStore.getAppState().layers);
     //events binding
     LamDispatcher.bind("show-layers", function(payload) {
       LamToolbar.toggleToolbarItem("lam-layer-tree");
     });
-  };
-
-  var loadLayersUri = function(layer, callback) {
-    if (layer.layersUri) {
-      countRequest++;
-      layerUriCount++;
-      $.ajax({
-        dataType: "json",
-        url: layer.layersUri,
-        cache: false
-      })
-        .done(function(data) {
-          layer.layers = data;
-          layer.layers.forEach(function(e) {
-            loadLayersUri(e, callback);
-          });
-        })
-        .fail(function(data) {
-          lamDispatch({
-            eventName: "log",
-            message: "Layer Tree: Unable to load layers " + layer.layersUri
-          });
-        })
-        .always(function(data) {
-          countRequest--;
-          if (countRequest === 0) {
-            render(treeDiv, LamStore.getAppState().layers);
-            LamStore.setInitialAppState(LamStore.getAppState());
-            LamMap.loadConfig(LamStore.getAppState()); //reloading layer state
-            callback();
-          }
-        });
-    } else if (layer.layers) {
-      layer.layers.forEach(function(e) {
-        loadLayersUri(e, callback);
-      });
-    }
   };
 
   var render = function(div, layers) {
@@ -111,6 +64,8 @@ var LamLayerTree = (function() {
     output += "</div>"; //generale
 
     jQuery("#" + div).html(output);
+
+    checkInitialVisibility(LamStore.getAppState().layers);
     isRendered = true;
   };
 
@@ -224,24 +179,6 @@ var LamLayerTree = (function() {
     }
   };
 
-  var toggleCheck = function(layerGid, groupId) {
-    const item = "#" + layerGid + "_c";
-    if ($(item).hasClass("lam-unchecked")) {
-      $(item).removeClass("lam-unchecked");
-      $(item).addClass("lam-checked");
-      $(item).html(LamResources.svgCheckbox);
-      $("#" + groupId).addClass("layertree-layer--selected");
-      return;
-    }
-    if ($(item).hasClass("lam-checked")) {
-      $(item).removeClass("lam-checked");
-      $(item).addClass("lam-unchecked");
-      $(item).html(LamResources.svgCheckboxOutline);
-      $("#" + groupId).removeClass("layertree-layer--selected");
-      return;
-    }
-  };
-
   var toggleGroup = function(groupName) {
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
@@ -298,6 +235,32 @@ var LamLayerTree = (function() {
     }
   };
 
+  /**
+   * Sets the initial grouplayer check, based on the children visibility
+   */
+  let checkInitialVisibility = function(layers) {
+    layers.forEach(function(groupLayer) {
+      if (groupLayer.layerType != "group") return;
+      countLayerGroupChildrenVisibility(groupLayer);
+      if (groupLayer.layers) {
+        checkInitialVisibility(groupLayer.layers);
+      }
+    });
+
+    function countLayerGroupChildrenVisibility(groupLayer) {
+      if (!groupLayer.layers) return;
+      let layerCount = 0;
+      let layerVisibile = 0;
+      groupLayer.layers.forEach(function(layer) {
+        layerCount++;
+        if (layer.visible) layerVisibile++;
+        debugger;
+        countLayerGroupChildrenVisibility(layer);
+      });
+      setCheckVisibility(groupLayer.gid, layerVisibile === layerCount);
+    }
+  };
+
   return {
     formatString: formatString,
     render: render,
@@ -305,7 +268,6 @@ var LamLayerTree = (function() {
     setCheckVisibility: setCheckVisibility,
     setLayerVisibility: setLayerVisibility,
     setGropupCheckVisibility: setGropupCheckVisibility,
-    toggleCheck: toggleCheck,
     toggleGroup: toggleGroup
   };
 })();

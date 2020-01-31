@@ -42,20 +42,7 @@ function lamDispatch(payload) {
  * @param {*} mapTemplateUrl Url of the map template to load.
  */
 function LamInit(mapDiv, appStateUrl, mapTemplateUrl) {
-  LamStore.lamInit(mapDiv, appStateUrl, mapTemplateUrl);
-}
-/*Custom functions*/
-function customFunctions() {
-  //Right click menu
-  var items = [
-    //   {
-    //     text: "Cerca qui",
-    //     classname: "some-style-class",
-    //     callback: reverseGeocoding
-    //   }
-  ];
-  //TODO Revisione del context menu
-  //LamMap.addContextMenu(items);
+  LamLoader.lamInit(mapDiv, appStateUrl, mapTemplateUrl);
 }
 
 function reverseGeocoding(obj) {
