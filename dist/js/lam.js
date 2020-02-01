@@ -6462,8 +6462,9 @@ let LamLayerTree = (function() {
   let renderGroup = function(groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
+    output += "<div style='layertree-group lam-background'>";
     output += formatString(
-      '<div class="layertree-item__title lam-background {1} {2}">',
+      '<div class="layertree-item__title {1} {2}">',
       groupId,
       groupLayer.cssClass ? groupLayer.cssClass : "",
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
@@ -6481,6 +6482,7 @@ let LamLayerTree = (function() {
       groupLayer.gid,
       LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
     );
+    output += "</div>";
     output += "</div>";
     output += "</div>";
 

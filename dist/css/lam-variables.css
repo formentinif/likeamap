@@ -32,6 +32,7 @@ body {
   margin: 0px;
   font-family: "Open Sans", Helvetica, sans-serif;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased !important;
 }
 
 body {
@@ -62,7 +63,7 @@ sample class for layer background
   color: green !important;
   fill: green !important;
 }
-.layer-red .layertree-item__title-icon {
+.layer-red .layertree-group__title-icon {
   background-color: red !important;
   color: green !important;
   fill: green !important;
