@@ -6538,7 +6538,6 @@ let LamLayerTree = (function() {
       $(item).addClass("layertree--hidden");
     }
     const icon = "#" + groupName + "_i";
-
     if ($(icon).hasClass("lam-plus")) {
       $(icon).removeClass("lam-plus");
       $(icon).addClass("lam-minus");

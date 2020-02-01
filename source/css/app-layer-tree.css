@@ -19,8 +19,20 @@
   width: 100%;
 }
 
+.layertree-item:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 .layertree-item-bottom {
   margin-top: 5px;
+}
+
+.layertree-item__layers:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .layertree-group {
@@ -176,7 +188,6 @@
 .layertree--visible {
   transition: opacity 0.4s, max-height 0.3s ease-in;
   opacity: 1;
-  max-height: 900px;
 }
 
 /*layers arguments
