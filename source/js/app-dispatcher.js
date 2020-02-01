@@ -77,7 +77,6 @@ var LamDispatcher = (function() {
     });
 
     this.bind("toggle-layer-group", function(payload) {
-      debugger;
       LamStore.toggleLayersInGroup(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });

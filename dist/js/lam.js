@@ -5065,7 +5065,6 @@ var LamDispatcher = (function() {
     });
 
     this.bind("toggle-layer-group", function(payload) {
-      debugger;
       LamStore.toggleLayersInGroup(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
@@ -6483,7 +6482,7 @@ let LamLayerTree = (function() {
     output += formatString(
       '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-item__title-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
       groupLayer.gid,
-      groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+      LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
     );
     output += "</div>";
 
@@ -6564,10 +6563,6 @@ let LamLayerTree = (function() {
     return str;
   };
 
-  let setLayerVisibility = function(layerGid) {
-    $("#" + layerGid + "_c");
-  };
-
   /**
    * Sets the initial grouplayer check, based on the children visibility
    */
@@ -6613,7 +6608,6 @@ let LamLayerTree = (function() {
     render: render,
     init: init,
     setCheckVisibility: setCheckVisibility,
-    setLayerVisibility: setLayerVisibility,
     toggleGroup: toggleGroup,
     updateCheckBoxesStates: updateCheckBoxesStates
   };
