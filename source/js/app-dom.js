@@ -18,6 +18,10 @@ var LamDom = (function() {
     $("#info-window").hide();
   };
 
+  /**
+   * Sets the loader visibility
+   * @param {boolean} visibility
+   */
   let toggleLoader = function(visibility) {
     if (visibility) {
       $("#app-loader").removeClass("lam-hidden");
@@ -29,15 +33,15 @@ var LamDom = (function() {
   var showAppTools = function() {
     var modules = LamStore.getAppState().modules;
     if (modules) {
-      $("#menu-toolbar__layer-tree").toggle(modules["lam-layer-tree"]);
-      $("#menu-toolbar__search-tools").toggle(modules["search-tools"]);
-      $("#menu-toolbar__print-tools").toggle(modules["print-tools"]);
-      $("#menu-toolbar__share-tools").toggle(modules["share-tools"]);
-      $("#menu-toolbar__map-tools").toggle(modules["map-tools"]);
-      $("#menu-toolbar__draw-tools").toggle(modules["draw-tools"]);
-      $("#menu-toolbar__gps-tools").toggle(modules["gps-tools"]);
-      if (modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(modules["links-tools"]);
-      if (modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(modules["legend-tools"]);
+      setvisibility("#menu-toolbar__layer-tree", modules["layer-tree"]);
+      setvisibility("#menu-toolbar__search-tools", modules["search-tools"]);
+      setvisibility("#menu-toolbar__print-tools", modules["print-tools"]);
+      setvisibility("#menu-toolbar__share-tools", modules["share-tools"]);
+      setvisibility("#menu-toolbar__map-tools", modules["map-tools"]);
+      setvisibility("#menu-toolbar__draw-tools", modules["draw-tools"]);
+      setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
+      if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);
+      if (modules["legend-tools"]) setvisibility("#menu-toolbar__legend-tools", modules["legend-tools"]);
     }
   };
 
@@ -115,11 +119,23 @@ var LamDom = (function() {
     $("#" + htmlElement + "").show();
   };
 
+  /**
+   * Wrapper for hide/show jquery
+   */
+  let setvisibility = function(element, status) {
+    if (status) {
+      $(element).show();
+    } else {
+      $(element).hide();
+    }
+  };
+
   return {
     dragElement: dragElement,
     init: init,
     isMobile: isMobile,
     hideInfoWindow: hideInfoWindow,
+    setvisibility: setvisibility,
     showAppTools: showAppTools,
     showContent: showContent,
     showContentInfoWindow: showContentInfoWindow,

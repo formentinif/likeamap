@@ -5057,18 +5057,17 @@ var LamDispatcher = (function() {
 
     /**
      * {string} paylod.gid Layer Gid
-     * {bool} paylod.refreshGroup Refresh the group layer state
      */
     this.bind("toggle-layer", function(payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
-      if (payload.refreshGroup) {
-        LamLayerTree.setGropupCheckVisibility(payload.gid);
-      }
+      LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
     this.bind("toggle-layer-group", function(payload) {
+      debugger;
       LamStore.toggleLayersInGroup(payload.gid);
+      LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
     this.bind("set-layer-visibility", function(payload) {
@@ -5404,6 +5403,10 @@ var LamDom = (function() {
     $("#info-window").hide();
   };
 
+  /**
+   * Sets the loader visibility
+   * @param {boolean} visibility
+   */
   let toggleLoader = function(visibility) {
     if (visibility) {
       $("#app-loader").removeClass("lam-hidden");
@@ -5415,15 +5418,15 @@ var LamDom = (function() {
   var showAppTools = function() {
     var modules = LamStore.getAppState().modules;
     if (modules) {
-      $("#menu-toolbar__layer-tree").toggle(modules["lam-layer-tree"]);
-      $("#menu-toolbar__search-tools").toggle(modules["search-tools"]);
-      $("#menu-toolbar__print-tools").toggle(modules["print-tools"]);
-      $("#menu-toolbar__share-tools").toggle(modules["share-tools"]);
-      $("#menu-toolbar__map-tools").toggle(modules["map-tools"]);
-      $("#menu-toolbar__draw-tools").toggle(modules["draw-tools"]);
-      $("#menu-toolbar__gps-tools").toggle(modules["gps-tools"]);
-      if (modules["links-tools"]) $("#menu-toolbar__links-tools").toggle(modules["links-tools"]);
-      if (modules["legend-tools"]) $("#menu-toolbar__legend-tools").toggle(modules["legend-tools"]);
+      setvisibility("#menu-toolbar__layer-tree", modules["layer-tree"]);
+      setvisibility("#menu-toolbar__search-tools", modules["search-tools"]);
+      setvisibility("#menu-toolbar__print-tools", modules["print-tools"]);
+      setvisibility("#menu-toolbar__share-tools", modules["share-tools"]);
+      setvisibility("#menu-toolbar__map-tools", modules["map-tools"]);
+      setvisibility("#menu-toolbar__draw-tools", modules["draw-tools"]);
+      setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
+      if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);
+      if (modules["legend-tools"]) setvisibility("#menu-toolbar__legend-tools", modules["legend-tools"]);
     }
   };
 
@@ -5501,11 +5504,23 @@ var LamDom = (function() {
     $("#" + htmlElement + "").show();
   };
 
+  /**
+   * Wrapper for hide/show jquery
+   */
+  let setvisibility = function(element, status) {
+    if (status) {
+      $(element).show();
+    } else {
+      $(element).hide();
+    }
+  };
+
   return {
     dragElement: dragElement,
     init: init,
     isMobile: isMobile,
     hideInfoWindow: hideInfoWindow,
+    setvisibility: setvisibility,
     showAppTools: showAppTools,
     showContent: showContent,
     showContentInfoWindow: showContentInfoWindow,
@@ -5677,17 +5692,17 @@ var LamLoader = (function() {
     LamMap.render("lam-map", LamStore.getAppState());
     LamMapTooltip.init();
     //carico i layers
-    LamLayerTree.init();
+    LamLayerTree.render(null, LamStore.getAppState().layers);
 
     //carico gli strumenti di ricerca
     LamSearchTools.render(
       "search-tools",
-      appState.searchProvider,
-      appState.searchProviderAddressUrl,
-      appState.searchProviderAddressField,
-      appState.searchProviderHouseNumberUrl,
-      appState.searchProviderHouseNumberField,
-      getSearchLayers()
+      LamStore.getAppState().searchProvider,
+      LamStore.getAppState().searchProviderAddressUrl,
+      LamStore.getAppState().searchProviderAddressField,
+      LamStore.getAppState().searchProviderHouseNumberUrl,
+      LamStore.getAppState().searchProviderHouseNumberField,
+      LamStore.getSearchLayers()
     );
     //carico gli strumenti di share
     LamShareTools.render("share-tools", null);
@@ -5697,13 +5712,13 @@ var LamLoader = (function() {
     LamMapTools.render("map-tools");
     //carico gli strumenti di disegno
     LamDrawTools.render("draw-tools");
-    if (appState.modules["select-tools"]) {
+    if (LamStore.getAppState().modules["select-tools"]) {
       LamSelectTools.render(getQueryLayers());
     }
-    if (appState.modules["links-tools"]) {
+    if (LamStore.getAppState().modules["links-tools"]) {
       LamLinksTools.init();
     }
-    if (appState.modules["legend-tools"]) {
+    if (LamStore.getAppState().modules["legend-tools"]) {
       LamLegendTools.init();
     }
     //loading templates
@@ -5711,19 +5726,21 @@ var LamLoader = (function() {
     LamDownloadTools.init();
     LamToolbar.init();
     //eseguo il callback
-    callback();
+    if (callback) callback();
+    LamDom.toggleLoader(false);
   };
 
   /**
    * Load the remote layers nested in the appstate
    */
   let loadRemoteLayers = function(callback) {
+    LamDom.toggleLoader(true);
     LamStore.getAppState().layers.forEach(function(layer) {
       loadLayersUri(layer, callback);
     });
     if (layerUriCount === 0) {
       //no ajax request sent, loading all json immediately
-      callback();
+      if (callback) callback();
     }
   };
 
@@ -5757,8 +5774,7 @@ var LamLoader = (function() {
           countRequest--;
           if (countRequest === 0) {
             LamStore.setInitialAppState(LamStore.getAppState());
-            mapInit();
-            callback();
+            if (callback) callback();
           }
         });
     } else if (layer.layers) {
@@ -5929,11 +5945,14 @@ var LamStore = (function() {
    */
   let setLayersVisibilityInGroup = function(gid, visibility) {
     let groupLayer = getLayer(gid);
-    let icon = $("#" + gid + "_c");
     if (groupLayer && groupLayer.layers) {
       groupLayer.layers.forEach(function(layer) {
-        LamMap.setLayerVisibility(layer.gid, visibility);
-        LamStore.setLayerVisibility(layer.gid, visibility);
+        if (layer.layerType != "group") {
+          LamMap.setLayerVisibility(layer.gid, visibility);
+          LamStore.setLayerVisibility(layer.gid, visibility);
+        } else {
+          setLayersVisibilityInGroup(layer.gid, visibility);
+        }
       });
     }
     LamLayerTree.setCheckVisibility(gid, visibility);
@@ -6140,13 +6159,13 @@ var LamStore = (function() {
   var liveReload = function(newAppState) {
     LamStore.setAppState(newAppState);
     LamDom.showAppTools();
-    LamLayerTree.render("lam-layer-tree", newAppState.layers);
+    LamLayerTree.render(null, newAppState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(newAppState);
   };
 
   var mapReload = function() {
-    LamLayerTree.render("lam-layer-tree", appState.layers);
+    LamLayerTree.render(null, appState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(appState);
   };
@@ -6356,7 +6375,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamLayerTree = (function() {
+let LamLayerTree = (function() {
   let treeDiv = "lam-layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
@@ -6365,16 +6384,19 @@ var LamLayerTree = (function() {
   //let layerUriCount = 0;
   //let countRequest = 0;
 
-  var init = function() {
-    render(treeDiv, LamStore.getAppState().layers);
+  let init = function() {
     //events binding
     LamDispatcher.bind("show-layers", function(payload) {
-      LamToolbar.toggleToolbarItem("lam-layer-tree");
+      LamToolbar.toggleToolbarItem(treeDiv);
     });
   };
 
-  var render = function(div, layers) {
-    var output = "";
+  let render = function(div, layers) {
+    if (div) treeDiv = div;
+    if (!isRendered) {
+      init();
+    }
+    let output = "";
     if (!LamStore.getAppState().logoPanelUrl) {
       output += '<h4 class="lam-title">Temi</h4>';
     }
@@ -6394,19 +6416,19 @@ var LamLayerTree = (function() {
     output += '<div class="layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
     output += "</div>"; //generale
 
-    jQuery("#" + div).html(output);
+    jQuery("#" + treeDiv).html(output);
 
-    checkInitialVisibility(LamStore.getAppState().layers);
+    updateCheckBoxesStates(LamStore.getAppState().layers);
     isRendered = true;
   };
 
-  var renderLayer = function(layer, layerId) {
+  let renderLayer = function(layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border">', layerId);
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\', refreshGroup: true})">{1}</i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
       layerId,
       layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
@@ -6424,7 +6446,7 @@ var LamLayerTree = (function() {
     return output;
   };
 
-  var renderLayerTools = function(groupLayer, groupId) {
+  let renderLayerTools = function(groupLayer, groupId) {
     let output = "";
     //--------------
     output += formatString('<div id="" class="layertree-layer">');
@@ -6438,7 +6460,7 @@ var LamLayerTree = (function() {
     return output;
   };
 
-  var renderGroup = function(groupLayer, groupId) {
+  let renderGroup = function(groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
     output += formatString(
@@ -6497,7 +6519,7 @@ var LamLayerTree = (function() {
     return output;
   };
 
-  var setCheckVisibility = function(layerGid, visibility) {
+  let setCheckVisibility = function(layerGid, visibility) {
     const item = "#" + layerGid + "_c";
     if (visibility) {
       $(item).html(LamResources.svgCheckbox);
@@ -6510,7 +6532,7 @@ var LamLayerTree = (function() {
     }
   };
 
-  var toggleGroup = function(groupName) {
+  let toggleGroup = function(groupName) {
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
       $(item).removeClass("layertree--hidden");
@@ -6535,7 +6557,7 @@ var LamLayerTree = (function() {
   };
 
   let formatString = function() {
-    var str = arguments[0];
+    let str = arguments[0];
     for (k = 0; k < arguments.length - 1; k++) {
       str = str.replace(new RegExp("\\{" + k + "\\}", "g"), arguments[k + 1]);
     }
@@ -6547,48 +6569,42 @@ var LamLayerTree = (function() {
   };
 
   /**
-   * Set the group layer parent visibility by layer gid
-   * @param {string} layerGid Layer gid
-   */
-  let setGropupCheckVisibility = function(layerGid) {
-    var groupLayer = LamStore.getGroupLayerByLayerGid(layerGid);
-    //TO DO replace with filter
-    if (groupLayer && groupLayer.layers) {
-      let allVisible = true;
-      groupLayer.layers.forEach(function(layer) {
-        if (layer.layerType != "group" && !layer.visible) {
-          allVisible = false;
-        }
-      });
-      LamLayerTree.setCheckVisibility(groupLayer.gid, allVisible);
-    } else {
-      LamLayerTree.setCheckVisibility(groupLayer.gid, false);
-    }
-  };
-
-  /**
    * Sets the initial grouplayer check, based on the children visibility
    */
-  let checkInitialVisibility = function(layers) {
+  let updateCheckBoxesStates = function(layers) {
     layers.forEach(function(groupLayer) {
       if (groupLayer.layerType != "group") return;
-      countLayerGroupChildrenVisibility(groupLayer);
+      countLayerGroupFatherVisibility(groupLayer);
       if (groupLayer.layers) {
-        checkInitialVisibility(groupLayer.layers);
+        updateCheckBoxesStates(groupLayer.layers);
       }
     });
 
-    function countLayerGroupChildrenVisibility(groupLayer) {
-      if (!groupLayer.layers) return;
+    function countLayerGroupFatherVisibility(groupLayer) {
       let layerCount = 0;
       let layerVisibile = 0;
+      if (!groupLayer.layers) return;
       groupLayer.layers.forEach(function(layer) {
-        layerCount++;
-        if (layer.visible) layerVisibile++;
-        debugger;
-        countLayerGroupChildrenVisibility(layer);
+        if (layer.layerType != "group") {
+          layerCount++;
+          if (layer.visible) layerVisibile++;
+        } else {
+          countLayerGroupChildrenVisibility(layer);
+        }
       });
       setCheckVisibility(groupLayer.gid, layerVisibile === layerCount);
+
+      function countLayerGroupChildrenVisibility(groupLayer) {
+        if (!groupLayer.layers) return;
+        groupLayer.layers.forEach(function(layer) {
+          if (layer.layerType != "group") {
+            layerCount++;
+            if (layer.visible) layerVisibile++;
+          } else {
+            countLayerGroupChildrenVisibility(layer);
+          }
+        });
+      }
     }
   };
 
@@ -6598,8 +6614,8 @@ var LamLayerTree = (function() {
     init: init,
     setCheckVisibility: setCheckVisibility,
     setLayerVisibility: setLayerVisibility,
-    setGropupCheckVisibility: setGropupCheckVisibility,
-    toggleGroup: toggleGroup
+    toggleGroup: toggleGroup,
+    updateCheckBoxesStates: updateCheckBoxesStates
   };
 })();
 

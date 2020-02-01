@@ -162,17 +162,17 @@ var LamLoader = (function() {
     LamMap.render("lam-map", LamStore.getAppState());
     LamMapTooltip.init();
     //carico i layers
-    LamLayerTree.init();
+    LamLayerTree.render(null, LamStore.getAppState().layers);
 
     //carico gli strumenti di ricerca
     LamSearchTools.render(
       "search-tools",
-      appState.searchProvider,
-      appState.searchProviderAddressUrl,
-      appState.searchProviderAddressField,
-      appState.searchProviderHouseNumberUrl,
-      appState.searchProviderHouseNumberField,
-      getSearchLayers()
+      LamStore.getAppState().searchProvider,
+      LamStore.getAppState().searchProviderAddressUrl,
+      LamStore.getAppState().searchProviderAddressField,
+      LamStore.getAppState().searchProviderHouseNumberUrl,
+      LamStore.getAppState().searchProviderHouseNumberField,
+      LamStore.getSearchLayers()
     );
     //carico gli strumenti di share
     LamShareTools.render("share-tools", null);
@@ -182,13 +182,13 @@ var LamLoader = (function() {
     LamMapTools.render("map-tools");
     //carico gli strumenti di disegno
     LamDrawTools.render("draw-tools");
-    if (appState.modules["select-tools"]) {
+    if (LamStore.getAppState().modules["select-tools"]) {
       LamSelectTools.render(getQueryLayers());
     }
-    if (appState.modules["links-tools"]) {
+    if (LamStore.getAppState().modules["links-tools"]) {
       LamLinksTools.init();
     }
-    if (appState.modules["legend-tools"]) {
+    if (LamStore.getAppState().modules["legend-tools"]) {
       LamLegendTools.init();
     }
     //loading templates
@@ -196,19 +196,21 @@ var LamLoader = (function() {
     LamDownloadTools.init();
     LamToolbar.init();
     //eseguo il callback
-    callback();
+    if (callback) callback();
+    LamDom.toggleLoader(false);
   };
 
   /**
    * Load the remote layers nested in the appstate
    */
   let loadRemoteLayers = function(callback) {
+    LamDom.toggleLoader(true);
     LamStore.getAppState().layers.forEach(function(layer) {
       loadLayersUri(layer, callback);
     });
     if (layerUriCount === 0) {
       //no ajax request sent, loading all json immediately
-      callback();
+      if (callback) callback();
     }
   };
 
@@ -242,8 +244,7 @@ var LamLoader = (function() {
           countRequest--;
           if (countRequest === 0) {
             LamStore.setInitialAppState(LamStore.getAppState());
-            mapInit();
-            callback();
+            if (callback) callback();
           }
         });
     } else if (layer.layers) {

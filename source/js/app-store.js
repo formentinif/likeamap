@@ -151,11 +151,14 @@ var LamStore = (function() {
    */
   let setLayersVisibilityInGroup = function(gid, visibility) {
     let groupLayer = getLayer(gid);
-    let icon = $("#" + gid + "_c");
     if (groupLayer && groupLayer.layers) {
       groupLayer.layers.forEach(function(layer) {
-        LamMap.setLayerVisibility(layer.gid, visibility);
-        LamStore.setLayerVisibility(layer.gid, visibility);
+        if (layer.layerType != "group") {
+          LamMap.setLayerVisibility(layer.gid, visibility);
+          LamStore.setLayerVisibility(layer.gid, visibility);
+        } else {
+          setLayersVisibilityInGroup(layer.gid, visibility);
+        }
       });
     }
     LamLayerTree.setCheckVisibility(gid, visibility);
@@ -362,13 +365,13 @@ var LamStore = (function() {
   var liveReload = function(newAppState) {
     LamStore.setAppState(newAppState);
     LamDom.showAppTools();
-    LamLayerTree.render("lam-layer-tree", newAppState.layers);
+    LamLayerTree.render(null, newAppState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(newAppState);
   };
 
   var mapReload = function() {
-    LamLayerTree.render("lam-layer-tree", appState.layers);
+    LamLayerTree.render(null, appState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(appState);
   };

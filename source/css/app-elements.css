@@ -31,6 +31,7 @@
   height: 50px;
   background-image: url(../img/loader.gif);
   background-repeat: no-repeat;
+  z-index: 10000;
 }
 
 .lam-toolbar {

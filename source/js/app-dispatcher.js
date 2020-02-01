@@ -69,18 +69,17 @@ var LamDispatcher = (function() {
 
     /**
      * {string} paylod.gid Layer Gid
-     * {bool} paylod.refreshGroup Refresh the group layer state
      */
     this.bind("toggle-layer", function(payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
-      if (payload.refreshGroup) {
-        LamLayerTree.setGropupCheckVisibility(payload.gid);
-      }
+      LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
     this.bind("toggle-layer-group", function(payload) {
+      debugger;
       LamStore.toggleLayersInGroup(payload.gid);
+      LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
     this.bind("set-layer-visibility", function(payload) {
