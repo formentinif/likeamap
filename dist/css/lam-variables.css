@@ -54,3 +54,17 @@ body {
 .lam-background {
   background-color: var(--lam-bg-menu-color);
 }
+
+/*
+sample class for layer background
+.layer-red {
+  background-color: red !important;
+  color: green !important;
+  fill: green !important;
+}
+.layer-red .layertree-item__title-icon {
+  background-color: red !important;
+  color: green !important;
+  fill: green !important;
+}
+*/

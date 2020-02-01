@@ -6423,7 +6423,7 @@ let LamLayerTree = (function() {
 
   let renderLayer = function(layer, layerId) {
     let output = "";
-    output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border">', layerId);
+    output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
     output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
     output += '<div class="layertree-layer__icons">';
     output += formatString(
@@ -6465,19 +6465,16 @@ let LamLayerTree = (function() {
     output += formatString(
       '<div class="layertree-item__title lam-background {1} {2}">',
       groupId,
-      groupLayer.color,
+      groupLayer.cssClass ? groupLayer.cssClass : "",
       groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
     );
     output += formatString(
-      '<i id="{0}_i" class="layertree-item__title-icon {3}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{2}</i>',
+      '<i id="{0}_i" class="layertree-item__title-icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
       groupId,
-      groupLayer.color,
       groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore,
       groupLayer.visible ? "lam-plus" : "lam-minus"
     );
-
     output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
-
     output += '<div class="layertree-layer__title-icons">';
     output += formatString(
       '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-item__title-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
@@ -6485,7 +6482,6 @@ let LamLayerTree = (function() {
       LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
     );
     output += "</div>";
-
     output += "</div>";
 
     output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
