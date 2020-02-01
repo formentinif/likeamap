@@ -57,15 +57,24 @@ body {
 }
 
 /*
-sample class for layer background
+sample class for layer background 
+*/
 .layer-red {
   background-color: red !important;
-  color: green !important;
-  fill: green !important;
 }
-.layer-red .layertree-group__title-icon {
-  background-color: red !important;
-  color: green !important;
-  fill: green !important;
-}
+/*
+sample class for styling fonts and icons 
 */
+.layer-red .layertree-group__title-text {
+  color: black !important;
+}
+.layer-red .layertree-group__icon {
+  fill: black !important;
+}
+
+.layer-red .layertree-layer__title-text {
+  color: black !important;
+}
+.layer-red .layertree-layer__icon {
+  fill: black !important;
+}

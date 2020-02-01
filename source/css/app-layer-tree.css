@@ -28,11 +28,11 @@
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
   border-bottom: 0px solid rgb(251, 251, 251);
-  padding: 2px;
   margin-bottom: 2px;
 }
 
 .layertree-group__title {
+  padding: 2px;
   box-sizing: border-box;
   font-size: 1.2rem;
   color: white;
@@ -41,13 +41,29 @@
   -webkit-font-smoothing: antialiased !important;
 }
 
-.layertree-group__title-icon {
+.layertree-group__icon {
   cursor: pointer;
   fill: white;
   display: inline-block;
   line-height: 0rem;
   font-size: 0pt;
   order: 1;
+}
+
+.layertree-group__chevron-icon {
+  cursor: pointer;
+  fill: white;
+  display: inline-block;
+  line-height: 0rem;
+  font-size: 0pt;
+  order: 1;
+}
+
+.layertree-group__layers-icons {
+  padding: 0rem 0.1rem 0rem 0rem;
+  font-size: 1.2rem;
+  order: 3;
+  min-width: 35px;
 }
 
 .layertree-group__title-text {
@@ -59,7 +75,7 @@
 .layertree-group__title--sub1 {
   box-sizing: border-box;
   font-size: 1.2rem;
-  filter: brightness(110%);
+  backdrop-filter: brightness(110%);
   padding: 2px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
@@ -68,7 +84,7 @@
 .layertree-group__title--sub2 {
   box-sizing: border-box;
   font-size: 1.1rem;
-  filter: brightness(130%);
+  backdrop-filter: brightness(130%);
   padding: 2px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
@@ -77,7 +93,7 @@
 .layertree-group__title--sub3 {
   box-sizing: border-box;
   font-size: 1rem;
-  filter: brightness(150%);
+  backdrop-filter: brightness(150%);
   padding: 2px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
@@ -86,7 +102,7 @@
 .layertree-group__title--sub4 {
   box-sizing: border-box;
   font-size: 1.1rem;
-  filter: brightness(170%);
+  backdrop-filter: brightness(170%);
   padding: 2px;
   width: 100%;
 }
@@ -115,28 +131,28 @@
   background-color: #ebebeb;
 }
 
-.layertree-layer__title {
+.layertree-layer__title-text {
   padding: 0rem 0rem 0rem 0rem;
   font-size: 1rem;
   order: 0;
   flex-grow: 1;
 }
 
-.layertree-layer__title-icons {
+/* .layertree-layer__title-icons {
   padding: 0rem 0.1rem 0rem 0rem;
   font-size: 1.2rem;
   order: 3;
   min-width: 35px;
-}
+} */
 
-.layertree-layer__icons {
+.layertree-layer__layers-icons {
   padding: 0px;
   font-size: 1.2rem;
   order: 2;
   min-width: 70px;
 }
 
-.layertree-icon {
+.layertree-layer__icon {
   cursor: pointer;
   fill: var(--lam-btn-color);
   display: inline-block;
@@ -144,7 +160,7 @@
   font-size: 0pt;
 }
 
-.layertree-icon-empty {
+.layertree-layer__icon-empty {
   display: inline-block;
   width: 24px;
   height: 24px;

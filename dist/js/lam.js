@@ -6424,17 +6424,17 @@ let LamLayerTree = (function() {
   let renderLayer = function(layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
-    output += formatString('<div class="layertree-layer__title">{0}</div>', layer.layerName);
-    output += '<div class="layertree-layer__icons">';
+    output += formatString('<div class="layertree-layer__title-text">{0}</div>', layer.layerName);
+    output += '<div class="layertree-layer__layers-icons">';
     output += formatString(
-      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
+      '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-layer__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
       layerId,
       layer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline,
       layer.gid
     );
     if (!layer.hideLegend) {
       output += formatString(
-        '<i title="Informazioni sul layer" class="layertree-icon lam-right" onclick="LamDispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })">{1}</i>',
+        '<i title="Informazioni sul layer" class="layertree-layer__icon lam-right" onclick="LamDispatcher.dispatch({ eventName: \'show-legend\', gid: \'{0}\', scaled: true })">{1}</i>',
         layer.gid,
         LamResources.svgInfo
       );
@@ -6449,11 +6449,10 @@ let LamLayerTree = (function() {
     let output = "";
     //--------------
     output += formatString('<div id="" class="layertree-layer">');
-    output += formatString('<div class="layertree-layer__title"></div>');
-    output += '<div class="layertree-layer__icons">';
+    output += formatString('<div class="layertree-layer__title-text"></div>');
+    output += '<div class="layertree-layer__layers-icons">';
     //placeholder
-    //output += '<i class="layertree-icon lam-right layertree-icon-empty"></i>';
-
+    //output += '<i class="layertree-layer__icon lam-right layertree-layer__icon-empty"></i>';
     output += "</div>";
     output += "</div>";
     return output;
@@ -6462,23 +6461,23 @@ let LamLayerTree = (function() {
   let renderGroup = function(groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
-    output += "<div style='layertree-group lam-background'>";
+    output += "<div class='layertree-group lam-background'>";
     output += formatString(
-      '<div class="layertree-item__title {1} {2}">',
+      '<div class="layertree-group__title {1} {2}">',
       groupId,
       groupLayer.cssClass ? groupLayer.cssClass : "",
-      groupLayer.nestingStyle ? "layertree-item__title--" + groupLayer.nestingStyle : ""
+      groupLayer.nestingStyle ? "layertree-group__title--" + groupLayer.nestingStyle : ""
     );
     output += formatString(
-      '<i id="{0}_i" class="layertree-item__title-icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
+      '<i id="{0}_i" class="layertree-group__icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
       groupId,
       groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore,
       groupLayer.visible ? "lam-plus" : "lam-minus"
     );
-    output += "<span class='layertree-item__title-text'>" + groupLayer.layerName + "</span>";
-    output += '<div class="layertree-layer__title-icons">';
+    output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
+    output += '<div class="layertree-group__layers-icons">';
     output += formatString(
-      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-item__title-icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-group__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
       groupLayer.gid,
       LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
     );
