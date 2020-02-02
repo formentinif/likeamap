@@ -42,6 +42,12 @@
       "type": "string",
       "default": "templates"
     },
+    "srid": {
+      "title": "SRID",
+      "description": "SRID della mappa. Es: 3857 (al momento è supportato solo il 3857)",
+      "enum": ["3857"],
+      "type": "string"
+    },
     "startMapLon": {
       "title": "Longitudine",
       "description": "Longitudine della posizione home",

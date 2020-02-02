@@ -1352,9 +1352,43 @@ let LamMap = (function() {
         preloadUrl += "&srsName=EPSG:" + mapSrid;
       }
       var vectorSource = new ol.source.Vector({
-        url: getWFSfromWMS(preloadUrl),
         format: new ol.format.GeoJSON(),
-        strategy: ol.loadingstrategy.all
+        strategy: ol.loadingstrategy.all,
+        loader: function(extent, resolution, projection) {
+          // $.ajax({
+          //   dataType: "jsonp",
+          //   url: getWFSfromWMS(preloadUrl),
+          //   cache: false,
+          //   error: function(jqXHR, textStatus, errorThrown) {
+          //     lamDispatch({
+          //       eventName: "log",
+          //       message: "LamSearchTools: unable to complete response"
+          //     });
+          //   }
+          // });
+          let xhr = new XMLHttpRequest();
+          xhr.withCredentials = false;
+          xhr.open("GET", getWFSfromWMS(preloadUrl));
+          xhr.setRequestHeader("Accept", "*/*");
+          debugger;
+          xhr.setRequestHeader("Sec-Fetch-Mode", "no-cors");
+          xhr.setRequestHeader("Sec-Fetch-Site", "cross-sited");
+          xhr.setRequestHeader("Host", "geoserver.comune.re.it");
+          let onError = function() {
+            debugger;
+            //vectorSource.removeLoadedExtent(extent);
+          };
+          xhr.onerror = onError;
+          xhr.onload = function() {
+            if (xhr.status == 200) {
+              debugger;
+              vectorSource.addFeatures(vectorSource.getFormat().readFeatures(xhr.responseText));
+            } else {
+              onError();
+            }
+          };
+          xhr.send();
+        }
       });
       var vector = new ol.layer.Vector({
         zIndex: parseInt(zIndex),
@@ -5888,6 +5922,7 @@ var LamStore = (function() {
    * @param {Object} normalize the given appstate
    */
   let normalizeAppState = function(appstate) {
+    if (!appstate.srid) appstate.srid = 3857;
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];

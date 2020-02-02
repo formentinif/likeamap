@@ -95,6 +95,7 @@ var LamStore = (function() {
    * @param {Object} normalize the given appstate
    */
   let normalizeAppState = function(appstate) {
+    if (!appstate.srid) appstate.srid = 3857;
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
