@@ -88,10 +88,13 @@
   border-radius: 1rem;
 }
 
-.lam-legend {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.lam-legend-container {
+  padding: 0.2rem;
+}
 
+.lam-legend {
+  margin-top: 0.1rem;
+  margin-bottom: 0.5rem;
   max-width: 100%;
 }
 

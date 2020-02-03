@@ -9,10 +9,18 @@
 }
 
 .lam-title-h4 {
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
   font-size: 1.2rem;
   line-height: 22px;
+}
+
+.lam-title-legend {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+  font-size: 1.2rem;
+  line-height: 22px;
+  color: var(--lam-btn-color);
 }
 
 .lam-secondary {

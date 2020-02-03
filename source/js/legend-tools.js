@@ -118,10 +118,10 @@ var LamLegendTools = (function() {
             .addClass("lam-legend")
             .attr("src", urlImg)
             .on("error", function() {
-              $(this).hide();
+              $("#legend_" + layer.gid).addClass("lam-hidden");
             });
-          let container = $("<div />");
-          container.append($("<h4>" + layer.layerName + "</h4>").addClass("lam-title-h4"));
+          let container = $("<div id='legend_" + layer.gid + "' />").addClass("lam-legend-container");
+          container.append($("<h4>" + layer.layerName + "</h4>").addClass("lam-title-legend"));
           container.append(img);
           html.append(container);
         }

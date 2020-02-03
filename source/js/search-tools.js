@@ -35,7 +35,7 @@ var LamSearchTools = (function() {
   var searchHouseNumberProviderUrl = "";
   var searchHouseNumberProviderField = "";
   var searchLayers = [];
-  var timeout = 1000;
+  var timeout = 500;
   var timer;
 
   var init = function init() {
@@ -313,18 +313,22 @@ var LamSearchTools = (function() {
   };
 
   var searchAddressKeyup = function(ev) {
-    LamDispatcher.dispatch("show-loader");
     clearTimeout(timer);
     timer = setTimeout(function() {
-      doSearchAddress(ev);
+      if ($("#search-tools__search-address").val().length > 2) {
+        LamDispatcher.dispatch("show-loader");
+        doSearchAddress(ev);
+      }
     }, timeout);
   };
 
   var searchLayersKeyup = function(ev) {
-    LamDispatcher.dispatch("show-loader");
     clearTimeout(timer);
     timer = setTimeout(function() {
-      doSearchLayers(ev);
+      if ($("#search-tools__search-layers").val().length > 2) {
+        LamDispatcher.dispatch("show-loader");
+        doSearchLayers(ev);
+      }
     }, timeout);
   };
 
@@ -385,21 +389,19 @@ var LamSearchTools = (function() {
         civico +
         "%25%27";
     }
-
-    if (via.length > 2) {
-      via = via.replace("'", " ");
-      $.ajax({
-        dataType: "jsonp",
-        url: url + "&format_options=callback:LamSearchTools.parseResponseAddress",
-        //jsonpCallback: "LamStore.parseResponse",
-        error: function(jqXHR, textStatus, errorThrown) {
-          lamDispatch({
-            eventName: "log",
-            message: "LamSearchTools: unable to complete response"
-          });
-        }
-      });
-    }
+    via = via.replace("'", " ");
+    $.ajax({
+      dataType: "jsonp",
+      url: url + "&format_options=callback:LamSearchTools.parseResponseAddress",
+      //jsonpCallback: "LamStore.parseResponse",
+      error: function(jqXHR, textStatus, errorThrown) {
+        LamDispatcher.dispatch("hide-loader");
+        lamDispatch({
+          eventName: "log",
+          message: "LamSearchTools: unable to complete response"
+        });
+      }
+    });
   };
 
   let parseResponseAddress = function(data) {
@@ -479,6 +481,7 @@ var LamSearchTools = (function() {
         url: url + "&format_options=callback:LamSearchTools.parseResponseLayers",
         cache: false,
         error: function(jqXHR, textStatus, errorThrown) {
+          LamDispatcher.dispatch("hide-loader");
           lamDispatch({
             eventName: "log",
             message: "LamSearchTools: unable to complete response"
