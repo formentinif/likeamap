@@ -4743,6 +4743,7 @@ var LamDownloadTools = (function() {
   };
 
   let downloadResults = function() {
+    debugger;
     var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
@@ -5238,7 +5239,9 @@ var LamResources = {
   svgOpen:
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
   svgOpen16:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
+  svgDownload16:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>'
 };
 
 /*
@@ -5311,7 +5314,7 @@ var AppCustom = (function() {
 
 var LamRelations = (function() {
   let relationsResults = {};
-
+  let currentRelation; //relation currently evaluating
   var init = function init() {
     //events binding
   };
@@ -5342,56 +5345,14 @@ var LamRelations = (function() {
   var showRelation = function(relationGid, resultIndex) {
     lamDispatch("show-loader");
     var item = LamStore.getCurrentInfoItems().features[resultIndex];
-    var relation = LamRelations.getRelation(relationGid);
-    var templateUrl = Handlebars.compile(relation.serviceUrlTemplate);
+    currentRelation = LamRelations.getRelation(relationGid);
+    var templateUrl = Handlebars.compile(currentRelation.serviceUrlTemplate);
     var urlService = templateUrl(item.properties);
-
-    var template = LamTemplates.getTemplate(relation.gid, relation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
-
     $.ajax({
       dataType: "jsonp",
-      url: urlService,
+      url: urlService + "&format_options=callback:LamRelations.parseResponseRelation",
       jsonp: true,
       cache: false,
-      success: function(data) {
-        if (data.features) {
-          data = data.features;
-        }
-        LamRelations.setRelationResults({ data: data, template: template });
-        var title = relation.title;
-        var body = "";
-        if (!Array.isArray(data)) {
-          data = [data];
-        }
-        let propsList = [];
-        for (let i = 0; i < data.length; i++) {
-          var props = data[i].properties ? data[i].properties : data[i];
-          propsList.push(props);
-          if (!template.multipleItems) {
-            //single template not active by default
-            body += LamTemplates.processTemplate(template, props);
-            if (!body) {
-              body += LamTemplates.standardTemplate(props);
-            }
-            if (data.length > 1) {
-              body += "<div class='div-10'></div>";
-            }
-          }
-        }
-
-        //single template not active by default
-        if (template.multipleItems && propsList.length > 0) {
-          body += LamTemplates.processTemplate(template, propsList);
-        }
-        //download
-        body +=
-          "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'>Scarica CSV</button></div>";
-        if (data.length === 0) {
-          body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
-        }
-        LamDom.showContentInfoWindow(title, body);
-        lamDispatch("hide-loader");
-      },
       error: function(jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
@@ -5402,11 +5363,55 @@ var LamRelations = (function() {
     });
   };
 
+  let parseResponseRelation = function(data) {
+    if (data.features) {
+      data = data.features;
+    }
+    var template = LamTemplates.getTemplate(currentRelation.gid, currentRelation.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    LamRelations.setRelationResults({ data: data, template: template });
+    var title = currentRelation.title;
+    var body = "";
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+    let propsList = [];
+    for (let i = 0; i < data.length; i++) {
+      var props = data[i].properties ? data[i].properties : data[i];
+      propsList.push(props);
+      if (!template.multipleItems) {
+        //single template not active by default
+        body += LamTemplates.processTemplate(template, props);
+        if (!body) {
+          body += LamTemplates.standardTemplate(props);
+        }
+        if (data.length > 1) {
+          body += "<div class='div-10'></div>";
+        }
+      }
+    }
+
+    //single template not active by default
+    if (template.multipleItems && propsList.length > 0) {
+      body += LamTemplates.processTemplate(template, propsList);
+    }
+    //download
+    body +=
+      "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
+      LamResources.svgDownload16 +
+      "</i> Scarica CSV</button></div>";
+    if (data.length === 0) {
+      body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
+    }
+    LamDom.showContentInfoWindow(title, body);
+    lamDispatch("hide-loader");
+  };
+
   return {
     init: init,
     getRelations: getRelations,
     getRelation: getRelation,
     getRelationResults: getRelationResults,
+    parseResponseRelation: parseResponseRelation,
     setRelationResults: setRelationResults,
     showRelation: showRelation
   };

@@ -21,7 +21,7 @@
   width: 52px;
   height: 52px;
   line-height: 52px;
-  padding: 6px;
+  padding: 7px 7px;
   font-size: 14px;
 }
 
@@ -35,7 +35,7 @@
   width: 34px;
   height: 34px;
   line-height: 34px;
-  padding: 5px 5px;
+  padding: 4px 4px;
 }
 
 .lam-btn-large {
@@ -75,6 +75,7 @@
 }
 
 .lam-icon {
+  vertical-align: middle;
   fill: white;
 }
 

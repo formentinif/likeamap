@@ -43,6 +43,7 @@ var LamDownloadTools = (function() {
   };
 
   let downloadResults = function() {
+    debugger;
     var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
