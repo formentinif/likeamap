@@ -34,10 +34,30 @@ var LamLegendTools = (function() {
       LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow);
     });
 
+    /**
+     * Helper event to open legend for all layers at the current scale
+     */
     LamDispatcher.bind("show-legend-visible-layers", function(payload) {
       let layers = LamStore.getVisibleLayers();
-      LamLegendTools.showLegendLayers(layers, true, true);
+      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow);
     });
+
+    /**
+     * Helper event to open legend for all layers with scale parameter
+     */
+    LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
+      let layers = LamStore.getVisibleLayers();
+      LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow);
+    });
+
+    //carico la legenda all'avvio
+    if (LamStore.getAppState().showLegendOnLoad) {
+      LamDispatcher.dispatch({
+        eventName: "show-full-legend-visible-layers",
+        showInfoWindow: false,
+        scaled: true
+      });
+    }
   };
 
   var render = function(div) {
@@ -85,25 +105,42 @@ var LamLegendTools = (function() {
   };
 
   var showLegendLayers = function(layers, scaled, showInfoWindow) {
-    let html = "";
+    let html = $("<div />");
     layers.forEach(function(layer) {
-      if (!layer.hideLegend) {
+      if (!layer.hideLegend && layer.layerType != "group") {
         if (layer.legendUrl) {
           urlImg = layer.legendUrl;
         } else {
           urlImg = LamMap.getLegendUrl(layer.gid, scaled);
         }
         if (urlImg) {
-          html += "<div><img class='lam-legend' src='" + urlImg + "' /></div>";
+          let img = $("<img />")
+            .addClass("lam-legend")
+            .attr("src", urlImg)
+            .on("error", function() {
+              $(this).hide();
+            });
+          let container = $("<div />");
+          container.append($("<h4>" + layer.layerName + "</h4>").addClass("lam-title-h4"));
+          container.append(img);
+          html.append(container);
         }
       }
-      let title = "Legenda";
-      if (showInfoWindow) {
-        LamDom.showContentInfoWindow(title, html, "");
-      } else {
-        LamDom.showContent(title, html, "");
-      }
     });
+    let title = "Legenda";
+    if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
+    if (showInfoWindow) {
+      LamDom.showContentInfoWindow(title, html.html(), "");
+    } else {
+      LamDom.showContent(title, html.html(), "");
+    }
+  };
+
+  let loadImage = function(imageSrc, success, error) {
+    var img = new Image();
+    img.onload = success;
+    img.onerror = error;
+    img.src = imageSrc;
   };
 
   return {

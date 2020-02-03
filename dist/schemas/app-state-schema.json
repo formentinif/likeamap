@@ -96,6 +96,12 @@
       "default": false,
       "type": "boolean"
     },
+    "showLegendOnLoad": {
+      "title": "Visualizza la legenda all'avvio",
+      "description": "Visualizza la legenda all'avvio",
+      "default": false,
+      "type": "boolean"
+    },
     "infoSelectBehaviour": {
       "title": "Modalità di selezione",
       "description": "Definisce la modalità di selezione delle feature 1 Single 2 Multiple",
@@ -237,6 +243,11 @@
         "links-tools": {
           "title": "Links",
           "description": "Elenco link",
+          "type": "boolean"
+        },
+        "legend-tools": {
+          "title": "Legend",
+          "description": "Visualizza la legenda globale",
           "type": "boolean"
         },
         "select-tools": {

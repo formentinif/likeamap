@@ -100,18 +100,15 @@ var LamRequests = (function() {
   // xhr.withCredentials = false;
   // xhr.open("GET", getWFSfromWMS(preloadUrl));
   // xhr.setRequestHeader("Accept", "*/*");
-  // debugger;
   // xhr.setRequestHeader("Sec-Fetch-Mode", "no-cors");
   // xhr.setRequestHeader("Sec-Fetch-Site", "cross-sited");
   // xhr.setRequestHeader("Host", "geoserver.comune.re.it");
   // let onError = function() {
-  //   debugger;
   //   //vectorSource.removeLoadedExtent(extent);
   // };
   // xhr.onerror = onError;
   // xhr.onload = function() {
   //   if (xhr.status == 200) {
-  //     debugger;
   //     vectorSource.addFeatures(vectorSource.getFormat().readFeatures(xhr.responseText));
   //   } else {
   //     onError();
