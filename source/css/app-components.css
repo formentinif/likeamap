@@ -86,6 +86,10 @@
   margin: 0 0.2rem;
 }
 
+.lam-layer-metadata {
+  padding-bottom: 0.4rem;
+}
+
 .lam-table {
   width: 100%;
   border: 0px solid rgba(0, 0, 0, 0.12);

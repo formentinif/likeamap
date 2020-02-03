@@ -82,6 +82,8 @@ var LamLegendTools = (function() {
         html += "<img class='lam-legend' src='" + urlImg + "' />";
       }
     }
+    html += "<d class='lam-layer-metadata'></div>";
+    showLayerMetadata(thisLayer);
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
@@ -143,8 +145,37 @@ var LamLegendTools = (function() {
     img.src = imageSrc;
   };
 
+  var showLayerMetadata = function(layer) {
+    debugger;
+    if (!LamStore.getAppState().metaDataServiceUrlTemplate) return;
+    var templateUrl = Handlebars.compile(LamStore.getAppState().metaDataServiceUrlTemplate);
+    var urlService = templateUrl(layer);
+    $.ajax({
+      dataType: "jsonp",
+      url: urlService + "&format_options=callback:LamLegendTools.parseResponseMetadata",
+      jsonp: true,
+      cache: false,
+      error: function(jqXHR, textStatus, errorThrown) {
+        lamDispatch({
+          eventName: "log",
+          message: "LamLegend: unable to complete response"
+        });
+        lamDispatch("hide-loader");
+      }
+    });
+  };
+
+  let parseResponseMetadata = function(data) {
+    debugger;
+    if (!data.features.length) return;
+    var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
+    var html = template(data.features[0].properties);
+    $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
+  };
+
   return {
     init: init,
+    parseResponseMetadata: parseResponseMetadata,
     render: render,
     showLegend: showLegend,
     showLegendLayers: showLegendLayers

@@ -154,6 +154,16 @@
       "description": "Campo in cui verrà effettuata la ricerca civici",
       "type": "string"
     },
+    "metaDataServiceUrlTemplate": {
+      "title": "Servizio web da richiamare per i metadati dei layer",
+      "description": "Url da richiamare per i metadati del layer. Il nome del layer sarà sostituito dal placeholder {{layer}}",
+      "type": "string"
+    },
+    "metaDataTemplate": {
+      "title": "Template per i metadati",
+      "description": "Template da applicare per i metadati. Default è {{ABSTRACT}}",
+      "type": "string"
+    },
     "drawFeatures": {
       "title": "",
       "description": "Valore di sistema, lasciare a null",

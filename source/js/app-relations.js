@@ -42,7 +42,7 @@ var LamRelations = (function() {
       error: function(jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSearchTools: unable to complete response"
+          message: "LamRelations: unable to complete response"
         });
         lamDispatch("hide-loader");
       }

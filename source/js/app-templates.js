@@ -372,11 +372,15 @@ let LamTemplates = (function() {
     return body;
   };
 
+  let getTemplateMetadata = function() {
+    return Handlebars.compile("{{ABSTRACT}}");
+  };
   return {
     init: init,
     generateTemplate: generateTemplate,
     getLabelFeature: getLabelFeature,
     getTemplate: getTemplate,
+    getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
     featureIconsTemplate: featureIconsTemplate,
     processTemplate: processTemplate,
