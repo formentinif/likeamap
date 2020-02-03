@@ -277,56 +277,12 @@ let LamMap = (function() {
       if (mapSrid) {
         preloadUrl += "&srsName=EPSG:" + mapSrid;
       }
-      var vectorSource = new ol.source.Vector({
-        format: new ol.format.GeoJSON(),
-        strategy: ol.loadingstrategy.all,
-        loader: function(extent, resolution, projection) {
-          // $.ajax({
-          //   dataType: "jsonp",
-          //   url: getWFSfromWMS(preloadUrl),
-          //   cache: false,
-          //   error: function(jqXHR, textStatus, errorThrown) {
-          //     lamDispatch({
-          //       eventName: "log",
-          //       message: "LamSearchTools: unable to complete response"
-          //     });
-          //   }
-          // });
-          let xhr = new XMLHttpRequest();
-          xhr.withCredentials = false;
-          xhr.open("GET", getWFSfromWMS(preloadUrl));
-          xhr.setRequestHeader("Accept", "*/*");
-          debugger;
-          xhr.setRequestHeader("Sec-Fetch-Mode", "no-cors");
-          xhr.setRequestHeader("Sec-Fetch-Site", "cross-sited");
-          xhr.setRequestHeader("Host", "geoserver.comune.re.it");
-          let onError = function() {
-            debugger;
-            //vectorSource.removeLoadedExtent(extent);
-          };
-          xhr.onerror = onError;
-          xhr.onload = function() {
-            if (xhr.status == 200) {
-              debugger;
-              vectorSource.addFeatures(vectorSource.getFormat().readFeatures(xhr.responseText));
-            } else {
-              onError();
-            }
-          };
-          xhr.send();
-        }
-      });
-      var vector = new ol.layer.Vector({
-        zIndex: parseInt(zIndex),
-        source: vectorSource,
-        visible: visible,
-        style: LamMapStyles.getPreloadStyle(vectorWidth, vectorRadius)
-      });
-      vector.gid = gid + "_preload";
-      vector.hoverTooltip = hoverTooltip;
-      vector.srid = srid;
-      mainMap.addLayer(vector);
-      vector.setZIndex(parseInt(zIndex));
+      //as the request will be sent in jsonp, the only key that can couple the async request with the layer
+      //is geoserver's layer name. A better solution would be preferred but cors and withcredentials are not working
+      //with geoserver secured layers
+      LamRequests.addRequestData(layer.split(":").length ? layer.split(":")[1] : layer, thisLayer);
+      //launch preload here
+      LamRequests.sendPreloadRequest(getWFSfromWMS(preloadUrl));
     }
   };
 
@@ -527,7 +483,7 @@ let LamMap = (function() {
     let wfsUrlArray = wmsUrl.split("?");
     let baseUrl = wfsUrlArray[0].replace("wms", "wfs");
     let paramsArray = wfsUrlArray[1].split("&");
-    let url = baseUrl + "?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application%2Fjson";
+    let url = baseUrl + "?service=WFS&version=1.0.0&request=GetFeature&outputFormat=text%2Fjavascript";
     paramsArray.forEach(function(param) {
       if (param.toLowerCase().split("=")[0] === "layers") {
         url += "&typeName=" + param.split("=")[1];
