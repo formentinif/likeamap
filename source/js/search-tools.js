@@ -103,7 +103,6 @@ var LamSearchTools = (function() {
           LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
-            debugger;
             if (searchLayers[li].gid == currentLayer) {
               $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
             }
@@ -136,7 +135,7 @@ var LamSearchTools = (function() {
    * @param {string} html
    */
   let showSearchResults = function(html) {
-    jQuery("#" + searchResultsDiv).html(html);
+    LamDom.showContent("", html, html, searchResultsDiv);
   };
 
   /**

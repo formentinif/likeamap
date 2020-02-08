@@ -310,7 +310,6 @@ let LamTemplates = (function() {
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function(featureInfoCollection, template) {
-    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -353,25 +352,15 @@ let LamTemplates = (function() {
         features: featureInfoCollection
       };
     }
-
     let index = 0;
-    featureInfoCollection.features.forEach(function(feature) {
+    featureInfoCollection.features.forEach(function(feature, index) {
       let props = feature.properties ? feature.properties : feature;
       let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
       let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-2 lam-info-tooltip__content'>";
-      tempBody += "<div class='lam-grid'>";
-      tempBody += "<div class='lam-col'>";
+      tempBody += "<div class='lam-depth-1 lam-info-tooltip__content-item'>";
       tempBody += tooltip;
-      tempBody += "</div>";
-      tempBody += "<div class='lam-col'>";
-      tempBody +=
-        '<button class="lam-btn lam-btn-floating lam-btn-small lam-info-expander lam-icon" alt="Apri dettagli" title="Apri dettagli" onclick="LamDispatcher.dispatch(\'show-mobile-info-results\')">';
-      tempBody += "<i class='lam-icon'>" + LamResources.svgExpandLess + "</i>";
-      tempBody += "</button>";
-      tempBody += "</div>";
-      tempBody += "</div>";
+      tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";
       body += tempBody;
       index++;

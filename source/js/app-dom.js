@@ -12,6 +12,14 @@ var LamDom = (function() {
     LamDispatcher.bind("show-loader", function(payload) {
       LamDom.toggleLoader(true);
     });
+
+    LamDispatcher.bind("show-info-tooltip", function(payload) {
+      $("#info-tooltip").show();
+    });
+
+    LamDispatcher.bind("hide-info-tooltip", function(payload) {
+      $("#info-tooltip").hide();
+    });
   };
 
   let hideInfoWindow = function() {
@@ -103,11 +111,12 @@ var LamDom = (function() {
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
     $("#" + htmlElement + "").show();
+    $("#info-tooltip__title-text").html(title);
+    $("#info-tooltip__content").html(bodyMobile);
     if (!LamDom.isMobile()) {
       LamToolbar.toggleToolbarItem(htmlElement, true);
     } else {
       $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
     }
   };
 

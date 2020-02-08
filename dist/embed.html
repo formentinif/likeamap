@@ -210,5 +210,20 @@
   <span id="map-tooltip__title" class="lam-map-tooltip__title"></span>
 </div>
 <div id="info-tooltip" class="lam-info-tooltip">
-  <span id="info-tooltip__title" class="lam-info-tooltip__title"></span>
+  <span id="info-tooltip__title" class="lam-info-tooltip__title">
+    <button
+      class="lam-btn lam-btn-floating lam-btn-small lam-info-expander lam-icon"
+      alt="Apri dettagli"
+      title="Apri dettagli"
+      onclick="LamDispatcher.dispatch('show-mobile-info-results')"
+    >
+      <i class="lam-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
+          <path d="M0 0h24v24H0z" fill="none" />
+        </svg>
+      </i>
+    </button>
+  </span>
+  <span id="info-tooltip__content" class="lam-info-tooltip__content"></span>
 </div>

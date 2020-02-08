@@ -105,7 +105,10 @@ let LamMapInfo = (function() {
             feature: feature
           });
         }, 200);
-
+        if (LamDom.isMobile()) {
+          LamDispatcher.dispatch("show-info-tooltip");
+          LamDispatcher.dispatch("hide-menu");
+        }
         return;
       } catch (error) {
         LamDispatcher.dispatch({ eventName: "log", message: error });
@@ -456,6 +459,7 @@ let LamMapInfo = (function() {
     if (LamStore.getOpenResultInInfoWindow()) {
       LamDom.showContentInfoWindow(title, body, bodyMobile);
     } else {
+      debugger;
       LamDom.showContent(title, body, bodyMobile, htmlElement);
     }
   };

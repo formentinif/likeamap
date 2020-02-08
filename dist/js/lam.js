@@ -600,7 +600,10 @@ let LamMapInfo = (function() {
             feature: feature
           });
         }, 200);
-
+        if (LamDom.isMobile()) {
+          LamDispatcher.dispatch("show-info-tooltip");
+          LamDispatcher.dispatch("hide-menu");
+        }
         return;
       } catch (error) {
         LamDispatcher.dispatch({ eventName: "log", message: error });
@@ -951,6 +954,7 @@ let LamMapInfo = (function() {
     if (LamStore.getOpenResultInInfoWindow()) {
       LamDom.showContentInfoWindow(title, body, bodyMobile);
     } else {
+      debugger;
       LamDom.showContent(title, body, bodyMobile, htmlElement);
     }
   };
@@ -3644,7 +3648,6 @@ var LamSearchTools = (function() {
           LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
-            debugger;
             if (searchLayers[li].gid == currentLayer) {
               $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
             }
@@ -3677,7 +3680,7 @@ var LamSearchTools = (function() {
    * @param {string} html
    */
   let showSearchResults = function(html) {
-    jQuery("#" + searchResultsDiv).html(html);
+    LamDom.showContent("", html, html, searchResultsDiv);
   };
 
   /**
@@ -5489,6 +5492,14 @@ var LamDom = (function() {
     LamDispatcher.bind("show-loader", function(payload) {
       LamDom.toggleLoader(true);
     });
+
+    LamDispatcher.bind("show-info-tooltip", function(payload) {
+      $("#info-tooltip").show();
+    });
+
+    LamDispatcher.bind("hide-info-tooltip", function(payload) {
+      $("#info-tooltip").hide();
+    });
   };
 
   let hideInfoWindow = function() {
@@ -5580,11 +5591,12 @@ var LamDom = (function() {
     $("#" + htmlElement + "__content").html(body);
     $("#" + htmlElement + "__title").html(title);
     $("#" + htmlElement + "").show();
+    $("#info-tooltip__title-text").html(title);
+    $("#info-tooltip__content").html(bodyMobile);
     if (!LamDom.isMobile()) {
       LamToolbar.toggleToolbarItem(htmlElement, true);
     } else {
       $("#info-tooltip").show();
-      $("#info-tooltip").html(bodyMobile);
     }
   };
 
@@ -7144,7 +7156,6 @@ let LamTemplates = (function() {
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function(featureInfoCollection, template) {
-    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -7187,25 +7198,15 @@ let LamTemplates = (function() {
         features: featureInfoCollection
       };
     }
-
     let index = 0;
-    featureInfoCollection.features.forEach(function(feature) {
+    featureInfoCollection.features.forEach(function(feature, index) {
       let props = feature.properties ? feature.properties : feature;
       let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
       let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-2 lam-info-tooltip__content'>";
-      tempBody += "<div class='lam-grid'>";
-      tempBody += "<div class='lam-col'>";
+      tempBody += "<div class='lam-depth-1 lam-info-tooltip__content-item'>";
       tempBody += tooltip;
-      tempBody += "</div>";
-      tempBody += "<div class='lam-col'>";
-      tempBody +=
-        '<button class="lam-btn lam-btn-floating lam-btn-small lam-info-expander lam-icon" alt="Apri dettagli" title="Apri dettagli" onclick="LamDispatcher.dispatch(\'show-mobile-info-results\')">';
-      tempBody += "<i class='lam-icon'>" + LamResources.svgExpandLess + "</i>";
-      tempBody += "</button>";
-      tempBody += "</div>";
-      tempBody += "</div>";
+      tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";
       body += tempBody;
       index++;
