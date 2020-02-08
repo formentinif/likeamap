@@ -7114,7 +7114,7 @@ let LamTemplates = (function() {
    * Render te given collection into HTML format
    * @param {Object} featureInfoCollection GeoJson Collection
    */
-  let renderInfoFeatures = function(featureInfoCollection) {
+  let renderInfoFeatures = function(featureInfoCollection, template) {
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {

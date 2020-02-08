@@ -63,6 +63,10 @@ var LamSearchTools = (function() {
       LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
+    //Carico i template di base
+    if (LamStore.getAppState().searchProviderAddressTemplateUrl) loadTemplateAjax(LamStore.getAppState().searchProviderAddressTemplateUrl);
+    if (LamStore.getAppState().searchProviderHouseNumberTemplateUrl) loadTemplateAjax(LamStore.getAppState().searchProviderHouseNumberTemplateUrl);
+
     try {
     } catch (e) {
     } finally {

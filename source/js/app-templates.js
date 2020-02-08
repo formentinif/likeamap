@@ -307,7 +307,7 @@ let LamTemplates = (function() {
    * Render te given collection into HTML format
    * @param {Object} featureInfoCollection GeoJson Collection
    */
-  let renderInfoFeatures = function(featureInfoCollection) {
+  let renderInfoFeatures = function(featureInfoCollection, template) {
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -319,12 +319,15 @@ let LamTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
-      let layer = LamStore.getLayer(feature.layerGid);
-      let template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+      if (feature.layerGid) {
+        let layer = LamStore.getLayer(feature.layerGid);
+      }
+      if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
+
       //sezione relations
       let layerRelations = LamRelations.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
