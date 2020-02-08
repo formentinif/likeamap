@@ -174,11 +174,6 @@ var LamDrawTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   var setDraw = function(type) {
     lamDispatch({
       eventName: "set-draw",

@@ -54,11 +54,6 @@ var LamLinksTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   return {
     init: init,
     render: render,

@@ -146,7 +146,6 @@ var LamLegendTools = (function() {
   };
 
   var showLayerMetadata = function(layer) {
-    debugger;
     if (!LamStore.getAppState().metaDataServiceUrlTemplate) return;
     var templateUrl = Handlebars.compile(LamStore.getAppState().metaDataServiceUrlTemplate);
     var urlService = templateUrl(layer);
@@ -166,7 +165,6 @@ var LamLegendTools = (function() {
   };
 
   let parseResponseMetadata = function(data) {
-    debugger;
     if (!data.features.length) return;
     var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
     var html = template(data.features[0].properties);

@@ -550,6 +550,7 @@ let LamMapInfo = (function() {
   let init = function() {
     vectorInfo.setMap(LamMap.getMap());
     vectorFlash.setMap(LamMap.getMap());
+
     LamDispatcher.bind("show-info-items", function(payload) {
       LamMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
@@ -577,24 +578,29 @@ let LamMapInfo = (function() {
     LamDispatcher.bind("zoom-info-feature", function(payload) {
       try {
         let feature = LamStore.getCurrentInfoItems().features[payload.index];
-        let layer = LamStore.getLayer(feature.layerGid);
-        LamDispatcher.dispatch({
-          eventName: "set-layer-visibility",
-          gid: feature.layerGid,
-          visibility: 1
-        });
-        LamDispatcher.dispatch({
-          eventName: "flash-feature",
-          feature: feature
-        });
-
+        if (feature.layerGid) {
+          let layer = LamStore.getLayer(feature.layerGid);
+          LamDispatcher.dispatch({
+            eventName: "set-layer-visibility",
+            gid: feature.layerGid,
+            visibility: 1
+          });
+        }
         let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
         featureOl = LamMap.transform3857(featureOl, feature.srid);
         LamMap.goToGeometry(featureOl.getGeometry());
-        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-        if (tooltip) {
-          LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+        if (feature.tooltip) {
+          setTimeout(function() {
+            LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: feature.tooltip });
+          }, 400);
         }
+        setTimeout(function() {
+          LamDispatcher.dispatch({
+            eventName: "flash-feature",
+            feature: feature
+          });
+        }, 200);
+
         return;
       } catch (error) {
         LamDispatcher.dispatch({ eventName: "log", message: error });
@@ -755,6 +761,8 @@ let LamMapInfo = (function() {
         //     features: requestQueueData[0]
         //   }
         // });
+      } else {
+        showInfoWindow("Risultati", LamTemplates.getInfoResultEmpty());
       }
       return;
     }
@@ -898,8 +906,9 @@ let LamMapInfo = (function() {
   /**
    * Show the click info results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
+   * @param {string} template handlebars template to user where feature's layerGid property is not defined
    */
-  let showRequestInfoFeatures = function(featureInfoCollection) {
+  let showRequestInfoFeatures = function(featureInfoCollection, template) {
     var title = "Risultati";
     if (!featureInfoCollection) {
       return;
@@ -907,24 +916,24 @@ let LamMapInfo = (function() {
     if (featureInfoCollection.features.length > 0) {
       title += " (" + featureInfoCollection.features.length + ")";
     }
-    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
+    var body = LamTemplates.renderInfoFeatures(featureInfoCollection, template);
     var bodyMobile = LamTemplates.renderInfoFeaturesMobile(featureInfoCollection);
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
   let showInfoFeatureTooltip = function(feature) {
-    let layer = LamStore.getLayer(feature.layerGid);
-    let tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    if (!feature.tooltip) return;
     lamDispatch({
       eventName: "show-map-tooltip",
       geometry: feature.getGeometry().getCoordinates(),
-      tooltip: tooltip
+      tooltip: feature.tooltip
     });
   };
 
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
     let tooltip = "";
+    //preload layers do not have tooltip property
     if (feature.tooltip) {
       tooltip = feature.tooltip;
     } else {
@@ -2123,6 +2132,7 @@ let LamMap = (function() {
     let featureOl = reader.readFeature(feature);
     featureOl.layerGid = feature.layerGid;
     featureOl.srid = feature.srid;
+    featureOl.tooltip = feature.tooltip;
     return featureOl;
   };
 
@@ -2536,23 +2546,30 @@ let LamMap = (function() {
     return srid;
   };
 
+  /**
+   * Transform feature geometry in EPSG:3857
+   * @param {*} feature Feature to transform
+   * @param {*} srid Original Feature Srid.
+   */
   let transform3857 = function(feature, srid) {
     //verifico che lo srid sia un oggetto crs
-    if (srid) {
-      if (srid.properties) {
-        srid = getSRIDfromCRSName(srid.properties.name);
+    return transformFeatureGeometrySrid(feature, srid, 3857);
+  };
+
+  /**
+   * Transform feature geometry in the given SRID
+   * @param {Transform } feature Feature to transform
+   * @param {*} sridSource  Original Feature Srid.
+   * @param {*} sridDest  Destination Feature Srid.
+   */
+  let transformFeatureGeometrySrid = function(feature, sridSource, sridDest) {
+    //verifico che lo srid sia un oggetto crs
+    if (sridSource) {
+      if (sridSource.properties) {
+        sridSource = getSRIDfromCRSName(sridSource.properties.name);
       }
-      switch (parseInt(srid)) {
-        case 3003:
-          feature.getGeometry().transform("EPSG:3003", "EPSG:3857");
-          break;
-        case 25832:
-          feature.getGeometry().transform("EPSG:25832", "EPSG:3857");
-          break;
-        case 4326:
-          feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-          break;
-      }
+      feature.getGeometry().transform("EPSG:" + parseInt(sridSource), "EPSG:" + parseInt(sridDest));
+      feature.srid = sridDest;
     }
     return feature;
   };
@@ -2660,7 +2677,7 @@ let LamMap = (function() {
         if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
           return LamMapEnums.geometryTypes().Polygon;
         } else {
-          LamMapEnums.geometryTypes().Polyline;
+          return LamMapEnums.geometryTypes().Polyline;
         }
       } else {
         return LamMapEnums.geometryTypes().Point;
@@ -2959,11 +2976,6 @@ var LamDrawTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   var setDraw = function(type) {
     lamDispatch({
       eventName: "set-draw",
@@ -3097,11 +3109,6 @@ var LamMapTools = (function() {
     //template += 'Crea link da condividere con i tuoi colleghi';
     template += "</div>";
 
-    return Handlebars.compile(template);
-  };
-
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
     return Handlebars.compile(template);
   };
 
@@ -3344,11 +3351,6 @@ var LamPrintTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p>Nessun risultato disponibile</p>";
-    return Handlebars.compile(template);
-  };
-
   /**
    * Send the map print request to the LamDispatcher
    * @return {void}
@@ -3576,6 +3578,7 @@ var LamSearchTools = (function() {
   var searchLayers = [];
   var timeout = 500;
   var timer;
+  var searchResultsDiv = "search-tools__search-results";
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function(options) {
@@ -3584,23 +3587,40 @@ var LamSearchTools = (function() {
     });
 
     //events binding
+
+    /**
+     * Shows the search tool, resetting info-results
+     */
     LamDispatcher.bind("show-search", function(payload) {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
       lamDispatch("reset-search");
     });
 
+    /**
+     * Resets the search info-results
+     */
     LamDispatcher.bind("reset-search", function(payload) {
       LamSearchTools.resetSearch();
     });
 
     LamDispatcher.bind("show-search-items", function(payload) {
-      LamSearchTools.showSearchInfoFeatures(payload.features);
+      LamSearchTools.showSearchInfoFeatures(payload.features, payload.template);
     });
 
     LamDispatcher.bind("search-address", function(payload) {
       LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
+
+    //Carico i template di base
+    if (LamStore.getAppState().searchProviderAddressTemplateUrl)
+      LamTemplates.loadTemplateAjax(
+        LamTemplates.getTemplateUrl(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      );
+    if (LamStore.getAppState().searchProviderHouseNumberTemplateUrl)
+      LamTemplates.loadTemplateAjax(
+        LamTemplates.getTemplateUrl(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      );
 
     try {
     } catch (e) {
@@ -3624,12 +3644,12 @@ var LamSearchTools = (function() {
           LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
-            if (searchLayers[li].layer == currentLayer) {
+            debugger;
+            if (searchLayers[li].gid == currentLayer) {
               $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
             }
           }
-          $("#search-tools__search-layers").val("");
-          showSearchInfoFeatures(null);
+          resetSearch();
         });
         break;
     }
@@ -3649,7 +3669,15 @@ var LamSearchTools = (function() {
   let resetSearch = function() {
     $("#search-tools__search-layers").val("");
     $("#search-tools__search-address").val("");
-    $("#search-tools__search-results").html("");
+    showSearchResults("");
+  };
+
+  /**
+   * Helper function to show html results
+   * @param {string} html
+   */
+  let showSearchResults = function(html) {
+    jQuery("#" + searchResultsDiv).html(html);
   };
 
   /**
@@ -3658,8 +3686,8 @@ var LamSearchTools = (function() {
    */
   var updateScroll = function(offset) {
     var positionMenu = $("#menu-toolbar").offset();
-    var positionSearch = $("#search-tools__search-results").offset();
-    $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
+    var positionSearch = $("#" + searchResultsDiv).offset();
+    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - offset);
   };
 
   /**
@@ -3726,60 +3754,55 @@ var LamSearchTools = (function() {
       template += templateLayersTools(searchLayers);
     }
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
+    template += '<div id="' + searchResultsDiv + '" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
+
+  // /**
+  //  * Display the list of the WFS Address results in the left panel
+  //  * @param {Object} results
+  //  */
+  // var templateSearchResultsWFSGeoserver = function(results) {
+  //   template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
+  //   template = '<div class="lam-grid lam-grid-1">';
+  //   template += "{{#each this}}";
+  //   template += '<div class="lam-col">';
+  //   template +=
+  //     '<i class="lam-icon-primary">' +
+  //     LamResources.svgMarker +
+  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
+  //   template += "{{{display_name}}} ";
+  //   template += "{{{display_name2}}} ";
+  //   template += "</a>";
+  //   template += "</div>";
+  //   template += "{{/each}}";
+  //   template += "</div>";
+  //   return Handlebars.compile(template);
+  // };
+
+  // /**
+  //  * Display the list of the WFS Layers results in the left panel
+  //  * @param {Object} results
+  //  */
+  // var templateSearchResultsLayers = function(results) {
+  //   template = '<div class="lam-grid">';
+  //   template += "{{#each this}}";
+  //   template += '<div class="lam-col">';
+  //   template +=
+  //     '<i class="lam-icon-primary">' +
+  //     LamResources.svgMarker +
+  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
+  //   template += "{{{display_name}}}";
+  //   template += "</a>";
+  //   template += "</div>";
+  //   template += "{{/each}}";
+  //   template += "</div>";
+  //   return Handlebars.compile(template);
+  // };
 
   /**
-   * Display the list of the WFS Address results in the left panel
-   * @param {Object} results
-   */
-  var templateSearchResultsWFSGeoserver = function(results) {
-    template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
-    template = '<div class="lam-grid lam-grid-1">';
-    template += "{{#each this}}";
-    template += '<div class="lam-col">';
-    template +=
-      '<i class="lam-icon-primary">' +
-      LamResources.svgMarker +
-      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
-    template += "{{{display_name}}} ";
-    template += "{{{display_name2}}} ";
-    template += "</a>";
-    template += "</div>";
-    template += "{{/each}}";
-    template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  /**
-   * Display the list of the WFS Layers results in the left panel
-   * @param {Object} results
-   */
-  var templateSearchResultsLayers = function(results) {
-    template = '<div class="lam-grid">';
-    template += "{{#each this}}";
-    template += '<div class="lam-col">';
-    template +=
-      '<i class="lam-icon-primary">' +
-      LamResources.svgMarker +
-      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
-    template += "{{{display_name}}}";
-    template += "</a>";
-    template += "</div>";
-    template += "{{/each}}";
-    template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  var templateResultEmpty = function(results) {
-    var template = "<p>Nessun risultato disponibile</p>";
-    return Handlebars.compile(template);
-  };
-
-  /**
-   * Switch the address/layers tools
+   * Switch the address/layers top tools
    */
   var showSearchAddress = function() {
     $("#search-tools__label").text("Indirizzo");
@@ -3821,7 +3844,7 @@ var LamSearchTools = (function() {
         lamDispatch({
           eventName: "show-info-items",
           features: searchResults[index].item,
-          element: "search-tools__search-results"
+          element: searchResultsDiv
         });
       }
       let payload = {
@@ -3945,45 +3968,75 @@ var LamSearchTools = (function() {
 
   let parseResponseAddress = function(data) {
     LamDispatcher.dispatch("hide-loader");
-    var results = [];
-    if (data.features.length > 0) {
-      var toponimi = [];
-      var results = [];
-      for (var i = 0; i < data.features.length; i++) {
-        var currentAddress = data.features[i].properties[searchAddressProviderField];
-        if (data.features[i].properties[searchHouseNumberProviderField]) {
-          currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
-        }
-        if ($.inArray(currentAddress, toponimi) === -1) {
-          var cent = null;
-          if (data.features[i].geometry.type != "POINT") {
-            cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
-          } else {
-            cent = data.features[i].geometry.coordinates;
-          }
-          var tempItem = {
-            display_name: data.features[i].properties[searchAddressProviderField],
-            lon: cent[0],
-            lat: cent[1],
-            item: data.features[i]
-          };
-          if (searchHouseNumberProviderField) {
-            tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
-          }
-          results.push(tempItem);
-          toponimi.push(data.features[i].properties[searchAddressProviderField]);
-        }
-      }
-      searchResults = results.sort(SortByDisplayName);
-      //renderizzo i risultati
-      var templateTemp = templateSearchResultsWFSGeoserver();
-      var output = templateTemp(results);
-      jQuery("#search-tools__search-results").html(output);
-    } else {
-      var templateTemp = templateResultEmpty();
-      var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
+    lamDispatch("clear-layer-info");
+    if (!data.features.length) {
+      showSearchResults(LamTemplates.getResultEmpty());
+      return;
     }
+    console.log("parse");
+    let isPoint = data.features[0].geometry.type.toLowerCase().indexOf("point") >= 0;
+    let searchProviderAddressField = LamStore.getAppState().searchProviderAddressField;
+    let searchProviderHouseNumberField = LamStore.getAppState().searchProviderHouseNumberField;
+    data.features.forEach(function(feature) {
+      feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
+      feature.tooltip = isPoint ? feature.properties[searchProviderHouseNumberField] : feature.properties[searchProviderAddressField];
+    });
+    //defining the right template based on geometry result type
+    var template = isPoint
+      ? LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      : LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    lamDispatch({
+      eventName: "show-search-items",
+      features: data,
+      template: template
+    });
+    lamDispatch({
+      eventName: "show-info-geometries",
+      features: data
+    });
+
+    return;
+
+    // LamDispatcher.dispatch("hide-loader");
+    // var results = [];
+    // if (data.features.length > 0) {
+    //   var toponimi = [];
+    //   var results = [];
+    //   for (var i = 0; i < data.features.length; i++) {
+    //     var currentAddress = data.features[i].properties[searchAddressProviderField];
+    //     if (data.features[i].properties[searchHouseNumberProviderField]) {
+    //       currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
+    //     }
+    //     if ($.inArray(currentAddress, toponimi) === -1) {
+    //       var cent = null;
+    //       if (data.features[i].geometry.type != "POINT") {
+    //         cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
+    //       } else {
+    //         cent = data.features[i].geometry.coordinates;
+    //       }
+    //       var tempItem = {
+    //         display_name: data.features[i].properties[searchAddressProviderField],
+    //         lon: cent[0],
+    //         lat: cent[1],
+    //         item: data.features[i]
+    //       };
+    //       if (searchHouseNumberProviderField) {
+    //         tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
+    //       }
+    //       results.push(tempItem);
+    //       toponimi.push(data.features[i].properties[searchAddressProviderField]);
+    //     }
+    //   }
+    //   searchResults = results.sort(SortByDisplayName);
+    //   //renderizzo i risultati
+    //   var templateTemp = templateSearchResultsWFSGeoserver();
+    //   var output = templateTemp(results);
+    //   jQuery("#search-tools__search-results").html(output);
+    // } else {
+    //   var templateTemp = templateResultEmpty();
+    //   var output = templateTemp();
+    //   jQuery("#search-tools__search-results").html(output);
+    // }
   };
 
   /**
@@ -3999,7 +4052,7 @@ var LamSearchTools = (function() {
     //ricavo l'elenco dei layer da interrogare
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     if (itemStr.length > 2) {
-      jQuery("#search-tools__search-results").html("");
+      showSearchResults("");
       let layer = searchLayers.filter(function(element) {
         return element.gid == currentLayer;
       })[0];
@@ -4031,15 +4084,16 @@ var LamSearchTools = (function() {
   };
 
   let parseResponseLayers = function(data) {
+    LamDispatcher.dispatch("hide-loader");
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     let layer = searchLayers.filter(function(element) {
       return element.gid == currentLayer;
     })[0];
-    LamDispatcher.dispatch("hide-loader");
     console.log("parse");
     data.features.forEach(function(feature) {
       feature.layerGid = layer.gid;
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
+      feature.tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
     });
     if (data.features.length > 0) {
       lamDispatch({
@@ -4051,9 +4105,9 @@ var LamSearchTools = (function() {
         features: data
       });
     } else {
-      var templateTemp = templateResultEmpty();
+      var templateTemp = LamTemplates.getResultEmpty();
       var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
+      showSearchResults(output);
     }
     return;
   };
@@ -4062,14 +4116,12 @@ var LamSearchTools = (function() {
    * Show the search results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
-  let showSearchInfoFeatures = function(featureInfoCollection) {
-    var title = "Risultati";
+  let showSearchInfoFeatures = function(featureInfoCollection, template) {
     if (!featureInfoCollection) {
-      $("#search-tools__search-results").html("");
+      showSearchResults(AppTemplates.getResultEmpty);
       return;
     }
-    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
-    $("#search-tools__search-results").html(body);
+    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template));
   };
 
   var selectLayer = function(layer) {
@@ -4268,16 +4320,6 @@ let LamSelectTools = (function() {
     return Handlebars.compile(template);
   };
 
-  let templateEmpty = function(results) {
-    let template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
-  let templateResultEmpty = function(results) {
-    let template = "<p>Non sono stati trovati risultati.</p>";
-    return Handlebars.compile(template);
-  };
-
   let deleteFeatures = function() {
     lamDispatch({
       eventName: "delete-selection"
@@ -4361,9 +4403,7 @@ let LamSelectTools = (function() {
           let output = templateTemp(selectionResult);
           jQuery("#select-tools__results").append(output);
         } else {
-          let templateTemp = templateResultEmpty();
-          let output = templateTemp();
-          jQuery("#select-tools__results").html(output);
+          jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -4533,11 +4573,6 @@ var LamLinksTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   return {
     init: init,
     render: render,
@@ -4693,7 +4728,6 @@ var LamLegendTools = (function() {
   };
 
   var showLayerMetadata = function(layer) {
-    debugger;
     if (!LamStore.getAppState().metaDataServiceUrlTemplate) return;
     var templateUrl = Handlebars.compile(LamStore.getAppState().metaDataServiceUrlTemplate);
     var urlService = templateUrl(layer);
@@ -4713,7 +4747,6 @@ var LamLegendTools = (function() {
   };
 
   let parseResponseMetadata = function(data) {
-    debugger;
     if (!data.features.length) return;
     var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
     var html = template(data.features[0].properties);
@@ -4774,7 +4807,6 @@ var LamDownloadTools = (function() {
   };
 
   let downloadResults = function() {
-    debugger;
     var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
@@ -4916,11 +4948,6 @@ var LamShareTools = (function() {
 
     template += "</div>";
 
-    return Handlebars.compile(template);
-  };
-
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
     return Handlebars.compile(template);
   };
 
@@ -6907,6 +6934,7 @@ let LamTemplates = (function() {
   /**
    * Gets the uri of the template to be loaded by ajax
    * @param {object} layer Oggetto del layer/relation
+   * @param {templateUrl} layer Url completo del template. Senza https aggiunge il @repoUrl come prefisso
    * @param {string} repoUrl Url del repository
    */
   let getTemplateUrl = function(gid, templateUrl, repoUrl) {
@@ -6954,7 +6982,7 @@ let LamTemplates = (function() {
   let standardTemplate = function(props, layer) {
     let body = "";
     if (layer) {
-      body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + layer.layerName;
+      body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
       if (layer.labelField) {
         body += " - " + getLabelFeature(props, layer.labelField);
       }
@@ -6984,13 +7012,14 @@ let LamTemplates = (function() {
       "' })\">" +
       LamResources.svgMarker +
       "</i>";
-    let feature = LamStore.getCurrentInfoItem(index);
-    let centroid = LamMap.getLabelPoint(feature.geometry.coordinates);
+    let feature = LamMap.convertGeoJsonFeatureToOl(LamStore.getCurrentInfoItem(index));
+    feature = LamMap.transform3857(feature, feature.srid);
+    let centroid = LamMap.getLabelPoint(LamMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()).coordinates);
     let geometryOl = LamMap.convertGeometryToOl(
       {
         coordinates: centroid,
         type: "Point",
-        srid: 3857
+        srid: feature.srid
       },
       LamMapEnums.geometryFormats().GeoJson
     );
@@ -7100,9 +7129,9 @@ let LamTemplates = (function() {
 
   let getLabelFeature = function(props, labelName, layerTitle) {
     try {
-      let label = props[labelName];
+      let label = props[labelName] || "";
       if (layerTitle) {
-        label = layerTitle + " - " + label;
+        label = label === "" ? layerTitle : layerTitle + " - " + label;
       }
       return label;
     } catch (error) {
@@ -7115,6 +7144,7 @@ let LamTemplates = (function() {
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function(featureInfoCollection, template) {
+    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -7126,12 +7156,16 @@ let LamTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
-      let layer = LamStore.getLayer(feature.layerGid);
-      let template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+      let layer = {};
+      if (feature.layerGid) {
+        layer = LamStore.getLayer(feature.layerGid);
+        if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+      }
       let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
+
       //sezione relations
       let layerRelations = LamRelations.getRelations().filter(function(relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
@@ -7182,14 +7216,34 @@ let LamTemplates = (function() {
   let getTemplateMetadata = function() {
     return Handlebars.compile("{{ABSTRACT}}");
   };
+
+  var getTemplateEmpty = function(results) {
+    var template = "<p></p>";
+    return Handlebars.compile(template);
+  };
+
+  var getResultEmpty = function(results) {
+    var template = "<p>Nessun risultato disponibile</p>";
+    return Handlebars.compile(template);
+  };
+
+  var getInfoResultEmpty = function(results) {
+    var template = "<p>Nessun risultato disponibile nella posizione selezionata</p>";
+    return Handlebars.compile(template);
+  };
+
   return {
     init: init,
     generateTemplate: generateTemplate,
     getLabelFeature: getLabelFeature,
+    getInfoResultEmpty: getInfoResultEmpty,
+    getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
+    getTemplateEmpty: getTemplateEmpty,
     featureIconsTemplate: featureIconsTemplate,
+    loadTemplateAjax: loadTemplateAjax,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     renderInfoFeatures: renderInfoFeatures,

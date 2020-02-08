@@ -37,6 +37,7 @@ var LamSearchTools = (function() {
   var searchLayers = [];
   var timeout = 500;
   var timer;
+  var searchResultsDiv = "search-tools__search-results";
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function(options) {
@@ -45,18 +46,25 @@ var LamSearchTools = (function() {
     });
 
     //events binding
+
+    /**
+     * Shows the search tool, resetting info-results
+     */
     LamDispatcher.bind("show-search", function(payload) {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
       lamDispatch("reset-search");
     });
 
+    /**
+     * Resets the search info-results
+     */
     LamDispatcher.bind("reset-search", function(payload) {
       LamSearchTools.resetSearch();
     });
 
     LamDispatcher.bind("show-search-items", function(payload) {
-      LamSearchTools.showSearchInfoFeatures(payload.features);
+      LamSearchTools.showSearchInfoFeatures(payload.features, payload.template);
     });
 
     LamDispatcher.bind("search-address", function(payload) {
@@ -64,8 +72,14 @@ var LamSearchTools = (function() {
     });
 
     //Carico i template di base
-    if (LamStore.getAppState().searchProviderAddressTemplateUrl) loadTemplateAjax(LamStore.getAppState().searchProviderAddressTemplateUrl);
-    if (LamStore.getAppState().searchProviderHouseNumberTemplateUrl) loadTemplateAjax(LamStore.getAppState().searchProviderHouseNumberTemplateUrl);
+    if (LamStore.getAppState().searchProviderAddressTemplateUrl)
+      LamTemplates.loadTemplateAjax(
+        LamTemplates.getTemplateUrl(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      );
+    if (LamStore.getAppState().searchProviderHouseNumberTemplateUrl)
+      LamTemplates.loadTemplateAjax(
+        LamTemplates.getTemplateUrl(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      );
 
     try {
     } catch (e) {
@@ -89,12 +103,12 @@ var LamSearchTools = (function() {
           LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
-            if (searchLayers[li].layer == currentLayer) {
+            debugger;
+            if (searchLayers[li].gid == currentLayer) {
               $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
             }
           }
-          $("#search-tools__search-layers").val("");
-          showSearchInfoFeatures(null);
+          resetSearch();
         });
         break;
     }
@@ -114,7 +128,15 @@ var LamSearchTools = (function() {
   let resetSearch = function() {
     $("#search-tools__search-layers").val("");
     $("#search-tools__search-address").val("");
-    $("#search-tools__search-results").html("");
+    showSearchResults("");
+  };
+
+  /**
+   * Helper function to show html results
+   * @param {string} html
+   */
+  let showSearchResults = function(html) {
+    jQuery("#" + searchResultsDiv).html(html);
   };
 
   /**
@@ -123,8 +145,8 @@ var LamSearchTools = (function() {
    */
   var updateScroll = function(offset) {
     var positionMenu = $("#menu-toolbar").offset();
-    var positionSearch = $("#search-tools__search-results").offset();
-    $("#search-tools__search-results").height(positionMenu.top - positionSearch.top - offset);
+    var positionSearch = $("#" + searchResultsDiv).offset();
+    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - offset);
   };
 
   /**
@@ -191,60 +213,55 @@ var LamSearchTools = (function() {
       template += templateLayersTools(searchLayers);
     }
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
+    template += '<div id="' + searchResultsDiv + '" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
+
+  // /**
+  //  * Display the list of the WFS Address results in the left panel
+  //  * @param {Object} results
+  //  */
+  // var templateSearchResultsWFSGeoserver = function(results) {
+  //   template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
+  //   template = '<div class="lam-grid lam-grid-1">';
+  //   template += "{{#each this}}";
+  //   template += '<div class="lam-col">';
+  //   template +=
+  //     '<i class="lam-icon-primary">' +
+  //     LamResources.svgMarker +
+  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
+  //   template += "{{{display_name}}} ";
+  //   template += "{{{display_name2}}} ";
+  //   template += "</a>";
+  //   template += "</div>";
+  //   template += "{{/each}}";
+  //   template += "</div>";
+  //   return Handlebars.compile(template);
+  // };
+
+  // /**
+  //  * Display the list of the WFS Layers results in the left panel
+  //  * @param {Object} results
+  //  */
+  // var templateSearchResultsLayers = function(results) {
+  //   template = '<div class="lam-grid">';
+  //   template += "{{#each this}}";
+  //   template += '<div class="lam-col">';
+  //   template +=
+  //     '<i class="lam-icon-primary">' +
+  //     LamResources.svgMarker +
+  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
+  //   template += "{{{display_name}}}";
+  //   template += "</a>";
+  //   template += "</div>";
+  //   template += "{{/each}}";
+  //   template += "</div>";
+  //   return Handlebars.compile(template);
+  // };
 
   /**
-   * Display the list of the WFS Address results in the left panel
-   * @param {Object} results
-   */
-  var templateSearchResultsWFSGeoserver = function(results) {
-    template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
-    template = '<div class="lam-grid lam-grid-1">';
-    template += "{{#each this}}";
-    template += '<div class="lam-col">';
-    template +=
-      '<i class="lam-icon-primary">' +
-      LamResources.svgMarker +
-      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
-    template += "{{{display_name}}} ";
-    template += "{{{display_name2}}} ";
-    template += "</a>";
-    template += "</div>";
-    template += "{{/each}}";
-    template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  /**
-   * Display the list of the WFS Layers results in the left panel
-   * @param {Object} results
-   */
-  var templateSearchResultsLayers = function(results) {
-    template = '<div class="lam-grid">';
-    template += "{{#each this}}";
-    template += '<div class="lam-col">';
-    template +=
-      '<i class="lam-icon-primary">' +
-      LamResources.svgMarker +
-      '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
-    template += "{{{display_name}}}";
-    template += "</a>";
-    template += "</div>";
-    template += "{{/each}}";
-    template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  var templateResultEmpty = function(results) {
-    var template = "<p>Nessun risultato disponibile</p>";
-    return Handlebars.compile(template);
-  };
-
-  /**
-   * Switch the address/layers tools
+   * Switch the address/layers top tools
    */
   var showSearchAddress = function() {
     $("#search-tools__label").text("Indirizzo");
@@ -286,7 +303,7 @@ var LamSearchTools = (function() {
         lamDispatch({
           eventName: "show-info-items",
           features: searchResults[index].item,
-          element: "search-tools__search-results"
+          element: searchResultsDiv
         });
       }
       let payload = {
@@ -410,45 +427,75 @@ var LamSearchTools = (function() {
 
   let parseResponseAddress = function(data) {
     LamDispatcher.dispatch("hide-loader");
-    var results = [];
-    if (data.features.length > 0) {
-      var toponimi = [];
-      var results = [];
-      for (var i = 0; i < data.features.length; i++) {
-        var currentAddress = data.features[i].properties[searchAddressProviderField];
-        if (data.features[i].properties[searchHouseNumberProviderField]) {
-          currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
-        }
-        if ($.inArray(currentAddress, toponimi) === -1) {
-          var cent = null;
-          if (data.features[i].geometry.type != "POINT") {
-            cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
-          } else {
-            cent = data.features[i].geometry.coordinates;
-          }
-          var tempItem = {
-            display_name: data.features[i].properties[searchAddressProviderField],
-            lon: cent[0],
-            lat: cent[1],
-            item: data.features[i]
-          };
-          if (searchHouseNumberProviderField) {
-            tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
-          }
-          results.push(tempItem);
-          toponimi.push(data.features[i].properties[searchAddressProviderField]);
-        }
-      }
-      searchResults = results.sort(SortByDisplayName);
-      //renderizzo i risultati
-      var templateTemp = templateSearchResultsWFSGeoserver();
-      var output = templateTemp(results);
-      jQuery("#search-tools__search-results").html(output);
-    } else {
-      var templateTemp = templateResultEmpty();
-      var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
+    lamDispatch("clear-layer-info");
+    if (!data.features.length) {
+      showSearchResults(LamTemplates.getResultEmpty());
+      return;
     }
+    console.log("parse");
+    let isPoint = data.features[0].geometry.type.toLowerCase().indexOf("point") >= 0;
+    let searchProviderAddressField = LamStore.getAppState().searchProviderAddressField;
+    let searchProviderHouseNumberField = LamStore.getAppState().searchProviderHouseNumberField;
+    data.features.forEach(function(feature) {
+      feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
+      feature.tooltip = isPoint ? feature.properties[searchProviderHouseNumberField] : feature.properties[searchProviderAddressField];
+    });
+    //defining the right template based on geometry result type
+    var template = isPoint
+      ? LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
+      : LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    lamDispatch({
+      eventName: "show-search-items",
+      features: data,
+      template: template
+    });
+    lamDispatch({
+      eventName: "show-info-geometries",
+      features: data
+    });
+
+    return;
+
+    // LamDispatcher.dispatch("hide-loader");
+    // var results = [];
+    // if (data.features.length > 0) {
+    //   var toponimi = [];
+    //   var results = [];
+    //   for (var i = 0; i < data.features.length; i++) {
+    //     var currentAddress = data.features[i].properties[searchAddressProviderField];
+    //     if (data.features[i].properties[searchHouseNumberProviderField]) {
+    //       currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
+    //     }
+    //     if ($.inArray(currentAddress, toponimi) === -1) {
+    //       var cent = null;
+    //       if (data.features[i].geometry.type != "POINT") {
+    //         cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
+    //       } else {
+    //         cent = data.features[i].geometry.coordinates;
+    //       }
+    //       var tempItem = {
+    //         display_name: data.features[i].properties[searchAddressProviderField],
+    //         lon: cent[0],
+    //         lat: cent[1],
+    //         item: data.features[i]
+    //       };
+    //       if (searchHouseNumberProviderField) {
+    //         tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
+    //       }
+    //       results.push(tempItem);
+    //       toponimi.push(data.features[i].properties[searchAddressProviderField]);
+    //     }
+    //   }
+    //   searchResults = results.sort(SortByDisplayName);
+    //   //renderizzo i risultati
+    //   var templateTemp = templateSearchResultsWFSGeoserver();
+    //   var output = templateTemp(results);
+    //   jQuery("#search-tools__search-results").html(output);
+    // } else {
+    //   var templateTemp = templateResultEmpty();
+    //   var output = templateTemp();
+    //   jQuery("#search-tools__search-results").html(output);
+    // }
   };
 
   /**
@@ -464,7 +511,7 @@ var LamSearchTools = (function() {
     //ricavo l'elenco dei layer da interrogare
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     if (itemStr.length > 2) {
-      jQuery("#search-tools__search-results").html("");
+      showSearchResults("");
       let layer = searchLayers.filter(function(element) {
         return element.gid == currentLayer;
       })[0];
@@ -496,15 +543,16 @@ var LamSearchTools = (function() {
   };
 
   let parseResponseLayers = function(data) {
+    LamDispatcher.dispatch("hide-loader");
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     let layer = searchLayers.filter(function(element) {
       return element.gid == currentLayer;
     })[0];
-    LamDispatcher.dispatch("hide-loader");
     console.log("parse");
     data.features.forEach(function(feature) {
       feature.layerGid = layer.gid;
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
+      feature.tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
     });
     if (data.features.length > 0) {
       lamDispatch({
@@ -516,9 +564,9 @@ var LamSearchTools = (function() {
         features: data
       });
     } else {
-      var templateTemp = templateResultEmpty();
+      var templateTemp = LamTemplates.getResultEmpty();
       var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
+      showSearchResults(output);
     }
     return;
   };
@@ -527,14 +575,12 @@ var LamSearchTools = (function() {
    * Show the search results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
-  let showSearchInfoFeatures = function(featureInfoCollection) {
-    var title = "Risultati";
+  let showSearchInfoFeatures = function(featureInfoCollection, template) {
     if (!featureInfoCollection) {
-      $("#search-tools__search-results").html("");
+      showSearchResults(AppTemplates.getResultEmpty);
       return;
     }
-    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
-    $("#search-tools__search-results").html(body);
+    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template));
   };
 
   var selectLayer = function(layer) {

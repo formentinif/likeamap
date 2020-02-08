@@ -110,11 +110,6 @@ var LamShareTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   /**
    * Chiama il disptcher per creare l'url di condivisione
    * @return {null} la funzione non restituisce valori

@@ -1049,6 +1049,7 @@ let LamMap = (function() {
     let featureOl = reader.readFeature(feature);
     featureOl.layerGid = feature.layerGid;
     featureOl.srid = feature.srid;
+    featureOl.tooltip = feature.tooltip;
     return featureOl;
   };
 
@@ -1462,23 +1463,30 @@ let LamMap = (function() {
     return srid;
   };
 
+  /**
+   * Transform feature geometry in EPSG:3857
+   * @param {*} feature Feature to transform
+   * @param {*} srid Original Feature Srid.
+   */
   let transform3857 = function(feature, srid) {
     //verifico che lo srid sia un oggetto crs
-    if (srid) {
-      if (srid.properties) {
-        srid = getSRIDfromCRSName(srid.properties.name);
+    return transformFeatureGeometrySrid(feature, srid, 3857);
+  };
+
+  /**
+   * Transform feature geometry in the given SRID
+   * @param {Transform } feature Feature to transform
+   * @param {*} sridSource  Original Feature Srid.
+   * @param {*} sridDest  Destination Feature Srid.
+   */
+  let transformFeatureGeometrySrid = function(feature, sridSource, sridDest) {
+    //verifico che lo srid sia un oggetto crs
+    if (sridSource) {
+      if (sridSource.properties) {
+        sridSource = getSRIDfromCRSName(sridSource.properties.name);
       }
-      switch (parseInt(srid)) {
-        case 3003:
-          feature.getGeometry().transform("EPSG:3003", "EPSG:3857");
-          break;
-        case 25832:
-          feature.getGeometry().transform("EPSG:25832", "EPSG:3857");
-          break;
-        case 4326:
-          feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-          break;
-      }
+      feature.getGeometry().transform("EPSG:" + parseInt(sridSource), "EPSG:" + parseInt(sridDest));
+      feature.srid = sridDest;
     }
     return feature;
   };
@@ -1586,7 +1594,7 @@ let LamMap = (function() {
         if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
           return LamMapEnums.geometryTypes().Polygon;
         } else {
-          LamMapEnums.geometryTypes().Polyline;
+          return LamMapEnums.geometryTypes().Polyline;
         }
       } else {
         return LamMapEnums.geometryTypes().Point;

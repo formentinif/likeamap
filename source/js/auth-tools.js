@@ -67,11 +67,6 @@ var LamAuthTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
   var login = function() {
     lamDispatch({
       eventName: "do-login",

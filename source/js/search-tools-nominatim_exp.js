@@ -36,6 +36,7 @@ var LamSearchToolsNominatim = (function() {
   var searchHouseNumberProviderField = "";
   var currentSearchDate = "";
   var searchLayers = [];
+  let searchResultsDiv = "search-tools__search-results";
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function(options) {
@@ -105,6 +106,14 @@ var LamSearchToolsNominatim = (function() {
     }
 
     isRendered = true;
+  };
+
+  /**
+   * Helper function to show html results
+   * @param {string} html
+   */
+  let showSearchResults = function(html) {
+    jQuery("#" + searchResultsDiv).html(html);
   };
 
   /**
@@ -202,7 +211,7 @@ var LamSearchToolsNominatim = (function() {
       template += templateLayersTools(searchLayers);
     }
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
+    template += '<div id="' + searchResultsDiv + '" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -228,7 +237,7 @@ var LamSearchToolsNominatim = (function() {
       template += templateLayersTools(searchLayers);
     }
     template += '<div class="div-10"></div>';
-    template += '<div id="search-tools__search-results" class="lam-card lam-depth-2 lam-scrollable">';
+    template += '<div id="' + di+ " class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
     return Handlebars.compile(template);
   };
@@ -293,11 +302,6 @@ var LamSearchToolsNominatim = (function() {
     template += "</div>";
     template += "{{/each}}";
     template += "</div>";
-    return Handlebars.compile(template);
-  };
-
-  var templateResultEmpty = function(results) {
-    var template = "<p>Nessun risultato disponibile</p>";
     return Handlebars.compile(template);
   };
 
@@ -434,11 +438,10 @@ var LamSearchToolsNominatim = (function() {
 
             var templateTemp = templateResultsNominatim();
             var output = templateTemp(results);
-            jQuery("#search-tools__search-results").html(output);
+            jQuery("#" + searchResultsDiv).html(output);
           } else {
             var templateTemp = templateResultEmpty();
             var output = templateTemp();
-            jQuery("#search-tools__search-results").html(output);
           }
         })
         .fail(function(data) {
@@ -555,11 +558,11 @@ var LamSearchToolsNominatim = (function() {
             //renderizzo i risultati
             var templateTemp = templateSearchResultsWFSGeoserver();
             var output = templateTemp(results);
-            jQuery("#search-tools__search-results").html(output);
+            showSearchResults(output);
           } else {
             var templateTemp = templateResultEmpty();
             var output = templateTemp();
-            jQuery("#search-tools__search-results").html(output);
+            showSearchResults(output);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -588,7 +591,7 @@ var LamSearchToolsNominatim = (function() {
     var currentLayer = $("#search-tools__select-layers option:selected").val();
 
     if (itemStr.length > 2) {
-      jQuery("#search-tools__search-results").html("");
+      showSearchResults.html("");
       for (li = 0; li < searchLayers.length; li++) {
         if (searchLayers[li].layer == currentLayer) {
           var layer = searchLayers[li];
@@ -630,7 +633,7 @@ var LamSearchToolsNominatim = (function() {
               } else {
                 var templateTemp = templateResultEmpty();
                 var output = templateTemp();
-                jQuery("#search-tools__search-results").html(output);
+                showSearchResults.html(output);
               }
               return;
             },
@@ -653,11 +656,11 @@ var LamSearchToolsNominatim = (function() {
   let showSearchInfoFeatures = function(featureInfoCollection) {
     var title = "Risultati";
     if (!featureInfoCollection) {
-      $("#search-tools__search-results").html("");
+      showSearchResults.html("");
       return;
     }
     var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
-    $("#search-tools__search-results").html(body);
+    showSearchResults.html(body);
   };
 
   /**
@@ -697,11 +700,11 @@ var LamSearchToolsNominatim = (function() {
       //renderizzo i risultati
       var templateTemp = templateSearchResultsLayers();
       var output = templateTemp(results);
-      jQuery("#search-tools__search-results").html(output);
+      showSearchResults.html(output);
     } else {
       var templateTemp = templateResultEmpty();
       var output = templateTemp();
-      jQuery("#search-tools__search-results").html(output);
+      showSearchResults.html(output);
     }
   };
 

@@ -173,11 +173,6 @@ var LamPrintTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var templateEmpty = function(results) {
-    var template = "<p>Nessun risultato disponibile</p>";
-    return Handlebars.compile(template);
-  };
-
   /**
    * Send the map print request to the LamDispatcher
    * @return {void}

@@ -94,7 +94,7 @@ var LamGeocodingTools = (function() {
       var output = templateTemp(results);
       jQuery("#search-tools__search-results").html(output);
     } else {
-      var templateTemp = templateResultEmpty();
+      var templateTemp = LamTemplates.getemplateResultEmpty();
       var output = templateTemp();
       jQuery("#search-tools__search-results").html(output);
     }

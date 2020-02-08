@@ -55,6 +55,7 @@ let LamMapInfo = (function() {
   let init = function() {
     vectorInfo.setMap(LamMap.getMap());
     vectorFlash.setMap(LamMap.getMap());
+
     LamDispatcher.bind("show-info-items", function(payload) {
       LamMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
@@ -82,24 +83,29 @@ let LamMapInfo = (function() {
     LamDispatcher.bind("zoom-info-feature", function(payload) {
       try {
         let feature = LamStore.getCurrentInfoItems().features[payload.index];
-        let layer = LamStore.getLayer(feature.layerGid);
-        LamDispatcher.dispatch({
-          eventName: "set-layer-visibility",
-          gid: feature.layerGid,
-          visibility: 1
-        });
-        LamDispatcher.dispatch({
-          eventName: "flash-feature",
-          feature: feature
-        });
-
+        if (feature.layerGid) {
+          let layer = LamStore.getLayer(feature.layerGid);
+          LamDispatcher.dispatch({
+            eventName: "set-layer-visibility",
+            gid: feature.layerGid,
+            visibility: 1
+          });
+        }
         let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
         featureOl = LamMap.transform3857(featureOl, feature.srid);
         LamMap.goToGeometry(featureOl.getGeometry());
-        let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-        if (tooltip) {
-          LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: tooltip });
+        if (feature.tooltip) {
+          setTimeout(function() {
+            LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: feature.tooltip });
+          }, 400);
         }
+        setTimeout(function() {
+          LamDispatcher.dispatch({
+            eventName: "flash-feature",
+            feature: feature
+          });
+        }, 200);
+
         return;
       } catch (error) {
         LamDispatcher.dispatch({ eventName: "log", message: error });
@@ -260,6 +266,8 @@ let LamMapInfo = (function() {
         //     features: requestQueueData[0]
         //   }
         // });
+      } else {
+        showInfoWindow("Risultati", LamTemplates.getInfoResultEmpty());
       }
       return;
     }
@@ -403,8 +411,9 @@ let LamMapInfo = (function() {
   /**
    * Show the click info results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
+   * @param {string} template handlebars template to user where feature's layerGid property is not defined
    */
-  let showRequestInfoFeatures = function(featureInfoCollection) {
+  let showRequestInfoFeatures = function(featureInfoCollection, template) {
     var title = "Risultati";
     if (!featureInfoCollection) {
       return;
@@ -412,24 +421,24 @@ let LamMapInfo = (function() {
     if (featureInfoCollection.features.length > 0) {
       title += " (" + featureInfoCollection.features.length + ")";
     }
-    var body = LamTemplates.renderInfoFeatures(featureInfoCollection);
+    var body = LamTemplates.renderInfoFeatures(featureInfoCollection, template);
     var bodyMobile = LamTemplates.renderInfoFeaturesMobile(featureInfoCollection);
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
   let showInfoFeatureTooltip = function(feature) {
-    let layer = LamStore.getLayer(feature.layerGid);
-    let tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+    if (!feature.tooltip) return;
     lamDispatch({
       eventName: "show-map-tooltip",
       geometry: feature.getGeometry().getCoordinates(),
-      tooltip: tooltip
+      tooltip: feature.tooltip
     });
   };
 
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
     let tooltip = "";
+    //preload layers do not have tooltip property
     if (feature.tooltip) {
       tooltip = feature.tooltip;
     } else {

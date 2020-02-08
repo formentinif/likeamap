@@ -100,6 +100,7 @@ let LamTemplates = (function() {
   /**
    * Gets the uri of the template to be loaded by ajax
    * @param {object} layer Oggetto del layer/relation
+   * @param {templateUrl} layer Url completo del template. Senza https aggiunge il @repoUrl come prefisso
    * @param {string} repoUrl Url del repository
    */
   let getTemplateUrl = function(gid, templateUrl, repoUrl) {
@@ -147,7 +148,7 @@ let LamTemplates = (function() {
   let standardTemplate = function(props, layer) {
     let body = "";
     if (layer) {
-      body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + layer.layerName;
+      body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
       if (layer.labelField) {
         body += " - " + getLabelFeature(props, layer.labelField);
       }
@@ -177,13 +178,14 @@ let LamTemplates = (function() {
       "' })\">" +
       LamResources.svgMarker +
       "</i>";
-    let feature = LamStore.getCurrentInfoItem(index);
-    let centroid = LamMap.getLabelPoint(feature.geometry.coordinates);
+    let feature = LamMap.convertGeoJsonFeatureToOl(LamStore.getCurrentInfoItem(index));
+    feature = LamMap.transform3857(feature, feature.srid);
+    let centroid = LamMap.getLabelPoint(LamMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()).coordinates);
     let geometryOl = LamMap.convertGeometryToOl(
       {
         coordinates: centroid,
         type: "Point",
-        srid: 3857
+        srid: feature.srid
       },
       LamMapEnums.geometryFormats().GeoJson
     );
@@ -293,9 +295,9 @@ let LamTemplates = (function() {
 
   let getLabelFeature = function(props, labelName, layerTitle) {
     try {
-      let label = props[labelName];
+      let label = props[labelName] || "";
       if (layerTitle) {
-        label = layerTitle + " - " + label;
+        label = label === "" ? layerTitle : layerTitle + " - " + label;
       }
       return label;
     } catch (error) {
@@ -308,6 +310,7 @@ let LamTemplates = (function() {
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function(featureInfoCollection, template) {
+    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -319,10 +322,11 @@ let LamTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
+      let layer = {};
       if (feature.layerGid) {
-        let layer = LamStore.getLayer(feature.layerGid);
+        layer = LamStore.getLayer(feature.layerGid);
+        if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
-      if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
@@ -378,14 +382,34 @@ let LamTemplates = (function() {
   let getTemplateMetadata = function() {
     return Handlebars.compile("{{ABSTRACT}}");
   };
+
+  var getTemplateEmpty = function(results) {
+    var template = "<p></p>";
+    return Handlebars.compile(template);
+  };
+
+  var getResultEmpty = function(results) {
+    var template = "<p>Nessun risultato disponibile</p>";
+    return Handlebars.compile(template);
+  };
+
+  var getInfoResultEmpty = function(results) {
+    var template = "<p>Nessun risultato disponibile nella posizione selezionata</p>";
+    return Handlebars.compile(template);
+  };
+
   return {
     init: init,
     generateTemplate: generateTemplate,
     getLabelFeature: getLabelFeature,
+    getInfoResultEmpty: getInfoResultEmpty,
+    getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
+    getTemplateEmpty: getTemplateEmpty,
     featureIconsTemplate: featureIconsTemplate,
+    loadTemplateAjax: loadTemplateAjax,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     renderInfoFeatures: renderInfoFeatures,

@@ -165,16 +165,6 @@ let LamSelectTools = (function() {
     return Handlebars.compile(template);
   };
 
-  let templateEmpty = function(results) {
-    let template = "<p></p>";
-    return Handlebars.compile(template);
-  };
-
-  let templateResultEmpty = function(results) {
-    let template = "<p>Non sono stati trovati risultati.</p>";
-    return Handlebars.compile(template);
-  };
-
   let deleteFeatures = function() {
     lamDispatch({
       eventName: "delete-selection"
@@ -258,9 +248,7 @@ let LamSelectTools = (function() {
           let output = templateTemp(selectionResult);
           jQuery("#select-tools__results").append(output);
         } else {
-          let templateTemp = templateResultEmpty();
-          let output = templateTemp();
-          jQuery("#select-tools__results").html(output);
+          jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {

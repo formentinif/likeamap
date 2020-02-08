@@ -144,6 +144,11 @@
       "description": "Campo in cui verrà effettuata la ricerca WMS",
       "type": "string"
     },
+    "searchProviderAddressTemplateUrl": {
+      "title": "Template per il rendering degli indirizzi",
+      "description": "Url del Templatetper il rendering degli indirizzi",
+      "type": "string"
+    },
     "searchProviderHouseNumberUrl": {
       "title": "Url/KEY del provider di ricerca civici",
       "description": "Url del provider di ricerca per i civici",
@@ -152,6 +157,11 @@
     "searchProviderHouseNumberField": {
       "title": "Campo del provider di ricerca civici",
       "description": "Campo in cui verrà effettuata la ricerca civici",
+      "type": "string"
+    },
+    "searchProviderHouseNumberTemplateUrl": {
+      "title": "Template per il rendering dei civici",
+      "description": "Url del template per il rendering dei civici",
       "type": "string"
     },
     "metaDataServiceUrlTemplate": {
