@@ -71,8 +71,9 @@ let LamMapInfo = (function() {
       }, 800);
     });
     LamDispatcher.bind("show-mobile-info-results", function(payload) {
-      LamToolbar.toggleToolbarItem("info-results", true);
-      $("#info-tooltip").hide();
+      //LamToolbar.toggleToolbarItem("info-results", true);
+      LamToolbar.showMenu();
+      $("#bottom-info").hide();
     });
 
     LamDispatcher.bind("clear-layer-info", function(payload) {
@@ -106,7 +107,7 @@ let LamMapInfo = (function() {
           });
         }, 200);
         if (LamDom.isMobile()) {
-          LamDispatcher.dispatch("show-info-tooltip");
+          LamDispatcher.dispatch("show-bottom-info");
           LamDispatcher.dispatch("hide-menu");
         }
         return;
@@ -125,7 +126,7 @@ let LamMapInfo = (function() {
     });
 
     LamDispatcher.bind("add-geometry-info-map", function(payload) {
-      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
@@ -162,7 +163,7 @@ let LamMapInfo = (function() {
    * The pipeline is
    * 1. getRequestInfo
    * 2. getFeatureInfoRequest
-   * 3. processRequestInfo/processRequestInfoAll based on the variable visibleLayers
+   * 3. processRequestInfoAll based on the variable visibleLayers
    * @param {Array} coordinate Coordinate of the point clicked
    * @param {Array} pixel pixel clicked on map
    * @param {boolean} visibleLayers Visibile Layers
@@ -192,7 +193,7 @@ let LamMapInfo = (function() {
     // }
     if (featuresClicked.length > 0) {
       //verifing info behaviour
-      if (LamStore.getAppState().infoSelectBehaviour == LamMapEnums.infoSelectBehaviours().SingleFeature) {
+      if (LamStore.getAppState().infoSelectBehaviour == LamEnums.infoSelectBehaviours().SingleFeature) {
         featuresClicked = featuresClicked.slice(0, 1);
       }
       showVectorInfoFeatures(featuresClicked, pixel);
@@ -215,7 +216,8 @@ let LamMapInfo = (function() {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid));
+            debugger;
+            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid, layer.labelField, layer.layerName));
           }
         }
       });
@@ -345,8 +347,11 @@ let LamMapInfo = (function() {
     //se il dato è presente lo aggiungo al contenitore global
     if (featureCollection && featureCollection.features.length > 0) {
       for (let i = 0; i < featureCollection.features.length; i++) {
-        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-        featureCollection.features[i].srid = requestQueue.layers[requestQueue.currentLayerIndex].srid;
+        let layer = requestQueue.layers[requestQueue.currentLayerIndex];
+        featureCollection.features[i].layerGid = layer.gid;
+        featureCollection.features[i].srid = layer.srid;
+        debugger;
+        featureCollection.features[i].tooltip = LamTemplates.getLabelFeature(featureCollection.features[i].properties, layer.labelField, layer.layerName);
         requestQueueData.push(featureCollection.features[i]);
       }
     }
@@ -429,6 +434,10 @@ let LamMapInfo = (function() {
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
+  /**
+   * Shows the feature tooltip in the map, centered on the feature geometry
+   * @param {Object} feature
+   */
   let showInfoFeatureTooltip = function(feature) {
     if (!feature.tooltip) return;
     lamDispatch({
@@ -438,6 +447,11 @@ let LamMapInfo = (function() {
     });
   };
 
+  /**
+   * Shows the feature tooltip at a predefined position
+   * @param {Object} feature
+   * @param {Array} pixel
+   */
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
     let tooltip = "";
@@ -455,32 +469,46 @@ let LamMapInfo = (function() {
     });
   };
 
+  /**
+   * Open the wiondw with the html results, based on the device type and configuration
+   * @param {string} title
+   * @param {string} body
+   * @param {string} bodyMobile
+   * @param {string} htmlElement Html element id destination, default is info-results
+   */
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
     if (LamStore.getOpenResultInInfoWindow()) {
-      LamDom.showContentInfoWindow(title, body, bodyMobile);
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body, bodyMobile);
     } else {
-      debugger;
-      LamDom.showContent(title, body, bodyMobile, htmlElement);
+      if (LamDom.isMobile()) {
+        LamDom.showContent(LamEnums.showContentMode().BottomInfo, title, body, bodyMobile, null, htmlElement);
+      } else {
+        LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, body, bodyMobile, null, htmlElement);
+      }
     }
   };
 
-  let addWktInfoToMap = function addWktInfoToMap(wkt) {
-    /// <summary>
-    /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
-    /// </summary>
-    /// <param name="wkt">Geometria da caricare</param>
-    /// <returns type=""></returns>
+  // /**
+  //  * Adds a wkt geometry
+  //  * @param {string} wkt
+  //  */
+  //   let addWktInfoToMap = function addWktInfoToMap(wkt) {
+  //     /// <summary>
+  //     /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
+  //     /// </summary>
+  //     /// <param name="wkt">Geometria da caricare</param>
+  //     /// <returns type=""></returns>
 
-    let feature = formatWKT.readFeature(wkt);
-    /*let feature = formatWKT.readFeature(
-    'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
+  //     let feature = formatWKT.readFeature(wkt);
+  //     /*let feature = formatWKT.readFeature(
+  //     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
+  //     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
 
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
+  //     //feature.getGeometry().transform(projection, 'EPSG:3857');
+  //     vectorInfo.getSource().addFeature(feature);
 
-    return feature;
-  };
+  //     return feature;
+  //   };
 
   /**
    * Add a geometry info to the map
@@ -557,12 +585,14 @@ let LamMapInfo = (function() {
    * @param {int} zIndex Index of the layer
    * @param {string} gid Unique id of the layer
    */
-  let RequestLayer = function(url, zIndex, gid, srid) {
+  let RequestLayer = function(url, zIndex, gid, srid, labelField, layerName) {
     this.url = url;
     this.zIndex = zIndex;
     this.sent = false;
     this.gid = gid;
     this.srid = srid;
+    this.labelField = labelField;
+    this.layerName = layerName;
   };
 
   function SortByZIndex(a, b) {
@@ -575,7 +605,7 @@ let LamMapInfo = (function() {
     addGeometryInfoToMap: addGeometryInfoToMap,
     addFeatureFlashToMap: addFeatureFlashToMap,
     addFeatureInfoToMap: addFeatureInfoToMap,
-    addWktInfoToMap: addWktInfoToMap,
+    //addWktInfoToMap: addWktInfoToMap,
     clearLayerFlash: clearLayerFlash,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,

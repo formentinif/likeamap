@@ -59,13 +59,13 @@ var LamDispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
-      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
     });
 
-    this.bind("add-wkt-info-map", function(payload) {
-      LamMapInfo.addWktInfoToMap(payload.wkt);
-    });
+    // this.bind("add-wkt-info-map", function(payload) {
+    //   LamMapInfo.addWktInfoToMap(payload.wkt);
+    // });
 
     /**
      * {string} paylod.gid Layer Gid

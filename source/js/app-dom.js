@@ -13,12 +13,12 @@ var LamDom = (function() {
       LamDom.toggleLoader(true);
     });
 
-    LamDispatcher.bind("show-info-tooltip", function(payload) {
-      $("#info-tooltip").show();
+    LamDispatcher.bind("show-bottom-info", function(payload) {
+      $("#bottom-info").show();
     });
 
-    LamDispatcher.bind("hide-info-tooltip", function(payload) {
-      $("#info-tooltip").hide();
+    LamDispatcher.bind("hide-bottom-info", function(payload) {
+      $("#bottom-info").hide();
     });
   };
 
@@ -105,27 +105,51 @@ var LamDom = (function() {
     }
   };
 
-  let showContent = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-results";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    $("#info-tooltip__title-text").html(title);
-    $("#info-tooltip__content").html(bodyMobile);
-    if (!LamDom.isMobile()) {
-      LamToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
+  let showContent = function(contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
+    if (!htmlBottomInfo) htmlBottomInfo = htmlMain;
+    if (!toolBarItem) toolBarItem = "info-results";
+    let htmlTitle = $("<div id='" + elementId + "__title'></div>")
+      .addClass("lam-title")
+      .html(title);
+    let htmlContent = $("<div id='" + elementId + "__content'></div>")
+      .addClass("lam-scroll-padding")
+      .html(htmlMain);
+    switch (contentMode) {
+      case 1: //LeftPanel
+        if (!elementId) elementId = "info-results";
+        $("#" + elementId + "")
+          .html("")
+          .append(htmlTitle)
+          .append(htmlContent)
+          .show();
+        LamToolbar.toggleToolbarItem(toolBarItem, true);
+        LamDispatcher.dispatch("hide-info-window");
+        //LamDispatcher.dispatch("show-menu");
+        $("#bottom-info").hide();
+        break;
+      case 2: //BottomInfo
+        if (!elementId) elementId = "info-results";
+        $("#" + elementId + "")
+          .html("")
+          .append(htmlTitle)
+          .append(htmlContent)
+          .show();
+        $("#bottom-info__title-text").html(title);
+        $("#bottom-info__content").html(htmlBottomInfo);
+        LamToolbar.toggleToolbarItem(toolBarItem, false);
+        LamDispatcher.dispatch("hide-info-window");
+        LamDispatcher.dispatch("hide-menu");
+        $("#bottom-info").show();
+        break;
+      case 3: //InfoWindow
+        if (!elementId) elementId = "info-window";
+        LamDispatcher.dispatch("hide-menu");
+        $("#bottom-info").hide();
+        $("#" + elementId + "__content").html(htmlMain);
+        $("#" + elementId + "__title").html(title);
+        $("#" + elementId + "").show();
+        break;
     }
-  };
-
-  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-window";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
   };
 
   /**
@@ -147,7 +171,6 @@ var LamDom = (function() {
     setvisibility: setvisibility,
     showAppTools: showAppTools,
     showContent: showContent,
-    showContentInfoWindow: showContentInfoWindow,
     toggleLoader: toggleLoader
   };
 })();

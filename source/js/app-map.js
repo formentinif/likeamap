@@ -211,7 +211,9 @@ let LamMap = (function() {
     mapSrid,
     preload,
     vectorWidth,
-    vectorRadius
+    vectorRadius,
+    labelField,
+    layerName
   ) {
     let thisLayer;
     if (!params) {
@@ -260,6 +262,8 @@ let LamMap = (function() {
     if (thisLayer) {
       thisLayer.gid = gid;
       thisLayer.srid = srid;
+      thisLayer.labelField = labelField;
+      thisLayer.layerName = layerName;
       thisLayer.queryable = queryable;
       thisLayer.setVisible(visible);
       thisLayer.zIndex = parseInt(zIndex);
@@ -820,7 +824,9 @@ let LamMap = (function() {
         mapSrid,
         layer.preload,
         layer.vectorWidth,
-        layer.vectorRadius
+        layer.vectorRadius,
+        layer.labelField,
+        layer.layerName
       );
       if (layer.layers) {
         addLayersToMap(layer.layers, mapSrid);
@@ -1033,7 +1039,7 @@ let LamMap = (function() {
   let convertGeometryToOl = function(geometry, geometryFormat) {
     let geometryOl = geometry;
     switch (geometryFormat) {
-      case LamMapEnums.geometryFormats().GeoJson:
+      case LamEnums.geometryFormats().GeoJson:
         geometryOl = getGeometryFromGeoJsonGeometry(geometry);
         break;
     }
@@ -1585,50 +1591,50 @@ let LamMap = (function() {
    */
   let getGeometryType = function(coordinates) {
     if (!Array.isArray(coordinates)) {
-      return LamMapEnums.geometryTypes().GeometryNull;
+      return LamEnums.geometryTypes().GeometryNull;
     }
     let firstElement = coordinates[0];
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
         if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
-          return LamMapEnums.geometryTypes().Polygon;
+          return LamEnums.geometryTypes().Polygon;
         } else {
-          return LamMapEnums.geometryTypes().Polyline;
+          return LamEnums.geometryTypes().Polyline;
         }
       } else {
-        return LamMapEnums.geometryTypes().Point;
+        return LamEnums.geometryTypes().Point;
       }
     }
     if (!Array.isArray(firstElement[0])) {
       //if first and last point are the same is polygon, otherwise polyline
       let lastElement = coordinates[coordinates.length - 1];
       if (firstElement[0] === lastElement[0] && firstElement[1] === lastElement[1]) {
-        return LamMapEnums.geometryTypes().Polygon;
+        return LamEnums.geometryTypes().Polygon;
       } else {
-        return LamMapEnums.geometryTypes().Polyline;
+        return LamEnums.geometryTypes().Polyline;
       }
     }
     //multis
     switch (getGeometryType(firstElement)) {
-      case LamMapEnums.geometryTypes().Polygon:
-      case LamMapEnums.geometryTypes().MultiPolygon:
-        return LamMapEnums.geometryTypes().MultiPolygon;
-      case LamMapEnums.geometryTypes().Polyline:
-      case LamMapEnums.geometryTypes().MultiPolyline:
-        return LamMapEnums.geometryTypes().MultiPolyline;
+      case LamEnums.geometryTypes().Polygon:
+      case LamEnums.geometryTypes().MultiPolygon:
+        return LamEnums.geometryTypes().MultiPolygon;
+      case LamEnums.geometryTypes().Polyline:
+      case LamEnums.geometryTypes().MultiPolyline:
+        return LamEnums.geometryTypes().MultiPolyline;
     }
-    return LamMapEnums.geometryTypes().GeometryNull;
+    return LamEnums.geometryTypes().GeometryNull;
   };
 
   let getLabelPoint = function(coordinates) {
     if (coordinates.length === 1) coordinates = coordinates[0];
     switch (getGeometryType(coordinates)) {
-      case LamMapEnums.geometryTypes().Point:
+      case LamEnums.geometryTypes().Point:
         return coordinates;
-      case LamMapEnums.geometryTypes().Polyline:
+      case LamEnums.geometryTypes().Polyline:
         return coordinates[Math.floor(coordinates.length / 2)];
-      case LamMapEnums.geometryTypes().Polygon:
+      case LamEnums.geometryTypes().Polygon:
         let polygon = new ol.geom.Polygon(coordinates);
         let ppoint = polygon.getInteriorPoint().getCoordinates();
         if (isNaN(ppoint[0])) {
@@ -1636,10 +1642,10 @@ let LamMap = (function() {
           ppoint = polygon.getInteriorPoint().getCoordinates();
         }
         return ppoint;
-      case LamMapEnums.geometryTypes().MultiPolyline:
+      case LamEnums.geometryTypes().MultiPolyline:
         coordinates = coordinates[0];
         return coordinates[Math.floor(coordinates.length / 2)];
-      case LamMapEnums.geometryTypes().MultiPolygon:
+      case LamEnums.geometryTypes().MultiPolygon:
         let mpolygon = new ol.geom.Polygon(coordinates);
         return mpolygon.getInteriorPoint().getCoordinates();
     }

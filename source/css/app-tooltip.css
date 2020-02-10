@@ -43,7 +43,7 @@
   content: "✖";
 }
 
-.lam-info-tooltip {
+.lam-bottom-info {
   position: absolute;
   box-sizing: border-box;
   left: 0px;
@@ -57,7 +57,7 @@
   overflow: hidden;
 }
 
-.lam-info-tooltip__title {
+.lam-bottom-info__title {
   box-sizing: border-box;
   padding: 0rem;
   height: 45px;
@@ -68,13 +68,13 @@
   background-color: white;
 }
 
-.lam-info-tooltip__title {
+.lam-bottom-info__title {
   padding: 0.5rem;
   font-size: 1.2rem;
   font-weight: 500;
 }
 
-.lam-info-tooltip__content {
+.lam-bottom-info__content {
   box-sizing: border-box;
   padding-bottom: 45px;
   margin-top: 0.5rem;
@@ -84,7 +84,7 @@
   height: 100%;
 }
 
-.lam-info-tooltip__content-item {
+.lam-bottom-info__content-item {
   padding: 0.5rem;
   background-color: white;
   font-size: 1.2rem;

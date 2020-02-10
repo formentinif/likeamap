@@ -46,7 +46,6 @@ var LamSearchTools = (function() {
     });
 
     //events binding
-
     /**
      * Shows the search tool, resetting info-results
      */
@@ -54,6 +53,9 @@ var LamSearchTools = (function() {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
       lamDispatch("reset-search");
+      setTimeout(function() {
+        updateScrollHeight();
+      }, 500);
     });
 
     /**
@@ -112,9 +114,9 @@ var LamSearchTools = (function() {
         break;
     }
 
-    updateScroll(220);
+    updateScrollHeight();
     $(window).resize(function() {
-      updateScroll(20);
+      updateScrollHeight();
     });
 
     if (!isRendered) {
@@ -134,18 +136,22 @@ var LamSearchTools = (function() {
    * Helper function to show html results
    * @param {string} html
    */
-  let showSearchResults = function(html) {
-    LamDom.showContent("", html, html, searchResultsDiv);
+  let showSearchResults = function(html, htmlMobile) {
+    if (!htmlMobile) htmlMobile = html;
+    $("#" + searchResultsDiv).html(html);
+    //$("#bottom-info__title-text").html(title);
+    $("#bottom-info__content").html(htmlMobile);
+    //LamDom.showContent(LamEnums.showContentMode().LeftPanel, "", html, html, "search-tools", searchResultsDiv);
   };
 
   /**
    * Aggiorna la dimensione dello scroll dei contenuti
    * @return {null} La funzione non restituisce un valore
    */
-  var updateScroll = function(offset) {
+  var updateScrollHeight = function() {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#" + searchResultsDiv).offset();
-    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - offset);
+    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - 20);
   };
 
   /**
@@ -283,54 +289,54 @@ var LamSearchTools = (function() {
     lamDispatch("reset-search");
   };
 
-  /**
-   * Zoom the map to the lon-lat given and show the infobox of the given item index
-   * @param {float} lon
-   * @param {float} lat
-   * @param {int} index Item's index in the result array
-   * @param {boolean} showInfo
-   */
-  var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    lamDispatch("clear-layer-info");
-    if (searchResults[index]) {
-      lamDispatch({
-        eventName: "zoom-geometry",
-        geometry: searchResults[index].item.geometry,
-        srid: 4326
-      });
-      if (showInfo) {
-        lamDispatch({
-          eventName: "show-info-items",
-          features: searchResults[index].item,
-          element: searchResultsDiv
-        });
-      }
-      let payload = {
-        eventName: "add-geometry-info-map",
-        geometry: searchResults[index].item.geometry
-      };
-      try {
-        payload.srid = searchResults[index].item.crs;
-        if (payload.srid == null) {
-          payload.srid = 4326;
-        }
-      } catch (e) {
-        payload.srid = 4326;
-      }
-      lamDispatch(payload);
-      lamDispatch("hide-menu-mobile");
-    } else {
-      lamDispatch({
-        eventName: "zoom-lon-lat",
-        zoom: 18,
-        lon: parseFloat(lon),
-        lat: parseFloat(lat),
-        eventName: "add-wkt-info-map",
-        wkt: "POINT(" + lon + " " + lat + ")"
-      });
-      lamDispatch("hide-menu-mobile");
-    }
-  };
+  // /**
+  //  * Zoom the map to the lon-lat given and show the infobox of the given item index
+  //  * @param {float} lon
+  //  * @param {float} lat
+  //  * @param {int} index Item's index in the result array
+  //  * @param {boolean} showInfo
+  //  */
+  // var zoomToItemLayer = function(lon, lat, index, showInfo) {
+  //   lamDispatch("clear-layer-info");
+  //   if (searchResults[index]) {
+  //     lamDispatch({
+  //       eventName: "zoom-geometry",
+  //       geometry: searchResults[index].item.geometry,
+  //       srid: 4326
+  //     });
+  //     if (showInfo) {
+  //       lamDispatch({
+  //         eventName: "show-info-items",
+  //         features: searchResults[index].item,
+  //         element: searchResultsDiv
+  //       });
+  //     }
+  //     let payload = {
+  //       eventName: "add-geometry-info-map",
+  //       geometry: searchResults[index].item.geometry
+  //     };
+  //     try {
+  //       payload.srid = searchResults[index].item.crs;
+  //       if (payload.srid == null) {
+  //         payload.srid = 4326;
+  //       }
+  //     } catch (e) {
+  //       payload.srid = 4326;
+  //     }
+  //     lamDispatch(payload);
+  //     lamDispatch("hide-menu-mobile");
+  //   } else {
+  //     lamDispatch({
+  //       eventName: "zoom-lon-lat",
+  //       zoom: 18,
+  //       lon: parseFloat(lon),
+  //       lat: parseFloat(lat),
+  //       eventName: "add-wkt-info-map",
+  //       wkt: "POINT(" + lon + " " + lat + ")"
+  //     });
+  //     lamDispatch("hide-menu-mobile");
+  //   }
+  // };
 
   var searchAddressKeyup = function(ev) {
     clearTimeout(timer);
@@ -579,18 +585,12 @@ var LamSearchTools = (function() {
       showSearchResults(AppTemplates.getResultEmpty);
       return;
     }
-    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template));
+    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template), LamTemplates.renderInfoFeaturesMobile(featureInfoCollection));
   };
 
   var selectLayer = function(layer) {
     $("#search-tools__select-layers").val(layer);
   };
-
-  function SortByDisplayName(a, b) {
-    var aName = a.display_name.toLowerCase();
-    var bName = b.display_name.toLowerCase();
-    return aName < bName ? -1 : aName > bName ? 1 : 0;
-  }
 
   return {
     render: render,
@@ -605,8 +605,8 @@ var LamSearchTools = (function() {
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,
-    showSearchLayers: showSearchLayers,
+    showSearchLayers: showSearchLayers
     //zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
-    zoomToItemLayer: zoomToItemLayer
+    //zoomToItemLayer: zoomToItemLayer
   };
 })();

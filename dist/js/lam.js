@@ -28,8 +28,14 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Map Eumerations
  */
-let LamMapEnums = (function() {
+let LamEnums = (function() {
   "use strict";
+
+  let showContentModeEnum = {
+    LeftPanel: 1,
+    BottomInfo: 2,
+    InfoWindow: 3
+  };
 
   let infoSelectBehaviourEnum = {
     SingleFeature: 1,
@@ -62,7 +68,12 @@ let LamMapEnums = (function() {
     return infoSelectBehaviourEnum;
   };
 
+  let showContentMode = function() {
+    return showContentModeEnum;
+  };
+
   return {
+    showContentMode: showContentMode,
     geometryFormats: geometryFormats,
     geometryTypes: geometryTypes,
     infoSelectBehaviours: infoSelectBehaviours
@@ -566,8 +577,9 @@ let LamMapInfo = (function() {
       }, 800);
     });
     LamDispatcher.bind("show-mobile-info-results", function(payload) {
-      LamToolbar.toggleToolbarItem("info-results", true);
-      $("#info-tooltip").hide();
+      //LamToolbar.toggleToolbarItem("info-results", true);
+      LamToolbar.showMenu();
+      $("#bottom-info").hide();
     });
 
     LamDispatcher.bind("clear-layer-info", function(payload) {
@@ -601,7 +613,7 @@ let LamMapInfo = (function() {
           });
         }, 200);
         if (LamDom.isMobile()) {
-          LamDispatcher.dispatch("show-info-tooltip");
+          LamDispatcher.dispatch("show-bottom-info");
           LamDispatcher.dispatch("hide-menu");
         }
         return;
@@ -620,7 +632,7 @@ let LamMapInfo = (function() {
     });
 
     LamDispatcher.bind("add-geometry-info-map", function(payload) {
-      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
@@ -657,7 +669,7 @@ let LamMapInfo = (function() {
    * The pipeline is
    * 1. getRequestInfo
    * 2. getFeatureInfoRequest
-   * 3. processRequestInfo/processRequestInfoAll based on the variable visibleLayers
+   * 3. processRequestInfoAll based on the variable visibleLayers
    * @param {Array} coordinate Coordinate of the point clicked
    * @param {Array} pixel pixel clicked on map
    * @param {boolean} visibleLayers Visibile Layers
@@ -687,7 +699,7 @@ let LamMapInfo = (function() {
     // }
     if (featuresClicked.length > 0) {
       //verifing info behaviour
-      if (LamStore.getAppState().infoSelectBehaviour == LamMapEnums.infoSelectBehaviours().SingleFeature) {
+      if (LamStore.getAppState().infoSelectBehaviour == LamEnums.infoSelectBehaviours().SingleFeature) {
         featuresClicked = featuresClicked.slice(0, 1);
       }
       showVectorInfoFeatures(featuresClicked, pixel);
@@ -710,7 +722,8 @@ let LamMapInfo = (function() {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid));
+            debugger;
+            requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid, layer.labelField, layer.layerName));
           }
         }
       });
@@ -840,8 +853,11 @@ let LamMapInfo = (function() {
     //se il dato è presente lo aggiungo al contenitore global
     if (featureCollection && featureCollection.features.length > 0) {
       for (let i = 0; i < featureCollection.features.length; i++) {
-        featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-        featureCollection.features[i].srid = requestQueue.layers[requestQueue.currentLayerIndex].srid;
+        let layer = requestQueue.layers[requestQueue.currentLayerIndex];
+        featureCollection.features[i].layerGid = layer.gid;
+        featureCollection.features[i].srid = layer.srid;
+        debugger;
+        featureCollection.features[i].tooltip = LamTemplates.getLabelFeature(featureCollection.features[i].properties, layer.labelField, layer.layerName);
         requestQueueData.push(featureCollection.features[i]);
       }
     }
@@ -924,6 +940,10 @@ let LamMapInfo = (function() {
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
+  /**
+   * Shows the feature tooltip in the map, centered on the feature geometry
+   * @param {Object} feature
+   */
   let showInfoFeatureTooltip = function(feature) {
     if (!feature.tooltip) return;
     lamDispatch({
@@ -933,6 +953,11 @@ let LamMapInfo = (function() {
     });
   };
 
+  /**
+   * Shows the feature tooltip at a predefined position
+   * @param {Object} feature
+   * @param {Array} pixel
+   */
   let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
     let tooltip = "";
@@ -950,32 +975,46 @@ let LamMapInfo = (function() {
     });
   };
 
+  /**
+   * Open the wiondw with the html results, based on the device type and configuration
+   * @param {string} title
+   * @param {string} body
+   * @param {string} bodyMobile
+   * @param {string} htmlElement Html element id destination, default is info-results
+   */
   let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
     if (LamStore.getOpenResultInInfoWindow()) {
-      LamDom.showContentInfoWindow(title, body, bodyMobile);
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body, bodyMobile);
     } else {
-      debugger;
-      LamDom.showContent(title, body, bodyMobile, htmlElement);
+      if (LamDom.isMobile()) {
+        LamDom.showContent(LamEnums.showContentMode().BottomInfo, title, body, bodyMobile, null, htmlElement);
+      } else {
+        LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, body, bodyMobile, null, htmlElement);
+      }
     }
   };
 
-  let addWktInfoToMap = function addWktInfoToMap(wkt) {
-    /// <summary>
-    /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
-    /// </summary>
-    /// <param name="wkt">Geometria da caricare</param>
-    /// <returns type=""></returns>
+  // /**
+  //  * Adds a wkt geometry
+  //  * @param {string} wkt
+  //  */
+  //   let addWktInfoToMap = function addWktInfoToMap(wkt) {
+  //     /// <summary>
+  //     /// Aggiunge una geometria in formato GeoJson nella mappa dopo una selezione
+  //     /// </summary>
+  //     /// <param name="wkt">Geometria da caricare</param>
+  //     /// <returns type=""></returns>
 
-    let feature = formatWKT.readFeature(wkt);
-    /*let feature = formatWKT.readFeature(
-    'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
-    feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
+  //     let feature = formatWKT.readFeature(wkt);
+  //     /*let feature = formatWKT.readFeature(
+  //     'POLYGON ((10.6112420275072 44.7089045353454, 10.6010851023631 44.6981632996669, 10.6116329324321 44.685907897919, 10.6322275666758 44.7050600304689, 10.6112420275072 44.7089045353454))');*/
+  //     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
 
-    //feature.getGeometry().transform(projection, 'EPSG:3857');
-    vectorInfo.getSource().addFeature(feature);
+  //     //feature.getGeometry().transform(projection, 'EPSG:3857');
+  //     vectorInfo.getSource().addFeature(feature);
 
-    return feature;
-  };
+  //     return feature;
+  //   };
 
   /**
    * Add a geometry info to the map
@@ -1052,12 +1091,14 @@ let LamMapInfo = (function() {
    * @param {int} zIndex Index of the layer
    * @param {string} gid Unique id of the layer
    */
-  let RequestLayer = function(url, zIndex, gid, srid) {
+  let RequestLayer = function(url, zIndex, gid, srid, labelField, layerName) {
     this.url = url;
     this.zIndex = zIndex;
     this.sent = false;
     this.gid = gid;
     this.srid = srid;
+    this.labelField = labelField;
+    this.layerName = layerName;
   };
 
   function SortByZIndex(a, b) {
@@ -1070,7 +1111,7 @@ let LamMapInfo = (function() {
     addGeometryInfoToMap: addGeometryInfoToMap,
     addFeatureFlashToMap: addFeatureFlashToMap,
     addFeatureInfoToMap: addFeatureInfoToMap,
-    addWktInfoToMap: addWktInfoToMap,
+    //addWktInfoToMap: addWktInfoToMap,
     clearLayerFlash: clearLayerFlash,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
@@ -1298,7 +1339,9 @@ let LamMap = (function() {
     mapSrid,
     preload,
     vectorWidth,
-    vectorRadius
+    vectorRadius,
+    labelField,
+    layerName
   ) {
     let thisLayer;
     if (!params) {
@@ -1347,6 +1390,8 @@ let LamMap = (function() {
     if (thisLayer) {
       thisLayer.gid = gid;
       thisLayer.srid = srid;
+      thisLayer.labelField = labelField;
+      thisLayer.layerName = layerName;
       thisLayer.queryable = queryable;
       thisLayer.setVisible(visible);
       thisLayer.zIndex = parseInt(zIndex);
@@ -1907,7 +1952,9 @@ let LamMap = (function() {
         mapSrid,
         layer.preload,
         layer.vectorWidth,
-        layer.vectorRadius
+        layer.vectorRadius,
+        layer.labelField,
+        layer.layerName
       );
       if (layer.layers) {
         addLayersToMap(layer.layers, mapSrid);
@@ -2120,7 +2167,7 @@ let LamMap = (function() {
   let convertGeometryToOl = function(geometry, geometryFormat) {
     let geometryOl = geometry;
     switch (geometryFormat) {
-      case LamMapEnums.geometryFormats().GeoJson:
+      case LamEnums.geometryFormats().GeoJson:
         geometryOl = getGeometryFromGeoJsonGeometry(geometry);
         break;
     }
@@ -2672,50 +2719,50 @@ let LamMap = (function() {
    */
   let getGeometryType = function(coordinates) {
     if (!Array.isArray(coordinates)) {
-      return LamMapEnums.geometryTypes().GeometryNull;
+      return LamEnums.geometryTypes().GeometryNull;
     }
     let firstElement = coordinates[0];
     if (!Array.isArray(firstElement)) {
       //single array geometry
       if (coordinates.length > 2) {
         if (coordinates[0] === coordinates[coordinates.length - 2] && coordinates[1] === coordinates[coordinates.length - 1]) {
-          return LamMapEnums.geometryTypes().Polygon;
+          return LamEnums.geometryTypes().Polygon;
         } else {
-          return LamMapEnums.geometryTypes().Polyline;
+          return LamEnums.geometryTypes().Polyline;
         }
       } else {
-        return LamMapEnums.geometryTypes().Point;
+        return LamEnums.geometryTypes().Point;
       }
     }
     if (!Array.isArray(firstElement[0])) {
       //if first and last point are the same is polygon, otherwise polyline
       let lastElement = coordinates[coordinates.length - 1];
       if (firstElement[0] === lastElement[0] && firstElement[1] === lastElement[1]) {
-        return LamMapEnums.geometryTypes().Polygon;
+        return LamEnums.geometryTypes().Polygon;
       } else {
-        return LamMapEnums.geometryTypes().Polyline;
+        return LamEnums.geometryTypes().Polyline;
       }
     }
     //multis
     switch (getGeometryType(firstElement)) {
-      case LamMapEnums.geometryTypes().Polygon:
-      case LamMapEnums.geometryTypes().MultiPolygon:
-        return LamMapEnums.geometryTypes().MultiPolygon;
-      case LamMapEnums.geometryTypes().Polyline:
-      case LamMapEnums.geometryTypes().MultiPolyline:
-        return LamMapEnums.geometryTypes().MultiPolyline;
+      case LamEnums.geometryTypes().Polygon:
+      case LamEnums.geometryTypes().MultiPolygon:
+        return LamEnums.geometryTypes().MultiPolygon;
+      case LamEnums.geometryTypes().Polyline:
+      case LamEnums.geometryTypes().MultiPolyline:
+        return LamEnums.geometryTypes().MultiPolyline;
     }
-    return LamMapEnums.geometryTypes().GeometryNull;
+    return LamEnums.geometryTypes().GeometryNull;
   };
 
   let getLabelPoint = function(coordinates) {
     if (coordinates.length === 1) coordinates = coordinates[0];
     switch (getGeometryType(coordinates)) {
-      case LamMapEnums.geometryTypes().Point:
+      case LamEnums.geometryTypes().Point:
         return coordinates;
-      case LamMapEnums.geometryTypes().Polyline:
+      case LamEnums.geometryTypes().Polyline:
         return coordinates[Math.floor(coordinates.length / 2)];
-      case LamMapEnums.geometryTypes().Polygon:
+      case LamEnums.geometryTypes().Polygon:
         let polygon = new ol.geom.Polygon(coordinates);
         let ppoint = polygon.getInteriorPoint().getCoordinates();
         if (isNaN(ppoint[0])) {
@@ -2723,10 +2770,10 @@ let LamMap = (function() {
           ppoint = polygon.getInteriorPoint().getCoordinates();
         }
         return ppoint;
-      case LamMapEnums.geometryTypes().MultiPolyline:
+      case LamEnums.geometryTypes().MultiPolyline:
         coordinates = coordinates[0];
         return coordinates[Math.floor(coordinates.length / 2)];
-      case LamMapEnums.geometryTypes().MultiPolygon:
+      case LamEnums.geometryTypes().MultiPolygon:
         let mpolygon = new ol.geom.Polygon(coordinates);
         return mpolygon.getInteriorPoint().getCoordinates();
     }
@@ -3591,7 +3638,6 @@ var LamSearchTools = (function() {
     });
 
     //events binding
-
     /**
      * Shows the search tool, resetting info-results
      */
@@ -3599,6 +3645,9 @@ var LamSearchTools = (function() {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
       lamDispatch("reset-search");
+      setTimeout(function() {
+        updateScrollHeight();
+      }, 500);
     });
 
     /**
@@ -3657,9 +3706,9 @@ var LamSearchTools = (function() {
         break;
     }
 
-    updateScroll(220);
+    updateScrollHeight();
     $(window).resize(function() {
-      updateScroll(20);
+      updateScrollHeight();
     });
 
     if (!isRendered) {
@@ -3679,18 +3728,22 @@ var LamSearchTools = (function() {
    * Helper function to show html results
    * @param {string} html
    */
-  let showSearchResults = function(html) {
-    LamDom.showContent("", html, html, searchResultsDiv);
+  let showSearchResults = function(html, htmlMobile) {
+    if (!htmlMobile) htmlMobile = html;
+    $("#" + searchResultsDiv).html(html);
+    //$("#bottom-info__title-text").html(title);
+    $("#bottom-info__content").html(htmlMobile);
+    //LamDom.showContent(LamEnums.showContentMode().LeftPanel, "", html, html, "search-tools", searchResultsDiv);
   };
 
   /**
    * Aggiorna la dimensione dello scroll dei contenuti
    * @return {null} La funzione non restituisce un valore
    */
-  var updateScroll = function(offset) {
+  var updateScrollHeight = function() {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#" + searchResultsDiv).offset();
-    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - offset);
+    $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - 20);
   };
 
   /**
@@ -3828,54 +3881,54 @@ var LamSearchTools = (function() {
     lamDispatch("reset-search");
   };
 
-  /**
-   * Zoom the map to the lon-lat given and show the infobox of the given item index
-   * @param {float} lon
-   * @param {float} lat
-   * @param {int} index Item's index in the result array
-   * @param {boolean} showInfo
-   */
-  var zoomToItemLayer = function(lon, lat, index, showInfo) {
-    lamDispatch("clear-layer-info");
-    if (searchResults[index]) {
-      lamDispatch({
-        eventName: "zoom-geometry",
-        geometry: searchResults[index].item.geometry,
-        srid: 4326
-      });
-      if (showInfo) {
-        lamDispatch({
-          eventName: "show-info-items",
-          features: searchResults[index].item,
-          element: searchResultsDiv
-        });
-      }
-      let payload = {
-        eventName: "add-geometry-info-map",
-        geometry: searchResults[index].item.geometry
-      };
-      try {
-        payload.srid = searchResults[index].item.crs;
-        if (payload.srid == null) {
-          payload.srid = 4326;
-        }
-      } catch (e) {
-        payload.srid = 4326;
-      }
-      lamDispatch(payload);
-      lamDispatch("hide-menu-mobile");
-    } else {
-      lamDispatch({
-        eventName: "zoom-lon-lat",
-        zoom: 18,
-        lon: parseFloat(lon),
-        lat: parseFloat(lat),
-        eventName: "add-wkt-info-map",
-        wkt: "POINT(" + lon + " " + lat + ")"
-      });
-      lamDispatch("hide-menu-mobile");
-    }
-  };
+  // /**
+  //  * Zoom the map to the lon-lat given and show the infobox of the given item index
+  //  * @param {float} lon
+  //  * @param {float} lat
+  //  * @param {int} index Item's index in the result array
+  //  * @param {boolean} showInfo
+  //  */
+  // var zoomToItemLayer = function(lon, lat, index, showInfo) {
+  //   lamDispatch("clear-layer-info");
+  //   if (searchResults[index]) {
+  //     lamDispatch({
+  //       eventName: "zoom-geometry",
+  //       geometry: searchResults[index].item.geometry,
+  //       srid: 4326
+  //     });
+  //     if (showInfo) {
+  //       lamDispatch({
+  //         eventName: "show-info-items",
+  //         features: searchResults[index].item,
+  //         element: searchResultsDiv
+  //       });
+  //     }
+  //     let payload = {
+  //       eventName: "add-geometry-info-map",
+  //       geometry: searchResults[index].item.geometry
+  //     };
+  //     try {
+  //       payload.srid = searchResults[index].item.crs;
+  //       if (payload.srid == null) {
+  //         payload.srid = 4326;
+  //       }
+  //     } catch (e) {
+  //       payload.srid = 4326;
+  //     }
+  //     lamDispatch(payload);
+  //     lamDispatch("hide-menu-mobile");
+  //   } else {
+  //     lamDispatch({
+  //       eventName: "zoom-lon-lat",
+  //       zoom: 18,
+  //       lon: parseFloat(lon),
+  //       lat: parseFloat(lat),
+  //       eventName: "add-wkt-info-map",
+  //       wkt: "POINT(" + lon + " " + lat + ")"
+  //     });
+  //     lamDispatch("hide-menu-mobile");
+  //   }
+  // };
 
   var searchAddressKeyup = function(ev) {
     clearTimeout(timer);
@@ -4124,18 +4177,12 @@ var LamSearchTools = (function() {
       showSearchResults(AppTemplates.getResultEmpty);
       return;
     }
-    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template));
+    showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template), LamTemplates.renderInfoFeaturesMobile(featureInfoCollection));
   };
 
   var selectLayer = function(layer) {
     $("#search-tools__select-layers").val(layer);
   };
-
-  function SortByDisplayName(a, b) {
-    var aName = a.display_name.toLowerCase();
-    var bName = b.display_name.toLowerCase();
-    return aName < bName ? -1 : aName > bName ? 1 : 0;
-  }
 
   return {
     render: render,
@@ -4150,9 +4197,9 @@ var LamSearchTools = (function() {
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,
-    showSearchLayers: showSearchLayers,
+    showSearchLayers: showSearchLayers
     //zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
-    zoomToItemLayer: zoomToItemLayer
+    //zoomToItemLayer: zoomToItemLayer
   };
 })();
 
@@ -4555,7 +4602,7 @@ var LamLinksTools = (function() {
     LamDispatcher.bind("show-links", function(payload) {
       var templateTemp = templateLinks();
       var output = templateTemp(LamStore.getLinks());
-      LamDom.showContentInfoWindow("Links", output);
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
     });
   };
 
@@ -4684,9 +4731,9 @@ var LamLegendTools = (function() {
       layerName += " - " + thisLayer.layerName;
     }
     if (showInfoWindow) {
-      LamDom.showContentInfoWindow(layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, layerName, html, "");
     } else {
-      LamDom.showContent(layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, layerName, html, "");
     }
     return true;
   };
@@ -4717,9 +4764,9 @@ var LamLegendTools = (function() {
     let title = "Legenda";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
-      LamDom.showContentInfoWindow(title, html.html(), "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
     } else {
-      LamDom.showContent(title, html.html(), "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, html.html(), "");
     }
   };
 
@@ -5139,13 +5186,13 @@ var LamDispatcher = (function() {
     });
 
     this.bind("zoom-geometry", function(payload) {
-      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamMapEnums.geometryFormats().GeoJson);
+      let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
     });
 
-    this.bind("add-wkt-info-map", function(payload) {
-      LamMapInfo.addWktInfoToMap(payload.wkt);
-    });
+    // this.bind("add-wkt-info-map", function(payload) {
+    //   LamMapInfo.addWktInfoToMap(payload.wkt);
+    // });
 
     /**
      * {string} paylod.gid Layer Gid
@@ -5463,7 +5510,7 @@ var LamRelations = (function() {
     if (data.length === 0) {
       body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
     }
-    LamDom.showContentInfoWindow(title, body);
+    LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
     lamDispatch("hide-loader");
   };
 
@@ -5493,12 +5540,12 @@ var LamDom = (function() {
       LamDom.toggleLoader(true);
     });
 
-    LamDispatcher.bind("show-info-tooltip", function(payload) {
-      $("#info-tooltip").show();
+    LamDispatcher.bind("show-bottom-info", function(payload) {
+      $("#bottom-info").show();
     });
 
-    LamDispatcher.bind("hide-info-tooltip", function(payload) {
-      $("#info-tooltip").hide();
+    LamDispatcher.bind("hide-bottom-info", function(payload) {
+      $("#bottom-info").hide();
     });
   };
 
@@ -5585,27 +5632,51 @@ var LamDom = (function() {
     }
   };
 
-  let showContent = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-results";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
-    $("#info-tooltip__title-text").html(title);
-    $("#info-tooltip__content").html(bodyMobile);
-    if (!LamDom.isMobile()) {
-      LamToolbar.toggleToolbarItem(htmlElement, true);
-    } else {
-      $("#info-tooltip").show();
+  let showContent = function(contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
+    if (!htmlBottomInfo) htmlBottomInfo = htmlMain;
+    if (!toolBarItem) toolBarItem = "info-results";
+    let htmlTitle = $("<div id='" + elementId + "__title'></div>")
+      .addClass("lam-title")
+      .html(title);
+    let htmlContent = $("<div id='" + elementId + "__content'></div>")
+      .addClass("lam-scroll-padding")
+      .html(htmlMain);
+    switch (contentMode) {
+      case 1: //LeftPanel
+        if (!elementId) elementId = "info-results";
+        $("#" + elementId + "")
+          .html("")
+          .append(htmlTitle)
+          .append(htmlContent)
+          .show();
+        LamToolbar.toggleToolbarItem(toolBarItem, true);
+        LamDispatcher.dispatch("hide-info-window");
+        //LamDispatcher.dispatch("show-menu");
+        $("#bottom-info").hide();
+        break;
+      case 2: //BottomInfo
+        if (!elementId) elementId = "info-results";
+        $("#" + elementId + "")
+          .html("")
+          .append(htmlTitle)
+          .append(htmlContent)
+          .show();
+        $("#bottom-info__title-text").html(title);
+        $("#bottom-info__content").html(htmlBottomInfo);
+        LamToolbar.toggleToolbarItem(toolBarItem, false);
+        LamDispatcher.dispatch("hide-info-window");
+        LamDispatcher.dispatch("hide-menu");
+        $("#bottom-info").show();
+        break;
+      case 3: //InfoWindow
+        if (!elementId) elementId = "info-window";
+        LamDispatcher.dispatch("hide-menu");
+        $("#bottom-info").hide();
+        $("#" + elementId + "__content").html(htmlMain);
+        $("#" + elementId + "__title").html(title);
+        $("#" + elementId + "").show();
+        break;
     }
-  };
-
-  let showContentInfoWindow = function(title, body, bodyMobile, htmlElement) {
-    if (!htmlElement) htmlElement = "info-window";
-    if (!bodyMobile) bodyMobile = body;
-    $("#" + htmlElement + "__content").html(body);
-    $("#" + htmlElement + "__title").html(title);
-    $("#" + htmlElement + "").show();
   };
 
   /**
@@ -5627,7 +5698,6 @@ var LamDom = (function() {
     setvisibility: setvisibility,
     showAppTools: showAppTools,
     showContent: showContent,
-    showContentInfoWindow: showContentInfoWindow,
     toggleLoader: toggleLoader
   };
 })();
@@ -7033,7 +7103,7 @@ let LamTemplates = (function() {
         type: "Point",
         srid: feature.srid
       },
-      LamMapEnums.geometryFormats().GeoJson
+      LamEnums.geometryFormats().GeoJson
     );
     centroid = LamMap.transformGeometrySrid(geometryOl, 3857, 4326);
     icons +=
@@ -7148,6 +7218,7 @@ let LamTemplates = (function() {
       return label;
     } catch (error) {
       lamDispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
+      return "";
     }
   };
 
@@ -7191,6 +7262,7 @@ let LamTemplates = (function() {
   };
 
   let renderInfoFeaturesMobile = function(featureInfoCollection) {
+    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -7198,14 +7270,13 @@ let LamTemplates = (function() {
         features: featureInfoCollection
       };
     }
-    let index = 0;
     featureInfoCollection.features.forEach(function(feature, index) {
-      let props = feature.properties ? feature.properties : feature;
-      let layer = LamStore.getLayer(feature.layerGid);
+      //let props = feature.properties ? feature.properties : feature;
+      //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
-      let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-1 lam-info-tooltip__content-item'>";
-      tempBody += tooltip;
+      //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+      tempBody += "<div class='lam-depth-1 lam-bottom-info__content-item'>";
+      tempBody += feature.tooltip;
       tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";
       body += tempBody;
@@ -7324,6 +7395,7 @@ let LamToolbar = (function() {
   };
 
   let showMenu = function(toolId) {
+    $("#bottom-info").hide();
     $("#panel").animate(
       {
         width: "show"

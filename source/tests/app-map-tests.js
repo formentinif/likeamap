@@ -1,9 +1,9 @@
 QUnit.test("Geometry Type is null", function(assert) {
-  assert.ok(LamMap.getGeometryType(1) === LamMapEnums.geometryTypes().GeometryNull, "Passed!");
+  assert.ok(LamMap.getGeometryType(1) === LamEnums.geometryTypes().GeometryNull, "Passed!");
 });
 
 QUnit.test("Geometry Type is Point", function(assert) {
-  assert.ok(LamMap.getGeometryType([1, 1]) === LamMapEnums.geometryTypes().Point, "Passed!");
+  assert.ok(LamMap.getGeometryType([1, 1]) === LamEnums.geometryTypes().Point, "Passed!");
 });
 
 QUnit.test("Geometry Type is Polyline", function(assert) {
@@ -12,7 +12,7 @@ QUnit.test("Geometry Type is Polyline", function(assert) {
       [1, 1],
       [2, 2],
       [3, 3]
-    ]) === LamMapEnums.geometryTypes().Polyline,
+    ]) === LamEnums.geometryTypes().Polyline,
     "Passed!"
   );
 });
@@ -23,7 +23,7 @@ QUnit.test("Geometry Type is not Polygon", function(assert) {
       [1, 1],
       [2, 2],
       [3, 3]
-    ]) !== LamMapEnums.geometryTypes().Polygon,
+    ]) !== LamEnums.geometryTypes().Polygon,
     "Passed!"
   );
 });
@@ -35,7 +35,7 @@ QUnit.test("Geometry Type is Polygon", function(assert) {
       [2, 2],
       [3, 3],
       [1, 1]
-    ]) === LamMapEnums.geometryTypes().Polygon,
+    ]) === LamEnums.geometryTypes().Polygon,
     "Passed!"
   );
 });
@@ -52,7 +52,7 @@ QUnit.test("Geometry Type is Multi Polyline", function(assert) {
         [5, 5],
         [6, 6]
       ]
-    ]) === LamMapEnums.geometryTypes().MultiPolyline,
+    ]) === LamEnums.geometryTypes().MultiPolyline,
     "Passed!"
   );
 });
@@ -70,7 +70,7 @@ QUnit.test("Geometry Type is Multi Polygon", function(assert) {
         [5, 5],
         [6, 6]
       ]
-    ]) === LamMapEnums.geometryTypes().MultiPolygon,
+    ]) === LamEnums.geometryTypes().MultiPolygon,
     "Passed!"
   );
 });

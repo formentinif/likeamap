@@ -187,7 +187,7 @@ let LamTemplates = (function() {
         type: "Point",
         srid: feature.srid
       },
-      LamMapEnums.geometryFormats().GeoJson
+      LamEnums.geometryFormats().GeoJson
     );
     centroid = LamMap.transformGeometrySrid(geometryOl, 3857, 4326);
     icons +=
@@ -302,6 +302,7 @@ let LamTemplates = (function() {
       return label;
     } catch (error) {
       lamDispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
+      return "";
     }
   };
 
@@ -345,6 +346,7 @@ let LamTemplates = (function() {
   };
 
   let renderInfoFeaturesMobile = function(featureInfoCollection) {
+    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -352,14 +354,13 @@ let LamTemplates = (function() {
         features: featureInfoCollection
       };
     }
-    let index = 0;
     featureInfoCollection.features.forEach(function(feature, index) {
-      let props = feature.properties ? feature.properties : feature;
-      let layer = LamStore.getLayer(feature.layerGid);
+      //let props = feature.properties ? feature.properties : feature;
+      //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
-      let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-1 lam-info-tooltip__content-item'>";
-      tempBody += tooltip;
+      //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+      tempBody += "<div class='lam-depth-1 lam-bottom-info__content-item'>";
+      tempBody += feature.tooltip;
       tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";
       body += tempBody;

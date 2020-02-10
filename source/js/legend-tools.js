@@ -99,9 +99,9 @@ var LamLegendTools = (function() {
       layerName += " - " + thisLayer.layerName;
     }
     if (showInfoWindow) {
-      LamDom.showContentInfoWindow(layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, layerName, html, "");
     } else {
-      LamDom.showContent(layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, layerName, html, "");
     }
     return true;
   };
@@ -132,9 +132,9 @@ var LamLegendTools = (function() {
     let title = "Legenda";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
-      LamDom.showContentInfoWindow(title, html.html(), "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
     } else {
-      LamDom.showContent(title, html.html(), "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, html.html(), "");
     }
   };
 

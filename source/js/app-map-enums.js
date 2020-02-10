@@ -28,8 +28,14 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Map Eumerations
  */
-let LamMapEnums = (function() {
+let LamEnums = (function() {
   "use strict";
+
+  let showContentModeEnum = {
+    LeftPanel: 1,
+    BottomInfo: 2,
+    InfoWindow: 3
+  };
 
   let infoSelectBehaviourEnum = {
     SingleFeature: 1,
@@ -62,7 +68,12 @@ let LamMapEnums = (function() {
     return infoSelectBehaviourEnum;
   };
 
+  let showContentMode = function() {
+    return showContentModeEnum;
+  };
+
   return {
+    showContentMode: showContentMode,
     geometryFormats: geometryFormats,
     geometryTypes: geometryTypes,
     infoSelectBehaviours: infoSelectBehaviours

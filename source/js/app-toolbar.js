@@ -68,6 +68,7 @@ let LamToolbar = (function() {
   };
 
   let showMenu = function(toolId) {
+    $("#bottom-info").hide();
     $("#panel").animate(
       {
         width: "show"

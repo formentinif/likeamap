@@ -33,7 +33,7 @@ var LamLinksTools = (function() {
     LamDispatcher.bind("show-links", function(payload) {
       var templateTemp = templateLinks();
       var output = templateTemp(LamStore.getLinks());
-      LamDom.showContentInfoWindow("Links", output);
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
     });
   };
 
