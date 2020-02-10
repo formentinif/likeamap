@@ -722,7 +722,6 @@ let LamMapInfo = (function() {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-            debugger;
             requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid, layer.labelField, layer.layerName));
           }
         }
@@ -856,7 +855,6 @@ let LamMapInfo = (function() {
         let layer = requestQueue.layers[requestQueue.currentLayerIndex];
         featureCollection.features[i].layerGid = layer.gid;
         featureCollection.features[i].srid = layer.srid;
-        debugger;
         featureCollection.features[i].tooltip = LamTemplates.getLabelFeature(featureCollection.features[i].properties, layer.labelField, layer.layerName);
         requestQueueData.push(featureCollection.features[i]);
       }
@@ -3732,6 +3730,7 @@ var LamSearchTools = (function() {
     if (!htmlMobile) htmlMobile = html;
     $("#" + searchResultsDiv).html(html);
     //$("#bottom-info__title-text").html(title);
+    $("#bottom-info__title-text").html("Risultati di ricerca");
     $("#bottom-info__content").html(htmlMobile);
     //LamDom.showContent(LamEnums.showContentMode().LeftPanel, "", html, html, "search-tools", searchResultsDiv);
   };
@@ -3866,6 +3865,7 @@ var LamSearchTools = (function() {
     $("#search-tools__layers").hide();
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
+    updateScrollHeight();
   };
 
   /**
@@ -3879,6 +3879,7 @@ var LamSearchTools = (function() {
     $("#search-tools__layers").show();
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
+    updateScrollHeight();
   };
 
   // /**
@@ -7262,7 +7263,6 @@ let LamTemplates = (function() {
   };
 
   let renderInfoFeaturesMobile = function(featureInfoCollection) {
-    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -7275,7 +7275,7 @@ let LamTemplates = (function() {
       //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
       //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-1 lam-bottom-info__content-item'>";
+      tempBody += "<div class=' lam-bottom-info__content-item'>";
       tempBody += feature.tooltip;
       tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";

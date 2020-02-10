@@ -216,7 +216,6 @@ let LamMapInfo = (function() {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
-            debugger;
             requestQueue.layers.push(new RequestLayer(url, layer.zIndex, layer.gid, layer.srid, layer.labelField, layer.layerName));
           }
         }
@@ -350,7 +349,6 @@ let LamMapInfo = (function() {
         let layer = requestQueue.layers[requestQueue.currentLayerIndex];
         featureCollection.features[i].layerGid = layer.gid;
         featureCollection.features[i].srid = layer.srid;
-        debugger;
         featureCollection.features[i].tooltip = LamTemplates.getLabelFeature(featureCollection.features[i].properties, layer.labelField, layer.layerName);
         requestQueueData.push(featureCollection.features[i]);
       }

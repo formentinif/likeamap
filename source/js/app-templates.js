@@ -346,7 +346,6 @@ let LamTemplates = (function() {
   };
 
   let renderInfoFeaturesMobile = function(featureInfoCollection) {
-    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
@@ -359,7 +358,7 @@ let LamTemplates = (function() {
       //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
       //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
-      tempBody += "<div class='lam-depth-1 lam-bottom-info__content-item'>";
+      tempBody += "<div class=' lam-bottom-info__content-item'>";
       tempBody += feature.tooltip;
       tempBody += LamTemplates.featureIconsTemplate(index);
       tempBody += "</div>";

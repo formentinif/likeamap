@@ -140,6 +140,7 @@ var LamSearchTools = (function() {
     if (!htmlMobile) htmlMobile = html;
     $("#" + searchResultsDiv).html(html);
     //$("#bottom-info__title-text").html(title);
+    $("#bottom-info__title-text").html("Risultati di ricerca");
     $("#bottom-info__content").html(htmlMobile);
     //LamDom.showContent(LamEnums.showContentMode().LeftPanel, "", html, html, "search-tools", searchResultsDiv);
   };
@@ -274,6 +275,7 @@ var LamSearchTools = (function() {
     $("#search-tools__layers").hide();
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
+    updateScrollHeight();
   };
 
   /**
@@ -287,6 +289,7 @@ var LamSearchTools = (function() {
     $("#search-tools__layers").show();
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
+    updateScrollHeight();
   };
 
   // /**

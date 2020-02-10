@@ -49,7 +49,9 @@ body {
   --lam-bg-color: rgba(252, 252, 252, 0.9);
   --lam-bg-menu-color: #63818f;
   --lam-btn-color: #63818f;
-  --lam-btn-color-darken: #455a64;
+  --lam-btn-color-darken: #2a4f60;
+  --lam-btn-color-lighter: #c2cdd3;
+  /*426678 8BA1AB 63818F 426678 2a4f60*/
 }
 
 .lam-background {
