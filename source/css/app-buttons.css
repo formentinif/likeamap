@@ -1,8 +1,10 @@
 .lam-btn {
+  display: inline-block;
   background-color: var(--lam-btn-color);
   border: none;
   border-radius: 2px;
-  padding: 6px 6px;
+  padding: 8px 16px;
+  margin: 4px 4px;
   font-size: 1rem;
   cursor: pointer;
   color: white;
@@ -17,6 +19,7 @@
 }
 
 .lam-btn-floating {
+  margin: 4px 4px;
   border-radius: 100%;
   width: 52px;
   height: 52px;

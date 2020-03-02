@@ -30,7 +30,7 @@ body {
   height: 100%;
   padding: 0px;
   margin: 0px;
-  font-family: "Open Sans", Helvetica, sans-serif;
+  font-family: "Titillium Web", "Open Sans", Helvetica, sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased !important;
 }
@@ -49,8 +49,8 @@ body {
   --lam-bg-color: rgba(252, 252, 252, 0.9);
   --lam-bg-menu-color: #63818f;
   --lam-btn-color: #63818f;
-  --lam-btn-color-darken: #2a4f60;
-  --lam-btn-color-lighter: #c2cdd3;
+  --lam-btn-color-darken: #40535b;
+  --lam-btn-color-lighter: #87afc1;
   /*426678 8BA1AB 63818F 426678 2a4f60*/
 }
 

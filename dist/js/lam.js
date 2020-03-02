@@ -3719,7 +3719,7 @@ var LamSearchTools = (function() {
   let resetSearch = function() {
     $("#search-tools__search-layers").val("");
     $("#search-tools__search-address").val("");
-    showSearchResults("");
+    showSearchResults("<p>Inserisci un testo per iniziare la ricerca.</p>");
   };
 
   /**
@@ -3749,16 +3749,16 @@ var LamSearchTools = (function() {
    * General html code that will be injected in the panel as the main tools
    */
   var templateTopTools = function(layersNum) {
-    let template = '<div class="lam-bar lam-background">';
-    template += '<div class="lam-grid lam-no-margin lam-no-bg">';
+    let template = '<div class="lam-bar">';
     template +=
-      '<div class="lam-col"><button id="search-tools__button-address" class="lam-btn lam-btn-small lam-ripple lam-background-darken" onclick="LamSearchTools.showSearchAddress(); return false;" autofocus>Indirizzi</button>';
+      '<div id="lam-bar__item-address" class="lam-bar__item lam-is-half lam-bar__item-selected" onclick="LamSearchTools.showSearchAddress(); return false;">';
+    template += '<a id="search-tools__button-address" class="" autofocus>Indirizzi</a>';
+    template += "</div>";
     if (layersNum) {
-      template +=
-        '<button id="search-tools__button-layers" class="lam-btn lam-btn-small lam-ripple" onclick="LamSearchTools.showSearchLayers(); return false;" >Temi</button>';
+      template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half" onclick="LamSearchTools.showSearchLayers(); return false;">';
+      template += '<a id="search-tools__button-layers" class="" >Temi</a>';
+      template += "</div>";
     }
-    template += "</div>";
-    template += "</div>";
     template += "</div>";
     return template;
   };
@@ -3865,6 +3865,8 @@ var LamSearchTools = (function() {
     $("#search-tools__layers").hide();
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
+    $("#lam-bar__item-address").addClass("lam-bar__item-selected");
+    $("#lam-bar__item-layers").removeClass("lam-bar__item-selected");
     updateScrollHeight();
   };
 
@@ -3874,9 +3876,10 @@ var LamSearchTools = (function() {
   var showSearchLayers = function() {
     $("#search-tools__button-address").removeClass("lam-background-darken");
     $("#search-tools__label").text("Layers");
-    $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
     $("#search-tools__layers").show();
+    $("#lam-bar__item-address").removeClass("lam-bar__item-selected");
+    $("#lam-bar__item-layers").addClass("lam-bar__item-selected");
     lamDispatch("clear-layer-info");
     lamDispatch("reset-search");
     updateScrollHeight();
@@ -4726,9 +4729,9 @@ var LamLegendTools = (function() {
     }
     if (scaled) {
       html +=
-        "<p class='mt-2'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
-        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></p>";
+        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";
@@ -5509,7 +5512,7 @@ var LamRelations = (function() {
     }
     //download
     body +=
-      "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
+      "<div class=' lam-mt-1'><button class='lam-btn lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
       LamResources.svgDownload16 +
       "</i> Scarica CSV</button></div>";
     if (data.length === 0) {

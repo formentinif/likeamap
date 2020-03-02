@@ -44,9 +44,9 @@
 }
 
 .layertree-group__title {
-  padding: 2px;
+  padding: 4px 4px;
   box-sizing: border-box;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: white;
   display: flex;
   flex-direction: row;
@@ -73,7 +73,7 @@
 
 .layertree-group__layers-icons {
   padding: 0rem 0.1rem 0rem 0rem;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   order: 3;
   min-width: 35px;
 }
@@ -86,36 +86,36 @@
 
 .layertree-group__title--sub1 {
   box-sizing: border-box;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   backdrop-filter: brightness(110%);
-  padding: 2px;
+  padding: 4px 4px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
 .layertree-group__title--sub2 {
   box-sizing: border-box;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   backdrop-filter: brightness(130%);
-  padding: 2px;
+  padding: 4px 4px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
 .layertree-group__title--sub3 {
   box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 1.1rem;
   backdrop-filter: brightness(150%);
-  padding: 2px;
+  padding: 4px 4px;
   width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
 .layertree-group__title--sub4 {
   box-sizing: border-box;
-  font-size: 1.1rem;
+  font-size: 1rem;
   backdrop-filter: brightness(170%);
-  padding: 2px;
+  padding: 4px 4px;
   width: 100%;
 }
 
@@ -129,7 +129,7 @@
 
 .layertree-layer {
   margin: 0px;
-  padding: 2px 3px;
+  padding: 4px 4px;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: row;

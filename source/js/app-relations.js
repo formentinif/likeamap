@@ -82,7 +82,7 @@ var LamRelations = (function() {
     }
     //download
     body +=
-      "<div class=' lam-mt-1'><button class='lam-btn lam-small lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
+      "<div class=' lam-mt-1'><button class='lam-btn lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
       LamResources.svgDownload16 +
       "</i> Scarica CSV</button></div>";
     if (data.length === 0) {

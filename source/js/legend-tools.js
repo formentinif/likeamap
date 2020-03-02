@@ -89,9 +89,9 @@ var LamLegendTools = (function() {
     }
     if (scaled) {
       html +=
-        "<p class='mt-2'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
-        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></p>";
+        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";

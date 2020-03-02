@@ -3,23 +3,20 @@
 }
 
 .lam-title {
-  margin-top: 0.2rem;
-  margin-bottom: 0.3rem;
+  margin: 8px 8px;
   font-size: 2rem;
 }
 
 .lam-title-h4 {
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
-  font-size: 1.2rem;
-  line-height: 22px;
+  margin: 8px 8px;
+  font-size: 1.25rem;
+  line-height: 24px;
 }
 
 .lam-title-legend {
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
-  font-size: 1.2rem;
-  line-height: 22px;
+  margin: 8px 8px;
+  font-size: 1.25rem;
+  line-height: 1.25rem;
   color: var(--lam-btn-color);
 }
 
@@ -57,9 +54,24 @@
 
 .lam-bar {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
   color: white;
   width: 100%;
-  padding: 8px 16px;
+  padding: 0px 0px;
+  margin: 8px 0px;
+}
+
+.lam-bar__item {
+  padding: 8px 8px;
+  font-size: 1.25rem;
+  color: var(--lam-btn-color-lighter);
+  border-bottom: 2px solid var(--lam-btn-color-lighter);
+  cursor: pointer;
+}
+.lam-bar__item-selected {
+  border-bottom: 2px solid var(--lam-btn-color-darken);
+  color: var(--lam-btn-color-darken);
 }
 
 .fake-link {
