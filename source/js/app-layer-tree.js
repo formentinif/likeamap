@@ -29,10 +29,6 @@ let LamLayerTree = (function() {
   let treeDiv = "lam-layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
-  //let layerGroupItemPrefix = "lti";
-  //let layerGroupItemIconPrefix = "ltic";
-  //let layerUriCount = 0;
-  //let countRequest = 0;
 
   let init = function() {
     //events binding
@@ -69,6 +65,11 @@ let LamLayerTree = (function() {
     jQuery("#" + treeDiv).html(output);
 
     updateCheckBoxesStates(LamStore.getAppState().layers);
+    if (LamStore.getAppState().showLayerTreeOnLoad && !isRendered) {
+      LamDispatcher.dispatch({
+        eventName: "show-layers"
+      });
+    }
     isRendered = true;
   };
 

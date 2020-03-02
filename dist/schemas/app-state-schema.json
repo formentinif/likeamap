@@ -102,6 +102,12 @@
       "default": false,
       "type": "boolean"
     },
+    "showLayerTreeOnLoad": {
+      "title": "Visualizza l'albero dei livelli'avvio",
+      "description": "Visualizza l'albero dei livelli'avvio",
+      "default": false,
+      "type": "boolean"
+    },
     "infoSelectBehaviour": {
       "title": "Modalità di selezione",
       "description": "Definisce la modalità di selezione delle feature 1 Single 2 Multiple",
@@ -110,6 +116,18 @@
     },
     "openResultInInfoWindow": {
       "title": "Apri informazioni nella info window",
+      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "enum": [0, 1],
+      "type": "integer"
+    },
+    "openLinksInInfoWindow": {
+      "title": "Apri i link nella info window",
+      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "enum": [0, 1],
+      "type": "integer"
+    },
+    "openLegendInInfoWindow": {
+      "title": "Apri le legende nella info window",
       "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
       "enum": [0, 1],
       "type": "integer"

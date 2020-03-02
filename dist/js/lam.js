@@ -4603,7 +4603,11 @@ var LamLinksTools = (function() {
     LamDispatcher.bind("show-links", function(payload) {
       var templateTemp = templateLinks();
       var output = templateTemp(LamStore.getLinks());
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
+      if (LamStore.getAppState().openLinksInInfoWindow) {
+        LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
+      } else {
+        LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Links", output);
+      }
     });
   };
 
@@ -4664,7 +4668,7 @@ var LamLegendTools = (function() {
   var init = function init() {
     //events binding
     LamDispatcher.bind("show-legend", function(payload) {
-      LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow);
+      LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     /**
@@ -4672,7 +4676,7 @@ var LamLegendTools = (function() {
      */
     LamDispatcher.bind("show-legend-visible-layers", function(payload) {
       let layers = LamStore.getVisibleLayers();
-      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow);
+      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     /**
@@ -4680,14 +4684,14 @@ var LamLegendTools = (function() {
      */
     LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
       let layers = LamStore.getVisibleLayers();
-      LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow);
+      LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     //carico la legenda all'avvio
     if (LamStore.getAppState().showLegendOnLoad) {
       LamDispatcher.dispatch({
         eventName: "show-full-legend-visible-layers",
-        showInfoWindow: false,
+        showInfoWindow: LamStore.getAppState().openLegendInInfoWindow,
         scaled: true
       });
     }
@@ -4715,7 +4719,7 @@ var LamLegendTools = (function() {
         html += "<img class='lam-legend' src='" + urlImg + "' />";
       }
     }
-    html += "<d class='lam-layer-metadata'></div>";
+    html += "<div class='lam-layer-metadata'></div>";
     showLayerMetadata(thisLayer);
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
@@ -4762,7 +4766,7 @@ var LamLegendTools = (function() {
         }
       }
     });
-    let title = "Legenda";
+    let title = "Legenda dei temi attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
       LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
@@ -6684,10 +6688,6 @@ let LamLayerTree = (function() {
   let treeDiv = "lam-layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
-  //let layerGroupItemPrefix = "lti";
-  //let layerGroupItemIconPrefix = "ltic";
-  //let layerUriCount = 0;
-  //let countRequest = 0;
 
   let init = function() {
     //events binding
@@ -6724,6 +6724,11 @@ let LamLayerTree = (function() {
     jQuery("#" + treeDiv).html(output);
 
     updateCheckBoxesStates(LamStore.getAppState().layers);
+    if (LamStore.getAppState().showLayerTreeOnLoad && !isRendered) {
+      LamDispatcher.dispatch({
+        eventName: "show-layers"
+      });
+    }
     isRendered = true;
   };
 

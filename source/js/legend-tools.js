@@ -31,7 +31,7 @@ var LamLegendTools = (function() {
   var init = function init() {
     //events binding
     LamDispatcher.bind("show-legend", function(payload) {
-      LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow);
+      LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     /**
@@ -39,7 +39,7 @@ var LamLegendTools = (function() {
      */
     LamDispatcher.bind("show-legend-visible-layers", function(payload) {
       let layers = LamStore.getVisibleLayers();
-      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow);
+      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     /**
@@ -47,14 +47,14 @@ var LamLegendTools = (function() {
      */
     LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
       let layers = LamStore.getVisibleLayers();
-      LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow);
+      LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
     //carico la legenda all'avvio
     if (LamStore.getAppState().showLegendOnLoad) {
       LamDispatcher.dispatch({
         eventName: "show-full-legend-visible-layers",
-        showInfoWindow: false,
+        showInfoWindow: LamStore.getAppState().openLegendInInfoWindow,
         scaled: true
       });
     }
@@ -82,7 +82,7 @@ var LamLegendTools = (function() {
         html += "<img class='lam-legend' src='" + urlImg + "' />";
       }
     }
-    html += "<d class='lam-layer-metadata'></div>";
+    html += "<div class='lam-layer-metadata'></div>";
     showLayerMetadata(thisLayer);
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
@@ -129,7 +129,7 @@ var LamLegendTools = (function() {
         }
       }
     });
-    let title = "Legenda";
+    let title = "Legenda dei temi attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
       LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
