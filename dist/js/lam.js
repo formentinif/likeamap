@@ -5990,10 +5990,28 @@ var LamLoader = (function() {
       });
   };
 
+  let registerHandlebarsHelpers = function() {
+    Handlebars.registerHelper("ifequals", function(a, b, options) {
+      if (a == b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+
+    Handlebars.registerHelper("ifnotequals", function(a, b, options) {
+      if (a != b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+  };
+
   /*
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
   var mapInit = function(callback) {
+    registerHandlebarsHelpers();
+
     $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
     //definizione dei loghi
     if (LamStore.getAppState().logoUrl) {
@@ -6193,7 +6211,7 @@ var LamRequests = (function() {
     let vector = new ol.layer.Vector({
       //zIndex: parseInt(zIndex),
       source: vectorSource,
-      visible: layer.visible,
+      visible: layer.getVisible(),
       style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius)
     });
     try {
@@ -7307,7 +7325,7 @@ let LamTemplates = (function() {
 
   let generateTemplate = function(template, layer) {
     if (template.templateType === "string") {
-      return template.templateString;
+      return Array.isArray(template.templateString) ? template.templateString.join("") : template.templateString;
     }
     let str = "";
     if (template.templateType === "simple") {
@@ -7395,6 +7413,7 @@ let LamTemplates = (function() {
         layer = LamStore.getLayer(feature.layerGid);
         if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
+
       let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);

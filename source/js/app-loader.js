@@ -140,10 +140,28 @@ var LamLoader = (function() {
       });
   };
 
+  let registerHandlebarsHelpers = function() {
+    Handlebars.registerHelper("ifequals", function(a, b, options) {
+      if (a == b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+
+    Handlebars.registerHelper("ifnotequals", function(a, b, options) {
+      if (a != b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+  };
+
   /*
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
   var mapInit = function(callback) {
+    registerHandlebarsHelpers();
+
     $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
     //definizione dei loghi
     if (LamStore.getAppState().logoUrl) {

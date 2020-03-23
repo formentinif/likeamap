@@ -239,7 +239,7 @@ let LamTemplates = (function() {
 
   let generateTemplate = function(template, layer) {
     if (template.templateType === "string") {
-      return template.templateString;
+      return Array.isArray(template.templateString) ? template.templateString.join("") : template.templateString;
     }
     let str = "";
     if (template.templateType === "simple") {
@@ -327,6 +327,7 @@ let LamTemplates = (function() {
         layer = LamStore.getLayer(feature.layerGid);
         if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
+
       let tempBody = LamTemplates.processTemplate(template, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);

@@ -82,7 +82,7 @@ var LamRequests = (function() {
     let vector = new ol.layer.Vector({
       //zIndex: parseInt(zIndex),
       source: vectorSource,
-      visible: layer.visible,
+      visible: layer.getVisible(),
       style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius)
     });
     try {
