@@ -4652,6 +4652,12 @@ var LamLinksTools = (function() {
         LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Links", output);
       }
     });
+
+    //terms links load
+    //debugger;
+    templateTemp = templateTermsLinks();
+    output = templateTemp(LamStore.getTermsLinks());
+    $("#app-terms-links").html(output);
   };
 
   var render = function(div) {
@@ -4671,10 +4677,20 @@ var LamLinksTools = (function() {
     return Handlebars.compile(template);
   };
 
+  var templateTermsLinks = function() {
+    //pannello ricerca via
+    let template = "{{#each this}}";
+    template += "<a class='lam-link' href='{{url}}' target='_blank'>{{title}}</a>";
+    template += "{{/each}}";
+
+    return Handlebars.compile(template);
+  };
+
   return {
     init: init,
     render: render,
-    templateLinks: templateLinks
+    templateLinks: templateLinks,
+    templateTermsLinks: templateTermsLinks
   };
 })();
 
@@ -4882,7 +4898,6 @@ var LamLegendTools = (function() {
   };
 
   let updateLegend = function() {
-    debugger;
     if ($("#lam-legend-container").is(":visible")) {
       LamDispatcher.dispatch(currentLegendPayload);
     }
@@ -5987,9 +6002,7 @@ var LamLoader = (function() {
     if (LamStore.getAppState().modules["select-tools"]) {
       LamSelectTools.render(getQueryLayers());
     }
-    if (LamStore.getAppState().modules["links-tools"]) {
-      LamLinksTools.init();
-    }
+    LamLinksTools.init();
     LamLegendTools.init();
 
     //loading templates
@@ -6709,6 +6722,13 @@ var LamStore = (function() {
     return LamStore.getAppState().links;
   };
 
+  let getTermsLinks = function() {
+    if (!LamStore.getAppState().termsLinks) {
+      LamStore.getAppState().termsLinks = [];
+    }
+    return LamStore.getAppState().termsLinks;
+  };
+
   let parseResponse = function(e) {};
 
   return {
@@ -6729,6 +6749,7 @@ var LamStore = (function() {
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
+    getTermsLinks: getTermsLinks,
     getVisibleLayers: getVisibleLayers,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,

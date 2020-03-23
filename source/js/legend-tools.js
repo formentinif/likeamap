@@ -202,7 +202,6 @@ var LamLegendTools = (function() {
   };
 
   let updateLegend = function() {
-    debugger;
     if ($("#lam-legend-container").is(":visible")) {
       LamDispatcher.dispatch(currentLegendPayload);
     }

@@ -550,6 +550,14 @@
       "items": {
         "type": "object"
       }
+    },
+    "termsLinks": {
+      "description": "Elenco dei link per termini di utilizzo, privacy, cookies",
+      "type": "array",
+      "title": "Terms",
+      "items": {
+        "type": "object"
+      }
     }
   },
   "required": ["restAPIUrl", "title", "startMapLon", "startMapLat", "startMapZoom", "modules", "layers"]

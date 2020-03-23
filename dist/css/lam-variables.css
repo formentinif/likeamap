@@ -53,6 +53,16 @@ body {
   --lam-btn-color-lighter: #87afc1;
   /*426678 8BA1AB 63818F 426678 2a4f60*/
 }
+.ol-attribution {
+  bottom: 70px !important;
+}
+.app-terms-links {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 4px 8px;
+  z-index: 1000;
+}
 
 .lam-background {
   background-color: var(--lam-bg-menu-color);

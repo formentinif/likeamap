@@ -515,6 +515,13 @@ var LamStore = (function() {
     return LamStore.getAppState().links;
   };
 
+  let getTermsLinks = function() {
+    if (!LamStore.getAppState().termsLinks) {
+      LamStore.getAppState().termsLinks = [];
+    }
+    return LamStore.getAppState().termsLinks;
+  };
+
   let parseResponse = function(e) {};
 
   return {
@@ -535,6 +542,7 @@ var LamStore = (function() {
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
+    getTermsLinks: getTermsLinks,
     getVisibleLayers: getVisibleLayers,
     guid: guid,
     setInfoClickEnabled: setInfoClickEnabled,

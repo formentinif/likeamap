@@ -185,9 +185,7 @@ var LamLoader = (function() {
     if (LamStore.getAppState().modules["select-tools"]) {
       LamSelectTools.render(getQueryLayers());
     }
-    if (LamStore.getAppState().modules["links-tools"]) {
-      LamLinksTools.init();
-    }
+    LamLinksTools.init();
     LamLegendTools.init();
 
     //loading templates
