@@ -188,9 +188,8 @@ var LamLoader = (function() {
     if (LamStore.getAppState().modules["links-tools"]) {
       LamLinksTools.init();
     }
-    if (LamStore.getAppState().modules["legend-tools"]) {
-      LamLegendTools.init();
-    }
+    LamLegendTools.init();
+
     //loading templates
     LamTemplates.init();
     LamDownloadTools.init();

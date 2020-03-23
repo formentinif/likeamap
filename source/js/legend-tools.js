@@ -27,10 +27,12 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 var LamLegendTools = (function() {
   var isRendered = false;
+  var currentLegendPayload = false;
 
   var init = function init() {
     //events binding
     LamDispatcher.bind("show-legend", function(payload) {
+      currentLegendPayload = payload;
       LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
@@ -38,6 +40,7 @@ var LamLegendTools = (function() {
      * Helper event to open legend for all layers at the current scale
      */
     LamDispatcher.bind("show-legend-visible-layers", function(payload) {
+      currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
@@ -46,11 +49,16 @@ var LamLegendTools = (function() {
      * Helper event to open legend for all layers with scale parameter
      */
     LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
+      currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
-    //carico la legenda all'avvio
+    LamDispatcher.bind("update-legend", function() {
+      LamLegendTools.updateLegend();
+    });
+
+    //laoding legend on map init based on appstate
     if (LamStore.getAppState().showLegendOnLoad) {
       LamDispatcher.dispatch({
         eventName: "show-full-legend-visible-layers",
@@ -58,6 +66,11 @@ var LamLegendTools = (function() {
         scaled: true
       });
     }
+
+    //adding zoom-end event for automatic legend updates
+    LamMap.addZoomEndEvent({
+      eventName: "update-legend"
+    });
   };
 
   var render = function(div) {
@@ -68,7 +81,8 @@ var LamLegendTools = (function() {
   };
 
   var showLegend = function(gid, scaled, showInfoWindow) {
-    var html = "<div>";
+    $("#lam-legend-container").remove();
+    var html = "<div id='lam-legend-container'>";
     var urlImg = "";
     //checking custom url
     var thisLayer = LamStore.getLayer(gid);
@@ -91,7 +105,7 @@ var LamLegendTools = (function() {
       html +=
         "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
-        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></div>";
+        "', scaled: false })\">Visualizza legenda completa</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";
@@ -134,9 +148,23 @@ var LamLegendTools = (function() {
     let title = "Legenda dei temi attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
+      LamDom.showContent(
+        LamEnums.showContentMode().InfoWindow,
+        title,
+        $("<div>")
+          .append(html.clone())
+          .html(),
+        ""
+      );
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, html.html(), "");
+      LamDom.showContent(
+        LamEnums.showContentMode().LeftPanel,
+        title,
+        $("<div>")
+          .append(html.clone())
+          .html(),
+        ""
+      );
     }
   };
 
@@ -173,11 +201,19 @@ var LamLegendTools = (function() {
     $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
   };
 
+  let updateLegend = function() {
+    debugger;
+    if ($("#lam-legend-container").is(":visible")) {
+      LamDispatcher.dispatch(currentLegendPayload);
+    }
+  };
+
   return {
     init: init,
     parseResponseMetadata: parseResponseMetadata,
     render: render,
     showLegend: showLegend,
-    showLegendLayers: showLegendLayers
+    showLegendLayers: showLegendLayers,
+    updateLegend: updateLegend
   };
 })();

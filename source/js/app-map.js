@@ -44,6 +44,7 @@ let LamMap = (function() {
   };
 
   let mainMap;
+  let currentZoom = 10; //zoom value for zoom-end event, it will change right after initialization
   let isRendered = false;
   let formatWKT = new ol.format.WKT();
   let featuresWKT = new ol.Collection();
@@ -54,6 +55,8 @@ let LamMap = (function() {
   let vectorSelection;
   let lastTimeoutRequest;
   let lastMousePixel;
+  let moveEndPayloads = [];
+  let zoomEndPayloads = [];
 
   let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
@@ -646,6 +649,11 @@ let LamMap = (function() {
 
     mainMap.on("moveend", function() {
       lamDispatch("map-move-end");
+      var newZoom = mainMap.getView().getZoom();
+      if (currentZoom != newZoom) {
+        currentZoom = newZoom;
+        lamDispatch("map-zoom-end");
+      }
     });
 
     proj4.defs("EPSG:25832", "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -1655,6 +1663,38 @@ let LamMap = (function() {
     return mainMap.getCoordinateFromPixel([x, y]);
   };
 
+  /**
+   * Returns all the event payloads that must be executed after a map move-end event
+   */
+  let getMoveEndEvents = function() {
+    return moveEndPayloads;
+  };
+
+  /**
+   * Adds an event to be executed after a map move-end event
+   * The payload format is lam standard
+   * {eventName:"%event-name%",  data1: %data1-value%, data2: %data2-value% ...}
+   */
+  let addMoveEndEvent = function(payload) {
+    moveEndPayloads.push(payload);
+  };
+
+  /**
+   * Returns all the event payloads that must be executed after a map zoom-end event
+   */
+  let getZoomEndEvents = function() {
+    return zoomEndPayloads;
+  };
+
+  /**
+   * Adds an event to be executed after a map zoom-end event
+   * The payload format is lam standard
+   * {eventName:"%event-name%",  data1: %data1-value%, data2: %data2-value% ...}
+   */
+  let addZoomEndEvent = function(payload) {
+    zoomEndPayloads.push(payload);
+  };
+
   return {
     //addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
@@ -1663,6 +1703,8 @@ let LamMap = (function() {
     addFeatureToMap: addFeatureToMap,
     addGeometryToMap: addGeometryToMap,
     addLayerToMap: addLayerToMap,
+    addMoveEndEvent: addMoveEndEvent,
+    addZoomEndEvent: addZoomEndEvent,
     addSelectInteraction: addSelectInteraction,
     setPrintBox: setPrintBox,
     addWKTToMap: addWKTToMap,
@@ -1689,6 +1731,8 @@ let LamMap = (function() {
     getMapCenterLonLat: getMapCenterLonLat,
     getMapScale: getMapScale,
     getMapZoom: getMapZoom,
+    getMoveEndEvents: getMoveEndEvents,
+    getZoomEndEvents: getZoomEndEvents,
     getPixelFromCoordinate: getPixelFromCoordinate,
     getPrintCenter: getPrintCenter,
     getPrintCenterLonLat: getPrintCenterLonLat,

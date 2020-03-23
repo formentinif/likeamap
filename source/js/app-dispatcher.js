@@ -103,8 +103,15 @@ var LamDispatcher = (function() {
     });
 
     this.bind("map-move-end", function(payload) {
-      LamShareTools.hideUrl();
-      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
+      LamMap.getMoveEndEvents().forEach(element => {
+        LamDispatcher.dispatch(element);
+      });
+    });
+
+    this.bind("map-zoom-end", function(payload) {
+      LamMap.getZoomEndEvents().forEach(element => {
+        LamDispatcher.dispatch(element);
+      });
     });
 
     this.bind("map-zoom-in", function(payload) {

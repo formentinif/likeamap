@@ -1170,6 +1170,7 @@ let LamMap = (function() {
   };
 
   let mainMap;
+  let currentZoom = 10; //zoom value for zoom-end event, it will change right after initialization
   let isRendered = false;
   let formatWKT = new ol.format.WKT();
   let featuresWKT = new ol.Collection();
@@ -1180,6 +1181,8 @@ let LamMap = (function() {
   let vectorSelection;
   let lastTimeoutRequest;
   let lastMousePixel;
+  let moveEndPayloads = [];
+  let zoomEndPayloads = [];
 
   let vectorPrint = new ol.layer.Vector({
     source: new ol.source.Vector({
@@ -1772,6 +1775,11 @@ let LamMap = (function() {
 
     mainMap.on("moveend", function() {
       lamDispatch("map-move-end");
+      var newZoom = mainMap.getView().getZoom();
+      if (currentZoom != newZoom) {
+        currentZoom = newZoom;
+        lamDispatch("map-zoom-end");
+      }
     });
 
     proj4.defs("EPSG:25832", "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -2781,6 +2789,38 @@ let LamMap = (function() {
     return mainMap.getCoordinateFromPixel([x, y]);
   };
 
+  /**
+   * Returns all the event payloads that must be executed after a map move-end event
+   */
+  let getMoveEndEvents = function() {
+    return moveEndPayloads;
+  };
+
+  /**
+   * Adds an event to be executed after a map move-end event
+   * The payload format is lam standard
+   * {eventName:"%event-name%",  data1: %data1-value%, data2: %data2-value% ...}
+   */
+  let addMoveEndEvent = function(payload) {
+    moveEndPayloads.push(payload);
+  };
+
+  /**
+   * Returns all the event payloads that must be executed after a map zoom-end event
+   */
+  let getZoomEndEvents = function() {
+    return zoomEndPayloads;
+  };
+
+  /**
+   * Adds an event to be executed after a map zoom-end event
+   * The payload format is lam standard
+   * {eventName:"%event-name%",  data1: %data1-value%, data2: %data2-value% ...}
+   */
+  let addZoomEndEvent = function(payload) {
+    zoomEndPayloads.push(payload);
+  };
+
   return {
     //addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
@@ -2789,6 +2829,8 @@ let LamMap = (function() {
     addFeatureToMap: addFeatureToMap,
     addGeometryToMap: addGeometryToMap,
     addLayerToMap: addLayerToMap,
+    addMoveEndEvent: addMoveEndEvent,
+    addZoomEndEvent: addZoomEndEvent,
     addSelectInteraction: addSelectInteraction,
     setPrintBox: setPrintBox,
     addWKTToMap: addWKTToMap,
@@ -2815,6 +2857,8 @@ let LamMap = (function() {
     getMapCenterLonLat: getMapCenterLonLat,
     getMapScale: getMapScale,
     getMapZoom: getMapZoom,
+    getMoveEndEvents: getMoveEndEvents,
+    getZoomEndEvents: getZoomEndEvents,
     getPixelFromCoordinate: getPixelFromCoordinate,
     getPrintCenter: getPrintCenter,
     getPrintCenterLonLat: getPrintCenterLonLat,
@@ -4663,10 +4707,12 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 var LamLegendTools = (function() {
   var isRendered = false;
+  var currentLegendPayload = false;
 
   var init = function init() {
     //events binding
     LamDispatcher.bind("show-legend", function(payload) {
+      currentLegendPayload = payload;
       LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
@@ -4674,6 +4720,7 @@ var LamLegendTools = (function() {
      * Helper event to open legend for all layers at the current scale
      */
     LamDispatcher.bind("show-legend-visible-layers", function(payload) {
+      currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
@@ -4682,11 +4729,16 @@ var LamLegendTools = (function() {
      * Helper event to open legend for all layers with scale parameter
      */
     LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
+      currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
-    //carico la legenda all'avvio
+    LamDispatcher.bind("update-legend", function() {
+      LamLegendTools.updateLegend();
+    });
+
+    //laoding legend on map init based on appstate
     if (LamStore.getAppState().showLegendOnLoad) {
       LamDispatcher.dispatch({
         eventName: "show-full-legend-visible-layers",
@@ -4694,6 +4746,11 @@ var LamLegendTools = (function() {
         scaled: true
       });
     }
+
+    //adding zoom-end event for automatic legend updates
+    LamMap.addZoomEndEvent({
+      eventName: "update-legend"
+    });
   };
 
   var render = function(div) {
@@ -4704,7 +4761,8 @@ var LamLegendTools = (function() {
   };
 
   var showLegend = function(gid, scaled, showInfoWindow) {
-    var html = "<div>";
+    $("#lam-legend-container").remove();
+    var html = "<div id='lam-legend-container'>";
     var urlImg = "";
     //checking custom url
     var thisLayer = LamStore.getLayer(gid);
@@ -4727,7 +4785,7 @@ var LamLegendTools = (function() {
       html +=
         "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
-        "', scaled: false, showInfoWindow: true })\">Visualizza legenda completa</a></div>";
+        "', scaled: false })\">Visualizza legenda completa</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";
@@ -4743,7 +4801,9 @@ var LamLegendTools = (function() {
   };
 
   var showLegendLayers = function(layers, scaled, showInfoWindow) {
-    let html = $("<div />");
+    let html = $("<div />", {
+      id: "lam-legend-container"
+    });
     layers.forEach(function(layer) {
       if (!layer.hideLegend && layer.layerType != "group") {
         if (layer.legendUrl) {
@@ -4768,9 +4828,23 @@ var LamLegendTools = (function() {
     let title = "Legenda dei temi attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, html.html(), "");
+      LamDom.showContent(
+        LamEnums.showContentMode().InfoWindow,
+        title,
+        $("<div>")
+          .append(html.clone())
+          .html(),
+        ""
+      );
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, html.html(), "");
+      LamDom.showContent(
+        LamEnums.showContentMode().LeftPanel,
+        title,
+        $("<div>")
+          .append(html.clone())
+          .html(),
+        ""
+      );
     }
   };
 
@@ -4807,12 +4881,20 @@ var LamLegendTools = (function() {
     $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
   };
 
+  let updateLegend = function() {
+    debugger;
+    if ($("#lam-legend-container").is(":visible")) {
+      LamDispatcher.dispatch(currentLegendPayload);
+    }
+  };
+
   return {
     init: init,
     parseResponseMetadata: parseResponseMetadata,
     render: render,
     showLegend: showLegend,
-    showLegendLayers: showLegendLayers
+    showLegendLayers: showLegendLayers,
+    updateLegend: updateLegend
   };
 })();
 
@@ -4937,6 +5019,16 @@ var LamShareTools = (function() {
     LamDispatcher.bind("show-share", function(payload) {
       LamToolbar.toggleToolbarItem("share-tools");
       lamDispatch("clear-layer-info");
+    });
+
+    LamDispatcher.bind("update-share", function() {
+      LamShareTools.hideUrl();
+      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
+    });
+
+    //Adding event to map move-end
+    LamMap.addMoveEndEvent({
+      eventName: "update-share"
     });
   };
 
@@ -5234,13 +5326,15 @@ var LamDispatcher = (function() {
     });
 
     this.bind("map-move-end", function(payload) {
-      LamShareTools.hideUrl();
-      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
+      LamMap.getMoveEndEvents().forEach(element => {
+        LamDispatcher.dispatch(element);
+      });
     });
 
     this.bind("map-zoom-end", function(payload) {
-      LamShareTools.hideUrl();
-      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
+      LamMap.getZoomEndEvents().forEach(element => {
+        LamDispatcher.dispatch(element);
+      });
     });
 
     this.bind("map-zoom-in", function(payload) {
@@ -5896,9 +5990,8 @@ var LamLoader = (function() {
     if (LamStore.getAppState().modules["links-tools"]) {
       LamLinksTools.init();
     }
-    if (LamStore.getAppState().modules["legend-tools"]) {
-      LamLegendTools.init();
-    }
+    LamLegendTools.init();
+
     //loading templates
     LamTemplates.init();
     LamDownloadTools.init();

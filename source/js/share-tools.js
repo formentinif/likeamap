@@ -43,6 +43,16 @@ var LamShareTools = (function() {
       LamToolbar.toggleToolbarItem("share-tools");
       lamDispatch("clear-layer-info");
     });
+
+    LamDispatcher.bind("update-share", function() {
+      LamShareTools.hideUrl();
+      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
+    });
+
+    //Adding event to map move-end
+    LamMap.addMoveEndEvent({
+      eventName: "update-share"
+    });
   };
 
   var render = function(div) {
