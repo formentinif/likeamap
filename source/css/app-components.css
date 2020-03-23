@@ -16,12 +16,19 @@
 }
 
 .lam-group-list {
-  padding: 0.45rem;
+  padding: 0px 8px;
   list-style-type: none;
 }
 
 .lam-group-list li {
-  padding: 0.15rem;
+  padding: 4px;
+}
+
+.lam-group-list__sub-title {
+  padding: 4px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 .lam-card {
@@ -178,6 +185,7 @@ a.lam-link {
 
 a.lam-link:hover {
   color: var(--lam-btn-color-darken);
+  text-decoration: underline;
 }
 
 a.lam-link:active {

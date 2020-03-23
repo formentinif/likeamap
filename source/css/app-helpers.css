@@ -50,6 +50,10 @@
   margin: 0px !important;
 }
 
+.lam-no-padding {
+  padding: 0px !important;
+}
+
 .lam-no-bg {
   background-color: transparent !important;
 }

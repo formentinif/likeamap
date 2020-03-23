@@ -25,14 +25,25 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamLinksTools = (function() {
-  var isRendered = false;
+let LamLinksTools = (function() {
+  let isRendered = false;
 
-  var init = function init() {
+  let init = function init() {
     //events binding
     LamDispatcher.bind("show-links", function(payload) {
-      var templateTemp = templateLinks();
-      var output = templateTemp(LamStore.getLinks());
+      let templateTemp = templateLink();
+      let output = "<ul class='lam-group-list lam-no-padding'>";
+      LamStore.getLinks().forEach(function(link) {
+        output += "<li>";
+        if (link.links && link.links.length) {
+          //is grouped
+          output += renderGroupLink(link);
+        } else {
+          output += templateTemp(link);
+        }
+        output += "</li>";
+      });
+      output += "</ul>";
       if (LamStore.getAppState().openLinksInInfoWindow) {
         LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
       } else {
@@ -41,30 +52,52 @@ var LamLinksTools = (function() {
     });
 
     //terms links load
-    //debugger;
-    templateTemp = templateTermsLinks();
-    output = templateTemp(LamStore.getTermsLinks());
+
+    let templateTerms = templateTermsLinks();
+    output = templateTerms(LamStore.getTermsLinks());
     $("#app-terms-links").html(output);
   };
 
-  var render = function(div) {
+  let render = function(div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  var templateLinks = function() {
-    template = "<ul class='lam-group-list'>";
-    //pannello ricerca via
-    template += "{{#each this}}";
-    template += "<li><a class='lam-link' href='{{url}}' target='_blank'>{{title}} <i class='lam-feature__icon'>" + LamResources.svgOpen16 + "</i></a></li>";
-    template += "{{/each}}";
-    template += "</ul>";
+  let renderGroupLink = function(link) {
+    let templateTemp = templateLink();
+    let output = "";
+    if (link.title) {
+      output += "<h5 class='lam-group-list__sub-title'>";
+      if (link.url) {
+        output += "<a class='lam-link' href='" + link.url + "'>" + link.title + "</a>";
+      } else {
+        output += link.title;
+      }
+      output += "</h5>";
+    }
+    output += "<ul class='lam-group-list'>";
+    link.links.forEach(function(subLink) {
+      output += "<li>";
+      if (subLink.links && subLink.links.length) {
+        //is grouped
+        output += renderGroupLink(subLink);
+      } else {
+        output += templateTemp(subLink);
+      }
+      output += "</li>";
+    });
+    output += "</ul>";
+    return output;
+  };
+
+  let templateLink = function() {
+    let template = "<a class='lam-link' href='{{url}}' target='_blank'>{{title}} <i class='lam-feature__icon'>" + LamResources.svgOpen16 + "</i></a>";
     return Handlebars.compile(template);
   };
 
-  var templateTermsLinks = function() {
+  let templateTermsLinks = function() {
     //pannello ricerca via
     let template = "{{#each this}}";
     template += "<a class='lam-link' href='{{url}}' target='_blank'>{{title}}</a>";
@@ -76,7 +109,7 @@ var LamLinksTools = (function() {
   return {
     init: init,
     render: render,
-    templateLinks: templateLinks,
+    templateLink: templateLink,
     templateTermsLinks: templateTermsLinks
   };
 })();
