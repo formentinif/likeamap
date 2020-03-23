@@ -107,11 +107,6 @@ var LamDispatcher = (function() {
       LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
-    this.bind("map-zoom-end", function(payload) {
-      LamShareTools.hideUrl();
-      LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
-    });
-
     this.bind("map-zoom-in", function(payload) {
       LamMap.zoomIn();
     });

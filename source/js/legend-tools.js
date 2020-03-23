@@ -107,7 +107,9 @@ var LamLegendTools = (function() {
   };
 
   var showLegendLayers = function(layers, scaled, showInfoWindow) {
-    let html = $("<div />");
+    let html = $("<div />", {
+      id: "lam-legend-container"
+    });
     layers.forEach(function(layer) {
       if (!layer.hideLegend && layer.layerType != "group") {
         if (layer.legendUrl) {
