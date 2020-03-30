@@ -6004,6 +6004,40 @@ var LamLoader = (function() {
       }
       return options.inverse(this);
     });
+
+    Handlebars.registerHelper("get_point_x", function(options) {
+      try {
+        return options.data.root.lamCoordinates[0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_point_y", function(options) {
+      try {
+        return options.data.root.lamCoordinates[1];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_coordinate_x", function(index, options) {
+      try {
+        if (index === "undefined") return options.data.lamCoordinates[0];
+        return options.data.root.lamCoordinates[index][0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_coordinate_y", function(index, options) {
+      try {
+        if (index === "undefined") return options.data.lamCoordinates[1];
+        return options.data.root.lamCoordinates[index][1];
+      } catch (error) {
+        return "";
+      }
+    });
   };
 
   /*
@@ -7241,6 +7275,7 @@ let LamTemplates = (function() {
       body += "</div></div>";
     }
     for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
       body +=
         "<div class='lam-grid lam-mb-1'>" +
         "<div class='lam-feature-title lam-col'>" +
@@ -7408,6 +7443,8 @@ let LamTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
+      //adding the coords as properties
+      if (feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);

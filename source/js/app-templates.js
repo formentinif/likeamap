@@ -155,6 +155,7 @@ let LamTemplates = (function() {
       body += "</div></div>";
     }
     for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
       body +=
         "<div class='lam-grid lam-mb-1'>" +
         "<div class='lam-feature-title lam-col'>" +
@@ -322,6 +323,8 @@ let LamTemplates = (function() {
     let index = 0;
     featureInfoCollection.features.forEach(function(feature) {
       let props = feature.properties ? feature.properties : feature;
+      //adding the coords as properties
+      if (feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);
