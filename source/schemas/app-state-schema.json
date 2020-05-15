@@ -453,7 +453,7 @@
                 },
                 "labelField": {
                   "title": "Campo etichetta",
-                  "description": "Campo da utilizzare come etichetta. L'etichetta viene visualizzata nell'hover del mouse sull'entità. Deve essere un campo di tipo string. ",
+                  "description": "Campo da utilizzare come etichetta. L'etichetta viene visualizzata nell'hover del mouse sull'entità. Deve essere un campo di tipo string. In alternativa può essere utilizzato un template di tipo Handlebars, ovvero indicando i nomi dei campi tra doppie parentesi graffe. es Etichetta: {{campo_etichetta}}",
                   "type": "string"
                 },
                 "zIndex": {

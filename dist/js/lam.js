@@ -7152,7 +7152,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  *
  */
-let LamTemplates = (function() {
+let LamTemplates = (function () {
   let templates = [];
 
   let init = function init() {
@@ -7164,11 +7164,11 @@ let LamTemplates = (function() {
     loadRelationsTemplates(tempRelations, repoTemplatesUrl);
   };
 
-  let loadLayersTemplates = function(layers, repoTemplatesUrl) {
-    layers.forEach(function(layer) {
+  let loadLayersTemplates = function (layers, repoTemplatesUrl) {
+    layers.forEach(function (layer) {
       if (layer.queryable || layer.preload || layer.searchable) {
         let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
-        let template = templates.filter(function(el) {
+        let template = templates.filter(function (el) {
           return el.templateUrl === templateUrl;
         });
         if (template.length === 0) {
@@ -7180,11 +7180,11 @@ let LamTemplates = (function() {
     });
   };
 
-  let loadRelationsTemplates = function(tempRelations, repoTemplatesUrl) {
+  let loadRelationsTemplates = function (tempRelations, repoTemplatesUrl) {
     for (let i = 0; i < tempRelations.length; i++) {
       const relation = tempRelations[i];
       let templateUrl = getTemplateUrl(relation.gid, relation.templateUrl, repoTemplatesUrl);
-      let template = templates.filter(function(el) {
+      let template = templates.filter(function (el) {
         return el.templateUrl === templateUrl;
       });
       if (!template.length) {
@@ -7194,13 +7194,13 @@ let LamTemplates = (function() {
     }
   };
 
-  let loadTemplateAjax = function(templateUrl) {
+  let loadTemplateAjax = function (templateUrl) {
     $.ajax({
       dataType: "json",
       url: templateUrl,
-      cache: false
+      cache: false,
     })
-      .done(function(data) {
+      .done(function (data) {
         if (data) {
           if (data.length) {
             for (let i = 0; i < data.length; i++) {
@@ -7214,10 +7214,10 @@ let LamTemplates = (function() {
           }
         }
       })
-      .fail(function(data) {
+      .fail(function (data) {
         lamDispatch({
           eventName: "log",
-          message: "LamStore: Unable to load template"
+          message: "LamStore: Unable to load template",
         });
       });
   };
@@ -7228,7 +7228,7 @@ let LamTemplates = (function() {
    * @param {templateUrl} layer Url completo del template. Senza https aggiunge il @repoUrl come prefisso
    * @param {string} repoUrl Url del repository
    */
-  let getTemplateUrl = function(gid, templateUrl, repoUrl) {
+  let getTemplateUrl = function (gid, templateUrl, repoUrl) {
     if (templateUrl) {
       if (templateUrl.toLowerCase().includes("http://") || templateUrl.toLowerCase().includes("https://")) {
         return templateUrl;
@@ -7239,8 +7239,8 @@ let LamTemplates = (function() {
     return repoUrl + "/" + gid + ".json";
   };
 
-  let getTemplate = function(gid, templateUrl, repoUrl) {
-    let templatesFilter = templates.filter(function(el) {
+  let getTemplate = function (gid, templateUrl, repoUrl) {
+    let templatesFilter = templates.filter(function (el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
     });
     if (templatesFilter.length > 0) {
@@ -7249,7 +7249,7 @@ let LamTemplates = (function() {
     return null;
   };
 
-  let processTemplate = function(template, props, layer) {
+  let processTemplate = function (template, props, layer) {
     let result = "";
     if (template) {
       try {
@@ -7263,14 +7263,14 @@ let LamTemplates = (function() {
       } catch (e) {
         lamDispatch({
           eventName: "log",
-          message: e
+          message: e,
         });
       }
     }
     return result;
   };
 
-  let standardTemplate = function(props, layer) {
+  let standardTemplate = function (props, layer) {
     let body = "";
     if (layer) {
       body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
@@ -7295,7 +7295,7 @@ let LamTemplates = (function() {
     return body;
   };
 
-  let featureIconsTemplate = function(index) {
+  let featureIconsTemplate = function (index) {
     //icons
     let icons =
       "<div class='lam-feature__icons'>" +
@@ -7311,7 +7311,7 @@ let LamTemplates = (function() {
       {
         coordinates: centroid,
         type: "Point",
-        srid: feature.srid
+        srid: feature.srid,
       },
       LamEnums.geometryFormats().GeoJson
     );
@@ -7339,11 +7339,11 @@ let LamTemplates = (function() {
     return icons;
   };
 
-  let relationsTemplate = function(relations, props, index) {
+  let relationsTemplate = function (relations, props, index) {
     let result = "";
     if (relations.length > 0) {
       result += '<div class="lam-feature__relations">';
-      relations.map(function(relation) {
+      relations.map(function (relation) {
         result += '<div class="lam-mb-2 col s12">';
         result +=
           '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
@@ -7363,7 +7363,7 @@ let LamTemplates = (function() {
     return result;
   };
 
-  let generateTemplate = function(template, layer) {
+  let generateTemplate = function (template, layer) {
     if (template.templateType === "string") {
       return Array.isArray(template.templateString) ? template.templateString.join("") : template.templateString;
     }
@@ -7419,11 +7419,19 @@ let LamTemplates = (function() {
     return str;
   };
 
-  let getLabelFeature = function(props, labelName, layerTitle) {
+  let getLabelFeature = function (props, labelName, layerTitle) {
     try {
-      let label = props[labelName] || "";
-      if (layerTitle) {
-        label = label === "" ? layerTitle : layerTitle + " - " + label;
+      debugger;
+      let label = "";
+      if (props[labelName]) {
+        label = props[labelName];
+        if (layerTitle) {
+          label = label === "" ? layerTitle : layerTitle + " - " + label;
+        }
+      } else {
+        //custom template
+        let fieldTemplate = Handlebars.compile(labelName);
+        label = fieldTemplate(props);
       }
       return label;
     } catch (error) {
@@ -7436,17 +7444,17 @@ let LamTemplates = (function() {
    * Render te given collection into HTML format
    * @param {Object} featureInfoCollection GeoJson Collection
    */
-  let renderInfoFeatures = function(featureInfoCollection, template) {
+  let renderInfoFeatures = function (featureInfoCollection, template) {
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
       featureInfoCollection = {
-        features: featureInfoCollection
+        features: featureInfoCollection,
       };
     }
     LamStore.getAppState().currentInfoItems = featureInfoCollection;
     let index = 0;
-    featureInfoCollection.features.forEach(function(feature) {
+    featureInfoCollection.features.forEach(function (feature) {
       let props = feature.properties ? feature.properties : feature;
       //adding the coords as properties
       if (feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
@@ -7462,7 +7470,7 @@ let LamTemplates = (function() {
       }
 
       //sezione relations
-      let layerRelations = LamRelations.getRelations().filter(function(relation) {
+      let layerRelations = LamRelations.getRelations().filter(function (relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
       tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
@@ -7474,15 +7482,15 @@ let LamTemplates = (function() {
     return body;
   };
 
-  let renderInfoFeaturesMobile = function(featureInfoCollection) {
+  let renderInfoFeaturesMobile = function (featureInfoCollection) {
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
       featureInfoCollection = {
-        features: featureInfoCollection
+        features: featureInfoCollection,
       };
     }
-    featureInfoCollection.features.forEach(function(feature, index) {
+    featureInfoCollection.features.forEach(function (feature, index) {
       //let props = feature.properties ? feature.properties : feature;
       //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
@@ -7497,21 +7505,21 @@ let LamTemplates = (function() {
     return body;
   };
 
-  let getTemplateMetadata = function() {
+  let getTemplateMetadata = function () {
     return Handlebars.compile("{{ABSTRACT}}");
   };
 
-  var getTemplateEmpty = function(results) {
+  var getTemplateEmpty = function (results) {
     var template = "<p></p>";
     return Handlebars.compile(template);
   };
 
-  var getResultEmpty = function(results) {
+  var getResultEmpty = function (results) {
     var template = "<p>Nessun risultato disponibile</p>";
     return Handlebars.compile(template);
   };
 
-  var getInfoResultEmpty = function(results) {
+  var getInfoResultEmpty = function (results) {
     var template = "<p>Nessun risultato disponibile nella posizione selezionata</p>";
     return Handlebars.compile(template);
   };
@@ -7533,7 +7541,7 @@ let LamTemplates = (function() {
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,
-    templates: templates
+    templates: templates,
   };
 })();
 

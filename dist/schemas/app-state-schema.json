@@ -1,190 +1,191 @@
 {
   "$schema": "http://www.perspectiva.it/schemas/likeamap",
   "type": "object",
-  "title": "Configurazione Applicazione",
+  "title": "LikeAMap - Configurazione Applicazione",
   "properties": {
     "appId": {
       "title": "Codice applicazione",
-      "description": "Codice identificativo della mappa",
+      "description": "Codice identificativo della mappa/applicazione. Può essere utilizzato per funzioni custom.",
       "type": "string"
     },
     "title": {
-      "title": "Titolo",
-      "description": "Nome della mappa",
+      "title": "Titolo della mappa",
+      "description": "Nome della mappa che sarà visualizzato nel pannello laterale.",
       "type": "string"
     },
     "logoUrl": {
       "title": "Logo",
-      "description": "Logo della mappa",
+      "description": "Logo della mappa, visualizzato in alto a destra. Inserire un url assoluto o relativo.",
       "type": "string"
     },
     "logoPanelUrl": {
       "title": "Logo del pannello",
-      "description": "Logo del pannello",
+      "description": "Logo che viene visualizzato nel pannello laterale a scomparsa.  Inserire un url assoluto o relativo.",
       "type": "string"
     },
     "restAPIUrl": {
-      "title": "Url API Rest",
-      "description": "Url assoluto o relativo delle API REST",
+      "title": "Url delle API",
+      "description": "Url assoluto o relativo delle API REST utilizzate per la stampa, salvataggio e condivisione della mappa ecc.",
       "type": "string",
       "default": "/"
     },
-    "templatesRepositoryUrl": {
-      "title": "Url Template repository",
-      "description": "Url assoluto o relativo per il caricamento dei template",
-      "type": "string",
-      "default": "templates"
-    },
     "urlMapTemplate": {
       "title": "Url Template della mappa",
-      "description": "Url assoluto o relativo per il caricamento del template della mappa",
+      "description": "Url assoluto o relativo per il caricamento del template della mappa. Il template è il file con la layout html dell'applicazione. LikeAMap viene distribuito con una mappa standalone e una embedded.",
+      "type": "string",
+      "default": "map.html"
+    },
+    "templatesRepositoryUrl": {
+      "title": "Url Template repository",
+      "description": "Url assoluto o relativo per il caricamento dei template per i risultati delle interrogazioni dei layer. Se non fornito viene utilizzata la sottodirectory /templates",
       "type": "string",
       "default": "templates"
     },
     "relationsRepositoryUrl": {
       "title": "Url Relation repository",
-      "description": "Url assoluto o relativo per il caricamento delle relation",
+      "description": "Url assoluto o relativo per il caricamento dei template per i risultati delle relations. Se non fornito viene utilizzata la sottodirectory /templates",
       "type": "string",
       "default": "templates"
     },
     "srid": {
-      "title": "SRID",
+      "title": "SRID (Spatial reference ID)",
       "description": "SRID della mappa. Es: 3857 (al momento è supportato solo il 3857)",
       "enum": ["3857"],
       "type": "string"
     },
     "startMapLon": {
-      "title": "Longitudine",
-      "description": "Longitudine della posizione home",
+      "title": "Longitudine iniziale",
+      "description": "Longitudine della posizione iniziale della mappa, utilizzata anche dal bottone 'Home'",
       "default": 0,
       "type": "number"
     },
     "startMapLat": {
-      "title": "Latitudine",
-      "description": "Latitudine della posizione home",
+      "title": "Latitudine iniziale",
+      "description": "Latitudine della posizione iniziale della mappa, utilizzata anche dal bottone 'Home'",
       "default": 0,
       "type": "number"
     },
     "startMapZoom": {
-      "title": "Zoom",
-      "description": "Zoom della posizione home",
+      "title": "Zoom iniziale",
+      "description": "Zoom della della posizione iniziale della mappa, utilizzata anche dal bottone 'Home'",
       "default": 13,
       "type": "integer"
     },
     "mapLon": {
-      "title": "",
-      "description": "Longitudine della posizione iniziale/attuale",
+      "title": "Longitudine attuale (valore di sistema)",
+      "description": "Longitudine della posizione corrente della mappa. Valore di sistema da non utilizzare.",
       "default": 0,
       "type": "number"
     },
     "mapLat": {
-      "title": "",
-      "description": "Latitudine della posizione iniziale/attuale",
+      "title": "Latitudine attuale (valore di sistema)",
+      "description": "Latitudine della posizione corrente della mappa. Valore di sistema da non utilizzare.",
       "default": 0,
       "type": "number"
     },
     "mapZoom": {
-      "title": "",
-      "description": "Zoom della posizione iniziale/attuale",
+      "title": "Zoom attuale (valore di sistema)",
+      "description": "Zoom della posizione corrente della mappa. Valore di sistema da non utilizzare.",
       "default": 0,
       "type": "integer"
     },
     "mapExtent": {
-      "title": "",
-      "description": "Extent della mappa. Le coordinate devono essere nello srid della mappa",
+      "title": "Extent della mappa",
+      "description": "Area di interesse (extent) della mappa. Se fornito la mappa non carica i tile fuori dall'extent, riducendo i tempi di caricamento. Deve essere fornito come un array di coordinate [xmin,ymin,xmax,ymax]. Le coordinate devono essere nello srid della mappa.",
       "type": "array",
       "items": {}
     },
     "showMapScale": {
       "title": "Scala della mappa",
-      "description": "Mostra la scala della mappa",
+      "description": "Visualizza la scala della mappa in basso a destra.",
       "default": false,
       "type": "boolean"
     },
     "showLegendOnLoad": {
       "title": "Visualizza la legenda all'avvio",
-      "description": "Visualizza la legenda all'avvio",
+      "description": "All'avvio della mappa, visualizza il pannello laterale con la legenda globale caricata.",
       "default": false,
       "type": "boolean"
     },
     "showLayerTreeOnLoad": {
       "title": "Visualizza l'albero dei livelli'avvio",
-      "description": "Visualizza l'albero dei livelli'avvio",
+      "description": "All'avvio della mappa, visualizza il pannello laterale con l'albero dei livelli.",
       "default": false,
       "type": "boolean"
     },
     "infoSelectBehaviour": {
-      "title": "Modalità di selezione",
-      "description": "Definisce la modalità di selezione delle feature 1 Single 2 Multiple",
+      "title": "Modalità di interrogazione",
+      "description": "Definisce la modalità di interrogazione degli oggetti, singola o multipla. In modalità singola viene restituita solo il primo oggetto trovato. In modalità multipla sono restuiti tutti (drill down). I valori sono: 1 Single 2 Multipla.",
+      "enum": [1, 2],
       "default": 2,
       "type": "integer"
     },
     "openResultInInfoWindow": {
-      "title": "Apri informazioni nella info window",
-      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "title": "Modalità di visualizzazione delle interrogazioni",
+      "description": "Imposta l'apertura dei risultati delle interrogazioni nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
       "enum": [0, 1],
       "type": "integer"
     },
     "openLinksInInfoWindow": {
-      "title": "Apri i link nella info window",
-      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "title": "Modalità di visualizzazione dei link",
+      "description": "Imposta l'apertura dell'elenco dei link nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
       "enum": [0, 1],
       "type": "integer"
     },
     "openLegendInInfoWindow": {
-      "title": "Apri le legende nella info window",
-      "description": "Imposta l'apertura dei risultati nell'infowindow. 0 Left Panel 1 Infowindow",
+      "title": "Modalità di visualizzazione delle legendo",
+      "description": "Imposta l'apertura delle legende nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
       "enum": [0, 1],
       "type": "integer"
     },
     "improveMobileBehaviour": {
-      "title": "Migliora mobile UI",
+      "title": "Miglioramenti automatici per i dispositivi mobili",
       "description": "Migliora il comportamento dell'appstate per la visualizzazione mobile. Se mobile tutti preload vengono impostati a 0 e il queryable a 1",
       "default": 0,
       "enum": [0, 1],
       "type": "integer"
     },
     "disableAjaxRequestInfo": {
-      "title": "Disabilita le richieste ajax al click del mouse",
-      "description": "Disabilita le richieste ajax al click del mouse",
+      "title": "Disabilita tutte le interrogazioni",
+      "description": "Disabilita tutte le interrogazioni al click del mouse o altre richieste ajax. Da utilizzare ai solo fini di DEBUG.",
       "default": 0,
       "enum": [0, 1],
       "type": "integer"
     },
     "searchProvider": {
-      "title": "Provider di ricerca",
-      "description": "Valore di sistema, lasciare a 0",
+      "title": "Provider di ricerca (deprecated)",
+      "description": "Valore deprecato, lasciare a 0.",
       "type": "string",
       "enum": ["nominatim", "wms_geoserver", "google", "bing"]
     },
     "searchProviderAddressUrl": {
-      "title": "Url/KEY del provider di ricerca",
-      "description": "Url del provider di ricerca per WMS o API KEY Google/Bing",
+      "title": "Url del provider di ricerca per le vie",
+      "description": "Url del servizio WFS di ricerca per le vie.",
       "type": "string"
     },
     "searchProviderAddressField": {
-      "title": "Campo del provider di ricerca vie",
-      "description": "Campo in cui verrà effettuata la ricerca WMS",
+      "title": "Campo di ricerca per le vie",
+      "description": "Campo in cui verrà effettuata la ricerca del toponimo nel servizio impostato al parametro searchProviderAddressUrl.",
       "type": "string"
     },
     "searchProviderAddressTemplateUrl": {
-      "title": "Template per il rendering degli indirizzi",
-      "description": "Url del Templatetper il rendering degli indirizzi",
+      "title": "Template per il rendering delle vie",
+      "description": "Template per la visualizzazione dei risultati delle vie. Può essere fornito un template tramite url assoluto, relativo o inline in formato Handlebars.",
       "type": "string"
     },
     "searchProviderHouseNumberUrl": {
-      "title": "Url/KEY del provider di ricerca civici",
-      "description": "Url del provider di ricerca per i civici",
+      "title": "Url del provider di ricerca civici",
+      "description": "Url del servizio WFS di ricerca per i civici",
       "type": "string"
     },
     "searchProviderHouseNumberField": {
-      "title": "Campo del provider di ricerca civici",
-      "description": "Campo in cui verrà effettuata la ricerca civici",
+      "title": "Campo di ricerca per i civici",
+      "description": "Campo in cui verrà effettuata la ricerca civici nel servizio impostato al parametro searchProviderHouseNumberUrl.",
       "type": "string"
     },
     "searchProviderHouseNumberTemplateUrl": {
       "title": "Template per il rendering dei civici",
-      "description": "Url del template per il rendering dei civici",
+      "description": "Template per la visualizzazione dei risultati dei civici. Può essere fornito un template tramite url assoluto, relativo o inline in formato Handlebars.",
       "type": "string"
     },
     "metaDataServiceUrlTemplate": {
@@ -194,25 +195,25 @@
     },
     "metaDataTemplate": {
       "title": "Template per i metadati",
-      "description": "Template da applicare per i metadati. Default è {{ABSTRACT}}",
+      "description": "Template inline (handlebars) da applicare per i metadati. Default è {{ABSTRACT}}.",
       "type": "string"
     },
     "drawFeatures": {
-      "title": "",
+      "title": "Entità vettoriali della sezione disegno.",
       "description": "Valore di sistema, lasciare a null",
       "default": "",
       "type": "string"
     },
     "comuni": {
-      "title": "",
-      "description": "Valore di sistema, lasciare a null",
+      "title": "Elenco dei comuni (deprecated)",
+      "description": "Valore di sistema, lasciare a null  (deprecated)",
       "type": "array",
       "items": {}
     },
     "authentication": {
-      "description": "Gestione autenticazione",
+      "title": "Impostazioni di autenticazione",
+      "description": "Impostazioni per l'autenticazione di base. Da non utilizzare nel caso sia stata impostata una autenticazione custom.",
       "type": "object",
-      "title": "Autenticazione",
       "properties": {
         "requiresAuth": {
           "title": "Autenticazione Richiesta",
@@ -244,9 +245,9 @@
       }
     },
     "modules": {
-      "description": "Moduli abilitati",
+      "title": "Moduli del sistema",
+      "description": "Abilita i moduli/funzionalità della mappa",
       "type": "object",
-      "title": "Moduli",
       "properties": {
         "layer-tree": {
           "title": "Livelli",
@@ -308,21 +309,20 @@
           "description": "Accesso tramite login",
           "type": "boolean"
         }
-      },
-      "required": ["layer-tree", "search-tools", "print-tools", "share-tools", "map-tools", "draw-tools", "gps-tools"]
+      }
     },
     "selectedInfoItems": {
-      "description": "Elenco delle feature correntemente selezionate sulla mappa",
+      "title": "Elendo delle entitàò selezionate (systema)",
+      "description": "Elenco delle feature correntemente selezionate sulla mappa. Valore di sistema, non utilizzare",
       "type": "array",
-      "title": "Gruppi",
       "items": {
         "type": "object"
       }
     },
     "layers": {
+      "title": "Gruppi layer",
       "description": "Elenco dei raggruppamenti di layer",
       "type": "array",
-      "title": "Gruppi",
       "items": {
         "type": "object",
         "title": "Gruppo",
@@ -339,25 +339,25 @@
           },
           "layerType": {
             "title": "Tipologia",
-            "description": "Tipologia di layer",
+            "description": "Tipologia del group layer",
             "type": "string",
             "enum": ["group"]
           },
           "nestingStyle": {
             "title": "Dimensione gerarchia",
-            "description": "Dimensione da applicare per la gerarchia dell'oggetto",
+            "description": "Dimensione da applicare per la gerarchia dell'oggetto. I colori e la dimensione del testo saranno variati in automatico.",
             "type": "string",
             "enum": ["sub1", "sub2", "sub3", "sub4"]
           },
           "visible": {
-            "title": "Visibilità",
-            "description": "Visibilità iniziale in mappa",
+            "title": "Visibilità iniziale",
+            "description": "Visibilità iniziale, il gruppo sarà aperto (1) o chiuso (0)",
             "enum": [0, 1],
             "type": "integer"
           },
           "cssClass": {
-            "title": "Classe css del gruppo/layer",
-            "description": "Classe specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",
+            "title": "Classe CSS del gruppo/layer",
+            "description": "Classe CSS specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",
             "type": "string"
           },
           "layers": {
@@ -369,40 +369,40 @@
               "title": "Livello",
               "properties": {
                 "gid": {
-                  "title": "identificativo univoco",
+                  "title": "Identificativo univoco",
                   "description": "Identificatore globale univoco",
                   "type": "string"
                 },
                 "layerName": {
                   "title": "Titolo",
-                  "description": "Nome del layer (visualizzato in mappa)",
+                  "description": "Nome del layer (visualizzato nell'albero dei livelli)",
                   "type": "string"
                 },
                 "layersUri": {
                   "title": "Layer URI",
-                  "description": "Posizione di un oggetto JSON che sarà caricato in sostituzione di questo oggetto ",
+                  "description": "Url assoluto o relativo di un oggetto JSON con i layer che sarà caricato in sostituzione di questo oggetto. Utilizzando questa proprietà è possibile riutilizzare gruppi di layer esistenti.",
                   "type": "string"
                 },
                 "mapUri": {
-                  "title": "URL (WMS, TMS)",
+                  "title": "URL (WMS, TMS) del layer",
                   "description": "Url base del layer. Es: http://localhost:8080/geoserver/wms?",
                   "type": "string"
                 },
                 "layerType": {
-                  "title": "Tipologia",
-                  "description": "Tipologia del layer",
+                  "title": "Tipologia di layer",
+                  "description": "Tipologia del layer. Sono supportati layer di tipo WMS, Tiled o sfondi OSM.",
                   "enum": ["group", "osm", "otm", "ocm", "wms", "wmstiled", "tms"],
                   "type": "string",
                   "default": "wmstiled"
                 },
                 "layer": {
-                  "title": "Nome Layer",
+                  "title": "Nome Layer per il servizio.",
                   "description": "Nome del layer WMS da visualizzare. Per geoserver mettere workspace:nome del layer Es: stradario:civici",
                   "type": "string"
                 },
                 "srid": {
-                  "title": "SRID",
-                  "description": "SRID del layer. Es: 3857 (al momento è supportato solo il 3857)",
+                  "title": "SRID del layer",
+                  "description": "Spatial reference ID del layer. Es: 3857 (al momento è supportato solo il 3857)",
                   "enum": ["3857"],
                   "type": "string"
                 },
@@ -419,19 +419,19 @@
                 },
                 "tileMode": {
                   "title": "Tipologia Tile",
-                  "description": "Tipologia di tile da utilizare. Lasciare vuoto per il formato server predefinito",
+                  "description": "Tipologia di tile da utilizare nel caso di tiled layer. Lasciare vuoto per il formato server predefinito",
                   "enum": ["", "xyz", "quadkey"],
                   "type": "string"
                 },
                 "visible": {
-                  "title": "Visibilità",
-                  "description": "Visibilità iniziale in mappa",
+                  "title": "Visibilità iniziale",
+                  "description": "Visibilità iniziale del layer in mappa",
                   "enum": [0, 1],
                   "type": "integer"
                 },
                 "queryable": {
                   "title": "Layer interrogabile",
-                  "description": "Imposta se il layer è interrogabile tramite click, se visibile.",
+                  "description": "Definisce se il layer è interrogabile tramite click, se visibile.",
                   "enum": [0, 1],
                   "type": "integer"
                 },
@@ -453,7 +453,7 @@
                 },
                 "labelField": {
                   "title": "Campo etichetta",
-                  "description": "Campo da utilizzare come etichetta. Deve essere un campo di tipo string",
+                  "description": "Campo da utilizzare come etichetta. L'etichetta viene visualizzata nell'hover del mouse sull'entità. Deve essere un campo di tipo string. ",
                   "type": "string"
                 },
                 "zIndex": {
@@ -469,17 +469,17 @@
                 },
                 "legendUrl": {
                   "title": "Legenda personalizzata",
-                  "description": "Url della legenda personalizzata",
+                  "description": "Url della legenda personalizzata per il layer.",
                   "type": "string"
                 },
                 "hideLegend": {
                   "title": "Nascondi Legenda",
-                  "description": "Nasconde la legenda se non disponibile",
+                  "description": "Nasconde la legenda se non disponibile.",
                   "type": "boolean"
                 },
                 "templateUrl": {
                   "title": "Url del template",
-                  "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repo",
+                  "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repository di base.",
                   "type": "string"
                 },
                 "secured": {
@@ -500,12 +500,12 @@
                 },
                 "vectorRadius": {
                   "title": "Dimensione del punto precaricato",
-                  "description": "Dimensione del punto precaricato",
+                  "description": "Dimensione del punto precaricato quando il layer è in preload. Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa.",
                   "type": "integer"
                 },
                 "vectorWidth": {
                   "title": "Dimensione della linea precaricata",
-                  "description": "Dimensione della linea precaricata",
+                  "description": "Dimensione della linea precaricata quando il layer è in preload.  Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa",
                   "type": "integer"
                 },
                 "hoverTooltip": {
@@ -515,7 +515,7 @@
                 },
                 "cssClass": {
                   "title": "Classe css del gruppo/layer",
-                  "description": "Classe specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",
+                  "description": "Classe specifica da assegnare al testo del layer nell'albero dei livelli. Utilizzare il modficatore !important per sovreascrivere i default ",
                   "type": "string"
                 }
               },
@@ -541,7 +541,7 @@
       }
     },
     "relations": {
-      "description": "Elenco delle relations dell'applicazione. Vedere lo schema dedicato",
+      "description": "Elenco delle relations dell'applicazione. Consultare lo schema dedicato.",
       "type": "array",
       "title": "Relazioni",
       "items": {
@@ -549,7 +549,7 @@
       }
     },
     "link": {
-      "description": "Elenco dei link dell'applicazione",
+      "description": "Elenco dei link dell'applicazione. Consultare lo schema dedicato.",
       "type": "array",
       "title": "Links",
       "items": {
@@ -557,7 +557,7 @@
       }
     },
     "termsLinks": {
-      "description": "Elenco dei link per termini di utilizzo, privacy, cookies",
+      "description": "Elenco dei link per termini di utilizzo, privacy, cookies. Consultare lo schema dedicato.",
       "type": "array",
       "title": "Terms",
       "items": {
