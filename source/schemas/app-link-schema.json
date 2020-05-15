@@ -2,35 +2,34 @@
   "$schema": "http://www.perspectiva.it/schemas/likeamap_links",
   "type": "object",
   "title": "Configurazione Links LikeAMap",
+
   "properties": {
-    "properties": {
-      "gid": {
-        "title": "Gid del link",
-        "description": "Gid del link",
-        "type": "string"
-      },
-      "title": {
-        "title": "Titolo del link",
-        "description": "Titolo del link",
-        "type": "string"
-      },
-      "url": {
-        "title": "Url del Link",
-        "description": "Url del link completo di HTTP",
-        "type": "string"
-      },
-      "callback": {
-        "title": "Callback da eseguire sul click",
-        "description": "Callback da eseguire sul click",
-        "type": "string"
-      },
-      "links": {
-        "title": "Elenco dei sublink",
-        "description": "",
-        "type": "array",
-        "items": {
-          "type": "object"
-        }
+    "gid": {
+      "title": "Gid del link",
+      "description": "Gid del link",
+      "type": "string"
+    },
+    "title": {
+      "title": "Titolo del link",
+      "description": "Titolo del link",
+      "type": "string"
+    },
+    "url": {
+      "title": "Url del Link",
+      "description": "Url del link completo di HTTP",
+      "type": "string"
+    },
+    "callback": {
+      "title": "Callback da eseguire sul click",
+      "description": "Callback da eseguire sul click",
+      "type": "string"
+    },
+    "links": {
+      "title": "Elenco dei sublink",
+      "description": "",
+      "type": "array",
+      "items": {
+        "type": "object"
       }
     }
   }

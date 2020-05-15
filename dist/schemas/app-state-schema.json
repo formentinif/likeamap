@@ -3,6 +3,11 @@
   "type": "object",
   "title": "Configurazione Applicazione",
   "properties": {
+    "appId": {
+      "title": "Codice applicazione",
+      "description": "Codice identificativo della mappa",
+      "type": "string"
+    },
     "title": {
       "title": "Titolo",
       "description": "Nome della mappa",

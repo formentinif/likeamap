@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"></script>
+    <script src="json-schema-doc.js"></script>
+    <script>
+      jsonSchemaDocs.loadFile("../schemas/app-relation-schema.json");
+    </script>
+    <style>
+      .has-margin-top-1 {
+        margin-top: 8px;
+      }
+      .has-margin-top-3 {
+        margin-top: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <div class="columns">
+        <div class="column is-3">
+          <aside class="menu is-hidden-mobile">
+            <p class="menu-label has-margin-top-3">
+              Elenco tag
+            </p>
+            <ul id="menu" class="menu-list"></ul>
+          </aside>
+        </div>
+        <div class="column is-9">
+          <h1 id="title" class="title has-margin-top-3">Documentazione Tag LikeAMap</h1>
+          <div class="column is-12">
+            <div class="field">
+              <p class="control has-icons-left has-icons-right">
+                <input class="input" type="search" id="search" placeholder="filtra tag" />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-search"></i>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div class="columns">
+            <div id="content" class="column is-12"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

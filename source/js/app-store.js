@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamStore = (function() {
+var LamStore = (function () {
   var mapDiv = null;
   var mapTemplateUrl = null;
   var appState = null;
@@ -33,19 +33,23 @@ var LamStore = (function() {
   var authToken = null;
   let infoClickEnabled = true;
 
-  var setMapDiv = function(div) {
+  var setMapDiv = function (div) {
     mapDiv = div;
   };
 
-  var getMapDiv = function() {
+  var getMapDiv = function () {
     return mapDiv;
   };
 
-  var setMapTemplateUrl = function(url) {
+  var getAppId = function () {
+    return LamStore.getAppState().appId;
+  };
+
+  var setMapTemplateUrl = function (url) {
     mapTemplateUrl = url;
   };
 
-  var getMapTemplateUrl = function() {
+  var getMapTemplateUrl = function () {
     let tempTemplateUrl = "map.html";
     if (LamStore.getAppState().urlMapTemplate != null) {
       tempTemplateUrl = LamStore.getAppState().urlMapTemplate;
@@ -57,7 +61,7 @@ var LamStore = (function() {
    * Restituisce l'appstate corrente
    * @return {object} AppState corrente
    */
-  var getAppState = function() {
+  var getAppState = function () {
     return appState;
   };
 
@@ -65,14 +69,14 @@ var LamStore = (function() {
    * Restituisce l'appstate iniziale
    * @return {object} AppState iniziale
    */
-  var getInitialAppState = function() {
+  var getInitialAppState = function () {
     return initialAppState;
   };
 
   /**
    * Imposta l'appstate corrente
    */
-  var setAppState = function(currentAppState) {
+  var setAppState = function (currentAppState) {
     appState = normalizeAppState(currentAppState);
     if (LamDom.isMobile() && appState.improveMobileBehaviour) {
       appState = normalizeMobile(appState);
@@ -82,7 +86,7 @@ var LamStore = (function() {
   /**
    * Imposta l'appstate iniziale
    */
-  var setInitialAppState = function(appState) {
+  var setInitialAppState = function (appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
     initialAppState = normalizeAppState(initialAppState);
     if (LamDom.isMobile() && initialAppState.improveMobileBehaviour) {
@@ -94,7 +98,7 @@ var LamStore = (function() {
    * Set the default parameters for appstate
    * @param {Object} normalize the given appstate
    */
-  let normalizeAppState = function(appstate) {
+  let normalizeAppState = function (appstate) {
     if (!appstate.srid) appstate.srid = 3857;
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
@@ -106,8 +110,8 @@ var LamStore = (function() {
    * Improve the appstate for mobile
    * @param {Object} normalize the given appstate
    */
-  let normalizeMobile = function(appstate) {
-    let normalizeMobileArray = function(layers) {
+  let normalizeMobile = function (appstate) {
+    let normalizeMobileArray = function (layers) {
       for (let index = 0; index < layers.length; index++) {
         if (layers[index].preload) {
           layers[index].preload = 0;
@@ -128,7 +132,7 @@ var LamStore = (function() {
    * @param  {string} gid Identificativo del layer
    * @return {null}     Nessun valore restituito
    */
-  var toggleLayer = function(gid) {
+  var toggleLayer = function (gid) {
     let layer = getLayer(gid);
     if (layer) {
       layer.visible = 1 - layer.visible;
@@ -140,7 +144,7 @@ var LamStore = (function() {
    * Toggle all layers within a group
    * @param {string} gid Layer global id
    */
-  let toggleLayersInGroup = function(gid) {
+  let toggleLayersInGroup = function (gid) {
     let icon = $("#" + gid + "_c"); //TODO convention better to gain name from parameter
     let visibility = !icon.hasClass("lam-checked");
     setLayersVisibilityInGroup(gid, visibility);
@@ -150,10 +154,10 @@ var LamStore = (function() {
    * Set visibility of all layers within a group
    * @param {string} gid Layer global id
    */
-  let setLayersVisibilityInGroup = function(gid, visibility) {
+  let setLayersVisibilityInGroup = function (gid, visibility) {
     let groupLayer = getLayer(gid);
     if (groupLayer && groupLayer.layers) {
-      groupLayer.layers.forEach(function(layer) {
+      groupLayer.layers.forEach(function (layer) {
         if (layer.layerType != "group") {
           LamMap.setLayerVisibility(layer.gid, visibility);
           LamStore.setLayerVisibility(layer.gid, visibility);
@@ -171,7 +175,7 @@ var LamStore = (function() {
    * @param  {boolean} visibility Visibilità del layer da impostare
    * @return {null}  Nessun valore restituito
    */
-  var setLayerVisibility = function(gid, visibility) {
+  var setLayerVisibility = function (gid, visibility) {
     let layer = getLayer(gid);
     if (layer) {
       layer.visible = visibility;
@@ -184,9 +188,9 @@ var LamStore = (function() {
    * @param {Array} layers
    * @param {string} gid
    */
-  var getLayerArray = function(layers, gid) {
+  var getLayerArray = function (layers, gid) {
     var layerFound = null;
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (layer.gid === gid) {
         layerFound = layer;
       }
@@ -202,9 +206,9 @@ var LamStore = (function() {
    * @param {Array} layers
    * @param {string} layerName
    */
-  var getLayerArrayByName = function(layers, layerName) {
+  var getLayerArrayByName = function (layers, layerName) {
     var layerFound = null;
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (layer.layer && $.inArray(layerName, layer.layer.split(":")) >= 0) {
         layerFound = layer;
       }
@@ -220,7 +224,7 @@ var LamStore = (function() {
    * @param  {string} gid identificativo del layer
    * @return {object}     Layer
    */
-  var getLayer = function(gid) {
+  var getLayer = function (gid) {
     return LamStore.getLayerArray(appState.layers, gid);
   };
 
@@ -229,7 +233,7 @@ var LamStore = (function() {
    * @param  {string} layerName nome del layer
    * @return {object}     Layer
    */
-  var getLayerByName = function(layerName) {
+  var getLayerByName = function (layerName) {
     return LamStore.getLayerArrayByName(appState.layers, layerName);
   };
 
@@ -248,7 +252,7 @@ var LamStore = (function() {
    * Restituisce tutti i layer abilitati all'interrogazione
    * @return {array} Array dei layer interrogabili
    */
-  var getQueryLayers = function() {
+  var getQueryLayers = function () {
     let layers = getQueryLayersArray(appState.layers);
     layers.sort(SortByLayerName);
     return layers;
@@ -258,9 +262,9 @@ var LamStore = (function() {
    * Function needed for getting query layers recursively
    * @param {Object} layers
    */
-  var getQueryLayersArray = function(layers) {
+  var getQueryLayersArray = function (layers) {
     var layersFound = [];
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (layer.queryable) {
         layersFound.push(layer);
       }
@@ -275,7 +279,7 @@ var LamStore = (function() {
    * Restituisce tutti i layer abilitati alla ricerca
    * @return {array} Array dei layer ricercarbili
    */
-  var getSearchLayers = function() {
+  var getSearchLayers = function () {
     let layers = getSearchLayersArray(appState.layers);
     layers.sort(SortByLayerName);
     return layers;
@@ -285,9 +289,9 @@ var LamStore = (function() {
    * Function needed for getting search layers recursively
    * @param {Object} layers
    */
-  var getSearchLayersArray = function(layers) {
+  var getSearchLayersArray = function (layers) {
     var layersFound = [];
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (layer.searchable && layer.searchField) {
         layersFound.push(layer);
       }
@@ -302,7 +306,7 @@ var LamStore = (function() {
    * Restituisce tutti i layer visibili
    * @return {array} Array dei layer ricercarbili
    */
-  var getVisibleLayers = function() {
+  var getVisibleLayers = function () {
     let layers = getVisibleLayersArray(appState.layers);
     layers.sort(SortByLayerName);
     return layers;
@@ -312,9 +316,9 @@ var LamStore = (function() {
    * Function needed for getting search layers recursively
    * @param {Object} layers
    */
-  var getVisibleLayersArray = function(layers) {
+  var getVisibleLayersArray = function (layers) {
     var layersFound = [];
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (layer.visible) {
         layersFound.push(layer);
       }
@@ -329,9 +333,9 @@ var LamStore = (function() {
    * Get Group Layer bu Layer Gid
    * @param {string} gid Layer gid
    */
-  var getGroupLayerByLayerGid = function(gid) {
+  var getGroupLayerByLayerGid = function (gid) {
     var layerGroupsFound = [];
-    appState.layers.forEach(function(layer) {
+    appState.layers.forEach(function (layer) {
       var layerGroup = getGroupLayerByLayerGidArray(layer, gid);
       if (layerGroup) {
         layerGroupsFound.push(layerGroup);
@@ -345,9 +349,9 @@ var LamStore = (function() {
    * @param {Object} layerGroup
    * @param {string} gid
    */
-  var getGroupLayerByLayerGidArray = function(layerGroup, gid) {
+  var getGroupLayerByLayerGidArray = function (layerGroup, gid) {
     var layerFound = null;
-    layerGroup.layers.forEach(function(layer) {
+    layerGroup.layers.forEach(function (layer) {
       if (layer.gid === gid) {
         layerFound = layer;
       }
@@ -363,7 +367,7 @@ var LamStore = (function() {
    * Ricarica i livelli della mappa
    * @return {null}
    */
-  var liveReload = function(newAppState) {
+  var liveReload = function (newAppState) {
     LamStore.setAppState(newAppState);
     LamDom.showAppTools();
     LamLayerTree.render(null, newAppState.layers);
@@ -371,7 +375,7 @@ var LamStore = (function() {
     LamMap.loadConfig(newAppState);
   };
 
-  var mapReload = function() {
+  var mapReload = function () {
     LamLayerTree.render(null, appState.layers);
     LamMap.removeAllLayersFromMap();
     LamMap.loadConfig(appState);
@@ -381,18 +385,18 @@ var LamStore = (function() {
    * Resetta i layer alla situazione iniziale
    * @return {null} Nessun valore restituito
    */
-  var resetInitialLayers = function() {
+  var resetInitialLayers = function () {
     if (initialAppState.layers) {
       resetLayersArray(initialAppState.layers);
     }
   };
 
-  var resetLayersArray = function(layers) {
-    layers.forEach(function(layer) {
+  var resetLayersArray = function (layers) {
+    layers.forEach(function (layer) {
       lamDispatch({
         eventName: "set-layer-visibility",
         gid: layer.gid,
-        visibility: parseInt(layer.visible)
+        visibility: parseInt(layer.visible),
       });
       if (layer.layers) {
         resetLayersArray(layer.layers);
@@ -400,15 +404,15 @@ var LamStore = (function() {
     });
   };
 
-  var getInfoClickEnabled = function() {
+  var getInfoClickEnabled = function () {
     return infoClickEnabled;
   };
 
-  var setInfoClickEnabled = function(status) {
+  var setInfoClickEnabled = function (status) {
     infoClickEnabled = status;
   };
 
-  var doLogin = function(username, password) {
+  var doLogin = function (username, password) {
     switch (appState.authentication.authType) {
       case "anonymous":
         LamAuthTools.hideLogin();
@@ -428,9 +432,9 @@ var LamStore = (function() {
           async: false,
           cache: false,
           data: '{"username": "' + username + '", "password" : "' + password + '"}',
-          success: function() {
+          success: function () {
             alert("Thanks for your comment!");
-          }
+          },
         });
         LamAuthTools.hideLogin();
         break;
@@ -440,17 +444,17 @@ var LamStore = (function() {
         $.ajax({
           dataType: "json",
           url: url,
-          cache: false
+          cache: false,
         })
-          .done(function(data) {
+          .done(function (data) {
             authToken = data;
             LamAuthTools.hideLogin();
           })
-          .fail(function(data) {
+          .fail(function (data) {
             LamAuthTools.showError();
             lamDispatch({
               eventName: "log",
-              message: "LamStore: Unable to autheticate user"
+              message: "LamStore: Unable to autheticate user",
             });
           });
         break;
@@ -460,7 +464,7 @@ var LamStore = (function() {
     mapReload();
   };
 
-  var openUrlTemplate = function(urlTemplate) {
+  var openUrlTemplate = function (urlTemplate) {
     //credo delle proprietà standard
     var props = {};
     props.token = authToken.token;
@@ -474,7 +478,7 @@ var LamStore = (function() {
     win.focus();
   };
 
-  var getAuthorizationHeader = function() {
+  var getAuthorizationHeader = function () {
     switch (appState.authentication.authType) {
       case "basic":
         return "Basic " + appState.authentication.authToken;
@@ -483,11 +487,11 @@ var LamStore = (function() {
     }
   };
 
-  let getCurrentInfoItems = function() {
+  let getCurrentInfoItems = function () {
     return LamStore.getAppState().currentInfoItems;
   };
 
-  let getCurrentInfoItem = function(index) {
+  let getCurrentInfoItem = function (index) {
     return LamStore.getAppState().currentInfoItems.features[index];
   };
 
@@ -495,7 +499,7 @@ var LamStore = (function() {
    * Genera un GUID
    * @return {string} guid
    */
-  let guid = function() {
+  let guid = function () {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
         .toString(16)
@@ -504,25 +508,25 @@ var LamStore = (function() {
     return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
   };
 
-  let getOpenResultInInfoWindow = function() {
+  let getOpenResultInInfoWindow = function () {
     return LamStore.getAppState().openResultInInfoWindow;
   };
 
-  let getLinks = function() {
+  let getLinks = function () {
     if (!LamStore.getAppState().links) {
       LamStore.getAppState().links = [];
     }
     return LamStore.getAppState().links;
   };
 
-  let getTermsLinks = function() {
+  let getTermsLinks = function () {
     if (!LamStore.getAppState().termsLinks) {
       LamStore.getAppState().termsLinks = [];
     }
     return LamStore.getAppState().termsLinks;
   };
 
-  let parseResponse = function(e) {};
+  let parseResponse = function (e) {};
 
   return {
     doLogin: doLogin,
@@ -539,6 +543,7 @@ var LamStore = (function() {
     getLayerByName: getLayerByName,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
+    getAppId: getAppId,
     getQueryLayers: getQueryLayers,
     getMapTemplateUrl: getMapTemplateUrl,
     getSearchLayers: getSearchLayers,
@@ -559,6 +564,6 @@ var LamStore = (function() {
     setMapTemplateUrl: setMapTemplateUrl,
     setLayerVisibility: setLayerVisibility,
     toggleLayer: toggleLayer,
-    toggleLayersInGroup: toggleLayersInGroup
+    toggleLayersInGroup: toggleLayersInGroup,
   };
 })();

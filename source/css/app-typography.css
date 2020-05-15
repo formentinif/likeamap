@@ -52,6 +52,10 @@
   color: var(--lam-btn-color);
 }
 
+.lam-radius {
+  border-radius: 8px;
+}
+
 .lam-bar {
   box-sizing: border-box;
   display: flex;
