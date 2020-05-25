@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamLoader = (function() {
+var LamLoader = (function () {
   let layerUriCount = 0;
   let countRequest = 0;
 
@@ -53,60 +53,60 @@ var LamLoader = (function() {
       $.ajax({
         dataType: "json",
         url: "states/" + appStateId,
-        cache: false
+        cache: false,
       })
-        .done(function(appState) {
+        .done(function (appState) {
           loadLamState(appState);
         })
-        .fail(function() {
+        .fail(function () {
           lamDispatch({
             eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
+            message: "Share: Impossibile caricare la mappa condivisa",
           });
         });
     } else if (appStateJson) {
       $.ajax({
         dataType: "json",
         url: appStateJson,
-        cache: false
+        cache: false,
       })
-        .done(function(appstate) {
+        .done(function (appstate) {
           loadLamState(appstate);
         })
-        .fail(function() {
+        .fail(function () {
           lamDispatch({
             eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
+            message: "Share: Impossibile caricare la mappa condivisa",
           });
         });
     } else if (appStateUrl) {
       $.ajax({
         dataType: "json",
         url: appStateUrl,
-        cache: false
+        cache: false,
       })
-        .done(function(appstate) {
+        .done(function (appstate) {
           loadLamState(appstate);
         })
-        .fail(function() {
+        .fail(function () {
           lamDispatch({
             eventName: "log",
-            message: "Share: Impossibile caricare la mappa condivisa"
+            message: "Share: Impossibile caricare la mappa condivisa",
           });
         });
     } else {
       $.ajax({
         dataType: "json",
         url: "states/app-state.json",
-        cache: false
+        cache: false,
       })
-        .done(function(appstate) {
+        .done(function (appstate) {
           loadLamState(appstate);
         })
-        .fail(function() {
+        .fail(function () {
           lamDispatch({
             eventName: "log",
-            message: "Share: Impossibile caricare la mappa"
+            message: "Share: Impossibile caricare la mappa",
           });
         });
     }
@@ -117,45 +117,51 @@ var LamLoader = (function() {
       if (LamStore.getAppState().authentication.requireAuthentication) {
         LamAuthTools.render("login-container");
       }
+      //cookie consent
+      if (LamStore.getAppState().cookieConsent) {
+        if (LamStore.getAppState().cookieConsent.showConsentOnLoad) {
+          LamCookieConsent.cookieConsent();
+        }
+      }
       lamTemplateMapinit();
     }
   }
 
-  var lamTemplateMapinit = function() {
+  var lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",
       url: LamStore.getMapTemplateUrl(),
-      cache: false
+      cache: false,
     })
-      .done(function(data) {
+      .done(function (data) {
         $("#" + LamStore.getMapDiv()).html(data);
         //loading all remote layers
         loadRemoteLayers(LamLoader.mapInit);
       })
-      .fail(function(data) {
+      .fail(function (data) {
         lamDispatch({
           eventName: "log",
-          message: "Init Map: Unable to load map template"
+          message: "Init Map: Unable to load map template",
         });
       });
   };
 
-  let registerHandlebarsHelpers = function() {
-    Handlebars.registerHelper("ifequals", function(a, b, options) {
+  let registerHandlebarsHelpers = function () {
+    Handlebars.registerHelper("ifequals", function (a, b, options) {
       if (a == b) {
         return options.fn(this);
       }
       return options.inverse(this);
     });
 
-    Handlebars.registerHelper("ifnotequals", function(a, b, options) {
+    Handlebars.registerHelper("ifnotequals", function (a, b, options) {
       if (a != b) {
         return options.fn(this);
       }
       return options.inverse(this);
     });
 
-    Handlebars.registerHelper("get_point_x", function(options) {
+    Handlebars.registerHelper("get_point_x", function (options) {
       try {
         return options.data.root.lamCoordinates[0];
       } catch (error) {
@@ -163,7 +169,7 @@ var LamLoader = (function() {
       }
     });
 
-    Handlebars.registerHelper("get_point_y", function(options) {
+    Handlebars.registerHelper("get_point_y", function (options) {
       try {
         return options.data.root.lamCoordinates[1];
       } catch (error) {
@@ -171,7 +177,7 @@ var LamLoader = (function() {
       }
     });
 
-    Handlebars.registerHelper("get_coordinate_x", function(index, options) {
+    Handlebars.registerHelper("get_coordinate_x", function (index, options) {
       try {
         if (index === "undefined") return options.data.lamCoordinates[0];
         return options.data.root.lamCoordinates[index][0];
@@ -180,7 +186,7 @@ var LamLoader = (function() {
       }
     });
 
-    Handlebars.registerHelper("get_coordinate_y", function(index, options) {
+    Handlebars.registerHelper("get_coordinate_y", function (index, options) {
       try {
         if (index === "undefined") return options.data.lamCoordinates[1];
         return options.data.root.lamCoordinates[index][1];
@@ -193,7 +199,7 @@ var LamLoader = (function() {
   /*
   Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
   */
-  var mapInit = function(callback) {
+  var mapInit = function (callback) {
     registerHandlebarsHelpers();
 
     $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
@@ -252,9 +258,9 @@ var LamLoader = (function() {
   /**
    * Load the remote layers nested in the appstate
    */
-  let loadRemoteLayers = function(callback) {
+  let loadRemoteLayers = function (callback) {
     LamDom.toggleLoader(true);
-    LamStore.getAppState().layers.forEach(function(layer) {
+    LamStore.getAppState().layers.forEach(function (layer) {
       loadLayersUri(layer, callback);
     });
     if (layerUriCount === 0) {
@@ -268,28 +274,28 @@ var LamLoader = (function() {
    * @param {Object} layer layer to load
    * @param {string} callback function to call at the end
    */
-  var loadLayersUri = function(layer, callback) {
+  var loadLayersUri = function (layer, callback) {
     if (layer.layersUri) {
       countRequest++;
       layerUriCount++;
       $.ajax({
         dataType: "json",
         url: layer.layersUri,
-        cache: false
+        cache: false,
       })
-        .done(function(data) {
+        .done(function (data) {
           layer.layers = data;
-          layer.layers.forEach(function(e) {
+          layer.layers.forEach(function (e) {
             loadLayersUri(e, callback);
           });
         })
-        .fail(function(data) {
+        .fail(function (data) {
           lamDispatch({
             eventName: "log",
-            message: "Layer Tree: Unable to load layers " + layer.layersUri
+            message: "Layer Tree: Unable to load layers " + layer.layersUri,
           });
         })
-        .always(function(data) {
+        .always(function (data) {
           countRequest--;
           if (countRequest === 0) {
             LamStore.setInitialAppState(LamStore.getAppState());
@@ -297,7 +303,7 @@ var LamLoader = (function() {
           }
         });
     } else if (layer.layers) {
-      layer.layers.forEach(function(e) {
+      layer.layers.forEach(function (e) {
         loadLayersUri(e, callback);
       });
     }
@@ -307,6 +313,6 @@ var LamLoader = (function() {
     lamInit: lamInit,
     loadLayersUri: loadLayersUri,
     loadRemoteLayers: loadRemoteLayers,
-    mapInit: mapInit
+    mapInit: mapInit,
   };
 })();

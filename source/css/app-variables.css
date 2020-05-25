@@ -47,6 +47,7 @@ body {
 
 :root {
   --lam-bg-color: rgba(252, 252, 252, 0.9);
+  --lam-bg-color-no-alpha: rgba(252, 252, 252);
   --lam-bg-menu-color: #63818f;
   --lam-btn-color: #63818f;
   --lam-btn-color-darken: #40535b;
