@@ -198,6 +198,38 @@
       "description": "Template inline (handlebars) da applicare per i metadati. Default è {{ABSTRACT}}.",
       "type": "string"
     },
+    "cookieConsent": {
+      "title": "Cookie e Privacy consent",
+      "description": "Impostazioni per l'informativa di cookie e privacy",
+      "type": "object",
+      "properties": {
+        "showConsentOnLoad": {
+          "title": "Mostra l'informativa all'avvio",
+          "description": "Mostra l'informativa all'avvio dell'applicazione",
+          "type": "boolean"
+        },
+        "cookieTitle": {
+          "title": "Titolo del box dell'informativa",
+          "description": "Es. Privacy e Cookies",
+          "type": "string"
+        },
+        "cookieDesc": {
+          "title": "Descrizione del box dell'informativa",
+          "description": "Es: Questo sito utilizza solo cookie tecnici propri e di terze parti per il corretto funzionamento delle pagine web e per il miglioramento dei servizi. Chiudendo questo banner scorrendo questa pagina; cliccando su un link o proseguendo la navigazione in altra maniera acconsenti all'uso dei cookie.",
+          "type": "string"
+        },
+        "cookieLink": {
+          "title": "Link all'informativa del cookie",
+          "description": "Es: <a href='cookie-policy.html' target='_blank'>What for?</a>",
+          "type": "string"
+        },
+        "cookieButton": {
+          "title": "Testo del bottone di consenso",
+          "description": "Es: Accetta e chiudi ",
+          "type": "string"
+        }
+      }
+    },
     "drawFeatures": {
       "title": "Entità vettoriali della sezione disegno.",
       "description": "Valore di sistema, lasciare a null",
