@@ -296,7 +296,6 @@ let LamTemplates = (function () {
 
   let getLabelFeature = function (props, labelName, layerTitle) {
     try {
-      debugger;
       let label = "";
       if (props[labelName]) {
         label = props[labelName];
