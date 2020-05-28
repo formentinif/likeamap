@@ -63,7 +63,12 @@
 </div>
 
 <div id="menu-toolbar" class="lam-toolbar">
-  <button id="menu-toolbar__layer-tree" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-layers')">
+  <button
+    id="menu-toolbar__layer-tree"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-layers')"
+    title="Elenco dei layer"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0z" fill="none" />
@@ -71,7 +76,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__search-tools" class="lam-hidden lam-btn  lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-search')">
+  <button
+    id="menu-toolbar__search-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-search')"
+    title="Ricerca indirizzi e layer"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path
@@ -81,7 +91,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__print-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-print-tools')">
+  <button
+    id="menu-toolbar__print-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-print-tools')"
+    title="Stampa"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path
@@ -91,7 +106,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__share-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-share')">
+  <button
+    id="menu-toolbar__share-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-share')"
+    title="Condividi mappa"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0z" fill="none" />
@@ -101,7 +121,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__map-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-map-tools')">
+  <button
+    id="menu-toolbar__map-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-map-tools')"
+    title="Strumenti mappa"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path clip-rule="evenodd" fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +136,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__draw-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-draw-tools')">
+  <button
+    id="menu-toolbar__draw-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-draw-tools')"
+    title="Disegno"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path
@@ -121,7 +151,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__links-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-links')">
+  <button
+    id="menu-toolbar__links-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-links')"
+    title="Elenco dei link"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0z" fill="none" />
@@ -129,7 +164,12 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__gps-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-gps-tools')">
+  <button
+    id="menu-toolbar__gps-tools"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    onClick="lamDispatch('show-gps-tools')"
+    title="Strumenti GPS"
+  >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0z" fill="none" />
@@ -141,6 +181,7 @@
     id="menu-toolbar__legend-tools"
     class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
     onClick="lamDispatch('show-legend-visible-layers')"
+    title="Legenda"
   >
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -159,7 +200,7 @@
     </div>
     <div id="lam-layer-tree" class="lam-panel-content-item lam-visible"></div>
 
-    <div id="info-results" class="lam-panel-content-item ">
+    <div id="info-results" class="lam-panel-content-item">
       <h4 id="info-results__title" class="lam-title"></h4>
       <div id="info-results__content" class="lam-scroll-padding"></div>
     </div>

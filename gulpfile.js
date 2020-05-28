@@ -83,6 +83,7 @@ function combineCss(){
 	  "./source/css/app-shadows.css",
 	  "./source/css/app-tooltip.css",
 	  "./source/css/app-typography.css",
+	  "./source/css/app-cookie-consent.css",
 	  "./source/css/app-vendor.css",
 	  "./source/vendor/css/ol.css"
     ])
