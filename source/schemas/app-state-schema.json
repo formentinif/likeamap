@@ -369,6 +369,16 @@
             "description": "Nome del layer (visualizzato in mappa)",
             "type": "string"
           },
+          "layerDescription": {
+            "title": "Descrizone del layer",
+            "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
+            "type": "string"
+          },
+          "showDescriptionInLayerTree": {
+            "title": "Mostra descrizione nell'albero dei livelli",
+            "description": "Mostra la descrizione nell'albero dei layer",
+            "type": "boolean"
+          },
           "layerType": {
             "title": "Tipologia",
             "description": "Tipologia del group layer",
@@ -409,6 +419,16 @@
                   "title": "Titolo",
                   "description": "Nome del layer (visualizzato nell'albero dei livelli)",
                   "type": "string"
+                },
+                "layerDescription": {
+                  "title": "Descrizone del layer",
+                  "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
+                  "type": "string"
+                },
+                "showDescriptionInLayerTree": {
+                  "title": "Mostra descrizione nell'albero dei livelli",
+                  "description": "Mostra la descrizione nell'albero dei layer",
+                  "type": "boolean"
                 },
                 "layersUri": {
                   "title": "Layer URI",
