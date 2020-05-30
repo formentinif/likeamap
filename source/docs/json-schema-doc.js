@@ -52,7 +52,6 @@ jsonSchemaDocs.PropertyIsVisibleIterate = function (search, obj) {
 };
 
 jsonSchemaDocs.ShowExample = function (tag, target, prop) {
-  debugger;
   let valore = "'valore'";
   if (prop.type == "bool" || prop.type == "boolean") valore = "true";
   if (prop.enum && prop.enum.length) valore = prop.enum[0];
