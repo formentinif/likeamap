@@ -4754,13 +4754,13 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamLegendTools = (function() {
+var LamLegendTools = (function () {
   var isRendered = false;
   var currentLegendPayload = false;
 
   var init = function init() {
     //events binding
-    LamDispatcher.bind("show-legend", function(payload) {
+    LamDispatcher.bind("show-legend", function (payload) {
       currentLegendPayload = payload;
       LamLegendTools.showLegend(payload.gid, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
@@ -4768,7 +4768,7 @@ var LamLegendTools = (function() {
     /**
      * Helper event to open legend for all layers at the current scale
      */
-    LamDispatcher.bind("show-legend-visible-layers", function(payload) {
+    LamDispatcher.bind("show-legend-visible-layers", function (payload) {
       currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
@@ -4777,13 +4777,13 @@ var LamLegendTools = (function() {
     /**
      * Helper event to open legend for all layers with scale parameter
      */
-    LamDispatcher.bind("show-full-legend-visible-layers", function(payload) {
+    LamDispatcher.bind("show-full-legend-visible-layers", function (payload) {
       currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, payload.scaled, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
     });
 
-    LamDispatcher.bind("update-legend", function() {
+    LamDispatcher.bind("update-legend", function () {
       LamLegendTools.updateLegend();
     });
 
@@ -4792,24 +4792,25 @@ var LamLegendTools = (function() {
       LamDispatcher.dispatch({
         eventName: "show-full-legend-visible-layers",
         showInfoWindow: LamStore.getAppState().openLegendInInfoWindow,
-        scaled: true
+        scaled: true,
       });
     }
 
     //adding zoom-end event for automatic legend updates
     LamMap.addZoomEndEvent({
-      eventName: "update-legend"
+      eventName: "update-legend",
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  var showLegend = function(gid, scaled, showInfoWindow) {
+  var showLegend = function (gid, scaled, showInfoWindow) {
+    debugger;
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
     var urlImg = "";
@@ -4824,6 +4825,9 @@ var LamLegendTools = (function() {
       if (urlImg) {
         html += "<img class='lam-legend' src='" + urlImg + "' />";
       }
+    }
+    if (thisLayer.layerDescription) {
+      html += "<div class='lam-layer-description'>" + thisLayer.layerDescription + "</div>";
     }
     html += "<div class='lam-layer-metadata'></div>";
     showLayerMetadata(thisLayer);
@@ -4849,11 +4853,12 @@ var LamLegendTools = (function() {
     return true;
   };
 
-  var showLegendLayers = function(layers, scaled, showInfoWindow) {
+  var showLegendLayers = function (layers, scaled, showInfoWindow) {
+    debugger;
     let html = $("<div />", {
-      id: "lam-legend-container"
+      id: "lam-legend-container",
     });
-    layers.forEach(function(layer) {
+    layers.forEach(function (layer) {
       if (!layer.hideLegend && layer.layerType != "group") {
         if (layer.legendUrl) {
           urlImg = layer.legendUrl;
@@ -4864,12 +4869,17 @@ var LamLegendTools = (function() {
           let img = $("<img />")
             .addClass("lam-legend")
             .attr("src", urlImg)
-            .on("error", function() {
+            .on("error", function () {
               $("#legend_" + layer.gid).addClass("lam-hidden");
             });
           let container = $("<div id='legend_" + layer.gid + "' />").addClass("lam-legend-container");
+          debugger;
           container.append($("<h4>" + layer.layerName + "</h4>").addClass("lam-title-legend"));
           container.append(img);
+          if (thisLayer.layerDescription) {
+            let divDescription = $("<div />").addClass("lam-layer-description").text(thisLayer.layerDescription);
+            container.append(divDescription);
+          }
           html.append(container);
         }
       }
@@ -4877,34 +4887,20 @@ var LamLegendTools = (function() {
     let title = "Legenda dei temi attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
     if (showInfoWindow) {
-      LamDom.showContent(
-        LamEnums.showContentMode().InfoWindow,
-        title,
-        $("<div>")
-          .append(html.clone())
-          .html(),
-        ""
-      );
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "");
     } else {
-      LamDom.showContent(
-        LamEnums.showContentMode().LeftPanel,
-        title,
-        $("<div>")
-          .append(html.clone())
-          .html(),
-        ""
-      );
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, $("<div>").append(html.clone()).html(), "");
     }
   };
 
-  let loadImage = function(imageSrc, success, error) {
+  let loadImage = function (imageSrc, success, error) {
     var img = new Image();
     img.onload = success;
     img.onerror = error;
     img.src = imageSrc;
   };
 
-  var showLayerMetadata = function(layer) {
+  var showLayerMetadata = function (layer) {
     if (!LamStore.getAppState().metaDataServiceUrlTemplate) return;
     var templateUrl = Handlebars.compile(LamStore.getAppState().metaDataServiceUrlTemplate);
     var urlService = templateUrl(layer);
@@ -4913,24 +4909,24 @@ var LamLegendTools = (function() {
       url: urlService + "&format_options=callback:LamLegendTools.parseResponseMetadata",
       jsonp: true,
       cache: false,
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamLegend: unable to complete response"
+          message: "LamLegend: unable to complete response",
         });
         lamDispatch("hide-loader");
-      }
+      },
     });
   };
 
-  let parseResponseMetadata = function(data) {
+  let parseResponseMetadata = function (data) {
     if (!data.features.length) return;
     var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
     var html = template(data.features[0].properties);
     $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
   };
 
-  let updateLegend = function() {
+  let updateLegend = function () {
     if ($("#lam-legend-container").is(":visible")) {
       LamDispatcher.dispatch(currentLegendPayload);
     }
@@ -4942,7 +4938,7 @@ var LamLegendTools = (function() {
     render: render,
     showLegend: showLegend,
     showLegendLayers: showLegendLayers,
-    updateLegend: updateLegend
+    updateLegend: updateLegend,
   };
 })();
 
@@ -6893,19 +6889,19 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamLayerTree = (function() {
+let LamLayerTree = (function () {
   let treeDiv = "lam-layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
 
-  let init = function() {
+  let init = function () {
     //events binding
-    LamDispatcher.bind("show-layers", function(payload) {
+    LamDispatcher.bind("show-layers", function (payload) {
       LamToolbar.toggleToolbarItem(treeDiv);
     });
   };
 
-  let render = function(div, layers) {
+  let render = function (div, layers) {
     if (div) treeDiv = div;
     if (!isRendered) {
       init();
@@ -6916,7 +6912,7 @@ let LamLayerTree = (function() {
     }
     output += '<div class="layertree">'; //generale
     let index = 0;
-    layers.forEach(function(element) {
+    layers.forEach(function (element) {
       output += renderGroup(element, layerGroupPrefix + "_" + index);
       index++;
     });
@@ -6935,16 +6931,20 @@ let LamLayerTree = (function() {
     updateCheckBoxesStates(LamStore.getAppState().layers);
     if (LamStore.getAppState().showLayerTreeOnLoad && !isRendered) {
       LamDispatcher.dispatch({
-        eventName: "show-layers"
+        eventName: "show-layers",
       });
     }
     isRendered = true;
   };
 
-  let renderLayer = function(layer, layerId) {
+  let renderLayer = function (layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
-    output += formatString('<div class="layertree-layer__title-text">{0}</div>', layer.layerName);
+    if (layer.showDescriptionInLayerTree && layer.layerDescription) {
+      output += formatString('<div class="layertree-layer__title-text">{0} - {1}</div>', layer.layerName, layer.layerDescription);
+    } else {
+      output += formatString('<div class="layertree-layer__title-text">{0}</div>', layer.layerName);
+    }
     output += '<div class="layertree-layer__layers-icons">';
     output += formatString(
       '<i title="Mostra/Nascondi layer" id="{2}_c" class="layertree-layer__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer\',gid:\'{2}\'})">{1}</i>',
@@ -6965,7 +6965,7 @@ let LamLayerTree = (function() {
     return output;
   };
 
-  let renderLayerTools = function(groupLayer, groupId) {
+  let renderLayerTools = function (groupLayer, groupId) {
     let output = "";
     //--------------
     output += formatString('<div id="" class="layertree-layer">');
@@ -6978,7 +6978,7 @@ let LamLayerTree = (function() {
     return output;
   };
 
-  let renderGroup = function(groupLayer, groupId) {
+  let renderGroup = function (groupLayer, groupId) {
     let output = "";
     output += '<div class="layertree-item" >';
     output += "<div class='layertree-group lam-background'>";
@@ -7008,7 +7008,7 @@ let LamLayerTree = (function() {
     output += formatString('<div id="{0}_u" class="layertree-item__layers layertree--{1}">', groupId, groupLayer.visible ? "visible" : "hidden");
     if (groupLayer.layers) {
       let index = 0;
-      groupLayer.layers.forEach(function(element) {
+      groupLayer.layers.forEach(function (element) {
         switch (element.layerType) {
           case "group":
             output += renderGroup(element, groupId + "_" + index);
@@ -7023,7 +7023,7 @@ let LamLayerTree = (function() {
 
     //tools section
     if (groupLayer.layers) {
-      let geoLayers = groupLayer.layers.filter(function(el) {
+      let geoLayers = groupLayer.layers.filter(function (el) {
         return el.layerType !== "group";
       });
       if (geoLayers.length) {
@@ -7035,7 +7035,7 @@ let LamLayerTree = (function() {
     return output;
   };
 
-  let setCheckVisibility = function(layerGid, visibility) {
+  let setCheckVisibility = function (layerGid, visibility) {
     const item = "#" + layerGid + "_c";
     if (visibility) {
       $(item).html(LamResources.svgCheckbox);
@@ -7048,7 +7048,7 @@ let LamLayerTree = (function() {
     }
   };
 
-  let toggleGroup = function(groupName) {
+  let toggleGroup = function (groupName) {
     const item = "#" + groupName + "_u";
     if ($(item).hasClass("layertree--hidden")) {
       $(item).removeClass("layertree--hidden");
@@ -7071,7 +7071,7 @@ let LamLayerTree = (function() {
     }
   };
 
-  let formatString = function() {
+  let formatString = function () {
     let str = arguments[0];
     for (k = 0; k < arguments.length - 1; k++) {
       str = str.replace(new RegExp("\\{" + k + "\\}", "g"), arguments[k + 1]);
@@ -7082,8 +7082,8 @@ let LamLayerTree = (function() {
   /**
    * Sets the initial grouplayer check, based on the children visibility
    */
-  let updateCheckBoxesStates = function(layers) {
-    layers.forEach(function(groupLayer) {
+  let updateCheckBoxesStates = function (layers) {
+    layers.forEach(function (groupLayer) {
       if (groupLayer.layerType != "group") return;
       countLayerGroupFatherVisibility(groupLayer);
       if (groupLayer.layers) {
@@ -7095,7 +7095,7 @@ let LamLayerTree = (function() {
       let layerCount = 0;
       let layerVisibile = 0;
       if (!groupLayer.layers) return;
-      groupLayer.layers.forEach(function(layer) {
+      groupLayer.layers.forEach(function (layer) {
         if (layer.layerType != "group") {
           layerCount++;
           if (layer.visible) layerVisibile++;
@@ -7107,7 +7107,7 @@ let LamLayerTree = (function() {
 
       function countLayerGroupChildrenVisibility(groupLayer) {
         if (!groupLayer.layers) return;
-        groupLayer.layers.forEach(function(layer) {
+        groupLayer.layers.forEach(function (layer) {
           if (layer.layerType != "group") {
             layerCount++;
             if (layer.visible) layerVisibile++;
@@ -7125,7 +7125,7 @@ let LamLayerTree = (function() {
     init: init,
     setCheckVisibility: setCheckVisibility,
     toggleGroup: toggleGroup,
-    updateCheckBoxesStates: updateCheckBoxesStates
+    updateCheckBoxesStates: updateCheckBoxesStates,
   };
 })();
 

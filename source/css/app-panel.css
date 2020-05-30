@@ -17,7 +17,6 @@
   top: 0px;
   width: 330px;
   height: calc(100% - 70px);
-  z-index: 10;
   display: none;
   margin: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;
@@ -27,7 +26,7 @@
 .lam-panel .lam-panel-content {
   box-sizing: border-box;
   position: absolute;
-  z-index: 9;
+  z-index: 10;
   bottom: 0px;
   left: 0px;
   height: 100%;
