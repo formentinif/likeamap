@@ -65,7 +65,7 @@
       </svg>
     </i>
   </button>
-  <button id="menu-toolbar__search-tools" class="lam-hidden lam-btn  lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-search')">
+  <button id="menu-toolbar__search-tools" class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1" onClick="lamDispatch('show-search')">
     <i class="lam-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path
@@ -149,10 +149,11 @@
 <div id="panel" class="lam-panel">
   <div id="panel__content" class="lam-panel-content">
     <div id="panel__logo" class="lam-hidden panel__logo">
-      <img src="" id="panel__logo-img" />
+      <img src="" id="panel__logo-img" class="lam-hidden" />
+      <h1 id="panel__map-title" class="lam-hidden"></h1>
     </div>
     <div id="lam-layer-tree" class="lam-panel-content-item lam-visible"></div>
-    <div id="info-results" class="lam-panel-content-item ">
+    <div id="info-results" class="lam-panel-content-item">
       <!-- <h4 id="info-results__title" class="lam-title"></h4>
       <div id="info-results__content" class="lam-scroll-padding"></div> -->
     </div>

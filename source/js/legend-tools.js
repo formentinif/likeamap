@@ -81,7 +81,6 @@ var LamLegendTools = (function () {
   };
 
   var showLegend = function (gid, scaled, showInfoWindow) {
-    debugger;
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
     var urlImg = "";
@@ -125,7 +124,6 @@ var LamLegendTools = (function () {
   };
 
   var showLegendLayers = function (layers, scaled, showInfoWindow) {
-    debugger;
     let html = $("<div />", {
       id: "lam-legend-container",
     });
@@ -144,11 +142,10 @@ var LamLegendTools = (function () {
               $("#legend_" + layer.gid).addClass("lam-hidden");
             });
           let container = $("<div id='legend_" + layer.gid + "' />").addClass("lam-legend-container");
-          debugger;
           container.append($("<h4>" + layer.layerName + "</h4>").addClass("lam-title-legend"));
           container.append(img);
-          if (thisLayer.layerDescription) {
-            let divDescription = $("<div />").addClass("lam-layer-description").text(thisLayer.layerDescription);
+          if (layer.layerDescription) {
+            let divDescription = $("<div />").addClass("lam-layer-description").text(layer.layerDescription);
             container.append(divDescription);
           }
           html.append(container);

@@ -2,6 +2,12 @@
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
 }
+
+.panel__map-title {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
 .panel__top-margin {
   height: 20px;
 }

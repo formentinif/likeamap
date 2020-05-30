@@ -1,28 +1,28 @@
-var LamDom = (function() {
+var LamDom = (function () {
   var init = function init() {
     //events binding
-    LamDispatcher.bind("hide-info-window", function(payload) {
+    LamDispatcher.bind("hide-info-window", function (payload) {
       LamDom.hideInfoWindow();
     });
 
-    LamDispatcher.bind("hide-loader", function(payload) {
+    LamDispatcher.bind("hide-loader", function (payload) {
       LamDom.toggleLoader(false);
     });
 
-    LamDispatcher.bind("show-loader", function(payload) {
+    LamDispatcher.bind("show-loader", function (payload) {
       LamDom.toggleLoader(true);
     });
 
-    LamDispatcher.bind("show-bottom-info", function(payload) {
+    LamDispatcher.bind("show-bottom-info", function (payload) {
       $("#bottom-info").show();
     });
 
-    LamDispatcher.bind("hide-bottom-info", function(payload) {
+    LamDispatcher.bind("hide-bottom-info", function (payload) {
       $("#bottom-info").hide();
     });
   };
 
-  let hideInfoWindow = function() {
+  let hideInfoWindow = function () {
     $("#info-window").hide();
   };
 
@@ -30,7 +30,7 @@ var LamDom = (function() {
    * Sets the loader visibility
    * @param {boolean} visibility
    */
-  let toggleLoader = function(visibility) {
+  let toggleLoader = function (visibility) {
     if (visibility) {
       $("#app-loader").removeClass("lam-hidden");
     } else {
@@ -38,7 +38,7 @@ var LamDom = (function() {
     }
   };
 
-  var showAppTools = function() {
+  var showAppTools = function () {
     var modules = LamStore.getAppState().modules;
     if (modules) {
       setvisibility("#menu-toolbar__layer-tree", modules["layer-tree"]);
@@ -53,7 +53,7 @@ var LamDom = (function() {
     }
   };
 
-  var isMobile = function() {
+  var isMobile = function () {
     return /Mobi/.test(navigator.userAgent);
   };
 
@@ -61,7 +61,7 @@ var LamDom = (function() {
    * Dragging helper
    * @param {Object} elmnt
    */
-  var dragElement = function(elmnt) {
+  var dragElement = function (elmnt) {
     var pos1 = 0,
       pos2 = 0,
       pos3 = 0,
@@ -105,10 +105,11 @@ var LamDom = (function() {
     }
   };
 
-  let showContent = function(contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
+  let showContent = function (contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
+    if (!elementId) elementId = "info-results";
     if (!htmlBottomInfo) htmlBottomInfo = htmlMain;
     if (!toolBarItem) toolBarItem = "info-results";
-    let htmlTitle = $("<div id='" + elementId + "__title'></div>")
+    let htmlTitle = $("<h4 id='" + elementId + "__title'></h4>")
       .addClass("lam-title")
       .html(title);
     let htmlContent = $("<div id='" + elementId + "__content'></div>")
@@ -116,7 +117,6 @@ var LamDom = (function() {
       .html(htmlMain);
     switch (contentMode) {
       case 1: //LeftPanel
-        if (!elementId) elementId = "info-results";
         $("#" + elementId + "")
           .html("")
           .append(htmlTitle)
@@ -155,7 +155,7 @@ var LamDom = (function() {
   /**
    * Wrapper for hide/show jquery
    */
-  let setvisibility = function(element, status) {
+  let setvisibility = function (element, status) {
     if (status) {
       $(element).show();
     } else {
@@ -171,6 +171,6 @@ var LamDom = (function() {
     setvisibility: setvisibility,
     showAppTools: showAppTools,
     showContent: showContent,
-    toggleLoader: toggleLoader
+    toggleLoader: toggleLoader,
   };
 })();
