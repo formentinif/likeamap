@@ -26,6 +26,7 @@ function copyDist() {
   gulp.src("./source/img/*").pipe(gulp.dest("./dist/img"));
   gulp.src("./source/states/*").pipe(gulp.dest("./dist/states"));
   gulp.src("./source/schemas/*").pipe(gulp.dest("./dist/schemas"));
+  gulp.src("./source/docs/*").pipe(gulp.dest("./dist/docs"));
   gulp.src("./source/fonts/*").pipe(gulp.dest("./dist/fonts"));
   gulp.src("./source/states").pipe(gulp.dest("./dist/states"));
   gulp.src("./source/vendor/lib/jquery.js").pipe(gulp.dest("./dist/js"));
@@ -53,6 +54,7 @@ function combineAppJs() {
       "./source/js/share-tools.js",
       "./source/js/app-dispatcher.js",
       "./source/js/app-resources.js",
+	  "./source/js/app-cookie-consent.js",
       "./source/js/app-custom.js",
 	  "./source/js/app-relations.js",
 	  "./source/js/app-dom.js",
