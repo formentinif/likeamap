@@ -345,7 +345,7 @@ var LamSearchTools = (function () {
   var searchAddressKeyup = function (ev) {
     clearTimeout(timer);
     timer = setTimeout(function () {
-      if ($("#search-tools__search-address").val().length > 2) {
+      if ($("#search-tools__search-address").val().length > 2 && searchTermValid($("#search-tools__search-address").val())) {
         LamDispatcher.dispatch("show-loader");
         doSearchAddress(ev);
       }
@@ -462,49 +462,7 @@ var LamSearchTools = (function () {
       eventName: "show-info-geometries",
       features: data,
     });
-
     return;
-
-    // LamDispatcher.dispatch("hide-loader");
-    // var results = [];
-    // if (data.features.length > 0) {
-    //   var toponimi = [];
-    //   var results = [];
-    //   for (var i = 0; i < data.features.length; i++) {
-    //     var currentAddress = data.features[i].properties[searchAddressProviderField];
-    //     if (data.features[i].properties[searchHouseNumberProviderField]) {
-    //       currentAddress = " " + data.features[i].properties[searchHouseNumberProviderField];
-    //     }
-    //     if ($.inArray(currentAddress, toponimi) === -1) {
-    //       var cent = null;
-    //       if (data.features[i].geometry.type != "POINT") {
-    //         cent = LamMap.getCentroid(data.features[i].geometry.coordinates);
-    //       } else {
-    //         cent = data.features[i].geometry.coordinates;
-    //       }
-    //       var tempItem = {
-    //         display_name: data.features[i].properties[searchAddressProviderField],
-    //         lon: cent[0],
-    //         lat: cent[1],
-    //         item: data.features[i]
-    //       };
-    //       if (searchHouseNumberProviderField) {
-    //         tempItem.display_name2 = data.features[i].properties[searchHouseNumberProviderField];
-    //       }
-    //       results.push(tempItem);
-    //       toponimi.push(data.features[i].properties[searchAddressProviderField]);
-    //     }
-    //   }
-    //   searchResults = results.sort(SortByDisplayName);
-    //   //renderizzo i risultati
-    //   var templateTemp = templateSearchResultsWFSGeoserver();
-    //   var output = templateTemp(results);
-    //   jQuery("#search-tools__search-results").html(output);
-    // } else {
-    //   var templateTemp = templateResultEmpty();
-    //   var output = templateTemp();
-    //   jQuery("#search-tools__search-results").html(output);
-    // }
   };
 
   /**
@@ -594,6 +552,20 @@ var LamSearchTools = (function () {
 
   var selectLayer = function (layer) {
     $("#search-tools__select-layers").val(layer);
+  };
+
+  // var searchTermValid = function (search) {
+  //   var invalidTerms = ["via", "viale", "vicolo", "piazza"];
+  //   var addressTerms = search.split(" ");
+  //   addressTerms = addressTerms.filter(function (element) {
+  //     return addressTerms.includes(element.toLowerCase());
+  //   });
+  //   return addressTerms;
+  // };
+
+  var searchTermValid = function (search) {
+    var invalidTerms = ["via", "viale", "vicolo", "piazza"];
+    return !invalidTerms.includes(search.trim().toLowerCase());
   };
 
   return {
