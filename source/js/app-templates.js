@@ -114,6 +114,9 @@ let LamTemplates = (function () {
     return repoUrl + "/" + gid + ".json";
   };
 
+  let getTemplates = function () {
+    return templates;
+  };
   let getTemplate = function (gid, templateUrl, repoUrl) {
     let templatesFilter = templates.filter(function (el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
@@ -405,6 +408,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
     getTemplateEmpty: getTemplateEmpty,

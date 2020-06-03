@@ -528,6 +528,21 @@ var LamStore = (function () {
 
   let parseResponse = function (e) {};
 
+  let getLayers = function () {
+    let arrDest = [];
+    getLayersRecursive(appState.layers, arrDest);
+    return arrDest;
+  };
+
+  let getLayersRecursive = function (layers, arrDest) {
+    layers.forEach((layer) => {
+      arrDest.push(layer);
+      if (layer.layers) {
+        getLayersRecursive(layer.layers, arrDest);
+      }
+    });
+  };
+
   return {
     doLogin: doLogin,
     getAppState: getAppState,
@@ -541,6 +556,7 @@ var LamStore = (function () {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLayers: getLayers,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
     getAppId: getAppId,
