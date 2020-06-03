@@ -193,9 +193,7 @@ var LamSearchToolsNominatim = (function() {
   var templateSearchNominatim = function(searchLayers) {
     let template = "";
     //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Ricerca</h4>';
-    }
+    template += '<h4 class="lam-title">Ricerca</h4>';
     template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<select id="search-tools__comune" class="lam-input">';
@@ -222,9 +220,7 @@ var LamSearchToolsNominatim = (function() {
   var templateSearchWFSGeoserver = function() {
     let template = "";
     //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Ricerca</h4>';
-    }
+    template += '<h4 class="lam-title">Ricerca</h4>';
     template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<div id="search-tools__search-via-field" class="" >';

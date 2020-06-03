@@ -25,7 +25,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamSearchTools = (function() {
+var LamSearchTools = (function () {
   var isRendered = false;
 
   var comuni = [];
@@ -40,7 +40,7 @@ var LamSearchTools = (function() {
   var searchResultsDiv = "search-tools__search-results";
 
   var init = function init() {
-    Handlebars.registerHelper("hasLayers", function(options) {
+    Handlebars.registerHelper("hasLayers", function (options) {
       //return searchLayers.length > 0;
       return true;
     });
@@ -49,11 +49,11 @@ var LamSearchTools = (function() {
     /**
      * Shows the search tool, resetting info-results
      */
-    LamDispatcher.bind("show-search", function(payload) {
+    LamDispatcher.bind("show-search", function (payload) {
       LamToolbar.toggleToolbarItem("search-tools");
       lamDispatch("clear-layer-info");
       lamDispatch("reset-search");
-      setTimeout(function() {
+      setTimeout(function () {
         updateScrollHeight();
       }, 500);
     });
@@ -61,15 +61,15 @@ var LamSearchTools = (function() {
     /**
      * Resets the search info-results
      */
-    LamDispatcher.bind("reset-search", function(payload) {
+    LamDispatcher.bind("reset-search", function (payload) {
       LamSearchTools.resetSearch();
     });
 
-    LamDispatcher.bind("show-search-items", function(payload) {
+    LamDispatcher.bind("show-search-items", function (payload) {
       LamSearchTools.showSearchInfoFeatures(payload.features, payload.template);
     });
 
-    LamDispatcher.bind("search-address", function(payload) {
+    LamDispatcher.bind("search-address", function (payload) {
       LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
@@ -89,7 +89,7 @@ var LamSearchTools = (function() {
     }
   };
 
-  var render = function(div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
+  var render = function (div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -101,7 +101,7 @@ var LamSearchTools = (function() {
         var templateTemp = templateSearchWFSGeoserver(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
-        $("#search-tools__select-layers").on("change", function() {
+        $("#search-tools__select-layers").on("change", function () {
           LamDispatcher.dispatch("clear-layer-info");
           var currentLayer = $("#search-tools__select-layers option:selected").val();
           for (li = 0; li < searchLayers.length; li++) {
@@ -115,7 +115,7 @@ var LamSearchTools = (function() {
     }
 
     updateScrollHeight();
-    $(window).resize(function() {
+    $(window).resize(function () {
       updateScrollHeight();
     });
 
@@ -126,7 +126,7 @@ var LamSearchTools = (function() {
     isRendered = true;
   };
 
-  let resetSearch = function() {
+  let resetSearch = function () {
     $("#search-tools__search-layers").val("");
     $("#search-tools__search-address").val("");
     showSearchResults("<p>Inserisci un testo per iniziare la ricerca.</p>");
@@ -136,7 +136,7 @@ var LamSearchTools = (function() {
    * Helper function to show html results
    * @param {string} html
    */
-  let showSearchResults = function(html, htmlMobile) {
+  let showSearchResults = function (html, htmlMobile) {
     if (!htmlMobile) htmlMobile = html;
     $("#" + searchResultsDiv).html(html);
     //$("#bottom-info__title-text").html(title);
@@ -149,7 +149,7 @@ var LamSearchTools = (function() {
    * Aggiorna la dimensione dello scroll dei contenuti
    * @return {null} La funzione non restituisce un valore
    */
-  var updateScrollHeight = function() {
+  var updateScrollHeight = function () {
     var positionMenu = $("#menu-toolbar").offset();
     var positionSearch = $("#" + searchResultsDiv).offset();
     $("#" + searchResultsDiv).height(positionMenu.top - positionSearch.top - 20);
@@ -158,7 +158,7 @@ var LamSearchTools = (function() {
   /**
    * General html code that will be injected in the panel as the main tools
    */
-  var templateTopTools = function(layersNum) {
+  var templateTopTools = function (layersNum) {
     let template = '<div class="lam-bar">';
     template +=
       '<div id="lam-bar__item-address" class="lam-bar__item lam-is-half lam-bar__item-selected" onclick="LamSearchTools.showSearchAddress(); return false;">';
@@ -176,7 +176,7 @@ var LamSearchTools = (function() {
   /**
    * General html code that will be injected in order to display the layer tools
    */
-  var templateLayersTools = function(searchLayers) {
+  var templateLayersTools = function (searchLayers) {
     let template = '<div id="search-tools__layers" class="lam-card lam-depth-2 lam-hidden" >';
     template += '<select id="search-tools__select-layers" class="lam-select lam-mb-2">';
     for (var i = 0; i < searchLayers.length; i++) {
@@ -201,12 +201,10 @@ var LamSearchTools = (function() {
   /**
    * Initialize the panel if Geoserver is selected as default address provider
    */
-  var templateSearchWFSGeoserver = function() {
+  var templateSearchWFSGeoserver = function () {
     let template = "";
     //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Ricerca</h4>';
-    }
+    template += '<h4 class="lam-title">Ricerca</h4>';
     template += templateTopTools(searchLayers.length);
     template += '<div id="search-tools__address" class="lam-card lam-depth-2">';
     template += '<div id="search-tools__search-address-field" class="" >';
@@ -269,7 +267,7 @@ var LamSearchTools = (function() {
   /**
    * Switch the address/layers top tools
    */
-  var showSearchAddress = function() {
+  var showSearchAddress = function () {
     $("#search-tools__label").text("Indirizzo");
     $("#search-tools__address").show();
     $("#search-tools__layers").hide();
@@ -283,7 +281,7 @@ var LamSearchTools = (function() {
   /**
    * Switch the address/layers tools
    */
-  var showSearchLayers = function() {
+  var showSearchLayers = function () {
     $("#search-tools__button-address").removeClass("lam-background-darken");
     $("#search-tools__label").text("Layers");
     $("#search-tools__address").hide();
@@ -344,9 +342,9 @@ var LamSearchTools = (function() {
   //   }
   // };
 
-  var searchAddressKeyup = function(ev) {
+  var searchAddressKeyup = function (ev) {
     clearTimeout(timer);
-    timer = setTimeout(function() {
+    timer = setTimeout(function () {
       if ($("#search-tools__search-address").val().length > 2) {
         LamDispatcher.dispatch("show-loader");
         doSearchAddress(ev);
@@ -354,9 +352,9 @@ var LamSearchTools = (function() {
     }, timeout);
   };
 
-  var searchLayersKeyup = function(ev) {
+  var searchLayersKeyup = function (ev) {
     clearTimeout(timer);
-    timer = setTimeout(function() {
+    timer = setTimeout(function () {
       if ($("#search-tools__search-layers").val().length > 2) {
         LamDispatcher.dispatch("show-loader");
         doSearchLayers(ev);
@@ -368,7 +366,7 @@ var LamSearchTools = (function() {
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
-  var doSearchAddress = function(ev) {
+  var doSearchAddress = function (ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-address").blur();
     }
@@ -426,17 +424,17 @@ var LamSearchTools = (function() {
       dataType: "jsonp",
       url: url + "&format_options=callback:LamSearchTools.parseResponseAddress",
       //jsonpCallback: "LamStore.parseResponse",
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         LamDispatcher.dispatch("hide-loader");
         lamDispatch({
           eventName: "log",
-          message: "LamSearchTools: unable to complete response"
+          message: "LamSearchTools: unable to complete response",
         });
-      }
+      },
     });
   };
 
-  let parseResponseAddress = function(data) {
+  let parseResponseAddress = function (data) {
     LamDispatcher.dispatch("hide-loader");
     lamDispatch("clear-layer-info");
     if (!data.features.length) {
@@ -447,7 +445,7 @@ var LamSearchTools = (function() {
     let isPoint = data.features[0].geometry.type.toLowerCase().indexOf("point") >= 0;
     let searchProviderAddressField = LamStore.getAppState().searchProviderAddressField;
     let searchProviderHouseNumberField = LamStore.getAppState().searchProviderHouseNumberField;
-    data.features.forEach(function(feature) {
+    data.features.forEach(function (feature) {
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
       feature.tooltip = isPoint ? feature.properties[searchProviderHouseNumberField] : feature.properties[searchProviderAddressField];
     });
@@ -458,11 +456,11 @@ var LamSearchTools = (function() {
     lamDispatch({
       eventName: "show-search-items",
       features: data,
-      template: template
+      template: template,
     });
     lamDispatch({
       eventName: "show-info-geometries",
-      features: data
+      features: data,
     });
 
     return;
@@ -513,7 +511,7 @@ var LamSearchTools = (function() {
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
-  var doSearchLayers = function(ev) {
+  var doSearchLayers = function (ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-layers").blur();
     }
@@ -523,7 +521,7 @@ var LamSearchTools = (function() {
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     if (itemStr.length > 2) {
       showSearchResults("");
-      let layer = searchLayers.filter(function(element) {
+      let layer = searchLayers.filter(function (element) {
         return element.gid == currentLayer;
       })[0];
       var url = layer.mapUri;
@@ -542,25 +540,25 @@ var LamSearchTools = (function() {
         dataType: "jsonp",
         url: url + "&format_options=callback:LamSearchTools.parseResponseLayers",
         cache: false,
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
           LamDispatcher.dispatch("hide-loader");
           lamDispatch({
             eventName: "log",
-            message: "LamSearchTools: unable to complete response"
+            message: "LamSearchTools: unable to complete response",
           });
-        }
+        },
       });
     }
   };
 
-  let parseResponseLayers = function(data) {
+  let parseResponseLayers = function (data) {
     LamDispatcher.dispatch("hide-loader");
     var currentLayer = $("#search-tools__select-layers option:selected").val();
-    let layer = searchLayers.filter(function(element) {
+    let layer = searchLayers.filter(function (element) {
       return element.gid == currentLayer;
     })[0];
     console.log("parse");
-    data.features.forEach(function(feature) {
+    data.features.forEach(function (feature) {
       feature.layerGid = layer.gid;
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
       feature.tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
@@ -568,11 +566,11 @@ var LamSearchTools = (function() {
     if (data.features.length > 0) {
       lamDispatch({
         eventName: "show-search-items",
-        features: data
+        features: data,
       });
       lamDispatch({
         eventName: "show-info-geometries",
-        features: data
+        features: data,
       });
     } else {
       var templateTemp = LamTemplates.getResultEmpty();
@@ -586,7 +584,7 @@ var LamSearchTools = (function() {
    * Show the search results in menu
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
-  let showSearchInfoFeatures = function(featureInfoCollection, template) {
+  let showSearchInfoFeatures = function (featureInfoCollection, template) {
     if (!featureInfoCollection) {
       showSearchResults(AppTemplates.getResultEmpty);
       return;
@@ -594,7 +592,7 @@ var LamSearchTools = (function() {
     showSearchResults(LamTemplates.renderInfoFeatures(featureInfoCollection, template), LamTemplates.renderInfoFeaturesMobile(featureInfoCollection));
   };
 
-  var selectLayer = function(layer) {
+  var selectLayer = function (layer) {
     $("#search-tools__select-layers").val(layer);
   };
 
@@ -611,7 +609,7 @@ var LamSearchTools = (function() {
     selectLayer: selectLayer,
     showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,
-    showSearchLayers: showSearchLayers
+    showSearchLayers: showSearchLayers,
     //zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
     //zoomToItemLayer: zoomToItemLayer
   };
