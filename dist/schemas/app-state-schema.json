@@ -203,6 +203,16 @@
       "description": "Template inline (handlebars) da applicare per i metadati. Default è {{ABSTRACT}}.",
       "type": "string"
     },
+    "metaDataReplacementStrings": {
+      "title": "Stringhe di trasformazione per i metadati",
+      "description": "Coppie di stringhe per la sostituzione del campo dei metadati",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "title": "Coppie di stringhe di trasformazione es: [[stringa1,stringa2],[stringa3,stringa4]]"
+        }
+      }
+    },
     "cookieConsent": {
       "title": "Cookie e Privacy consent",
       "description": "Impostazioni per l'informativa di cookie e privacy",
