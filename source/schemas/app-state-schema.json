@@ -498,6 +498,11 @@
                   "enum": [0, 1],
                   "type": "integer"
                 },
+                "searchCustomEvent": {
+                  "title": "Evento custom per la ricerca",
+                  "description": "Evento impostato nel dispatcher per customizzare la ricerca. L'evento deve essere definito in un componente JS incluso.",
+                  "type": "string"
+                },
                 "searchField": {
                   "title": "Campo di ricerca",
                   "description": "Campo su cui effettuare la ricerca. Deve essere un campo di tipo string",

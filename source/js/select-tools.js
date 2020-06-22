@@ -25,29 +25,29 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamSelectTools = (function() {
+let LamSelectTools = (function () {
   let isRendered = false;
   let selectLayers = [];
   let selectionResult = [];
 
   let init = function init(layers) {
-    selectLayers = layers.filter(function(layer) {
+    selectLayers = layers.filter(function (layer) {
       return layer.labelField != null && layer.labelField != "";
     });
 
     let btn = $("<button/>", {
       class: "lam-btn lam-btn-floating lam-btn-large",
-      click: function(e) {
+      click: function (e) {
         e.preventDefault();
         lamDispatch("show-select-tools");
-      }
+      },
     }).append("<i class='large lam-icon '>select_all</i>");
     $("#menu-toolbar").append(btn);
 
     let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
     $("#panel__content").append(divSelect);
 
-    LamDispatcher.bind("show-select-tools", function(payload) {
+    LamDispatcher.bind("show-select-tools", function (payload) {
       LamToolbar.toggleToolbarItem("select-tools");
       if (LamToolbar.getCurrentToolbarItem() === "select-tools") {
         lamDispatch("set-select");
@@ -57,18 +57,18 @@ let LamSelectTools = (function() {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("set-select", function(payload) {
+    LamDispatcher.bind("set-select", function (payload) {
       LamMap.removeSelectInteraction();
       LamMap.addSelectInteraction(payload.type);
     });
 
-    LamDispatcher.bind("unset-select", function(payload) {
+    LamDispatcher.bind("unset-select", function (payload) {
       LamMap.removeSelectInteraction();
       LamMap.clearLayerSelection();
       LamMap.clearLayerSelectionMask();
     });
 
-    LamDispatcher.bind("start-selection-search", function(payload) {
+    LamDispatcher.bind("start-selection-search", function (payload) {
       LamMap.clearLayerSelection();
       let coords = payload.coords;
       if (!coords) {
@@ -81,7 +81,7 @@ let LamSelectTools = (function() {
       if (!coords || !layerName) {
         lamDispatch({
           eventName: "log",
-          message: "Parametri per la selezione non validi"
+          message: "Parametri per la selezione non validi",
         });
         return;
       }
@@ -89,11 +89,11 @@ let LamSelectTools = (function() {
     });
 
     LamToolbar.addResetToolsEvent({
-      eventName: "unset-select"
+      eventName: "unset-select",
     });
   };
 
-  let render = function(layers) {
+  let render = function (layers) {
     if (!isRendered) {
       init(layers);
     }
@@ -103,9 +103,9 @@ let LamSelectTools = (function() {
     //forzo che il contenuto non sia visualizzato
     $("#select-tools__content").hide();
 
-    $("#select-tools__layers").on("change", function() {
+    $("#select-tools__layers").on("change", function () {
       lamDispatch({
-        eventName: "start-selection-search"
+        eventName: "start-selection-search",
       });
     });
 
@@ -117,7 +117,7 @@ let LamSelectTools = (function() {
     isRendered = true;
   };
 
-  let templateSelect = function() {
+  let templateSelect = function () {
     let template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Seleziona</h4>';
@@ -131,11 +131,11 @@ let LamSelectTools = (function() {
   /**
    * General html code that will be injected in order to display the layer tools
    */
-  let templateLayersInput = function(selectLayers) {
+  let templateLayersInput = function (selectLayers) {
     let template = "";
     template += '<select id="select-tools__layers" class="lam-input">';
     template += '<option value="">Seleziona layer</option>';
-    selectLayers.forEach(function(layer) {
+    selectLayers.forEach(function (layer) {
       template += '<option value="' + layer.layer + '">' + layer.layerName + "</option>";
     });
     template += "</select>";
@@ -149,7 +149,7 @@ let LamSelectTools = (function() {
    * Display the list of the WFS Layers results in the left panel
    * @param {Object} results
    */
-  let templateSelectionResults = function(results) {
+  let templateSelectionResults = function (results) {
     template = '<div class="lam-grid lam-grid-1">';
     template += "{{#each this}}";
     template += '<div class="lam-col">';
@@ -165,9 +165,9 @@ let LamSelectTools = (function() {
     return Handlebars.compile(template);
   };
 
-  let deleteFeatures = function() {
+  let deleteFeatures = function () {
     lamDispatch({
-      eventName: "delete-selection"
+      eventName: "delete-selection",
     });
   };
 
@@ -175,10 +175,10 @@ let LamSelectTools = (function() {
    * Start the selection on the specified layer
    * @param {Array} coords coordinate of the selected polygon
    */
-  let doSelectionLayers = function(coords, currentLayer) {
+  let doSelectionLayers = function (coords, currentLayer) {
     if (Array.isArray(coords)) coords = coords[0];
     let coordsString = coords
-      .map(function(coord) {
+      .map(function (coord) {
         return coord[0] + " " + coord[1];
       })
       .join(",");
@@ -188,7 +188,7 @@ let LamSelectTools = (function() {
     let searchDate = new Date().getTime();
 
     jQuery("#select-tools__results").html("");
-    let layers = selectLayers.filter(function(layer) {
+    let layers = selectLayers.filter(function (layer) {
       return layer.layer == currentLayer;
     });
     if (layers.length == 0) {
@@ -210,7 +210,7 @@ let LamSelectTools = (function() {
       url: url,
       cache: false,
       jsonp: true,
-      success: function(data) {
+      success: function (data) {
         //verifica che la ricerca sia ancora valida
         if (currentSearchDate > searchDate) {
           return;
@@ -237,7 +237,7 @@ let LamSelectTools = (function() {
                 display_name: data.features[i].properties[layer.labelField],
                 lon: cent[0],
                 lat: cent[1],
-                item: item
+                item: item,
               });
               resultsIndex.push(data.features[i].properties[layer.labelField]);
             }
@@ -251,16 +251,16 @@ let LamSelectTools = (function() {
           jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
         }
       },
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSelectTools: unable to complete response"
+          message: "LamSelectTools: unable to complete response",
         });
         lamDispatch({
           eventName: "show-message",
-          message: "Non è stato possibile completare la richiesta."
+          message: "Non è stato possibile completare la richiesta.",
         });
-      }
+      },
     });
   };
 
@@ -271,21 +271,21 @@ let LamSelectTools = (function() {
    * @param {int} index Item's index in the result array
    * @param {boolean} showInfo
    */
-  var zoomToItem = function(lon, lat, index, showInfo) {
+  var zoomToItem = function (lon, lat, index, showInfo) {
     if (selectionResult[index]) {
       lamDispatch({
         eventName: "zoom-geometry",
-        geometry: selectionResult[index].item.geometry
+        geometry: selectionResult[index].item.geometry,
       });
       if (showInfo) {
         lamDispatch({
           eventName: "show-info-items",
-          features: selectionResult[index].item
+          features: selectionResult[index].item,
         });
       }
       let payload = {
         eventName: "add-geometry-info-map",
-        geometry: selectionResult[index].item.geometry
+        geometry: selectionResult[index].item.geometry,
       };
       try {
         payload.srid = selectionResult[index].item.crs;
@@ -301,7 +301,7 @@ let LamSelectTools = (function() {
         lon: parseFloat(lon),
         lat: parseFloat(lat),
         eventName: "add-wkt-info-map",
-        wkt: "POINT(" + lon + " " + lat + ")"
+        wkt: "POINT(" + lon + " " + lat + ")",
       });
       lamDispatch("hide-menu-mobile");
     }
@@ -313,7 +313,7 @@ let LamSelectTools = (function() {
     return aName < bName ? -1 : aName > bName ? 1 : 0;
   }
 
-  let convertToCSV = function(objArray) {
+  let convertToCSV = function (objArray) {
     var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     var str = "";
     for (var i = 0; i < array.length; i++) {
@@ -327,7 +327,7 @@ let LamSelectTools = (function() {
     return str;
   };
 
-  let exportCSVFile = function() {
+  let exportCSVFile = function () {
     let items = selectionResult;
     let fileName = "esportazione.csv";
     var jsonObject = JSON.stringify(items);
@@ -358,6 +358,6 @@ let LamSelectTools = (function() {
     init: init,
     render: render,
     templateSelect: templateSelect,
-    zoomToItem: zoomToItem
+    zoomToItem: zoomToItem,
   };
 })();

@@ -173,6 +173,16 @@
   outline: 0px;
 }
 
+.lam-select-small {
+  font-size: 1rem;
+  padding: 4px 0px;
+  border-right: 0px solid var(--lam-btn-color);
+  border-left: 0px solid var(--lam-btn-color);
+  border-top: 0px solid var(--lam-btn-color);
+  border-bottom: 1px solid var(--lam-btn-color);
+  outline: 0px;
+}
+
 .lam-option {
   padding: 0px;
 }

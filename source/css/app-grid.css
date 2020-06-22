@@ -16,6 +16,11 @@ Open source under the MIT License.
   background: #fff;
 }
 
+.lam-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .lam-col {
   box-sizing: border-box;
   flex: 1;
