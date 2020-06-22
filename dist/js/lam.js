@@ -534,7 +534,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let LamMapInfo = (function() {
+let LamMapInfo = (function () {
   "use strict";
 
   //Array with the requests to elaborate
@@ -544,50 +544,50 @@ let LamMapInfo = (function() {
 
   let vectorInfo = new ol.layer.Vector({
     source: new ol.source.Vector({
-      features: []
+      features: [],
     }),
     style: LamMapStyles.getInfoStyle(),
-    zIndex: 100
+    zIndex: 100,
   });
 
   let vectorFlash = new ol.layer.Vector({
     source: new ol.source.Vector({
-      features: []
+      features: [],
     }),
     style: LamMapStyles.getFlashStyle(),
-    zIndex: 101
+    zIndex: 101,
   });
 
-  let init = function() {
+  let init = function () {
     vectorInfo.setMap(LamMap.getMap());
     vectorFlash.setMap(LamMap.getMap());
 
-    LamDispatcher.bind("show-info-items", function(payload) {
+    LamDispatcher.bind("show-info-items", function (payload) {
       LamMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
-    LamDispatcher.bind("show-info-geometries", function(payload) {
+    LamDispatcher.bind("show-info-geometries", function (payload) {
       LamMapInfo.showRequestInfoFeaturesGeometries(payload.features);
     });
-    LamDispatcher.bind("flash-feature", function(payload) {
+    LamDispatcher.bind("flash-feature", function (payload) {
       let featureOl = LamMap.convertGeoJsonFeatureToOl(payload.feature);
       featureOl = LamMap.transform3857(featureOl, featureOl.srid);
       LamMapInfo.addFeatureFlashToMap(featureOl);
-      setTimeout(function() {
+      setTimeout(function () {
         LamMapInfo.clearLayerFlash();
       }, 800);
     });
-    LamDispatcher.bind("show-mobile-info-results", function(payload) {
+    LamDispatcher.bind("show-mobile-info-results", function (payload) {
       //LamToolbar.toggleToolbarItem("info-results", true);
       LamToolbar.showMenu();
       $("#bottom-info").hide();
     });
 
-    LamDispatcher.bind("clear-layer-info", function(payload) {
+    LamDispatcher.bind("clear-layer-info", function (payload) {
       clearLayerInfo(payload.layerGid);
       LamMapTooltip.hideMapTooltip();
     });
 
-    LamDispatcher.bind("zoom-info-feature", function(payload) {
+    LamDispatcher.bind("zoom-info-feature", function (payload) {
       try {
         let feature = LamStore.getCurrentInfoItems().features[payload.index];
         if (feature.layerGid) {
@@ -595,21 +595,21 @@ let LamMapInfo = (function() {
           LamDispatcher.dispatch({
             eventName: "set-layer-visibility",
             gid: feature.layerGid,
-            visibility: 1
+            visibility: 1,
           });
         }
         let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
         featureOl = LamMap.transform3857(featureOl, feature.srid);
         LamMap.goToGeometry(featureOl.getGeometry());
         if (feature.tooltip) {
-          setTimeout(function() {
+          setTimeout(function () {
             LamDispatcher.dispatch({ eventName: "show-map-tooltip", geometry: featureOl.getGeometry().getCoordinates(), tooltip: feature.tooltip });
           }, 400);
         }
-        setTimeout(function() {
+        setTimeout(function () {
           LamDispatcher.dispatch({
             eventName: "flash-feature",
-            feature: feature
+            feature: feature,
           });
         }, 200);
         if (LamDom.isMobile()) {
@@ -622,25 +622,25 @@ let LamMapInfo = (function() {
       }
     });
 
-    LamDispatcher.bind("add-info-point", function(payload) {
+    LamDispatcher.bind("add-info-point", function (payload) {
       let geometryOl = new ol.geom.Point([payload.lon, payload.lat]);
       let featureOl = new ol.Feature({
-        geometry: geometryOl
+        geometry: geometryOl,
       });
       featureOl.srid = 4326;
       LamMapInfo.addFeatureInfoToMap(featureOl);
     });
 
-    LamDispatcher.bind("add-geometry-info-map", function(payload) {
+    LamDispatcher.bind("add-geometry-info-map", function (payload) {
       let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMapInfo.addGeometryInfoToMap(geometryOl, payload.srid);
     });
 
-    LamDispatcher.bind("enable-map-info", function(payload) {
+    LamDispatcher.bind("enable-map-info", function (payload) {
       LamStore.setInfoClickEnabled(true);
     });
 
-    LamDispatcher.bind("disable-map-info", function(payload) {
+    LamDispatcher.bind("disable-map-info", function (payload) {
       LamStore.setInfoClickEnabled(false);
     });
   };
@@ -653,10 +653,10 @@ let LamMapInfo = (function() {
    * @param {String} infoFormat
    * @param {int} featureCount
    */
-  let getFeatureInfoUrl = function(layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
+  let getFeatureInfoUrl = function (layer, coordinate, viewResolution, infoFormat, featureCount, bbox) {
     let url = layer.getSource().getFeatureInfoUrl(coordinate, viewResolution, "EPSG:3857", {
       INFO_FORMAT: infoFormat,
-      feature_count: featureCount
+      feature_count: featureCount,
     });
     return url;
   };
@@ -684,7 +684,7 @@ let LamMapInfo = (function() {
     let featuresInfoClicked = [];
 
     if (pixel) {
-      LamMap.getMap().forEachFeatureAtPixel(pixel, function(feature, layer) {
+      LamMap.getMap().forEachFeatureAtPixel(pixel, function (feature, layer) {
         if (layer === null) {
           featuresInfoClicked.push(feature);
         } else {
@@ -712,13 +712,11 @@ let LamMapInfo = (function() {
     //Ajax requests
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
-    let viewResolution = LamMap.getMap()
-      .getView()
-      .getResolution();
+    let viewResolution = LamMap.getMap().getView().getResolution();
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
     LamMap.getMap()
       .getLayers()
-      .forEach(function(layer) {
+      .forEach(function (layer) {
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
@@ -740,7 +738,7 @@ let LamMapInfo = (function() {
   /**
    * Executes the request on the first layer not sent in the RequestQueue
    */
-  let getFeatureInfoRequest = function() {
+  let getFeatureInfoRequest = function () {
     let url = "";
     //ricavo l'url corrente dalla coda globale e setto il layer come completato
     //TODO refactor whe IE support will drop
@@ -761,14 +759,14 @@ let LamMapInfo = (function() {
         lamDispatch({
           eventName: "show-info-items",
           features: {
-            features: requestQueueData
-          }
+            features: requestQueueData,
+          },
         });
         lamDispatch({
           eventName: "show-info-geometries",
           features: {
-            features: requestQueueData
-          }
+            features: requestQueueData,
+          },
         });
         // lamDispatch({
         //   eventName: "show-map-tooltip",
@@ -798,16 +796,16 @@ let LamMapInfo = (function() {
       crossDomain: true,
       contentType: "application/json",
       cache: false,
-      success: function(response) {},
-      error: function(jqXHR, textStatus, errorThrown) {
+      success: function (response) {},
+      error: function (jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
         lamDispatch({
           eventName: "log",
-          message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid
+          message: "Error in ajax request " + requestQueue.layers[requestQueue.currentLayerIndex].gid,
         });
         getFeatureInfoRequest();
-      }
+      },
     });
   };
 
@@ -879,14 +877,14 @@ let LamMapInfo = (function() {
 
     let featureArray = [];
     if (features && features.length > 0) {
-      features.forEach(function(feature) {
+      features.forEach(function (feature) {
         addFeatureInfoToMap(feature);
         //transform OL feature in GeoJson
         featureArray.push({
           type: "Feature",
           layerGid: feature.layerGid,
           geometry: LamMap.getGeoJsonGeometryFromGeometry(feature.getGeometry()),
-          properties: feature.getProperties()
+          properties: feature.getProperties(),
         });
       });
       //tooltip
@@ -898,11 +896,11 @@ let LamMapInfo = (function() {
         }
       }
       let featuresCollection = {
-        features: featureArray
+        features: featureArray,
       };
       LamDispatcher.dispatch({
         eventName: "show-info-items",
-        features: featuresCollection
+        features: featuresCollection,
       });
     }
   };
@@ -911,8 +909,8 @@ let LamMapInfo = (function() {
    * Show the click geometries on the map
    * @param {Object} featureInfoCollection GeoJson feature collection
    */
-  let showRequestInfoFeaturesGeometries = function(featureInfoCollection) {
-    featureInfoCollection.features.forEach(function(feature) {
+  let showRequestInfoFeaturesGeometries = function (featureInfoCollection) {
+    featureInfoCollection.features.forEach(function (feature) {
       //let geometryOl = LamMap.convertGeometryToOl(feature.geometry, LamMap.getGeometryFormats().GeoJson);
       let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
       //featureOl = LamMap.transform3857(featureOl, featureOl.srid);
@@ -925,7 +923,7 @@ let LamMapInfo = (function() {
    * @param {Object} featureInfoCollection GeoJson feature collection
    * @param {string} template handlebars template to user where feature's layerGid property is not defined
    */
-  let showRequestInfoFeatures = function(featureInfoCollection, template) {
+  let showRequestInfoFeatures = function (featureInfoCollection, template) {
     var title = "Risultati";
     if (!featureInfoCollection) {
       return;
@@ -942,12 +940,12 @@ let LamMapInfo = (function() {
    * Shows the feature tooltip in the map, centered on the feature geometry
    * @param {Object} feature
    */
-  let showInfoFeatureTooltip = function(feature) {
+  let showInfoFeatureTooltip = function (feature) {
     if (!feature.tooltip) return;
     lamDispatch({
       eventName: "show-map-tooltip",
       geometry: feature.getGeometry().getCoordinates(),
-      tooltip: feature.tooltip
+      tooltip: feature.tooltip,
     });
   };
 
@@ -956,7 +954,7 @@ let LamMapInfo = (function() {
    * @param {Object} feature
    * @param {Array} pixel
    */
-  let showInfoFeatureTooltipAtPixel = function(feature, pixel) {
+  let showInfoFeatureTooltipAtPixel = function (feature, pixel) {
     let coordinate = LamMap.getCoordinateFromPixel(pixel[0], pixel[1]);
     let tooltip = "";
     //preload layers do not have tooltip property
@@ -969,7 +967,7 @@ let LamMapInfo = (function() {
     lamDispatch({
       eventName: "show-map-tooltip",
       geometry: coordinate,
-      tooltip: tooltip
+      tooltip: tooltip,
     });
   };
 
@@ -980,7 +978,7 @@ let LamMapInfo = (function() {
    * @param {string} bodyMobile
    * @param {string} htmlElement Html element id destination, default is info-results
    */
-  let showInfoWindow = function(title, body, bodyMobile, htmlElement) {
+  let showInfoWindow = function (title, body, bodyMobile, htmlElement) {
     if (LamStore.getOpenResultInInfoWindow()) {
       LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body, bodyMobile);
     } else {
@@ -1019,7 +1017,7 @@ let LamMapInfo = (function() {
    * @param {Ol/Geometry} geometry
    * @param {int} srid
    */
-  let addGeometryInfoToMap = function(geometry, srid, layerGid) {
+  let addGeometryInfoToMap = function (geometry, srid, layerGid) {
     return LamMap.addGeometryToMap(geometry, srid, vectorInfo, layerGid);
   };
 
@@ -1028,7 +1026,7 @@ let LamMapInfo = (function() {
    * @param {Ol/feature} feature
    * @param {int} srid
    */
-  let addFeatureInfoToMap = function(feature) {
+  let addFeatureInfoToMap = function (feature) {
     if (feature.layerGid) {
       let layer = LamStore.getLayer(feature.layerGid);
       feature.tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
@@ -1041,7 +1039,7 @@ let LamMapInfo = (function() {
    * @param {Ol/feature} feature
    * @param {int} srid
    */
-  let addFeatureFlashToMap = function(feature) {
+  let addFeatureFlashToMap = function (feature) {
     return LamMap.addFeatureToMap(feature, feature.srid, vectorFlash);
   };
 
@@ -1049,7 +1047,7 @@ let LamMapInfo = (function() {
    * Rimuove tutte le geometrie dal layer feature info
    * @return {null} La funzione non restituisce un valore
    */
-  let clearLayerInfo = function(layerGid) {
+  let clearLayerInfo = function (layerGid) {
     LamMap.clearVectorLayer(vectorInfo, layerGid);
   };
 
@@ -1057,12 +1055,12 @@ let LamMapInfo = (function() {
    * Rimuove tutte le geometrie dal layer flash
    * @return {null} La funzione non restituisce un valore
    */
-  let clearLayerFlash = function() {
+  let clearLayerFlash = function () {
     vectorFlash.getSource().clear(true);
   };
 
   //Private Classes
-  let featureInfo = function() {
+  let featureInfo = function () {
     this.layerGid = "";
     this.properties = {};
     this.geometry = {};
@@ -1074,7 +1072,7 @@ let LamMapInfo = (function() {
    * Request that is sent on map click
    * @param {Array} coordinate X,Y of the request position
    */
-  let RequestQueue = function(coordinate, visibleLayers) {
+  let RequestQueue = function (coordinate, visibleLayers) {
     this.id = LamStore.guid();
     this.layers = []; //Array of RequestLayer
     this.coordinate = coordinate;
@@ -1089,7 +1087,7 @@ let LamMapInfo = (function() {
    * @param {int} zIndex Index of the layer
    * @param {string} gid Unique id of the layer
    */
-  let RequestLayer = function(url, zIndex, gid, srid, labelField, layerName) {
+  let RequestLayer = function (url, zIndex, gid, srid, labelField, layerName) {
     this.url = url;
     this.zIndex = zIndex;
     this.sent = false;
@@ -1120,7 +1118,7 @@ let LamMapInfo = (function() {
     showInfoFeatureTooltipAtPixel: showInfoFeatureTooltipAtPixel,
     showRequestInfoFeatures: showRequestInfoFeatures,
     showRequestInfoFeaturesGeometries: showRequestInfoFeaturesGeometries,
-    showInfoWindow: showInfoWindow
+    showInfoWindow: showInfoWindow,
   };
 })();
 
@@ -3654,7 +3652,6 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 var LamSearchTools = (function () {
   var isRendered = false;
 
-  var comuni = [];
   var searchResults = [];
   var searchAddressProviderUrl = "";
   var searchAddressProviderField = "";
@@ -3699,6 +3696,10 @@ var LamSearchTools = (function () {
       LamStore.searchAddress(payload.data, "LamStore.processAddress");
     });
 
+    LamDispatcher.bind("show-search-results", function (payload) {
+      LamSearchTools.showSearchResults(payload.results);
+    });
+
     //Carico i template di base
     if (LamStore.getAppState().searchProviderAddressTemplateUrl)
       LamTemplates.loadTemplateAjax(
@@ -3729,14 +3730,23 @@ var LamSearchTools = (function () {
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function () {
           LamDispatcher.dispatch("clear-layer-info");
-          var currentLayer = $("#search-tools__select-layers option:selected").val();
-          for (li = 0; li < searchLayers.length; li++) {
-            if (searchLayers[li].gid == currentLayer) {
-              $("#search-tools__search-layers__label").text(searchLayers[li].searchFieldLabel || searchLayers[li].searchField);
-            }
+          var layerSelected = $("#search-tools__select-layers option:selected").val();
+          var layer = searchLayers.filter(function (element) {
+            return element.gid == layerSelected;
+          });
+          if (layer.length) layer = layer[0];
+          $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
+          //controllo del form custom
+          if (layer.searchCustomEvent) {
+            //esecuzione della funzione custom
+            LamDispatcher.dispatch(layer.searchCustomEvent);
+          } else {
+            $("#search-tools__search-layers-custom").hide();
+            $("#search-tools__search-layers-standard").show();
           }
           resetSearch();
         });
+        $("#search-tools__select-layers").trigger("change");
         break;
     }
 
@@ -3805,11 +3815,12 @@ var LamSearchTools = (function () {
   var templateLayersTools = function (searchLayers) {
     let template = '<div id="search-tools__layers" class="lam-card lam-depth-2 lam-hidden" >';
     template += '<select id="search-tools__select-layers" class="lam-select lam-mb-2">';
+    //template += '<option class="lam-option" value=""></option>';
     for (var i = 0; i < searchLayers.length; i++) {
       template += '<option class="lam-option" value="' + searchLayers[i].gid + '">' + searchLayers[i].layerName + "</option>";
     }
     template += "</select>";
-    template += '<div id="search-tools__search-layers-field" class="lam-grid" >';
+    template += '<div id="search-tools__search-layers-field" class="" >';
     template += '<label class="lam-label" id="search-tools__search-layers__label" for="search-tools__search-layers">';
     if (searchLayers.length > 0) {
       template += searchLayers[0].searchFieldLabel || searchLayers[0].searchField;
@@ -3817,8 +3828,11 @@ var LamSearchTools = (function () {
       template += "Seleziona un tema...";
     }
     template += "</label>";
+    //autocomplete standard for the layer
     template +=
-      '<input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.searchLayersKeyup(event)" placeholder="Ricerca...">';
+      '<div id="search-tools__search-layers-standard"><input id="search-tools__search-layers" class="lam-input" type="search" onkeyup="LamSearchTools.searchLayersKeyup(event)" placeholder="Ricerca..."></div>';
+    //custom form placeholder for thhe layer
+    template += '<div id="search-tools__search-layers-custom"></div>';
     template += "</div>";
     template += "</div>";
     return template;
@@ -3848,48 +3862,6 @@ var LamSearchTools = (function () {
     return Handlebars.compile(template);
   };
 
-  // /**
-  //  * Display the list of the WFS Address results in the left panel
-  //  * @param {Object} results
-  //  */
-  // var templateSearchResultsWFSGeoserver = function(results) {
-  //   template = '<h5 class="lam-title-h4>Risultati della ricerca</h5>';
-  //   template = '<div class="lam-grid lam-grid-1">';
-  //   template += "{{#each this}}";
-  //   template += '<div class="lam-col">';
-  //   template +=
-  //     '<i class="lam-icon-primary">' +
-  //     LamResources.svgMarker +
-  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, false);return false">';
-  //   template += "{{{display_name}}} ";
-  //   template += "{{{display_name2}}} ";
-  //   template += "</a>";
-  //   template += "</div>";
-  //   template += "{{/each}}";
-  //   template += "</div>";
-  //   return Handlebars.compile(template);
-  // };
-
-  // /**
-  //  * Display the list of the WFS Layers results in the left panel
-  //  * @param {Object} results
-  //  */
-  // var templateSearchResultsLayers = function(results) {
-  //   template = '<div class="lam-grid">';
-  //   template += "{{#each this}}";
-  //   template += '<div class="lam-col">';
-  //   template +=
-  //     '<i class="lam-icon-primary">' +
-  //     LamResources.svgMarker +
-  //     '</i><a href="#" class="lam-link" onclick="LamSearchTools.zoomToItemLayer({{{lon}}}, {{{lat}}}, {{@index}}, true);return false">';
-  //   template += "{{{display_name}}}";
-  //   template += "</a>";
-  //   template += "</div>";
-  //   template += "{{/each}}";
-  //   template += "</div>";
-  //   return Handlebars.compile(template);
-  // };
-
   /**
    * Switch the address/layers top tools
    */
@@ -3918,55 +3890,6 @@ var LamSearchTools = (function () {
     lamDispatch("reset-search");
     updateScrollHeight();
   };
-
-  // /**
-  //  * Zoom the map to the lon-lat given and show the infobox of the given item index
-  //  * @param {float} lon
-  //  * @param {float} lat
-  //  * @param {int} index Item's index in the result array
-  //  * @param {boolean} showInfo
-  //  */
-  // var zoomToItemLayer = function(lon, lat, index, showInfo) {
-  //   lamDispatch("clear-layer-info");
-  //   if (searchResults[index]) {
-  //     lamDispatch({
-  //       eventName: "zoom-geometry",
-  //       geometry: searchResults[index].item.geometry,
-  //       srid: 4326
-  //     });
-  //     if (showInfo) {
-  //       lamDispatch({
-  //         eventName: "show-info-items",
-  //         features: searchResults[index].item,
-  //         element: searchResultsDiv
-  //       });
-  //     }
-  //     let payload = {
-  //       eventName: "add-geometry-info-map",
-  //       geometry: searchResults[index].item.geometry
-  //     };
-  //     try {
-  //       payload.srid = searchResults[index].item.crs;
-  //       if (payload.srid == null) {
-  //         payload.srid = 4326;
-  //       }
-  //     } catch (e) {
-  //       payload.srid = 4326;
-  //     }
-  //     lamDispatch(payload);
-  //     lamDispatch("hide-menu-mobile");
-  //   } else {
-  //     lamDispatch({
-  //       eventName: "zoom-lon-lat",
-  //       zoom: 18,
-  //       lon: parseFloat(lon),
-  //       lat: parseFloat(lat),
-  //       eventName: "add-wkt-info-map",
-  //       wkt: "POINT(" + lon + " " + lat + ")"
-  //     });
-  //     lamDispatch("hide-menu-mobile");
-  //   }
-  // };
 
   var searchAddressKeyup = function (ev) {
     clearTimeout(timer);
@@ -4208,6 +4131,7 @@ var LamSearchTools = (function () {
     showSearchInfoFeatures: showSearchInfoFeatures,
     showSearchAddress: showSearchAddress,
     showSearchLayers: showSearchLayers,
+    showSearchResults: showSearchResults,
     //zoomToItemWFSGeoserver: zoomToItemWFSGeoserver,
     //zoomToItemLayer: zoomToItemLayer
   };
@@ -4240,29 +4164,29 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamSelectTools = (function() {
+let LamSelectTools = (function () {
   let isRendered = false;
   let selectLayers = [];
   let selectionResult = [];
 
   let init = function init(layers) {
-    selectLayers = layers.filter(function(layer) {
+    selectLayers = layers.filter(function (layer) {
       return layer.labelField != null && layer.labelField != "";
     });
 
     let btn = $("<button/>", {
       class: "lam-btn lam-btn-floating lam-btn-large",
-      click: function(e) {
+      click: function (e) {
         e.preventDefault();
         lamDispatch("show-select-tools");
-      }
+      },
     }).append("<i class='large lam-icon '>select_all</i>");
     $("#menu-toolbar").append(btn);
 
     let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
     $("#panel__content").append(divSelect);
 
-    LamDispatcher.bind("show-select-tools", function(payload) {
+    LamDispatcher.bind("show-select-tools", function (payload) {
       LamToolbar.toggleToolbarItem("select-tools");
       if (LamToolbar.getCurrentToolbarItem() === "select-tools") {
         lamDispatch("set-select");
@@ -4272,18 +4196,18 @@ let LamSelectTools = (function() {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("set-select", function(payload) {
+    LamDispatcher.bind("set-select", function (payload) {
       LamMap.removeSelectInteraction();
       LamMap.addSelectInteraction(payload.type);
     });
 
-    LamDispatcher.bind("unset-select", function(payload) {
+    LamDispatcher.bind("unset-select", function (payload) {
       LamMap.removeSelectInteraction();
       LamMap.clearLayerSelection();
       LamMap.clearLayerSelectionMask();
     });
 
-    LamDispatcher.bind("start-selection-search", function(payload) {
+    LamDispatcher.bind("start-selection-search", function (payload) {
       LamMap.clearLayerSelection();
       let coords = payload.coords;
       if (!coords) {
@@ -4296,7 +4220,7 @@ let LamSelectTools = (function() {
       if (!coords || !layerName) {
         lamDispatch({
           eventName: "log",
-          message: "Parametri per la selezione non validi"
+          message: "Parametri per la selezione non validi",
         });
         return;
       }
@@ -4304,11 +4228,11 @@ let LamSelectTools = (function() {
     });
 
     LamToolbar.addResetToolsEvent({
-      eventName: "unset-select"
+      eventName: "unset-select",
     });
   };
 
-  let render = function(layers) {
+  let render = function (layers) {
     if (!isRendered) {
       init(layers);
     }
@@ -4318,9 +4242,9 @@ let LamSelectTools = (function() {
     //forzo che il contenuto non sia visualizzato
     $("#select-tools__content").hide();
 
-    $("#select-tools__layers").on("change", function() {
+    $("#select-tools__layers").on("change", function () {
       lamDispatch({
-        eventName: "start-selection-search"
+        eventName: "start-selection-search",
       });
     });
 
@@ -4332,7 +4256,7 @@ let LamSelectTools = (function() {
     isRendered = true;
   };
 
-  let templateSelect = function() {
+  let templateSelect = function () {
     let template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Seleziona</h4>';
@@ -4346,11 +4270,11 @@ let LamSelectTools = (function() {
   /**
    * General html code that will be injected in order to display the layer tools
    */
-  let templateLayersInput = function(selectLayers) {
+  let templateLayersInput = function (selectLayers) {
     let template = "";
     template += '<select id="select-tools__layers" class="lam-input">';
     template += '<option value="">Seleziona layer</option>';
-    selectLayers.forEach(function(layer) {
+    selectLayers.forEach(function (layer) {
       template += '<option value="' + layer.layer + '">' + layer.layerName + "</option>";
     });
     template += "</select>";
@@ -4364,7 +4288,7 @@ let LamSelectTools = (function() {
    * Display the list of the WFS Layers results in the left panel
    * @param {Object} results
    */
-  let templateSelectionResults = function(results) {
+  let templateSelectionResults = function (results) {
     template = '<div class="lam-grid lam-grid-1">';
     template += "{{#each this}}";
     template += '<div class="lam-col">';
@@ -4380,9 +4304,9 @@ let LamSelectTools = (function() {
     return Handlebars.compile(template);
   };
 
-  let deleteFeatures = function() {
+  let deleteFeatures = function () {
     lamDispatch({
-      eventName: "delete-selection"
+      eventName: "delete-selection",
     });
   };
 
@@ -4390,10 +4314,10 @@ let LamSelectTools = (function() {
    * Start the selection on the specified layer
    * @param {Array} coords coordinate of the selected polygon
    */
-  let doSelectionLayers = function(coords, currentLayer) {
+  let doSelectionLayers = function (coords, currentLayer) {
     if (Array.isArray(coords)) coords = coords[0];
     let coordsString = coords
-      .map(function(coord) {
+      .map(function (coord) {
         return coord[0] + " " + coord[1];
       })
       .join(",");
@@ -4403,7 +4327,7 @@ let LamSelectTools = (function() {
     let searchDate = new Date().getTime();
 
     jQuery("#select-tools__results").html("");
-    let layers = selectLayers.filter(function(layer) {
+    let layers = selectLayers.filter(function (layer) {
       return layer.layer == currentLayer;
     });
     if (layers.length == 0) {
@@ -4425,7 +4349,7 @@ let LamSelectTools = (function() {
       url: url,
       cache: false,
       jsonp: true,
-      success: function(data) {
+      success: function (data) {
         //verifica che la ricerca sia ancora valida
         if (currentSearchDate > searchDate) {
           return;
@@ -4452,7 +4376,7 @@ let LamSelectTools = (function() {
                 display_name: data.features[i].properties[layer.labelField],
                 lon: cent[0],
                 lat: cent[1],
-                item: item
+                item: item,
               });
               resultsIndex.push(data.features[i].properties[layer.labelField]);
             }
@@ -4466,16 +4390,16 @@ let LamSelectTools = (function() {
           jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
         }
       },
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSelectTools: unable to complete response"
+          message: "LamSelectTools: unable to complete response",
         });
         lamDispatch({
           eventName: "show-message",
-          message: "Non è stato possibile completare la richiesta."
+          message: "Non è stato possibile completare la richiesta.",
         });
-      }
+      },
     });
   };
 
@@ -4486,21 +4410,21 @@ let LamSelectTools = (function() {
    * @param {int} index Item's index in the result array
    * @param {boolean} showInfo
    */
-  var zoomToItem = function(lon, lat, index, showInfo) {
+  var zoomToItem = function (lon, lat, index, showInfo) {
     if (selectionResult[index]) {
       lamDispatch({
         eventName: "zoom-geometry",
-        geometry: selectionResult[index].item.geometry
+        geometry: selectionResult[index].item.geometry,
       });
       if (showInfo) {
         lamDispatch({
           eventName: "show-info-items",
-          features: selectionResult[index].item
+          features: selectionResult[index].item,
         });
       }
       let payload = {
         eventName: "add-geometry-info-map",
-        geometry: selectionResult[index].item.geometry
+        geometry: selectionResult[index].item.geometry,
       };
       try {
         payload.srid = selectionResult[index].item.crs;
@@ -4516,7 +4440,7 @@ let LamSelectTools = (function() {
         lon: parseFloat(lon),
         lat: parseFloat(lat),
         eventName: "add-wkt-info-map",
-        wkt: "POINT(" + lon + " " + lat + ")"
+        wkt: "POINT(" + lon + " " + lat + ")",
       });
       lamDispatch("hide-menu-mobile");
     }
@@ -4528,7 +4452,7 @@ let LamSelectTools = (function() {
     return aName < bName ? -1 : aName > bName ? 1 : 0;
   }
 
-  let convertToCSV = function(objArray) {
+  let convertToCSV = function (objArray) {
     var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     var str = "";
     for (var i = 0; i < array.length; i++) {
@@ -4542,7 +4466,7 @@ let LamSelectTools = (function() {
     return str;
   };
 
-  let exportCSVFile = function() {
+  let exportCSVFile = function () {
     let items = selectionResult;
     let fileName = "esportazione.csv";
     var jsonObject = JSON.stringify(items);
@@ -4573,7 +4497,7 @@ let LamSelectTools = (function() {
     init: init,
     render: render,
     templateSelect: templateSelect,
-    zoomToItem: zoomToItem
+    zoomToItem: zoomToItem,
   };
 })();
 
