@@ -4810,7 +4810,24 @@ var LamLegendTools = (function () {
     if (!data.features.length) return;
     var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
     var html = template(data.features[0].properties);
-    $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
+    html = formatMetadata(html);
+    $(".lam-layer-metadata").html(html);
+  };
+
+  let formatMetadata = function (html) {
+    debugger;
+    //newline to br
+    html = html.replace(/(?:\r\n|\r|\n)/g, "<br>");
+    //sostituzione dei link
+    html = replaceLinks(html);
+    //replace delle stringhe
+    if (LamStore.getAppState().metaDataReplacementStrings) {
+      let strings = LamStore.getAppState().metaDataReplacementStrings;
+      strings.forEach(function (element) {
+        html = html.replace(new RegExp(element[0], "gi"), element[1]);
+      });
+    }
+    return html;
   };
 
   let updateLegend = function () {
@@ -4819,7 +4836,18 @@ var LamLegendTools = (function () {
     }
   };
 
+  let replaceLinks = function (text) {
+    return (text || "").replace(/([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi, function (match, space, url) {
+      var hyperlink = url;
+      if (!hyperlink.match("^https?://")) {
+        hyperlink = "http://" + hyperlink;
+      }
+      return space + '<a href="' + hyperlink + '">' + url + "</a>";
+    });
+  };
+
   return {
+    formatMetadata: formatMetadata,
     init: init,
     parseResponseMetadata: parseResponseMetadata,
     render: render,
