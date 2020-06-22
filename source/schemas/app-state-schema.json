@@ -13,6 +13,11 @@
       "description": "Nome della mappa che sarà visualizzato nel pannello laterale.",
       "type": "string"
     },
+    "description": {
+      "title": "Descrizione breve della mappa",
+      "description": "Descrizione che comparirà al primo avvio della mappa.",
+      "type": "string"
+    },
     "logoUrl": {
       "title": "Logo",
       "description": "Logo della mappa, visualizzato in alto a destra. Inserire un url assoluto o relativo.",
