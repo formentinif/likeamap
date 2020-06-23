@@ -196,7 +196,6 @@ var LamLegendTools = (function () {
   };
 
   let formatMetadata = function (html) {
-    debugger;
     //newline to br
     html = html.replace(/(?:\r\n|\r|\n)/g, "<br>");
     //sostituzione dei link

@@ -142,7 +142,8 @@ var LamDom = (function () {
         $("#bottom-info").show();
         break;
       case 3: //InfoWindow
-        if (!elementId) elementId = "info-window";
+        //if (!elementId)
+        elementId = "info-window";
         LamDispatcher.dispatch("hide-menu");
         $("#bottom-info").hide();
         $("#" + elementId + "__content").html(htmlMain);
