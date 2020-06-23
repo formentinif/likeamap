@@ -25,7 +25,6 @@ QUnit.test("Hyperlink http is replaced", function (assert) {
 });
 
 QUnit.test("Metadata is replaced", function (assert) {
-  debugger;
   LamStore.setAppState({
     metaDataReplacementStrings: [
       ["descrizione:", "<strong>Descrizione:</strong>"],

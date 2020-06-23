@@ -106,9 +106,25 @@ var LamLegendTools = (function () {
     }
     if (scaled) {
       html +=
-        "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
         "', scaled: false })\">Visualizza legenda completa</a></div>";
+    }
+    if (thisLayer.queryable) {
+      var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "csv");
+      html +=
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='" +
+        layerUrl +
+        "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
+        LamResources.svgDownload16 +
+        "</i> CSV</a>";
+      layerUrl = LamMap.getWFSUrlfromLayer(thisLayer);
+      html +=
+        " <a href='" +
+        layerUrl +
+        "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
+        LamResources.svgDownload16 +
+        "</i> SHP</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";
