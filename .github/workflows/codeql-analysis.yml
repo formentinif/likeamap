@@ -2,7 +2,7 @@ name: "Code scanning - action"
 
 on:
   schedule:
-    - cron: '0 0 * * 31'
+    - cron: '0 0 * * 6'
 
 jobs:
   CodeQL-Build:
