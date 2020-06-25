@@ -15,7 +15,7 @@
     },
     "layer": {
       "title": "Layer",
-      "description": "Identificativo del layer WMS, senza workspace",
+      "description": "Identificativo del layer WMS, senza workspace DEPRECATED",
       "type": "string"
     },
     "layerGid": {
@@ -25,7 +25,7 @@
     },
     "multipleItems": {
       "title": "Template per array di oggetti",
-      "description": "Elabora gli oggetti con un singolo template. Valido solo per gli templateType=string",
+      "description": "Elabora gli oggetti con un singolo template. Valido solo per il valore templateType=string",
       "enum": ["simple", "string"],
       "type": "string"
     },

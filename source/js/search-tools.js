@@ -344,6 +344,9 @@ var LamSearchTools = (function () {
         civico +
         "%25%27";
     }
+    if (url.toLowerCase().indexOf("srsname") < 0 && LamStore.getAppState().srid) {
+      url += "&srsName=EPSG:" + LamStore.getAppState().srid;
+    }
     via = via.replace("'", " ");
     $.ajax({
       dataType: "jsonp",
@@ -399,7 +402,6 @@ var LamSearchTools = (function () {
       $("#search-tools__search-layers").blur();
     }
     var itemStr = $("#search-tools__search-layers").val();
-    var cql = "";
     //ricavo l'elenco dei layer da interrogare
     var currentLayer = $("#search-tools__select-layers option:selected").val();
     if (itemStr.length > 2) {
@@ -417,6 +419,10 @@ var LamSearchTools = (function () {
         "]ilike%27%25" +
         itemStr.trim() +
         "%25%27";
+      let srid = layer.srid || LamStore.getAppState().srid;
+      if (url.toLowerCase().indexOf("srsname") < 0 && srid) {
+        url += "&srsName=EPSG:" + srid;
+      }
       itemStr = itemStr.replace("'", " ");
 
       $.ajax({
