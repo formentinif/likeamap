@@ -7320,11 +7320,11 @@ let LamTemplates = (function () {
             for (let i = 0; i < data.length; i++) {
               let thisTemplate = data[i];
               thisTemplate.templateUrl = templateUrl;
-              templates.push(thisTemplate);
+              templates.push(normalizeTemplate(thisTemplate));
             }
           } else {
             data.templateUrl = templateUrl;
-            templates.push(data);
+            templates.push(normalizeTemplate(data));
           }
         }
       })
@@ -7351,6 +7351,12 @@ let LamTemplates = (function () {
       }
     }
     return repoUrl + "/" + gid + ".json";
+  };
+
+  let normalizeTemplate = function (template) {
+    //multipleitems is default
+    if (template.templateType == "table") template.multipleItems = true;
+    return template;
   };
 
   let getTemplate = function (gid, templateUrl, repoUrl) {
@@ -7493,8 +7499,6 @@ let LamTemplates = (function () {
         str = getSimpleTemplate(template, layer);
         break;
       case "table":
-        //multipleitems is default
-        template.multipleItems = true;
         str = getTableTemplate(template, layer);
         break;
     }
