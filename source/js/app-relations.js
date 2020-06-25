@@ -13,6 +13,7 @@ var LamRelations = (function () {
     let relationResult = LamStore.getAppState().relations.filter(function (el) {
       return el.gid == gid;
     });
+
     return relationResult[0];
   };
 
