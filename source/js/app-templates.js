@@ -238,62 +238,36 @@ let LamTemplates = (function () {
     return result;
   };
 
+  /**
+   * Generates the template handlebars code
+   * @param {Object} template
+   * @param {Object} layer
+   */
   let generateTemplate = function (template, layer) {
+    //joins the strings if the template is an array
     if (template.templateType === "string") {
       return Array.isArray(template.templateString) ? template.templateString.join("") : template.templateString;
     }
     let str = "";
-    if (template.templateType === "simple") {
-      str += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
-
-      for (let i = 0; i < template.fields.length; i++) {
-        str += "<div class='lam-grid lam-mb-1'>";
-        let field = template.fields[i];
-        switch (field.type) {
-          case "int":
-            str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
-            break;
-          case "string":
-            str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
-            break;
-          case "yesno":
-            str +=
-              "<div class='lam-feature-title lam-col'>" +
-              field.label +
-              ":</div><div class='lam-feature-content lam-col'>{{#if " +
-              field.field +
-              "}}Sì{{else}}No{{/if}}</div>";
-            break;
-          /*  case "moreinfo":
-            str +=
-              '<tr><td colspan="2"><a href="#" onclick="lamDispatch({ eventName: \'more-info\', gid: \'{{' +
-              field.field +
-              "}}' , layerGid: '" +
-              field.layerGid +
-              "', url: '" +
-              field.url +
-              "' })\">" +
-              field.label +
-              "</a></td>";
-            break;
-          */
-          case "array":
-            str += field.header;
-            str += "{{#each " + field.field + "}}";
-            str += field.item;
-            str += "{{/each}}";
-            str += field.footer;
-            break;
-          case "link":
-            str += '<div class="lam-feature-content lam-col"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
-            break;
-        }
-        str += "</div>";
-      }
+    switch (template.templateType) {
+      case "simple":
+        str = getSimpleTemplate(template, layer);
+        break;
+      case "table":
+        //multipleitems is default
+        template.multipleItems = true;
+        str = getTableTemplate(template, layer);
+        break;
     }
     return str;
   };
 
+  /**
+   * Returns the item's label.
+   * @param {Array} props
+   * @param {string} labelName Can be a property name or handlebars template
+   * @param {string} layerTitle Layer title string
+   */
   let getLabelFeature = function (props, labelName, layerTitle) {
     try {
       let label = "";
@@ -312,6 +286,81 @@ let LamTemplates = (function () {
       lamDispatch({ eventName: "log", data: "Unable to compute label field " + labelName });
       return "";
     }
+  };
+
+  /**
+   * Generates the handlebars template for a single feature
+   * @param {Object} template
+   * @param {Object} layer
+   */
+  let getSimpleTemplate = function (template, layer) {
+    let str = "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<div class='lam-grid lam-mb-1'>";
+      let field = template.fields[i];
+      switch (field.type) {
+        case "int":
+          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          break;
+        case "string":
+          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          break;
+        case "yesno":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{#if " +
+            field.field +
+            "}}Sì{{else}}No{{/if}}</div>";
+          break;
+        /*  case "moreinfo":
+            str +=
+              '<tr><td colspan="2"><a href="#" onclick="lamDispatch({ eventName: \'more-info\', gid: \'{{' +
+              field.field +
+              "}}' , layerGid: '" +
+              field.layerGid +
+              "', url: '" +
+              field.url +
+              "' })\">" +
+              field.label +
+              "</a></td>";
+            break;
+          */
+        case "array":
+          str += field.header;
+          str += "{{#each " + field.field + "}}";
+          str += field.item;
+          str += "{{/each}}";
+          str += field.footer;
+          break;
+        case "link":
+          str += '<div class="lam-feature-content lam-col"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
+          break;
+      }
+      str += "</div>";
+    }
+    return str;
+  };
+
+  /**
+   * Generates the handlebars template for a table
+   * @param {Object} template
+   * @param {Object} layer
+   */
+  let getTableTemplate = function (template, layer) {
+    let str = "<table class='lam-table'>";
+    str += "<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<th>" + template.fields[i].label + "</th>";
+    }
+    str += "</tr>";
+    str += "{{#each this}}<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<td>{{" + template.fields[i].field + "}}</td>";
+    }
+    str += "</tr>{{/each}}";
+    str += "</table>";
+    return str;
   };
 
   /**

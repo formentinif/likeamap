@@ -65,7 +65,7 @@ var LamRelations = (function () {
       var props = data[i].properties ? data[i].properties : data[i];
       propsList.push(props);
       if (!template.multipleItems) {
-        //single template not active by default
+        //Templates are applied on every item
         body += LamTemplates.processTemplate(template, props);
         if (!body) {
           body += LamTemplates.standardTemplate(props);
@@ -76,18 +76,18 @@ var LamRelations = (function () {
       }
     }
 
-    //single template not active by default
+    //single template not active by default, a single template for all items
     if (template.multipleItems && propsList.length > 0) {
       body += LamTemplates.processTemplate(template, propsList);
     }
     //download
-    body +=
-      "<div class=' lam-mt-1'><button class='lam-btn lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
-      LamResources.svgDownload16 +
-      "</i> Scarica CSV</button></div>";
     if (data.length === 0) {
       body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
     }
+    body +=
+      "<div class=' lam-mt-1'><button class='lam-btn lam-right lam-depth-1' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
+      LamResources.svgDownload16 +
+      "</i> Scarica CSV</button></div>";
     LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
     lamDispatch("hide-loader");
   };
