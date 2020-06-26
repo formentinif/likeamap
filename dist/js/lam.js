@@ -7612,6 +7612,7 @@ let LamTemplates = (function () {
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function (featureInfoCollection, template) {
+    debugger;
     let body = "";
     //single feature sent
     if (!featureInfoCollection.features) {
