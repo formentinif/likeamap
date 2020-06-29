@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+    <script src="json-schema-doc.js"></script>
+    <script>
+      jsonSchemaDocs.loadFile("../schemas/app-link-schema.json");
+    </script>
+    <style>
+      .has-margin-top-1 {
+        margin-top: 8px;
+      }
+      .has-margin-top-3 {
+        margin-top: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <div class="columns">
+        <div class="column is-3">
+          <aside class="menu is-hidden-mobile">
+            <p class="menu-label">
+              Elenco tag
+            </p>
+            <ul id="menu" class="menu-list"></ul>
+          </aside>
+        </div>
+        <div id="content" class="column is-9"></div>
+      </div>
+    </div>
+  </body>
+</html>

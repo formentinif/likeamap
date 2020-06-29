@@ -43,6 +43,7 @@ let LamTemplates = (function () {
     layers.forEach(function (layer) {
       if (layer.queryable || layer.preload || layer.searchable) {
         let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
+        layer.templateUrlParsed = templateUrl;
         let template = templates.filter(function (el) {
           return el.templateUrl === templateUrl;
         });

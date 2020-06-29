@@ -5867,7 +5867,9 @@ il software distribuito nei termini della Licenza è distribuito
 Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
 
 */
-
+/**
+ * Global Istance that manages application loading
+ */
 var LamLoader = (function () {
   let layerUriCount = 0;
   let countRequest = 0;
@@ -5970,6 +5972,10 @@ var LamLoader = (function () {
     }
   }
 
+  /**
+   * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
+   * After that calls the mapInit
+   */
   var lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",
@@ -6825,6 +6831,26 @@ var LamStore = (function () {
 
   let parseResponse = function (e) {};
 
+  let getLayers = function () {
+    let arrDest = [];
+    getLayersRecursive(appState.layers, null, arrDest);
+    return arrDest;
+  };
+
+  let getLayersRecursive = function (layers, groupLayer, arrDest) {
+    layers.forEach((layer) => {
+      //adding group layer data
+      if (groupLayer) {
+        layer.groupName = groupLayer.layerName;
+        layer.groupGid = groupLayer.gid;
+      }
+      arrDest.push(layer);
+      if (layer.layers) {
+        getLayersRecursive(layer.layers, layer, arrDest);
+      }
+    });
+  };
+
   return {
     doLogin: doLogin,
     getAppState: getAppState,
@@ -6838,6 +6864,7 @@ var LamStore = (function () {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLayers: getLayers,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
     getAppId: getAppId,
@@ -7177,6 +7204,7 @@ let LamTemplates = (function () {
     layers.forEach(function (layer) {
       if (layer.queryable || layer.preload || layer.searchable) {
         let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
+        layer.templateUrlParsed = templateUrl;
         let template = templates.filter(function (el) {
           return el.templateUrl === templateUrl;
         });
@@ -7248,6 +7276,9 @@ let LamTemplates = (function () {
     return repoUrl + "/" + gid + ".json";
   };
 
+  let getTemplates = function () {
+    return templates;
+  };
   let getTemplate = function (gid, templateUrl, repoUrl) {
     let templatesFilter = templates.filter(function (el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
@@ -7539,6 +7570,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
     getTemplateEmpty: getTemplateEmpty,

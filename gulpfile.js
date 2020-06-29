@@ -30,6 +30,8 @@ function copyDist() {
   gulp.src("./source/states").pipe(gulp.dest("./dist/states"));
   gulp.src("./source/vendor/lib/jquery.js").pipe(gulp.dest("./dist/js"));
   gulp.src("./source/css/app-variables.css").pipe(concat("lam-variables.css")).pipe(gulp.dest("./dist/css"));
+  gulp.src("./source/templates/*").pipe(gulp.dest("./dist/templates"));
+  gulp.src("./source/docs/*").pipe(gulp.dest("./dist/docs"));
   return gulp.src("./source/templates").pipe(gulp.dest("./dist/templates/"));
 }
  

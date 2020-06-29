@@ -530,15 +530,20 @@ var LamStore = (function () {
 
   let getLayers = function () {
     let arrDest = [];
-    getLayersRecursive(appState.layers, arrDest);
+    getLayersRecursive(appState.layers, null, arrDest);
     return arrDest;
   };
 
-  let getLayersRecursive = function (layers, arrDest) {
+  let getLayersRecursive = function (layers, groupLayer, arrDest) {
     layers.forEach((layer) => {
+      //adding group layer data
+      if (groupLayer) {
+        layer.groupName = groupLayer.layerName;
+        layer.groupGid = groupLayer.gid;
+      }
       arrDest.push(layer);
       if (layer.layers) {
-        getLayersRecursive(layer.layers, arrDest);
+        getLayersRecursive(layer.layers, layer, arrDest);
       }
     });
   };
