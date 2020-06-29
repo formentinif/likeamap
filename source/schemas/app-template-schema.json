@@ -85,5 +85,6 @@
         "required": ["field", "label", "type"]
       }
     }
-  }
+  } ,
+  "required": ["title", "layer", "layerGid", "templateType", "fields"]
 }
