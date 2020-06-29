@@ -125,6 +125,10 @@ var LamLoader = (function () {
           LamCookieConsent.cookieConsent();
         }
       }
+      //cookie description
+      if (LamStore.getAppState().description) {
+        LamCookieDescription.cookieDescription();
+      }
       lamTemplateMapinit();
     }
   }

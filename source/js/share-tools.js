@@ -25,37 +25,37 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamShareTools = (function() {
+var LamShareTools = (function () {
   var isRendered = false;
 
   var init = function init() {
     //events binding
-    LamDispatcher.bind("create-share-url", function(payload) {
+    LamDispatcher.bind("create-share-url", function (payload) {
       LamShareTools.createShareUrl();
     });
 
-    LamDispatcher.bind("show-share-url-query", function(payload) {
+    LamDispatcher.bind("show-share-url-query", function (payload) {
       LamShareTools.createShareUrl();
       LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
-    LamDispatcher.bind("show-share", function(payload) {
+    LamDispatcher.bind("show-share", function (payload) {
       LamToolbar.toggleToolbarItem("share-tools");
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("update-share", function() {
+    LamDispatcher.bind("update-share", function () {
       LamShareTools.hideUrl();
       LamShareTools.setShareUrlQuery(LamShareTools.writeUrlShare());
     });
 
     //Adding event to map move-end
     LamMap.addMoveEndEvent({
-      eventName: "update-share"
+      eventName: "update-share",
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
     var templateTemp = templateShare();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -68,12 +68,10 @@ var LamShareTools = (function() {
     lamDispatch("show-share-url-query");
   };
 
-  var templateShare = function() {
+  var templateShare = function () {
     template = "";
     //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Condividi</h4>';
-    }
+    template += '<h4 class="lam-title">Condividi</h4>';
     template += '<div class="lam-card lam-depth-2">';
 
     //template += 'Crea link da condividere con i tuoi colleghi';
@@ -124,7 +122,7 @@ var LamShareTools = (function() {
    * Chiama il disptcher per creare l'url di condivisione
    * @return {null} la funzione non restituisce valori
    */
-  var createUrl = function() {
+  var createUrl = function () {
     LamDispatcher.dispatch("create-share-url");
   };
 
@@ -134,7 +132,7 @@ var LamShareTools = (function() {
    * @param  {url} appStateId url opzionale dell'appstate
    * @return {null}  la funzione non restituisce valori
    */
-  var displayUrl = function(appStateId, url) {
+  var displayUrl = function (appStateId, url) {
     ////ricavo lurl di base
     var urlArray = location.href.split("?");
     var baseUrl = urlArray[0].replace("#", "");
@@ -145,9 +143,9 @@ var LamShareTools = (function() {
     $("#share-tools__input-url").val(shareLink);
 
     var clipboard = new ClipboardJS("#share-tools__copy-url", {
-      text: function(trigger) {
+      text: function (trigger) {
         return shareLink;
-      }
+      },
     });
 
     //$("#share-tools__email-url").click(function() {
@@ -161,22 +159,22 @@ var LamShareTools = (function() {
    * Nasconde i link
    * @return {null} la funzione non restituisce valori
    */
-  var hideUrl = function() {
+  var hideUrl = function () {
     $("#share-tools__content").hide();
   };
 
-  var setShareUrlQuery = function(shareLink) {
+  var setShareUrlQuery = function (shareLink) {
     $("#share-tools__input-query").val(shareLink);
     $("#share-tools__url-query").attr("href", shareLink);
 
     var clipboard = new ClipboardJS("#share-tools__copy-url-query", {
-      text: function(trigger) {
+      text: function (trigger) {
         return shareLink;
-      }
+      },
     });
   };
 
-  var createShareUrl = function() {
+  var createShareUrl = function () {
     let appState = LamStore.getAppState();
 
     //invio una copia dell'appstate con gli attuali valori che sarà saòvato per la condivisione
@@ -190,17 +188,17 @@ var LamShareTools = (function() {
 
     //invio la richiesta
     $.post(appState.restAPIUrl + "/api/share/", {
-      appstate: JSON.stringify(appState)
+      appstate: JSON.stringify(appState),
     })
-      .done(function(data) {
+      .done(function (data) {
         var url = data.Url;
         var appStateId = data.AppStateId;
         LamShareTools.displayUrl(appStateId, url);
       })
-      .fail(function(err) {
+      .fail(function (err) {
         lamDispatch({
           eventName: "log",
-          message: "LamStore: create-share-url " + err
+          message: "LamStore: create-share-url " + err,
         });
       });
   };
@@ -209,7 +207,7 @@ var LamShareTools = (function() {
    * Genera l'url da copiare per visualizzare lo stato dell'applicazione solo tramite querystring
    * @return {null} Nessun valore restituito
    */
-  var writeUrlShare = function() {
+  var writeUrlShare = function () {
     let appState = LamStore.getAppState();
     //posizione
     var qPos = "";
@@ -240,6 +238,6 @@ var LamShareTools = (function() {
     render: render,
     setShareUrlQuery: setShareUrlQuery,
     templateShare: templateShare,
-    writeUrlShare: writeUrlShare
+    writeUrlShare: writeUrlShare,
   };
 })();

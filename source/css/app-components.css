@@ -136,7 +136,7 @@
   vertical-align: middle;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 4px 4px;
+  padding: 1px 4px;
   text-align: left;
 }
 
@@ -164,6 +164,16 @@
 
 .lam-select {
   width: 100%;
+  font-size: 1rem;
+  padding: 4px 0px;
+  border-right: 0px solid var(--lam-btn-color);
+  border-left: 0px solid var(--lam-btn-color);
+  border-top: 0px solid var(--lam-btn-color);
+  border-bottom: 1px solid var(--lam-btn-color);
+  outline: 0px;
+}
+
+.lam-select-small {
   font-size: 1rem;
   padding: 4px 0px;
   border-right: 0px solid var(--lam-btn-color);

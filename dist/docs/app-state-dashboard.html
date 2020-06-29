@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+<<<<<<< HEAD
     <title>Cruscotto AppState</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+=======
+    <title></title>
+>>>>>>> master
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css" />
     <script src="../js/jquery.js"></script>
@@ -11,12 +15,18 @@
     <script src="app-state-dashboard.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script>
+<<<<<<< HEAD
       appStateDashboard.loadAppStates(["../states/app-state.json", "../states/app-state_l.json"]);
     </script>
     <style>
       html {
         overflow: auto;
       }
+=======
+      appStateDashboard.loadAppState("../states/app-state.json");
+    </script>
+    <style>
+>>>>>>> master
       .has-margin-top-1 {
         margin-top: 8px;
       }
@@ -26,6 +36,7 @@
     </style>
   </head>
   <body>
+<<<<<<< HEAD
     <div id="app" class="container has-margin-top-3">
       <h1 class="title">Layer LikeAMap</h1>
       <div class="columns">
@@ -112,6 +123,25 @@
             </tr>
           </table>
         </div>
+=======
+    <div id="app" class="container">
+      <div class="columns">
+        <div class="column is-3">
+          <aside class="menu is-hidden-mobile">
+            <p class="menu-label">
+              Elenco tag
+            </p>
+            <ul id="menu" class="menu-list"></ul>
+          </aside>
+        </div>
+        <div id="content" class="column is-9">
+          <div id="layersList">
+            <div v-for="layer in layers">
+              {{layer.layerName}}
+            </viv>
+          </div>
+        </div>
+>>>>>>> master
       </div>
     </div>
   </body>

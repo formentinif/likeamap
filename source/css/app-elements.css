@@ -94,6 +94,10 @@
   max-width: 100%;
 }
 
+#search-tools__search-layers-custom {
+  display: none;
+}
+
 @media screen and (min-width: 801px) {
   .login-container__access {
     padding-top: 5rem;

@@ -106,9 +106,25 @@ var LamLegendTools = (function () {
     }
     if (scaled) {
       html +=
-        "<div class='mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
         gid +
         "', scaled: false })\">Visualizza legenda completa</a></div>";
+    }
+    if (thisLayer.queryable) {
+      var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "csv");
+      html +=
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='" +
+        layerUrl +
+        "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
+        LamResources.svgDownload16 +
+        "</i> CSV</a>";
+      layerUrl = LamMap.getWFSUrlfromLayer(thisLayer);
+      html +=
+        " <a href='" +
+        layerUrl +
+        "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
+        LamResources.svgDownload16 +
+        "</i> SHP</a></div>";
     }
     html += "<div>";
     var layerName = "Legenda ";
@@ -191,7 +207,23 @@ var LamLegendTools = (function () {
     if (!data.features.length) return;
     var template = !LamStore.getAppState().metaDataTemplate ? LamTemplates.getTemplateMetadata() : Handlebars.compile(LamStore.getAppState().metaDataTemplate);
     var html = template(data.features[0].properties);
-    $(".lam-layer-metadata").html(html.replace(/(?:\r\n|\r|\n)/g, "<br>"));
+    html = formatMetadata(html);
+    $(".lam-layer-metadata").html(html);
+  };
+
+  let formatMetadata = function (html) {
+    //newline to br
+    html = html.replace(/(?:\r\n|\r|\n)/g, "<br>");
+    //sostituzione dei link
+    html = replaceLinks(html);
+    //replace delle stringhe
+    if (LamStore.getAppState().metaDataReplacementStrings) {
+      let strings = LamStore.getAppState().metaDataReplacementStrings;
+      strings.forEach(function (element) {
+        html = html.replace(new RegExp(element[0], "gi"), element[1]);
+      });
+    }
+    return html;
   };
 
   let updateLegend = function () {
@@ -200,7 +232,18 @@ var LamLegendTools = (function () {
     }
   };
 
+  let replaceLinks = function (text) {
+    return (text || "").replace(/([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi, function (match, space, url) {
+      var hyperlink = url;
+      if (!hyperlink.match("^https?://")) {
+        hyperlink = "http://" + hyperlink;
+      }
+      return space + '<a href="' + hyperlink + '">' + url + "</a>";
+    });
+  };
+
   return {
+    formatMetadata: formatMetadata,
     init: init,
     parseResponseMetadata: parseResponseMetadata,
     render: render,

@@ -1,22 +1,23 @@
-var LamRelations = (function() {
+var LamRelations = (function () {
   let relationsResults = {};
   let currentRelation; //relation currently evaluating
   var init = function init() {
     //events binding
   };
 
-  var getRelations = function() {
+  var getRelations = function () {
     return LamStore.getAppState().relations;
   };
 
-  var getRelation = function(gid) {
-    let relationResult = LamStore.getAppState().relations.filter(function(el) {
+  var getRelation = function (gid) {
+    let relationResult = LamStore.getAppState().relations.filter(function (el) {
       return el.gid == gid;
     });
+
     return relationResult[0];
   };
 
-  var getRelationResults = function() {
+  var getRelationResults = function () {
     return relationsResults;
   };
 
@@ -24,11 +25,11 @@ var LamRelations = (function() {
    * Sets the last relation result.
    * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
    */
-  var setRelationResults = function(results) {
+  var setRelationResults = function (results) {
     relationsResults = results;
   };
 
-  var showRelation = function(relationGid, resultIndex) {
+  var showRelation = function (relationGid, resultIndex) {
     lamDispatch("show-loader");
     var item = LamStore.getCurrentInfoItems().features[resultIndex];
     currentRelation = LamRelations.getRelation(relationGid);
@@ -39,17 +40,17 @@ var LamRelations = (function() {
       url: urlService + "&format_options=callback:LamRelations.parseResponseRelation",
       jsonp: true,
       cache: false,
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamRelations: unable to complete response"
+          message: "LamRelations: unable to complete response",
         });
         lamDispatch("hide-loader");
-      }
+      },
     });
   };
 
-  let parseResponseRelation = function(data) {
+  let parseResponseRelation = function (data) {
     if (data.features) {
       data = data.features;
     }
@@ -65,7 +66,7 @@ var LamRelations = (function() {
       var props = data[i].properties ? data[i].properties : data[i];
       propsList.push(props);
       if (!template.multipleItems) {
-        //single template not active by default
+        //Templates are applied on every item
         body += LamTemplates.processTemplate(template, props);
         if (!body) {
           body += LamTemplates.standardTemplate(props);
@@ -76,18 +77,18 @@ var LamRelations = (function() {
       }
     }
 
-    //single template not active by default
+    //single template not active by default, a single template for all items
     if (template.multipleItems && propsList.length > 0) {
       body += LamTemplates.processTemplate(template, propsList);
     }
     //download
-    body +=
-      "<div class=' lam-mt-1'><button class='lam-btn lam-right' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
-      LamResources.svgDownload16 +
-      "</i> Scarica CSV</button></div>";
     if (data.length === 0) {
       body += '<div class="lam-warning lam-mb-2 lam-p-2">' + LamResources.risultati_non_trovati + "</div>";
     }
+    body +=
+      "<div class=' lam-mt-1'><button class='lam-btn lam-right lam-depth-1' onclick='lamDispatch(\"download-relation-results\")'><i class='lam-icon'>" +
+      LamResources.svgDownload16 +
+      "</i> Scarica CSV</button></div>";
     LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
     lamDispatch("hide-loader");
   };
@@ -99,6 +100,6 @@ var LamRelations = (function() {
     getRelationResults: getRelationResults,
     parseResponseRelation: parseResponseRelation,
     setRelationResults: setRelationResults,
-    showRelation: showRelation
+    showRelation: showRelation,
   };
 })();

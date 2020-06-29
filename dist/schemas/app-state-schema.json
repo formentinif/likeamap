@@ -13,6 +13,11 @@
       "description": "Nome della mappa che sarà visualizzato nel pannello laterale.",
       "type": "string"
     },
+    "description": {
+      "title": "Descrizione breve della mappa",
+      "description": "Descrizione che comparirà al primo avvio della mappa.",
+      "type": "string"
+    },
     "logoUrl": {
       "title": "Logo",
       "description": "Logo della mappa, visualizzato in alto a destra. Inserire un url assoluto o relativo.",
@@ -197,6 +202,16 @@
       "title": "Template per i metadati",
       "description": "Template inline (handlebars) da applicare per i metadati. Default è {{ABSTRACT}}.",
       "type": "string"
+    },
+    "metaDataReplacementStrings": {
+      "title": "Stringhe di trasformazione per i metadati",
+      "description": "Coppie di stringhe per la sostituzione del campo dei metadati",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "title": "Coppie di stringhe di trasformazione es: [[stringa1,stringa2],[stringa3,stringa4]]"
+        }
+      }
     },
     "cookieConsent": {
       "title": "Cookie e Privacy consent",
@@ -492,6 +507,11 @@
                   "description": "Definire se il layer è ricercabile.",
                   "enum": [0, 1],
                   "type": "integer"
+                },
+                "searchCustomEvent": {
+                  "title": "Evento custom per la ricerca",
+                  "description": "Evento impostato nel dispatcher per customizzare la ricerca. L'evento deve essere definito in un componente JS incluso.",
+                  "type": "string"
                 },
                 "searchField": {
                   "title": "Campo di ricerca",

@@ -25,18 +25,18 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamMapTools = (function() {
+var LamMapTools = (function () {
   var isRendered = false;
 
   var init = function init() {
     //Events binding
-    LamDispatcher.bind("show-map-tools", function(payload) {
+    LamDispatcher.bind("show-map-tools", function (payload) {
       LamToolbar.toggleToolbarItem("map-tools");
       if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
         LamStore.setInfoClickEnabled(false);
       }
 
-      LamDispatcher.bind("stop-copy-coordinate", function(payload) {
+      LamDispatcher.bind("stop-copy-coordinate", function (payload) {
         LamMapTools.stopCopyCoordinate();
       });
 
@@ -44,7 +44,7 @@ var LamMapTools = (function() {
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
     var templateTemp = templateTools();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -56,20 +56,18 @@ var LamMapTools = (function() {
     //aggiungo la copia nel bottone
 
     var clipboard = new ClipboardJS("#search-tools__copy-url", {
-      text: function(trigger) {
+      text: function (trigger) {
         return $("#map-tools__coordinate-textarea").val();
-      }
+      },
     });
 
     isRendered = true;
   };
 
-  var templateTools = function() {
+  var templateTools = function () {
     template = "";
     //pannello ricerca via
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Strumenti</h4>';
-    }
+    template += '<h4 class="lam-title">Strumenti</h4>';
     template += '<div class="lam-card lam-depth-2">';
     template += '<h5 class="lam-title-h4">Vai a..</h5>';
     template += '<div id="map-tools__lon-field" class="lam-mb-2" >';
@@ -116,7 +114,7 @@ var LamMapTools = (function() {
    * Chiama il disptcher per creare l'url di condivisione
    * @return {null} la funzione non restituisce valori
    */
-  var goToLonLat = function() {
+  var goToLonLat = function () {
     var payload = {};
     try {
       payload.eventName = "zoom-lon-lat";
@@ -126,7 +124,7 @@ var LamMapTools = (function() {
     } catch (e) {
       lamDispatch({
         eventName: "log",
-        message: "LamStore: map-tools " + e
+        message: "LamStore: map-tools " + e,
       });
     }
 
@@ -142,24 +140,24 @@ var LamMapTools = (function() {
     } catch (e) {
       lamDispatch({
         eventName: "log",
-        message: "LamStore: map-tools " + e
+        message: "LamStore: map-tools " + e,
       });
     }
   };
 
-  var startCopyCoordinate = function() {
+  var startCopyCoordinate = function () {
     $("#search-tools__start-copy-url").hide();
     $("#search-tools__stop-copy-url").show();
     lamDispatch("start-copy-coordinate");
   };
 
-  var stopCopyCoordinate = function() {
+  var stopCopyCoordinate = function () {
     $("#search-tools__start-copy-url").show();
     $("#search-tools__stop-copy-url").hide();
     LamMap.stopCopyCoordinate();
   };
 
-  var addCoordinate = function(lon, lat) {
+  var addCoordinate = function (lon, lat) {
     lamDispatch({ eventName: "add-info-point", lon: lon, lat: lat }), (lon = Math.round(lon * 1000000) / 1000000);
     lat = Math.round(lat * 1000000) / 1000000;
     $("#map-tools__coordinate-textarea").val($("#map-tools__coordinate-textarea").val() + lon + " " + lat + ";\n");
@@ -172,6 +170,6 @@ var LamMapTools = (function() {
     goToLonLat: goToLonLat,
     init: init,
     render: render,
-    templateTools: templateTools
+    templateTools: templateTools,
   };
 })();

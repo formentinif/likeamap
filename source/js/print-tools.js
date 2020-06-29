@@ -25,36 +25,36 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamPrintTools = (function() {
+var LamPrintTools = (function () {
   var isRendered = false;
 
   var papersMM = {
     A4: {
       width: 210,
-      height: 297
+      height: 297,
     },
     A3: {
       width: 210,
-      height: 420
-    }
+      height: 420,
+    },
   };
 
   var papersPX = {
     A4: {
       width: 794,
-      height: 1123
+      height: 1123,
     },
     A3: {
       width: 1123,
-      height: 1587
-    }
+      height: 1587,
+    },
   };
 
   var init = function init() {
     //Upgrade grafici
 
     //bindo la scala con solo numeri
-    $("#print-tools__scale").keyup(function(event) {
+    $("#print-tools__scale").keyup(function (event) {
       //console.log(event.which);
       if (event.which != 8 && isNaN(String.fromCharCode(event.which))) {
         event.preventDefault();
@@ -63,11 +63,11 @@ var LamPrintTools = (function() {
     });
 
     //bindo i controlli per formato e orientamento
-    $("#print-tools__orientation").change(function() {
+    $("#print-tools__orientation").change(function () {
       showPrintArea();
     });
 
-    $("#print-tools__paper").change(function() {
+    $("#print-tools__paper").change(function () {
       showPrintArea();
     });
 
@@ -75,7 +75,7 @@ var LamPrintTools = (function() {
     LamToolbar.addResetToolsEvent({ eventName: "clear-layer-print" });
 
     //events binding
-    LamDispatcher.bind("show-print-tools", function(payload) {
+    LamDispatcher.bind("show-print-tools", function (payload) {
       LamToolbar.toggleToolbarItem("print-tools");
       if (LamToolbar.getCurrentToolbarItem() === "print-tools") {
         LamPrintTools.showPrintArea();
@@ -84,15 +84,15 @@ var LamPrintTools = (function() {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("print-map", function(payload) {
+    LamDispatcher.bind("print-map", function (payload) {
       LamPrintTools.printMap(payload.paper, payload.orientation, payload.format, payload.template);
     });
 
-    LamDispatcher.bind("clear-layer-print", function(payload) {
+    LamDispatcher.bind("clear-layer-print", function (payload) {
       LamMap.clearLayerPrint();
     });
 
-    LamDispatcher.bind("show-print-area", function(payload) {
+    LamDispatcher.bind("show-print-area", function (payload) {
       //ricavo posizione e risoluzione
       //Cerco il centro del rettangolo attuale di stampa o lo metto al centro della mappa
       var printCenter = LamMap.getPrintCenter();
@@ -117,7 +117,7 @@ var LamPrintTools = (function() {
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
     var templateTemp = templatePrint();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -128,11 +128,9 @@ var LamPrintTools = (function() {
     isRendered = true;
   };
 
-  var templatePrint = function() {
+  var templatePrint = function () {
     template = "";
-    if (!LamStore.getAppState().logoPanelUrl) {
-      template += '<h4 class="lam-title">Stampa</h4>';
-    }
+    template += '<h4 class="lam-title">Stampa</h4>';
     template += '<div class="lam-card lam-depth-2">';
 
     template += '<div class="lam-mb-2">';
@@ -177,7 +175,7 @@ var LamPrintTools = (function() {
    * Send the map print request to the LamDispatcher
    * @return {void}
    */
-  var printClick = function() {
+  var printClick = function () {
     var paper = $("#print-tools__paper").val();
     var orientation = $("#print-tools__orientation").val();
     var format = "PDF";
@@ -187,7 +185,7 @@ var LamPrintTools = (function() {
       paper: paper,
       format: format,
       orientation: orientation,
-      template: template
+      template: template,
     };
     LamDispatcher.dispatch(payload);
   };
@@ -200,7 +198,7 @@ var LamPrintTools = (function() {
    * @param  {[type]} template    [description]
    * @return {[type]}             [description]
    */
-  var printMap = function(paper, orientation, format, template) {
+  var printMap = function (paper, orientation, format, template) {
     let appState = LamStore.getAppState();
     //ricavo le dimensioni di Stampa
     appState.printPaper = paper;
@@ -231,12 +229,12 @@ var LamPrintTools = (function() {
     //invio la richiesta al servizio di print
 
     $.post(appState.restAPIUrl + "/api/print", {
-      appstate: JSON.stringify(appState)
+      appstate: JSON.stringify(appState),
     })
-      .done(function(pdf) {
+      .done(function (pdf) {
         window.location = appState.restAPIUrl + "/api/print/" + pdf.pdfName;
       })
-      .fail(function(err) {
+      .fail(function (err) {
         //TODO completare fail
       });
   };
@@ -248,7 +246,7 @@ var LamPrintTools = (function() {
    * @param  {float} resolution  map pixel resolution
    * @return {object}             object with width and height properties
    */
-  var getPrintMapSize = function(paper, orientation, resolution) {
+  var getPrintMapSize = function (paper, orientation, resolution) {
     var width = 0;
     var height = 0;
     var size = getPaperSize(paper, orientation);
@@ -264,7 +262,7 @@ var LamPrintTools = (function() {
    * @param  {String} orientation orientamento carta
    * @return {null}
    */
-  var showPrintArea = function(scale, paper, orientation) {
+  var showPrintArea = function (scale, paper, orientation) {
     if (!scale) {
       scale = parseInt($("#print-tools__scale").val());
     }
@@ -278,21 +276,21 @@ var LamPrintTools = (function() {
       eventName: "show-print-area",
       scale: scale,
       paper: paper,
-      orientation: orientation
+      orientation: orientation,
     });
   };
 
-  var setScale = function(scale) {
+  var setScale = function (scale) {
     $("#print-tools__scale").val(Math.round(scale));
     $("#print-tools__scale-label").addClass("active");
     //$("#print-tools__scale").parent().addClass("active");
   };
 
-  var getScale = function() {
+  var getScale = function () {
     return Math.round(parseInt($("#print-tools__scale").val()));
   };
 
-  var getPaperSize = function(paper, orientation) {
+  var getPaperSize = function (paper, orientation) {
     var width = 0;
     var height = 0;
     switch (paper) {
@@ -333,7 +331,7 @@ var LamPrintTools = (function() {
    * @param  {float} height [description]
    * @return {object}        [description]
    */
-  var getPrintEnvelopeCenter = function(x, y, width, height) {
+  var getPrintEnvelopeCenter = function (x, y, width, height) {
     var xMin = x - width / 2;
     var xMax = x + width / 2;
     var yMin = y - height / 2;
@@ -342,7 +340,7 @@ var LamPrintTools = (function() {
       xMin: xMin,
       xMax: xMax,
       yMin: yMin,
-      yMax: yMax
+      yMax: yMax,
     };
   };
 
@@ -357,6 +355,6 @@ var LamPrintTools = (function() {
     render: render,
     setScale: setScale,
     showPrintArea: showPrintArea,
-    templatePrint: templatePrint
+    templatePrint: templatePrint,
   };
 })();

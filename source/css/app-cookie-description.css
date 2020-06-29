@@ -1,0 +1,67 @@
+/*
+This code was inspired by https://github.com/SnowPatch/PureCookie
+*/
+.lamDescriptionContainer {
+  position: absolute;
+  top: 30%;
+  left: 25%;
+  margin-top: -50px;
+  margin-left: -50px;
+  z-index: 999;
+  width: 50%;
+  min-height: 24px;
+  box-sizing: border-box;
+  padding: 24px;
+  background-color: var(--lam-bg-color-no-alpha);
+  overflow: hidden;
+  display: none;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.lamDescriptionContainer .cookieTitle a {
+  color: var(--lam-btn-color);
+  font-size: 22px;
+  line-height: 20px;
+  display: block;
+}
+
+.lamDescriptionContainer .cookieDesc p {
+  margin: 0;
+  padding: 0;
+  display: block;
+  margin-top: 12px;
+}
+
+.lamDescriptionContainer .cookieDesc a {
+  text-decoration: underline;
+}
+
+.lamDescriptionContainer .cookieButton a {
+  display: inline-block;
+  background-color: var(--lam-btn-color);
+  border: none;
+  border-radius: 2px;
+  padding: 8px 16px;
+  margin: 12px 0px 0px 0px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  outline: none;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.lamDescriptionContainer .cookieButton a:hover {
+  cursor: pointer;
+  background: var(--lam-btn-color-darken);
+}
+
+@media (max-width: 980px) {
+  .lamDescriptionContainer {
+    width: 92% !important;
+    top: 20% !important;
+    left: 8px !important;
+    margin-right: 3% !important;
+    margin-left: 3% !important;
+  }
+}
