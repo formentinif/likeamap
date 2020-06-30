@@ -1,7 +1,9 @@
 dist/states
+dist/temp
 dist/templates
 dist/custom
 source/states
+source/temp
 source/templates
 node_modules
 samples

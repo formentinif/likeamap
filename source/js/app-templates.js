@@ -43,6 +43,7 @@ let LamTemplates = (function () {
     layers.forEach(function (layer) {
       if (layer.queryable || layer.preload || layer.searchable) {
         let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
+        layer.templateUrlParsed = templateUrl;
         let template = templates.filter(function (el) {
           return el.templateUrl === templateUrl;
         });
@@ -112,6 +113,10 @@ let LamTemplates = (function () {
       }
     }
     return repoUrl + "/" + gid + ".json";
+  };
+
+  let getTemplates = function () {
+    return templates;
   };
 
   let normalizeTemplate = function (template) {
@@ -459,6 +464,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
     getTemplateEmpty: getTemplateEmpty,

@@ -528,6 +528,26 @@ var LamStore = (function () {
 
   let parseResponse = function (e) {};
 
+  let getLayers = function () {
+    let arrDest = [];
+    getLayersRecursive(appState.layers, null, arrDest);
+    return arrDest;
+  };
+
+  let getLayersRecursive = function (layers, groupLayer, arrDest) {
+    layers.forEach((layer) => {
+      //adding group layer data
+      if (groupLayer) {
+        layer.groupName = groupLayer.layerName;
+        layer.groupGid = groupLayer.gid;
+      }
+      arrDest.push(layer);
+      if (layer.layers) {
+        getLayersRecursive(layer.layers, layer, arrDest);
+      }
+    });
+  };
+
   return {
     doLogin: doLogin,
     getAppState: getAppState,
@@ -541,6 +561,7 @@ var LamStore = (function () {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLayers: getLayers,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
     getAppId: getAppId,

@@ -210,430 +210,429 @@
       "items": {
         "type": "array",
         "title": "Coppie di stringhe di trasformazione es: [[stringa1,stringa2],[stringa3,stringa4]]"
-        }
       }
-    },
-    "cookieConsent": {
-      "title": "Cookie e Privacy consent",
-      "description": "Impostazioni per l'informativa di cookie e privacy",
+    }
+  },
+  "cookieConsent": {
+    "title": "Cookie e Privacy consent",
+    "description": "Impostazioni per l'informativa di cookie e privacy",
+    "type": "object",
+    "properties": {
+      "showConsentOnLoad": {
+        "title": "Mostra l'informativa all'avvio",
+        "description": "Mostra l'informativa all'avvio dell'applicazione",
+        "type": "boolean"
+      },
+      "cookieTitle": {
+        "title": "Titolo del box dell'informativa",
+        "description": "Es. Privacy e Cookies",
+        "type": "string"
+      },
+      "cookieDesc": {
+        "title": "Descrizione del box dell'informativa",
+        "description": "Es: Questo sito utilizza solo cookie tecnici propri e di terze parti per il corretto funzionamento delle pagine web e per il miglioramento dei servizi. Chiudendo questo banner scorrendo questa pagina; cliccando su un link o proseguendo la navigazione in altra maniera acconsenti all'uso dei cookie.",
+        "type": "string"
+      },
+      "cookieLink": {
+        "title": "Link all'informativa del cookie",
+        "description": "Es: <a href='cookie-policy.html' target='_blank'>What for?</a>",
+        "type": "string"
+      },
+      "cookieButton": {
+        "title": "Testo del bottone di consenso",
+        "description": "Es: Accetta e chiudi ",
+        "type": "string"
+      }
+    }
+  },
+  "drawFeatures": {
+    "title": "Entità vettoriali della sezione disegno.",
+    "description": "Valore di sistema, lasciare a null",
+    "default": "",
+    "type": "string"
+  },
+  "comuni": {
+    "title": "Elenco dei comuni (deprecated)",
+    "description": "Valore di sistema, lasciare a null  (deprecated)",
+    "type": "array",
+    "items": {}
+  },
+  "authentication": {
+    "title": "Impostazioni di autenticazione",
+    "description": "Impostazioni per l'autenticazione di base. Da non utilizzare nel caso sia stata impostata una autenticazione custom.",
+    "type": "object",
+    "properties": {
+      "requiresAuth": {
+        "title": "Autenticazione Richiesta",
+        "description": "Richiede l'Autenticazione",
+        "type": "boolean"
+      },
+      "authType": {
+        "title": "Tipo di autenticazione",
+        "description": "Tipo di autenticazione",
+        "type": "string",
+        "enum": ["anonymous", "basic", "custom"]
+      },
+      "authToken": {
+        "title": "Token di autenticazione",
+        "description": "Token di autenticazione",
+        "type": "string"
+      },
+      "customAuthUrl": {
+        "title": "Url di autenticazione custom",
+        "description": "Template url. Lo user e password devono essere inseriti nei placeholder {{user}} {{password}}. Il risultato sarà inserito nella proprietà customAuthObject",
+        "type": "string"
+      },
+      "customAuthObject": {
+        "title": "Oggetto con le informazione di autenticazione custom",
+        "description": "Oggetto con le informazione di autenticazione custom",
+        "type": "object"
+      },
+      "required": []
+    }
+  },
+  "modules": {
+    "title": "Moduli del sistema",
+    "description": "Abilita i moduli/funzionalità della mappa",
+    "type": "object",
+    "properties": {
+      "layer-tree": {
+        "title": "Livelli",
+        "description": "Elenco dei livelli",
+        "type": "boolean"
+      },
+      "search-tools": {
+        "title": "Ricerca",
+        "description": "Ricerca vie",
+        "type": "boolean"
+      },
+      "print-tools": {
+        "title": "Stampa",
+        "description": "Stampa pdf",
+        "type": "boolean"
+      },
+      "share-tools": {
+        "title": "Condividi",
+        "description": "Condividi mappe",
+        "type": "boolean"
+      },
+      "map-tools-create-url": {
+        "title": "Condividi",
+        "description": "Condividi mappe",
+        "type": "boolean"
+      },
+      "map-tools": {
+        "title": "Strumenti",
+        "description": "Strumenti mappa",
+        "type": "boolean"
+      },
+      "draw-tools": {
+        "title": "Disegno",
+        "description": "Strumenti di disegno",
+        "type": "boolean"
+      },
+      "links-tools": {
+        "title": "Links",
+        "description": "Elenco link",
+        "type": "boolean"
+      },
+      "legend-tools": {
+        "title": "Legend",
+        "description": "Visualizza la legenda globale",
+        "type": "boolean"
+      },
+      "select-tools": {
+        "title": "Selezione",
+        "description": "Selezione ad area delle features",
+        "type": "boolean"
+      },
+      "gps-tools": {
+        "title": "GPS",
+        "description": "Strumenti GPS",
+        "type": "boolean"
+      },
+      "auth-tools": {
+        "title": "Login",
+        "description": "Accesso tramite login",
+        "type": "boolean"
+      }
+    }
+  },
+  "selectedInfoItems": {
+    "title": "Elendo delle entitàò selezionate (systema)",
+    "description": "Elenco delle feature correntemente selezionate sulla mappa. Valore di sistema, non utilizzare",
+    "type": "array",
+    "items": {
+      "type": "object"
+    }
+  },
+  "layers": {
+    "title": "Gruppi layer",
+    "description": "Elenco dei raggruppamenti di layer",
+    "type": "array",
+    "items": {
       "type": "object",
+      "title": "Gruppo",
       "properties": {
-        "showConsentOnLoad": {
-          "title": "Mostra l'informativa all'avvio",
-          "description": "Mostra l'informativa all'avvio dell'applicazione",
+        "gid": {
+          "title": "Identificativo univoco",
+          "description": "Identificatore globale univoco ",
+          "type": "string"
+        },
+        "layerName": {
+          "title": "Titolo",
+          "description": "Nome del layer (visualizzato in mappa)",
+          "type": "string"
+        },
+        "layerDescription": {
+          "title": "Descrizone del layer",
+          "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
+          "type": "string"
+        },
+        "showDescriptionInLayerTree": {
+          "title": "Mostra descrizione nell'albero dei livelli",
+          "description": "Mostra la descrizione nell'albero dei layer",
           "type": "boolean"
         },
-        "cookieTitle": {
-          "title": "Titolo del box dell'informativa",
-          "description": "Es. Privacy e Cookies",
-          "type": "string"
-        },
-        "cookieDesc": {
-          "title": "Descrizione del box dell'informativa",
-          "description": "Es: Questo sito utilizza solo cookie tecnici propri e di terze parti per il corretto funzionamento delle pagine web e per il miglioramento dei servizi. Chiudendo questo banner scorrendo questa pagina; cliccando su un link o proseguendo la navigazione in altra maniera acconsenti all'uso dei cookie.",
-          "type": "string"
-        },
-        "cookieLink": {
-          "title": "Link all'informativa del cookie",
-          "description": "Es: <a href='cookie-policy.html' target='_blank'>What for?</a>",
-          "type": "string"
-        },
-        "cookieButton": {
-          "title": "Testo del bottone di consenso",
-          "description": "Es: Accetta e chiudi ",
-          "type": "string"
-        }
-      }
-    },
-    "drawFeatures": {
-      "title": "Entità vettoriali della sezione disegno.",
-      "description": "Valore di sistema, lasciare a null",
-      "default": "",
-      "type": "string"
-    },
-    "comuni": {
-      "title": "Elenco dei comuni (deprecated)",
-      "description": "Valore di sistema, lasciare a null  (deprecated)",
-      "type": "array",
-      "items": {}
-    },
-    "authentication": {
-      "title": "Impostazioni di autenticazione",
-      "description": "Impostazioni per l'autenticazione di base. Da non utilizzare nel caso sia stata impostata una autenticazione custom.",
-      "type": "object",
-      "properties": {
-        "requiresAuth": {
-          "title": "Autenticazione Richiesta",
-          "description": "Richiede l'Autenticazione",
-          "type": "boolean"
-        },
-        "authType": {
-          "title": "Tipo di autenticazione",
-          "description": "Tipo di autenticazione",
+        "layerType": {
+          "title": "Tipologia",
+          "description": "Tipologia del group layer",
           "type": "string",
-          "enum": ["anonymous", "basic", "custom"]
+          "enum": ["group"]
         },
-        "authToken": {
-          "title": "Token di autenticazione",
-          "description": "Token di autenticazione",
+        "nestingStyle": {
+          "title": "Dimensione gerarchia",
+          "description": "Dimensione da applicare per la gerarchia dell'oggetto. I colori e la dimensione del testo saranno variati in automatico.",
+          "type": "string",
+          "enum": ["sub1", "sub2", "sub3", "sub4"]
+        },
+        "visible": {
+          "title": "Visibilità iniziale",
+          "description": "Visibilità iniziale, il gruppo sarà aperto (1) o chiuso (0)",
+          "enum": [0, 1],
+          "type": "integer"
+        },
+        "cssClass": {
+          "title": "Classe CSS del gruppo/layer",
+          "description": "Classe CSS specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",
           "type": "string"
         },
-        "customAuthUrl": {
-          "title": "Url di autenticazione custom",
-          "description": "Template url. Lo user e password devono essere inseriti nei placeholder {{user}} {{password}}. Il risultato sarà inserito nella proprietà customAuthObject",
-          "type": "string"
-        },
-        "customAuthObject": {
-          "title": "Oggetto con le informazione di autenticazione custom",
-          "description": "Oggetto con le informazione di autenticazione custom",
-          "type": "object"
-        },
-        "required": []
-      }
-    },
-    "modules": {
-      "title": "Moduli del sistema",
-      "description": "Abilita i moduli/funzionalità della mappa",
-      "type": "object",
-      "properties": {
-        "layer-tree": {
+        "layers": {
           "title": "Livelli",
-          "description": "Elenco dei livelli",
-          "type": "boolean"
-        },
-        "search-tools": {
-          "title": "Ricerca",
-          "description": "Ricerca vie",
-          "type": "boolean"
-        },
-        "print-tools": {
-          "title": "Stampa",
-          "description": "Stampa pdf",
-          "type": "boolean"
-        },
-        "share-tools": {
-          "title": "Condividi",
-          "description": "Condividi mappe",
-          "type": "boolean"
-        },
-        "map-tools-create-url": {
-          "title": "Condividi",
-          "description": "Condividi mappe",
-          "type": "boolean"
-        },
-        "map-tools": {
-          "title": "Strumenti",
-          "description": "Strumenti mappa",
-          "type": "boolean"
-        },
-        "draw-tools": {
-          "title": "Disegno",
-          "description": "Strumenti di disegno",
-          "type": "boolean"
-        },
-        "links-tools": {
-          "title": "Links",
-          "description": "Elenco link",
-          "type": "boolean"
-        },
-        "legend-tools": {
-          "title": "Legend",
-          "description": "Visualizza la legenda globale",
-          "type": "boolean"
-        },
-        "select-tools": {
-          "title": "Selezione",
-          "description": "Selezione ad area delle features",
-          "type": "boolean"
-        },
-        "gps-tools": {
-          "title": "GPS",
-          "description": "Strumenti GPS",
-          "type": "boolean"
-        },
-        "auth-tools": {
-          "title": "Login",
-          "description": "Accesso tramite login",
-          "type": "boolean"
-        }
-      }
-    },
-    "selectedInfoItems": {
-      "title": "Elendo delle entitàò selezionate (systema)",
-      "description": "Elenco delle feature correntemente selezionate sulla mappa. Valore di sistema, non utilizzare",
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "layers": {
-      "title": "Gruppi layer",
-      "description": "Elenco dei raggruppamenti di layer",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "title": "Gruppo",
-        "properties": {
-          "gid": {
-            "title": "Identificativo univoco",
-            "description": "Identificatore globale univoco ",
-            "type": "string"
-          },
-          "layerName": {
-            "title": "Titolo",
-            "description": "Nome del layer (visualizzato in mappa)",
-            "type": "string"
-          },
-          "layerDescription": {
-            "title": "Descrizone del layer",
-            "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
-            "type": "string"
-          },
-          "showDescriptionInLayerTree": {
-            "title": "Mostra descrizione nell'albero dei livelli",
-            "description": "Mostra la descrizione nell'albero dei layer",
-            "type": "boolean"
-          },
-          "layerType": {
-            "title": "Tipologia",
-            "description": "Tipologia del group layer",
-            "type": "string",
-            "enum": ["group"]
-          },
-          "nestingStyle": {
-            "title": "Dimensione gerarchia",
-            "description": "Dimensione da applicare per la gerarchia dell'oggetto. I colori e la dimensione del testo saranno variati in automatico.",
-            "type": "string",
-            "enum": ["sub1", "sub2", "sub3", "sub4"]
-          },
-          "visible": {
-            "title": "Visibilità iniziale",
-            "description": "Visibilità iniziale, il gruppo sarà aperto (1) o chiuso (0)",
-            "enum": [0, 1],
-            "type": "integer"
-          },
-          "cssClass": {
-            "title": "Classe CSS del gruppo/layer",
-            "description": "Classe CSS specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",
-            "type": "string"
-          },
-          "layers": {
-            "title": "Livelli",
-            "description": "Array dei layer catografici appartenenti al gruppo",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "title": "Livello",
-              "properties": {
-                "gid": {
-                  "title": "Identificativo univoco",
-                  "description": "Identificatore globale univoco",
-                  "type": "string"
-                },
-                "layerName": {
-                  "title": "Titolo",
-                  "description": "Nome del layer (visualizzato nell'albero dei livelli)",
-                  "type": "string"
-                },
-                "layerDescription": {
-                  "title": "Descrizone del layer",
-                  "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
-                  "type": "string"
-                },
-                "showDescriptionInLayerTree": {
-                  "title": "Mostra descrizione nell'albero dei livelli",
-                  "description": "Mostra la descrizione nell'albero dei layer",
-                  "type": "boolean"
-                },
-                "layersUri": {
-                  "title": "Layer URI",
-                  "description": "Url assoluto o relativo di un oggetto JSON con i layer che sarà caricato in sostituzione di questo oggetto. Utilizzando questa proprietà è possibile riutilizzare gruppi di layer esistenti.",
-                  "type": "string"
-                },
-                "mapUri": {
-                  "title": "URL (WMS, TMS) del layer",
-                  "description": "Url base del layer. Es: http://localhost:8080/geoserver/wms?",
-                  "type": "string"
-                },
-                "layerType": {
-                  "title": "Tipologia di layer",
-                  "description": "Tipologia del layer. Sono supportati layer di tipo WMS, Tiled o sfondi OSM.",
-                  "enum": ["group", "osm", "otm", "ocm", "wms", "wmstiled", "tms"],
-                  "type": "string",
-                  "default": "wmstiled"
-                },
-                "layer": {
-                  "title": "Nome Layer per il servizio.",
-                  "description": "Nome del layer WMS da visualizzare. Per geoserver mettere workspace:nome del layer Es: stradario:civici",
-                  "type": "string"
-                },
-                "srid": {
-                  "title": "SRID del layer",
-                  "description": "Spatial reference ID del layer. Es: 3857 (al momento è supportato solo il 3857)",
-                  "enum": ["3857"],
-                  "type": "string"
-                },
-                "opacity": {
-                  "title": "Opacità",
-                  "description": "Trasparenza iniziale del layer",
-                  "enum": [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0],
-                  "type": "number"
-                },
-                "params": {
-                  "title": "Parametri aggiuntivi",
-                  "description": "Parametri aggiuntivi da aggiungere alla chiamata WMS. Per maggiori informazioni consultare la specifica del WMS",
-                  "type": "string"
-                },
-                "tileMode": {
-                  "title": "Tipologia Tile",
-                  "description": "Tipologia di tile da utilizare nel caso di tiled layer. Lasciare vuoto per il formato server predefinito",
-                  "enum": ["", "xyz", "quadkey"],
-                  "type": "string"
-                },
-                "visible": {
-                  "title": "Visibilità iniziale",
-                  "description": "Visibilità iniziale del layer in mappa",
-                  "enum": [0, 1],
-                  "type": "integer"
-                },
-                "queryable": {
-                  "title": "Layer interrogabile",
-                  "description": "Definisce se il layer è interrogabile tramite click, se visibile.",
-                  "enum": [0, 1],
-                  "type": "integer"
-                },
-                "searchable": {
-                  "title": "Layer ricercabile",
-                  "description": "Definire se il layer è ricercabile.",
-                  "enum": [0, 1],
-                  "type": "integer"
-                },
-                "searchCustomEvent": {
-                  "title": "Evento custom per la ricerca",
-                  "description": "Evento impostato nel dispatcher per customizzare la ricerca. L'evento deve essere definito in un componente JS incluso.",
-                  "type": "string"
-                },
-                "searchField": {
-                  "title": "Campo di ricerca",
-                  "description": "Campo su cui effettuare la ricerca. Deve essere un campo di tipo string",
-                  "type": "string"
-                },
-                "searchFieldLabel": {
-                  "title": "Etichetta del campo di ricerca",
-                  "description": "Etichetta del campo su cui effettuare la ricerca",
-                  "type": "string"
-                },
-                "labelField": {
-                  "title": "Campo etichetta",
-                  "description": "Campo da utilizzare come etichetta. L'etichetta viene visualizzata nell'hover del mouse sull'entità. Deve essere un campo di tipo string. In alternativa può essere utilizzato un template di tipo Handlebars, ovvero indicando i nomi dei campi tra doppie parentesi graffe. es Etichetta: {{campo_etichetta}}",
-                  "type": "string"
-                },
-                "zIndex": {
-                  "title": "Ordine del livello",
-                  "description": "Ordine di visualizzazione in mappa",
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "attribution": {
-                  "title": "Attribuzione del layer",
-                  "description": "Attribuzione dei diritti da visualizzare per il layer",
-                  "type": "string"
-                },
-                "legendUrl": {
-                  "title": "Legenda personalizzata",
-                  "description": "Url della legenda personalizzata per il layer.",
-                  "type": "string"
-                },
-                "hideLegend": {
-                  "title": "Nascondi Legenda",
-                  "description": "Nasconde la legenda se non disponibile.",
-                  "type": "boolean"
-                },
-                "templateUrl": {
-                  "title": "Url del template",
-                  "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repository di base.",
-                  "type": "string"
-                },
-                "secured": {
-                  "title": "Autorizzazione richiesta",
-                  "description": "Il layer richiede la basic authentication",
-                  "type": "boolean"
-                },
-                "apikey": {
-                  "title": "Api Key del servizio",
-                  "description": "Api Key del servizio",
-                  "type": "string"
-                },
-                "preload": {
-                  "title": "Preload del layer",
-                  "description": "Abilita il caricamento in preload del layer",
-                  "enum": [0, 1],
-                  "type": "integer"
-                },
-                "vectorRadius": {
-                  "title": "Dimensione del punto precaricato",
-                  "description": "Dimensione del punto precaricato quando il layer è in preload. Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa.",
-                  "type": "integer"
-                },
-                "vectorWidth": {
-                  "title": "Dimensione della linea precaricata",
-                  "description": "Dimensione della linea precaricata quando il layer è in preload.  Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa",
-                  "type": "integer"
-                },
-                "hoverTooltip": {
-                  "title": "Tooltip on hover",
-                  "description": "Abilita il tooltip se il mouse attraversa la feature ",
-                  "type": "boolean"
-                },
-                "cssClass": {
-                  "title": "Classe css del gruppo/layer",
-                  "description": "Classe specifica da assegnare al testo del layer nell'albero dei livelli. Utilizzare il modficatore !important per sovreascrivere i default ",
-                  "type": "string"
-                }
+          "description": "Array dei layer catografici appartenenti al gruppo",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "Livello",
+            "properties": {
+              "gid": {
+                "title": "Identificativo univoco",
+                "description": "Identificatore globale univoco",
+                "type": "string"
               },
-              "required": [
-                "gid",
-                "mapUri",
-                "layerType",
-                "layerName",
-                "layer",
-                "srid",
-                "opacity",
-                "params",
-                "tileMode",
-                "visible",
-                "queryable",
-                "labelField",
-                "zIndex"
-              ]
-            }
+              "layerName": {
+                "title": "Titolo",
+                "description": "Nome del layer (visualizzato nell'albero dei livelli)",
+                "type": "string"
+              },
+              "layerDescription": {
+                "title": "Descrizone del layer",
+                "description": "Descrizione estesa del layer da visualizzare in legenda o nell'albero dei layer (vedi proprietà showDescriptionInLayerTree)",
+                "type": "string"
+              },
+              "showDescriptionInLayerTree": {
+                "title": "Mostra descrizione nell'albero dei livelli",
+                "description": "Mostra la descrizione nell'albero dei layer",
+                "type": "boolean"
+              },
+              "layersUri": {
+                "title": "Layer URI",
+                "description": "Url assoluto o relativo di un oggetto JSON con i layer che sarà caricato in sostituzione di questo oggetto. Utilizzando questa proprietà è possibile riutilizzare gruppi di layer esistenti.",
+                "type": "string"
+              },
+              "mapUri": {
+                "title": "URL (WMS, TMS) del layer",
+                "description": "Url base del layer. Es: http://localhost:8080/geoserver/wms?",
+                "type": "string"
+              },
+              "layerType": {
+                "title": "Tipologia di layer",
+                "description": "Tipologia del layer. Sono supportati layer di tipo WMS, Tiled o sfondi OSM.",
+                "enum": ["group", "osm", "otm", "ocm", "wms", "wmstiled", "tms"],
+                "type": "string",
+                "default": "wmstiled"
+              },
+              "layer": {
+                "title": "Nome Layer per il servizio.",
+                "description": "Nome del layer WMS da visualizzare. Per geoserver mettere workspace:nome del layer Es: stradario:civici",
+                "type": "string"
+              },
+              "srid": {
+                "title": "SRID del layer",
+                "description": "Spatial reference ID del layer. Es: 3857 (al momento è supportato solo il 3857)",
+                "enum": ["3857"],
+                "type": "string"
+              },
+              "opacity": {
+                "title": "Opacità",
+                "description": "Trasparenza iniziale del layer",
+                "enum": [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0],
+                "type": "number"
+              },
+              "params": {
+                "title": "Parametri aggiuntivi",
+                "description": "Parametri aggiuntivi da aggiungere alla chiamata WMS. Per maggiori informazioni consultare la specifica del WMS",
+                "type": "string"
+              },
+              "tileMode": {
+                "title": "Tipologia Tile",
+                "description": "Tipologia di tile da utilizare nel caso di tiled layer. Lasciare vuoto per il formato server predefinito",
+                "enum": ["", "xyz", "quadkey"],
+                "type": "string"
+              },
+              "visible": {
+                "title": "Visibilità iniziale",
+                "description": "Visibilità iniziale del layer in mappa",
+                "enum": [0, 1],
+                "type": "integer"
+              },
+              "queryable": {
+                "title": "Layer interrogabile",
+                "description": "Definisce se il layer è interrogabile tramite click, se visibile.",
+                "enum": [0, 1],
+                "type": "integer"
+              },
+              "searchable": {
+                "title": "Layer ricercabile",
+                "description": "Definire se il layer è ricercabile.",
+                "enum": [0, 1],
+                "type": "integer"
+              },
+              "searchCustomEvent": {
+                "title": "Evento custom per la ricerca",
+                "description": "Evento impostato nel dispatcher per customizzare la ricerca. L'evento deve essere definito in un componente JS incluso.",
+                "type": "string"
+              },
+              "searchField": {
+                "title": "Campo di ricerca",
+                "description": "Campo su cui effettuare la ricerca. Deve essere un campo di tipo string",
+                "type": "string"
+              },
+              "searchFieldLabel": {
+                "title": "Etichetta del campo di ricerca",
+                "description": "Etichetta del campo su cui effettuare la ricerca",
+                "type": "string"
+              },
+              "labelField": {
+                "title": "Campo etichetta",
+                "description": "Campo da utilizzare come etichetta. L'etichetta viene visualizzata nell'hover del mouse sull'entità. Deve essere un campo di tipo string. In alternativa può essere utilizzato un template di tipo Handlebars, ovvero indicando i nomi dei campi tra doppie parentesi graffe. es Etichetta: {{campo_etichetta}}",
+                "type": "string"
+              },
+              "zIndex": {
+                "title": "Ordine del livello",
+                "description": "Ordine di visualizzazione in mappa",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "attribution": {
+                "title": "Attribuzione del layer",
+                "description": "Attribuzione dei diritti da visualizzare per il layer",
+                "type": "string"
+              },
+              "legendUrl": {
+                "title": "Legenda personalizzata",
+                "description": "Url della legenda personalizzata per il layer.",
+                "type": "string"
+              },
+              "hideLegend": {
+                "title": "Nascondi Legenda",
+                "description": "Nasconde la legenda se non disponibile.",
+                "type": "boolean"
+              },
+              "templateUrl": {
+                "title": "Url del template",
+                "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repository di base.",
+                "type": "string"
+              },
+              "secured": {
+                "title": "Autorizzazione richiesta",
+                "description": "Il layer richiede la basic authentication",
+                "type": "boolean"
+              },
+              "apikey": {
+                "title": "Api Key del servizio",
+                "description": "Api Key del servizio",
+                "type": "string"
+              },
+              "preload": {
+                "title": "Preload del layer",
+                "description": "Abilita il caricamento in preload del layer",
+                "enum": [0, 1],
+                "type": "integer"
+              },
+              "vectorRadius": {
+                "title": "Dimensione del punto precaricato",
+                "description": "Dimensione del punto precaricato quando il layer è in preload. Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa.",
+                "type": "integer"
+              },
+              "vectorWidth": {
+                "title": "Dimensione della linea precaricata",
+                "description": "Dimensione della linea precaricata quando il layer è in preload.  Utilizzato per dare un effetto hover del mouse più affine alla geometria visualizzata in mappa",
+                "type": "integer"
+              },
+              "hoverTooltip": {
+                "title": "Tooltip on hover",
+                "description": "Abilita il tooltip se il mouse attraversa la feature ",
+                "type": "boolean"
+              },
+              "cssClass": {
+                "title": "Classe css del gruppo/layer",
+                "description": "Classe specifica da assegnare al testo del layer nell'albero dei livelli. Utilizzare il modficatore !important per sovreascrivere i default ",
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "mapUri",
+              "layerType",
+              "layerName",
+              "layer",
+              "srid",
+              "opacity",
+              "params",
+              "tileMode",
+              "visible",
+              "queryable",
+              "labelField",
+              "zIndex"
+            ]
           }
-        },
-        "required": ["gid", "layerType", "layerName", "visible", "layers"]
-      }
-    },
-    "relations": {
-      "description": "Elenco delle relations dell'applicazione. Consultare lo schema dedicato.",
-      "type": "array",
-      "title": "Relazioni",
-      "items": {
-        "type": "object"
-      }
-    },
-    "link": {
-      "description": "Elenco dei link dell'applicazione. Consultare lo schema dedicato.",
-      "type": "array",
-      "title": "Links",
-      "items": {
-        "type": "object"
-      }
-    },
-    "termsLinks": {
-      "description": "Elenco dei link per termini di utilizzo, privacy, cookies. Consultare lo schema dedicato.",
-      "type": "array",
-      "title": "Terms",
-      "items": {
-        "type": "object"
-      }
+        }
+      },
+      "required": ["gid", "layerType", "layerName", "visible", "layers"]
+    }
+  },
+  "relations": {
+    "description": "Elenco delle relations dell'applicazione. Consultare lo schema dedicato.",
+    "type": "array",
+    "title": "Relazioni",
+    "items": {
+      "type": "object"
+    }
+  },
+  "link": {
+    "description": "Elenco dei link dell'applicazione. Consultare lo schema dedicato.",
+    "type": "array",
+    "title": "Links",
+    "items": {
+      "type": "object"
+    }
+  },
+  "termsLinks": {
+    "description": "Elenco dei link per termini di utilizzo, privacy, cookies. Consultare lo schema dedicato.",
+    "type": "array",
+    "title": "Terms",
+    "items": {
+      "type": "object"
     }
 }

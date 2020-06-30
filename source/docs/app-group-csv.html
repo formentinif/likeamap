@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css" />
+    <script src="../js/jquery.js"></script>
+    <script src="../js/lam-libs.js"></script>
+    <script src="../js/lam.js"></script>
+    <script src="app-group-csv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      window.onload = function () {
+        appGroupCsv.init();
+      };
+    </script>
+    <style>
+      html {
+        overflow: auto;
+      }
+      .has-margin-top-1 {
+        margin-top: 8px;
+      }
+      .has-margin-top-3 {
+        margin-top: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <h1 class="title has-margin-top-3">Trasforma CSV to Layer</h1>
+      <div class="columns">
+        <div class="column is-9">
+          <input class="input" placeholder="url csv..." v-model="csvUrl" value="" />
+        </div>
+        <div class="column is-3">
+          <button class="button" v-on:click="loadCsv">Carica csv</button>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-12">
+          <div class="title is-5">CSV</div>
+          <pre>
+              {{csvText}}
+          </pre>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-12">
+          <div class="title is-5">JSON Layers <button class="button is-small" v-on:click="generateJson">Genera layer JSON</button></div>
+          <textarea class="textarea" id="jsonText" v-model="jsonText" rows="20"></textarea>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

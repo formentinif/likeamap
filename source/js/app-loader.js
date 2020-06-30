@@ -24,7 +24,9 @@ il software distribuito nei termini della Licenza è distribuito
 Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
 
 */
-
+/**
+ * Global Istance that manages application loading
+ */
 var LamLoader = (function () {
   let layerUriCount = 0;
   let countRequest = 0;
@@ -131,6 +133,10 @@ var LamLoader = (function () {
     }
   }
 
+  /**
+   * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
+   * After that calls the mapInit
+   */
   var lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",

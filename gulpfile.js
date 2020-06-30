@@ -32,6 +32,8 @@ function copyDist() {
   gulp.src("./source/vendor/lib/jquery.js").pipe(gulp.dest("./dist/js"));
   gulp.src("./source/css/app-variables.css").pipe(concat("lam-variables.css")).pipe(gulp.dest("./dist/css"));
   gulp.src("./source/templates/*").pipe(gulp.dest("./dist/templates"));
+  gulp.src("./source/temp/*").pipe(gulp.dest("./dist/temp"));
+  gulp.src("./source/docs/*").pipe(gulp.dest("./dist/docs"));
   return gulp.src("./source/templates").pipe(gulp.dest("./dist/templates/"));
 }
 
@@ -57,7 +59,7 @@ function combineAppJs() {
         "./source/js/app-dispatcher.js",
         "./source/js/app-resources.js",
         "./source/js/app-cookie-consent.js",
-		"./source/js/app-cookie-description.js",
+        "./source/js/app-cookie-description.js",
         "./source/js/app-custom.js",
         "./source/js/app-relations.js",
         "./source/js/app-dom.js",
@@ -90,7 +92,7 @@ function combineCss() {
       "./source/css/app-tooltip.css",
       "./source/css/app-typography.css",
       "./source/css/app-cookie-consent.css",
-	  "./source/css/app-cookie-description.css",
+      "./source/css/app-cookie-description.css",
       "./source/css/app-vendor.css",
       "./source/vendor/css/ol.css",
     ])
