@@ -28,23 +28,23 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Map Eumerations
  */
-let LamEnums = (function () {
+let LamEnums = (function() {
   "use strict";
 
   let showContentModeEnum = {
     LeftPanel: 1,
     BottomInfo: 2,
-    InfoWindow: 3,
+    InfoWindow: 3
   };
 
   let infoSelectBehaviourEnum = {
     SingleFeature: 1,
-    MultipleFeature: 2,
+    MultipleFeature: 2
   };
 
   let geometryFormatsEnum = {
     GeoJson: 1,
-    OL: 2,
+    OL: 2
   };
 
   let geometryTypesEnum = {
@@ -53,22 +53,22 @@ let LamEnums = (function () {
     Polyline: 2,
     Polygon: 3,
     MultiPolyline: 4,
-    MultyPolygon: 5,
+    MultyPolygon: 5
   };
 
-  let geometryFormats = function () {
+  let geometryFormats = function() {
     return geometryFormatsEnum;
   };
 
-  let geometryTypes = function () {
+  let geometryTypes = function() {
     return geometryTypesEnum;
   };
 
-  let infoSelectBehaviours = function () {
+  let infoSelectBehaviours = function() {
     return infoSelectBehaviourEnum;
   };
 
-  let showContentMode = function () {
+  let showContentMode = function() {
     return showContentModeEnum;
   };
 
@@ -76,7 +76,7 @@ let LamEnums = (function () {
     showContentMode: showContentMode,
     geometryFormats: geometryFormats,
     geometryTypes: geometryTypes,
-    infoSelectBehaviours: infoSelectBehaviours,
+    infoSelectBehaviours: infoSelectBehaviours
   };
 })();
 
@@ -110,7 +110,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let LamMapStyles = (function () {
+let LamMapStyles = (function() {
   "use strict";
 
   /**
@@ -118,22 +118,22 @@ let LamMapStyles = (function () {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getPreloadStyle = function (width, radius) {
+  let getPreloadStyle = function(width, radius) {
     if (!width) width = 4;
     if (!radius) radius = 10;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 255, 255, 0.01],
+        color: [255, 255, 255, 0.01]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 255, 255, 0.01],
-        width: width,
+        width: width
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 255, 255, 0.01],
-        }),
+          color: [255, 255, 255, 0.01]
+        })
       }),
       text: new ol.style.Text({
         text: "",
@@ -141,31 +141,31 @@ let LamMapStyles = (function () {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000",
+          color: "#000000"
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5,
-        }),
-      }),
+          width: 3.5
+        })
+      })
     });
     return style;
   };
 
-  let getDrawStyle = function () {
+  let getDrawStyle = function() {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [68, 138, 255, 0.2],
+        color: [68, 138, 255, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [68, 138, 255, 1],
-        width: 2,
+        width: 2
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [68, 138, 255, 1],
-        }),
+          color: [68, 138, 255, 1]
+        })
       }),
       text: new ol.style.Text({
         text: "pippo",
@@ -173,50 +173,50 @@ let LamMapStyles = (function () {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000",
+          color: "#000000"
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5,
-        }),
-      }),
+          width: 3.5
+        })
+      })
     });
     return style;
   };
 
-  let getSelectionStyle = function () {
+  let getSelectionStyle = function() {
     let styleSelection = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.2],
+        color: [255, 216, 0, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 1],
-        width: 2,
+        width: 2
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 1],
-        }),
-      }),
+          color: [255, 216, 0, 1]
+        })
+      })
     });
     return styleSelection;
   };
 
-  let getSelectionMaskStyle = function () {
+  let getSelectionMaskStyle = function() {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.1],
+        color: [255, 216, 0, 0.1]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 0.5],
-        width: 2,
+        width: 2
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 0.5],
-        }),
+          color: [255, 216, 0, 0.5]
+        })
       }),
       text: new ol.style.Text({
         text: "",
@@ -224,26 +224,26 @@ let LamMapStyles = (function () {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000",
+          color: "#000000"
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5,
-        }),
-      }),
+          width: 3.5
+        })
+      })
     });
     return style;
   };
 
-  let getModifyStyle = function () {
+  let getModifyStyle = function() {
     let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
-        color: [255, 0, 0, 1],
+        color: [255, 0, 0, 1]
       }),
       fill: new ol.style.Stroke({
-        color: [255, 0, 0, 0.2],
-      }),
+        color: [255, 0, 0, 0.2]
+      })
     });
     return style_modify;
   };
@@ -253,23 +253,23 @@ let LamMapStyles = (function () {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getInfoStyle = function (width, radius) {
+  let getInfoStyle = function(width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [0, 255, 255, 0.2],
+        color: [0, 255, 255, 0.2]
       }),
       stroke: new ol.style.Stroke({
         color: [0, 255, 255, 1],
-        width: width,
+        width: width
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [0, 255, 255, 1],
-        }),
-      }),
+          color: [0, 255, 255, 1]
+        })
+      })
     });
     return style;
   };
@@ -279,23 +279,23 @@ let LamMapStyles = (function () {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getFlashStyle = function (width, radius) {
+  let getFlashStyle = function(width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 125, 0, 1],
+        color: [255, 125, 0, 1]
       }),
       stroke: new ol.style.Stroke({
         color: [255, 125, 0, 1],
-        width: width,
+        width: width
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 125, 0, 1],
-        }),
-      }),
+          color: [255, 125, 0, 1]
+        })
+      })
     });
     return style;
   };
@@ -342,7 +342,7 @@ let LamMapStyles = (function () {
     getPreloadStyle: getPreloadStyle,
     getSelectionStyle: getSelectionStyle,
     getSelectionMaskStyle: getSelectionMaskStyle,
-    getDrawStyle: getDrawStyle,
+    getDrawStyle: getDrawStyle
   };
 })();
 
@@ -373,7 +373,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamMapVector = (function () {
+let LamMapVector = (function() {
   /// <summary>
   /// Classe per la gestione delle funzionalità vector
   /// </summary>
@@ -412,18 +412,18 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * This Class manages the tooltip features
  */
-let LamMapTooltip = (function () {
+let LamMapTooltip = (function() {
   "use strict";
 
   let mapTooltip;
 
-  let init = function () {
+  let init = function() {
     mapTooltip = new ol.Overlay({
       element: document.getElementById("map-tooltip"),
       autoPan: true,
       autoPanAnimation: {
-        duration: 250,
-      },
+        duration: 250
+      }
     });
 
     LamMap.getMap().addOverlay(mapTooltip);
@@ -434,10 +434,10 @@ let LamMapTooltip = (function () {
     // LamDispatcher.bind("hide-tooltip", function(payload) {
     //   LamMapTooltip.hideTooltip();
     // });
-    LamDispatcher.bind("show-map-tooltip", function (payload) {
+    LamDispatcher.bind("show-map-tooltip", function(payload) {
       LamMapTooltip.showMapTooltip(payload.geometry, payload.tooltip);
     });
-    LamDispatcher.bind("hide-map-tooltip", function (payload) {
+    LamDispatcher.bind("hide-map-tooltip", function(payload) {
       LamMapTooltip.hideMapTooltip();
     });
   };
@@ -473,11 +473,11 @@ let LamMapTooltip = (function () {
   //   toolTip.hide();
   // };
 
-  let showHtmlTooltip = function (coordinates, title) {};
+  let showHtmlTooltip = function(coordinates, title) {};
 
-  let hideHtmlTooltip = function () {};
+  let hideHtmlTooltip = function() {};
 
-  let showMapTooltip = function (coordinates, title) {
+  let showMapTooltip = function(coordinates, title) {
     if (!title) {
       hideMapTooltip();
       return;
@@ -490,7 +490,7 @@ let LamMapTooltip = (function () {
     mapTooltip.setPosition(labelPoint);
   };
 
-  let hideMapTooltip = function () {
+  let hideMapTooltip = function() {
     mapTooltip.setPosition(undefined);
     return false;
   };
@@ -500,7 +500,7 @@ let LamMapTooltip = (function () {
     hideMapTooltip: hideMapTooltip,
     init: init,
     showHtmlTooltip: showHtmlTooltip,
-    showMapTooltip: showMapTooltip,
+    showMapTooltip: showMapTooltip
   };
 })();
 
@@ -2914,40 +2914,40 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamDrawTools = (function () {
+var LamDrawTools = (function() {
   var isRendered = false;
 
   var init = function init() {
-    $("#draw-tools__point").click(function () {
+    $("#draw-tools__point").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Point",
+        type: "Point"
       });
     });
-    $("#draw-tools__polyline").click(function () {
+    $("#draw-tools__polyline").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "LineString",
+        type: "LineString"
       });
     });
-    $("#draw-tools__polygon").click(function () {
+    $("#draw-tools__polygon").click(function() {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Polygon",
+        type: "Polygon"
       });
     });
-    $("#draw-tools__delete").click(function () {
+    $("#draw-tools__delete").click(function() {
       $("#draw-tools__draw-settings").hide();
       $("#draw-tools__delete-settings").show();
       lamDispatch({
         eventName: "set-draw-delete",
-        type: "Delete",
+        type: "Delete"
       });
     });
 
@@ -2955,7 +2955,7 @@ var LamDrawTools = (function () {
     LamToolbar.addResetToolsEvent({ eventName: "unset-draw" });
 
     //Events binding
-    LamDispatcher.bind("show-draw-tools", function (payload) {
+    LamDispatcher.bind("show-draw-tools", function(payload) {
       LamToolbar.toggleToolbarItem("draw-tools");
       if (LamToolbar.getCurrentToolbarItem() === "draw-tools") {
         LamStore.setInfoClickEnabled(false);
@@ -2963,29 +2963,29 @@ var LamDrawTools = (function () {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("set-draw", function (payload) {
+    LamDispatcher.bind("set-draw", function(payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawInteraction(payload.type);
     });
 
-    LamDispatcher.bind("unset-draw", function (payload) {
+    LamDispatcher.bind("unset-draw", function(payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
     });
 
-    LamDispatcher.bind("set-draw-delete", function (payload) {
+    LamDispatcher.bind("set-draw-delete", function(payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawDeleteInteraction(payload.type);
     });
 
-    LamDispatcher.bind("delete-draw", function (payload) {
+    LamDispatcher.bind("delete-draw", function(payload) {
       LamMap.deleteDrawFeatures(payload.type);
     });
   };
 
-  var render = function (div) {
+  var render = function(div) {
     var templateTemp = templateDraw();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -2997,7 +2997,7 @@ var LamDrawTools = (function () {
     isRendered = true;
   };
 
-  var templateDraw = function () {
+  var templateDraw = function() {
     template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Disegna</h4>';
@@ -3063,16 +3063,16 @@ var LamDrawTools = (function () {
     return Handlebars.compile(template);
   };
 
-  var setDraw = function (type) {
+  var setDraw = function(type) {
     lamDispatch({
       eventName: "set-draw",
-      type: type,
+      type: type
     });
   };
 
-  var deleteFeatures = function () {
+  var deleteFeatures = function() {
     lamDispatch({
-      eventName: "delete-draw",
+      eventName: "delete-draw"
     });
   };
 
@@ -3081,7 +3081,7 @@ var LamDrawTools = (function () {
     deleteFeatures: deleteFeatures,
     init: init,
     render: render,
-    templateDraw: templateDraw,
+    templateDraw: templateDraw
   };
 })();
 
@@ -4534,15 +4534,15 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamLinksTools = (function () {
+let LamLinksTools = (function() {
   let isRendered = false;
 
   let init = function init() {
     //events binding
-    LamDispatcher.bind("show-links", function (payload) {
+    LamDispatcher.bind("show-links", function(payload) {
       let templateTemp = templateLink();
       let output = "<ul class='lam-group-list lam-no-padding'>";
-      LamStore.getLinks().forEach(function (link) {
+      LamStore.getLinks().forEach(function(link) {
         output += "<li>";
         if (link.links && link.links.length) {
           //is grouped
@@ -4567,14 +4567,14 @@ let LamLinksTools = (function () {
     $("#app-terms-links").html(output);
   };
 
-  let render = function (div) {
+  let render = function(div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  let renderGroupLink = function (link) {
+  let renderGroupLink = function(link) {
     let templateTemp = templateLink();
     let output = "";
     if (link.title) {
@@ -4587,7 +4587,7 @@ let LamLinksTools = (function () {
       output += "</h5>";
     }
     output += "<ul class='lam-group-list'>";
-    link.links.forEach(function (subLink) {
+    link.links.forEach(function(subLink) {
       output += "<li>";
       if (subLink.links && subLink.links.length) {
         //is grouped
@@ -4601,12 +4601,12 @@ let LamLinksTools = (function () {
     return output;
   };
 
-  let templateLink = function () {
+  let templateLink = function() {
     let template = "<a class='lam-link' href='{{url}}' target='_blank'>{{title}} <i class='lam-feature__icon'>" + LamResources.svgOpen16 + "</i></a>";
     return Handlebars.compile(template);
   };
 
-  let templateTermsLinks = function () {
+  let templateTermsLinks = function() {
     //pannello ricerca via
     let template = "{{#each this}}";
     template += "<a class='lam-link' href='{{url}}' target='_blank'>{{title}}</a>";
@@ -4619,7 +4619,7 @@ let LamLinksTools = (function () {
     init: init,
     render: render,
     templateLink: templateLink,
-    templateTermsLinks: templateTermsLinks,
+    templateTermsLinks: templateTermsLinks
   };
 })();
 
@@ -4905,24 +4905,24 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamDownloadTools = (function () {
+var LamDownloadTools = (function() {
   var isRendered = false;
 
   var init = function init() {
     //events binding
-    LamDispatcher.bind("download-relation-results", function (payload) {
+    LamDispatcher.bind("download-relation-results", function(payload) {
       LamDownloadTools.downloadResults();
     });
   };
 
-  var render = function (div) {
+  var render = function(div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  let downloadResults = function () {
+  let downloadResults = function() {
     var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
@@ -4930,12 +4930,12 @@ var LamDownloadTools = (function () {
     for (let i = 0; i < results.data.length; i++) {
       propsList.push(results.data[i].properties ? results.data[i].properties : results.data[i]);
     }
-    results.template.fields.forEach(function (field) {
+    results.template.fields.forEach(function(field) {
       csv += '"' + field.label + '";';
     });
     csv += "\n";
-    propsList.forEach(function (row) {
-      results.template.fields.forEach(function (field) {
+    propsList.forEach(function(row) {
+      results.template.fields.forEach(function(field) {
         csv += '"' + row[field.field] + '";';
       });
       csv += "\n";
@@ -4951,7 +4951,7 @@ var LamDownloadTools = (function () {
   return {
     init: init,
     render: render,
-    downloadResults: downloadResults,
+    downloadResults: downloadResults
   };
 })();
 
@@ -5227,39 +5227,39 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 //definizione e inizializzazione del LamDispatcher
-var LamDispatcher = (function () {
+var LamDispatcher = (function() {
   var init = function functionName() {
-    this.bind("log", function (payload) {
+    this.bind("log", function(payload) {
       console.log("log", payload);
     });
 
-    this.bind("show-menu", function (payload) {
+    this.bind("show-menu", function(payload) {
       LamToolbar.showMenu();
     });
 
-    this.bind("hide-menu", function (payload) {
+    this.bind("hide-menu", function(payload) {
       LamToolbar.hideMenu();
     });
 
-    this.bind("reset-tools", function (payload) {
+    this.bind("reset-tools", function(payload) {
       LamToolbar.resetTools();
     });
 
-    this.bind("hide-menu-mobile", function (payload) {
+    this.bind("hide-menu-mobile", function(payload) {
       if (LamDom.isMobile()) {
         LamStore.hideMenu();
       }
     });
 
-    this.bind("live-reload", function (payload) {
+    this.bind("live-reload", function(payload) {
       LamStore.liveReload(payload.appState);
     });
 
-    this.bind("zoom-lon-lat", function (payload) {
+    this.bind("zoom-lon-lat", function(payload) {
       LamMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
 
-    this.bind("zoom-geometry", function (payload) {
+    this.bind("zoom-geometry", function(payload) {
       let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
     });
@@ -5271,71 +5271,71 @@ var LamDispatcher = (function () {
     /**
      * {string} paylod.gid Layer Gid
      */
-    this.bind("toggle-layer", function (payload) {
+    this.bind("toggle-layer", function(payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("toggle-layer-group", function (payload) {
+    this.bind("toggle-layer-group", function(payload) {
       LamStore.toggleLayersInGroup(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("set-layer-visibility", function (payload) {
+    this.bind("set-layer-visibility", function(payload) {
       LamMap.setLayerVisibility(payload.gid, payload.visibility);
       LamStore.setLayerVisibility(payload.gid, payload.visibility);
     });
 
-    this.bind("reset-layers", function (payload) {
+    this.bind("reset-layers", function(payload) {
       LamStore.resetInitialLayers();
     });
 
-    this.bind("start-copy-coordinate", function (payload) {
+    this.bind("start-copy-coordinate", function(payload) {
       LamMap.startCopyCoordinate();
     });
 
-    this.bind("map-click", function (payload) {
+    this.bind("map-click", function(payload) {
       LamMapTools.addCoordinate(payload.lon, payload.lat);
     });
 
-    this.bind("init-map-app", function (payload) {
+    this.bind("init-map-app", function(payload) {
       LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
 
-    this.bind("map-move-end", function (payload) {
-      LamMap.getMoveEndEvents().forEach((element) => {
+    this.bind("map-move-end", function(payload) {
+      LamMap.getMoveEndEvents().forEach(element => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-end", function (payload) {
-      LamMap.getZoomEndEvents().forEach((element) => {
+    this.bind("map-zoom-end", function(payload) {
+      LamMap.getZoomEndEvents().forEach(element => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-in", function (payload) {
+    this.bind("map-zoom-in", function(payload) {
       LamMap.zoomIn();
     });
 
-    this.bind("map-zoom-out", function (payload) {
+    this.bind("map-zoom-out", function(payload) {
       LamMap.zoomOut();
     });
 
-    this.bind("map-browser-location", function (payload) {
+    this.bind("map-browser-location", function(payload) {
       LamMap.goToBrowserLocation();
     });
 
-    this.bind("do-login", function (payload) {
+    this.bind("do-login", function(payload) {
       LamStore.doLogin(payload.username, payload.password);
     });
 
-    this.bind("open-url-location", function (payload) {
+    this.bind("open-url-location", function(payload) {
       LamStore.openUrlTemplate(payload.urlTemplate);
     });
 
-    this.bind("log", function (payload) {
+    this.bind("log", function(payload) {
       if (console) {
         console.log(payload.str);
       }
@@ -5344,10 +5344,10 @@ var LamDispatcher = (function () {
       }
     });
 
-    this.bind("show-message", function (payload) {
+    this.bind("show-message", function(payload) {
       let msg = {
         html: "",
-        classes: "",
+        classes: ""
       };
       if (payload.message) {
         msg.html += "<div>" + payload.message + "<div>";
@@ -5380,7 +5380,7 @@ var LamDispatcher = (function () {
   var dispatch = function lamDispatch(payload) {
     if (typeof payload == "string") {
       payload = {
-        eventName: payload,
+        eventName: payload
       };
     }
     LamDispatcher.trigger(payload.eventName, payload);
@@ -5388,7 +5388,7 @@ var LamDispatcher = (function () {
 
   return {
     dispatch: dispatch,
-    init: init,
+    init: init
   };
 })();
 
@@ -5425,7 +5425,7 @@ var LamResources = {
   svgOpen16:
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
   svgDownload16:
-    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>'
 };
 
 var LamCookieConsent = (function () {
@@ -5621,7 +5621,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 //Object that expose temporary functions. These function should be moved to other objects
-var AppCustom = (function () {
+var AppCustom = (function() {
   //thanks to David Walsh https://davidwalsh.name/convert-xml-json
   function xmlToJson(xml) {
     var obj = {};
@@ -5657,7 +5657,7 @@ var AppCustom = (function () {
     return obj;
   }
   return {
-    xmlToJson: xmlToJson,
+    xmlToJson: xmlToJson
   };
 })();
 
@@ -6307,29 +6307,29 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamRequests = (function () {
+var LamRequests = (function() {
   let requestsData = [];
 
-  let addRequestData = function (key, data) {
+  let addRequestData = function(key, data) {
     requestsData.push({
       key: key,
-      data: data,
+      data: data
     });
   };
 
-  let removeRequestData = function (key) {
-    requestsData = requestsData.filter(function (element) {
+  let removeRequestData = function(key) {
+    requestsData = requestsData.filter(function(element) {
       return element.key != key;
     });
   };
 
-  let getRequestData = function (key) {
-    return requestsData.filter(function (element) {
+  let getRequestData = function(key) {
+    return requestsData.filter(function(element) {
       return element.key == key;
     });
   };
 
-  let getRequestsData = function () {
+  let getRequestsData = function() {
     return requestsData;
   };
 
@@ -6337,20 +6337,20 @@ var LamRequests = (function () {
    * Sends a preload request using JSONP protocol. Even if JSONP has been replaced by CORS, geoserver sens a 404 response if not
    * authenticated and the Allow-Control-Allow-Origin is not always predictable
    */
-  let sendPreloadRequest = function (url) {
+  let sendPreloadRequest = function(url) {
     $.ajax({
       dataType: "jsonp",
       url: url + "&format_options=callback:LamRequests.parseResponsePreload",
-      error: function (jqXHR, textStatus, errorThrown) {
+      error: function(jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSearchTools: unable to complete response preload",
+          message: "LamSearchTools: unable to complete response preload"
         });
-      },
+      }
     });
   };
 
-  let parseResponsePreload = function (data) {
+  let parseResponsePreload = function(data) {
     if (!data.features.length) return;
     let layerId = data.features[0].id.split(".")[0];
     var layer = getRequestData(layerId);
@@ -6359,13 +6359,13 @@ var LamRequests = (function () {
     let vectorSource = new ol.source.Vector({
       format: new ol.format.GeoJSON(),
       features: new ol.format.GeoJSON().readFeatures(data),
-      strategy: ol.loadingstrategy.all,
+      strategy: ol.loadingstrategy.all
     });
     let vector = new ol.layer.Vector({
       //zIndex: parseInt(zIndex),
       source: vectorSource,
       visible: layer.getVisible(),
-      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius),
+      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius)
     });
     try {
       vector.gid = layer.gid + "_preload";
@@ -6405,7 +6405,7 @@ var LamRequests = (function () {
     removeRequestData: removeRequestData,
 
     sendPreloadRequest: sendPreloadRequest,
-    parseResponsePreload: parseResponsePreload,
+    parseResponsePreload: parseResponsePreload
   };
 })();
 
@@ -7776,7 +7776,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione della toolbar
  */
-let LamToolbar = (function () {
+let LamToolbar = (function() {
   "use strict";
 
   var easingTime = 300;
@@ -7784,7 +7784,7 @@ let LamToolbar = (function () {
 
   let resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }];
 
-  let init = function () {
+  let init = function() {
     //eseguo degli aggiustamente in caso di browser mobile
     if (LamDom.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
@@ -7805,30 +7805,30 @@ let LamToolbar = (function () {
    * Resetta tutti i controlli mappa al cambio di menu
    * @return {null} La funzione non restituisce un valore
    */
-  let resetTools = function () {
-    resetToolsPayloads.forEach(function (payload) {
+  let resetTools = function() {
+    resetToolsPayloads.forEach(function(payload) {
       lamDispatch(payload);
     });
   };
 
-  let addResetToolsEvent = function (event) {
+  let addResetToolsEvent = function(event) {
     resetToolsPayloads.push(event);
   };
 
-  let showMenu = function (toolId) {
+  let showMenu = function(toolId) {
     $("#bottom-info").hide();
     $("#panel").animate(
       {
-        width: "show",
+        width: "show"
       },
       {
         duration: easingTime,
-        complete: function () {
+        complete: function() {
           if (toolId) {
             $("#" + toolId).show();
           }
           $("#panel__open").hide();
-        },
+        }
       }
     );
   };
@@ -7836,19 +7836,19 @@ let LamToolbar = (function () {
   /**
    * Nasconde il pannello del menu
    */
-  var hideMenu = function () {
+  var hideMenu = function() {
     $("#panel").animate(
       {
-        width: "hide",
+        width: "hide"
       },
       easingTime,
-      function () {
+      function() {
         $("#panel__open").show();
       }
     );
   };
 
-  var toggleToolbarItem = function (toolId, keepOpen) {
+  var toggleToolbarItem = function(toolId, keepOpen) {
     LamStore.setInfoClickEnabled(true);
     //verifico se il pannello non è già selezionato
     if (currentToolbarItem != toolId) {
@@ -7872,7 +7872,7 @@ let LamToolbar = (function () {
     }
   };
 
-  let getCurrentToolbarItem = function () {
+  let getCurrentToolbarItem = function() {
     return currentToolbarItem;
   };
 
@@ -7882,7 +7882,7 @@ let LamToolbar = (function () {
     hideMenu: hideMenu,
     init: init,
     showMenu: showMenu,
-    toggleToolbarItem: toggleToolbarItem,
+    toggleToolbarItem: toggleToolbarItem
   };
 })();
 
@@ -7936,6 +7936,6 @@ function LamInit(mapDiv, appStateUrl, mapTemplateUrl) {
 function reverseGeocoding(obj) {
   lamDispatch({
     eventName: "reverse-geocoding",
-    coordinate: obj.coordinate,
+    coordinate: obj.coordinate
   });
 }

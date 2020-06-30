@@ -7,13 +7,17 @@
     <script src="../js/jquery.js"></script>
     <script src="../js/lam-libs.js"></script>
     <script src="../js/lam.js"></script>
-    <script src="app-state-dashboard.js"></script>
+    <script src="app-group-csv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script>
-      appStateDashboard.loadAppState(["../states/app-state.json","../states/app-state_l.json"]);
-      
+      window.onload = function () {
+        appGroupCsv.init();
+      };
     </script>
     <style>
+      html {
+        overflow: auto;
+      }
       .has-margin-top-1 {
         margin-top: 8px;
       }
@@ -24,21 +28,27 @@
   </head>
   <body>
     <div id="app" class="container">
+      <h1 class="title has-margin-top-3">Trasforma CSV to Layer</h1>
       <div class="columns">
-        <div class="column is-3">
-          <aside class="menu is-hidden-mobile">
-            <p class="menu-label">
-              Elenco tag
-            </p>
-            <ul id="menu" class="menu-list"></ul>
-          </aside>
+        <div class="column is-9">
+          <input class="input" placeholder="url csv..." v-model="csvUrl" value="" />
         </div>
-        <div id="content" class="column is-9">
-          <div id="layersList">
-            <div v-for="layer in layers">
-              {{layer.layerName}}
-            </viv>
-          </div>
+        <div class="column is-3">
+          <button class="button" v-on:click="loadCsv">Carica csv</button>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-12">
+          <div class="title is-5">CSV</div>
+          <pre>
+              {{csvText}}
+          </pre>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-12">
+          <div class="title is-5">JSON Layers <button class="button is-small" v-on:click="generateJson">Genera layer JSON</button></div>
+          <textarea class="textarea" id="jsonText" v-model="jsonText" rows="20"></textarea>
         </div>
       </div>
     </div>
