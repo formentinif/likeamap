@@ -66,7 +66,6 @@ appGroupCsv.groupFromString = function (groupLayerName, mapTitle) {
  * @param {Array} jsonLayersCsv
  */
 appGroupCsv.generateLayers = function (jsonLayersCsv) {
-  debugger;
   let groupLayers = [];
   let mapLayers = [];
   var layers = [];
@@ -108,7 +107,6 @@ appGroupCsv.generateLayers = function (jsonLayersCsv) {
       return map.layerName == group.mapTitle;
     });
     map.layers.map((group) => {
-      debugger;
       if (!group.nestingStyle) group.nestingStyle = "sub1";
     });
   }
@@ -119,7 +117,6 @@ appGroupCsv.generateLayers = function (jsonLayersCsv) {
     .forEach((element) => {
       mapLayers.push(element);
     });
-  debugger;
   return JSON.stringify(mapLayers, undefined, 4);
 };
 

@@ -635,6 +635,5 @@
     "items": {
       "type": "object"
     }
-  },
-  "required": ["restAPIUrl", "title", "startMapLon", "startMapLat", "startMapZoom", "modules", "layers"]
+  }
 }

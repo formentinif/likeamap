@@ -23,16 +23,23 @@
       .has-margin-top-3 {
         margin-top: 24px;
       }
+      .appstateUrl {
+        max-height: 200px;
+        overflow: scroll;
+      }
     </style>
   </head>
   <body>
     <div id="app" class="container has-margin-top-3">
-      <h1 class="title">Layer LikeAMap</h1>
+      <h1 class="title">Appstates LikeAMap</h1>
       <div class="columns">
         <div class="column is-3">
-          <input type="text" class="input" placeholder="layer" v-model="searchLayer" />
-        </div>
-        <div class="column is-3">
+          <div class="select">
+            <select class="select" v-on:change="onItemTypeSelected">
+              <option value="layers">Layers</option>
+              <option value="relations">Relazioni</option>
+            </select>
+          </div>
           <div class="select">
             <select class="select" v-on:change="onMapSelected">
               <option value="">Mappa...</option>
@@ -40,77 +47,131 @@
             </select>
           </div>
         </div>
-        <div class="column is-3">
-          <div class="select">
-            <select v-on:change="onGroupSelected">
-              <option value="">Gruppo...</option>
-              <option v-for="group in groupLayers" v-bind:value="group.gid">{{group.layerName}}</option>
-            </select>
-          </div>
-        </div>
-        <div class="column is-3">
-          <div>
-            <h5 class="title is-5">Appstates</h5>
-            <pre>{{appStateUrlsJoined}}</pre>
+        <div class="column is-9">
+          <div class="is-scrollable">
+            <pre class="appstateUrl">
+Appstates
+{{appStateUrlsJoined}}
+</pre
+            >
           </div>
         </div>
       </div>
-      <div class="columns">
-        <div id="content" class="column is-12">
-          <table id="layersList" class="table">
-            <tr>
-              <th></th>
-              <th>Gid</th>
-              <th>Mappa</th>
-              <th>Gruppo</th>
-              <th>Layer</th>
-              <th>Tipo</th>
-              <th>Servizio</th>
-              <th>Layer</th>
-              <th>Parametri</th>
-              <th>Interrogabile</th>
-              <th>Ricerca</th>
-              <th>Template</th>
-            </tr>
-            <tr v-for="layer in layersFiltered" :id="'row_' + layer.gid">
-              <td>
-                <button class="button is-small" v-on:click="showCode($event, layer.gid)">Mostra JSON</button>
-              </td>
-              <td>
-                {{layer.gid}}
-              </td>
-              <td>
-                {{layer.mapTitle}}
-              </td>
-              <td>
-                {{layer.groupName}}
-              </td>
-              <td>
-                {{layer.layerName}}
-              </td>
-              <td>
-                {{layer.layerType}}
-              </td>
-              <td>
-                {{layer.urlBase}}
-              </td>
-              <td>
-                {{layer.layer}}
-              </td>
-              <td>
-                {{layer.params}}
-              </td>
-              <td>
-                {{layer.queryable}}
-              </td>
-              <td>
-                {{layer.searchable}}
-              </td>
-              <td>
-                <a :href="layer.templateUrlParsed" target="_blank">{{layer.templateUrl}}</a>
-              </td>
-            </tr>
-          </table>
+
+      <div id="layersContainer" v-if="itemTypeSelected === 'layers'">
+        <h1 class="title is-5">Layers</h1>
+        <div class="columns">
+          <div class="column is-3">
+            <input type="text" class="input" placeholder="Layer..." v-model="searchLayer" />
+          </div>
+          <div class="column is-3">
+            <div class="select">
+              <select v-on:change="onGroupSelected">
+                <option value="">Gruppo...</option>
+                <option v-for="group in groupLayers" v-bind:value="group.gid">{{group.layerName}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div id="content" class="column is-12">
+            <table id="layersList" class="table">
+              <tr>
+                <th></th>
+                <th>Gid</th>
+                <th>Mappa</th>
+                <th>Gruppo</th>
+                <th>Layer</th>
+                <th>Tipo</th>
+                <th>Servizio</th>
+                <th>Layer</th>
+                <th>Parametri</th>
+                <th>Interrogabile</th>
+                <th>Ricerca</th>
+                <th>Template</th>
+              </tr>
+              <tr v-for="layer in layersFiltered" :id="'row_layer_' + layer.gid">
+                <td>
+                  <button class="button is-small" v-on:click="showCodeLayer($event, layer.gid)">Mostra JSON</button>
+                </td>
+                <td>
+                  {{layer.gid}}
+                </td>
+                <td>
+                  {{layer.mapTitle}}
+                </td>
+                <td>
+                  {{layer.groupName}}
+                </td>
+                <td>
+                  {{layer.layerName}}
+                </td>
+                <td>
+                  {{layer.layerType}}
+                </td>
+                <td>
+                  {{layer.urlBase}}
+                </td>
+                <td>
+                  {{layer.layer}}
+                </td>
+                <td>
+                  {{layer.params}}
+                </td>
+                <td>
+                  {{layer.queryable}}
+                </td>
+                <td>
+                  {{layer.searchable}}
+                </td>
+                <td>
+                  <a :href="layer.templateUrlParsed" target="_blank">{{layer.templateUrl}}</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="relationsContainer" v-if="itemTypeSelected === 'relations'">
+        <h1 class="title is-5">Relazioni</h1>
+        <div class="columns">
+          <div class="column is-3">
+            <input type="text" class="input" placeholder="Relazione..." v-model="searchRelation" />
+          </div>
+          <div class="column is-3">
+            <div class="select">
+              <select class="select" v-on:change="onMapSelected">
+                <option value="">Mappa...</option>
+                <option v-for="map in layersMaps" v-bind:value="map">{{map}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div id="content" class="column is-12">
+            <table id="relationsList" class="table">
+              <tr>
+                <th></th>
+                <th>Gid</th>
+                <th>Mappa</th>
+                <th>Relazione</th>
+              </tr>
+              <tr v-for="relation in relationsFiltered" :id="'row_relation_' + relation.gid">
+                <td>
+                  <button class="button is-small" v-on:click="showCodeRelation($event, relation.gid)">Mostra JSON</button>
+                </td>
+                <td>
+                  {{relation.gid}}
+                </td>
+                <td>
+                  {{relation.mapTitle}}
+                </td>
+                <td>
+                  {{relation.groupName}}
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
