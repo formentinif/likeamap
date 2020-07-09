@@ -56,6 +56,7 @@ var LamShareTools = (function () {
   };
 
   var render = function (div) {
+    if (!LamStore.getAppState().modules["share-tools"]) return;
     var templateTemp = templateShare();
     var output = templateTemp();
     jQuery("#" + div).html(output);

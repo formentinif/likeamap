@@ -93,6 +93,7 @@ var LamSearchTools = (function () {
   };
 
   var render = function (div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
+    if (!LamStore.getAppState().modules["search-tools"]) return;
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":

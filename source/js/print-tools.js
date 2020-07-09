@@ -118,6 +118,7 @@ var LamPrintTools = (function () {
   };
 
   var render = function (div) {
+    if (!LamStore.getAppState().modules["print-tools"]) return;
     var templateTemp = templatePrint();
     var output = templateTemp();
     jQuery("#" + div).html(output);

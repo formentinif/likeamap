@@ -25,40 +25,40 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamDrawTools = (function() {
+var LamDrawTools = (function () {
   var isRendered = false;
 
   var init = function init() {
-    $("#draw-tools__point").click(function() {
+    $("#draw-tools__point").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Point"
+        type: "Point",
       });
     });
-    $("#draw-tools__polyline").click(function() {
+    $("#draw-tools__polyline").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "LineString"
+        type: "LineString",
       });
     });
-    $("#draw-tools__polygon").click(function() {
+    $("#draw-tools__polygon").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Polygon"
+        type: "Polygon",
       });
     });
-    $("#draw-tools__delete").click(function() {
+    $("#draw-tools__delete").click(function () {
       $("#draw-tools__draw-settings").hide();
       $("#draw-tools__delete-settings").show();
       lamDispatch({
         eventName: "set-draw-delete",
-        type: "Delete"
+        type: "Delete",
       });
     });
 
@@ -66,7 +66,7 @@ var LamDrawTools = (function() {
     LamToolbar.addResetToolsEvent({ eventName: "unset-draw" });
 
     //Events binding
-    LamDispatcher.bind("show-draw-tools", function(payload) {
+    LamDispatcher.bind("show-draw-tools", function (payload) {
       LamToolbar.toggleToolbarItem("draw-tools");
       if (LamToolbar.getCurrentToolbarItem() === "draw-tools") {
         LamStore.setInfoClickEnabled(false);
@@ -74,29 +74,30 @@ var LamDrawTools = (function() {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("set-draw", function(payload) {
+    LamDispatcher.bind("set-draw", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawInteraction(payload.type);
     });
 
-    LamDispatcher.bind("unset-draw", function(payload) {
+    LamDispatcher.bind("unset-draw", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
     });
 
-    LamDispatcher.bind("set-draw-delete", function(payload) {
+    LamDispatcher.bind("set-draw-delete", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawDeleteInteraction(payload.type);
     });
 
-    LamDispatcher.bind("delete-draw", function(payload) {
+    LamDispatcher.bind("delete-draw", function (payload) {
       LamMap.deleteDrawFeatures(payload.type);
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
+    if (!LamStore.getAppState().modules["draw-tools"]) return;
     var templateTemp = templateDraw();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -108,7 +109,7 @@ var LamDrawTools = (function() {
     isRendered = true;
   };
 
-  var templateDraw = function() {
+  var templateDraw = function () {
     template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Disegna</h4>';
@@ -174,16 +175,16 @@ var LamDrawTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var setDraw = function(type) {
+  var setDraw = function (type) {
     lamDispatch({
       eventName: "set-draw",
-      type: type
+      type: type,
     });
   };
 
-  var deleteFeatures = function() {
+  var deleteFeatures = function () {
     lamDispatch({
-      eventName: "delete-draw"
+      eventName: "delete-draw",
     });
   };
 
@@ -192,6 +193,6 @@ var LamDrawTools = (function() {
     deleteFeatures: deleteFeatures,
     init: init,
     render: render,
-    templateDraw: templateDraw
+    templateDraw: templateDraw,
   };
 })();
