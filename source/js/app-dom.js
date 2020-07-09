@@ -45,7 +45,7 @@ var LamDom = (function () {
       setvisibility("#menu-toolbar__search-tools", modules["search-tools"]);
       setvisibility("#menu-toolbar__print-tools", modules["print-tools"]);
       setvisibility("#menu-toolbar__share-tools", modules["share-tools"]);
-      setvisibility("#menu-toolbar__map-tools", modules["map-tools"]);
+      setvisibility("#menu-toolbar__map-tools", modules["map-tools-measure"] || modules["map-tools-copyCoordinate"] || modules["map-tools-goLonLat"]);
       setvisibility("#menu-toolbar__draw-tools", modules["draw-tools"]);
       setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
       if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);

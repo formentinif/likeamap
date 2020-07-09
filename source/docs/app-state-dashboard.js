@@ -122,7 +122,6 @@ appStateDashboard.loadApplication = function () {
             return element.mapTitle.toLowerCase().indexOf(filter) >= 0;
           });
         }
-        debugger;
         return relationsFiltered;
       },
       layersMaps: function () {
