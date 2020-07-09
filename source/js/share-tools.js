@@ -56,6 +56,7 @@ var LamShareTools = (function () {
   };
 
   var render = function (div) {
+    if (!LamStore.getAppState().modules["share-tools"]) return;
     var templateTemp = templateShare();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -90,7 +91,7 @@ var LamShareTools = (function () {
 
     template += '<div class="div-20"></div>';
     template += "<div id='share-tools__create_tool' class='";
-    if (!LamStore.getAppState().modules["map-tools-create-url"]) {
+    if (!LamStore.getAppState().modules["share-tools-create-url"]) {
       template += " lam-hidden ";
     }
     template += "'>";

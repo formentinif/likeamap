@@ -26,39 +26,39 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 //definizione e inizializzazione del LamDispatcher
-var LamDispatcher = (function() {
+var LamDispatcher = (function () {
   var init = function functionName() {
-    this.bind("log", function(payload) {
+    this.bind("log", function (payload) {
       console.log("log", payload);
     });
 
-    this.bind("show-menu", function(payload) {
+    this.bind("show-menu", function (payload) {
       LamToolbar.showMenu();
     });
 
-    this.bind("hide-menu", function(payload) {
+    this.bind("hide-menu", function (payload) {
       LamToolbar.hideMenu();
     });
 
-    this.bind("reset-tools", function(payload) {
+    this.bind("reset-tools", function (payload) {
       LamToolbar.resetTools();
     });
 
-    this.bind("hide-menu-mobile", function(payload) {
+    this.bind("hide-menu-mobile", function (payload) {
       if (LamDom.isMobile()) {
         LamStore.hideMenu();
       }
     });
 
-    this.bind("live-reload", function(payload) {
+    this.bind("live-reload", function (payload) {
       LamStore.liveReload(payload.appState);
     });
 
-    this.bind("zoom-lon-lat", function(payload) {
+    this.bind("zoom-lon-lat", function (payload) {
       LamMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
 
-    this.bind("zoom-geometry", function(payload) {
+    this.bind("zoom-geometry", function (payload) {
       let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
     });
@@ -70,71 +70,67 @@ var LamDispatcher = (function() {
     /**
      * {string} paylod.gid Layer Gid
      */
-    this.bind("toggle-layer", function(payload) {
+    this.bind("toggle-layer", function (payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("toggle-layer-group", function(payload) {
+    this.bind("toggle-layer-group", function (payload) {
       LamStore.toggleLayersInGroup(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("set-layer-visibility", function(payload) {
+    this.bind("set-layer-visibility", function (payload) {
       LamMap.setLayerVisibility(payload.gid, payload.visibility);
       LamStore.setLayerVisibility(payload.gid, payload.visibility);
     });
 
-    this.bind("reset-layers", function(payload) {
+    this.bind("reset-layers", function (payload) {
       LamStore.resetInitialLayers();
     });
 
-    this.bind("start-copy-coordinate", function(payload) {
-      LamMap.startCopyCoordinate();
-    });
-
-    this.bind("map-click", function(payload) {
+    this.bind("map-click", function (payload) {
       LamMapTools.addCoordinate(payload.lon, payload.lat);
     });
 
-    this.bind("init-map-app", function(payload) {
+    this.bind("init-map-app", function (payload) {
       LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
 
-    this.bind("map-move-end", function(payload) {
-      LamMap.getMoveEndEvents().forEach(element => {
+    this.bind("map-move-end", function (payload) {
+      LamMap.getMoveEndEvents().forEach((element) => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-end", function(payload) {
-      LamMap.getZoomEndEvents().forEach(element => {
+    this.bind("map-zoom-end", function (payload) {
+      LamMap.getZoomEndEvents().forEach((element) => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-in", function(payload) {
+    this.bind("map-zoom-in", function (payload) {
       LamMap.zoomIn();
     });
 
-    this.bind("map-zoom-out", function(payload) {
+    this.bind("map-zoom-out", function (payload) {
       LamMap.zoomOut();
     });
 
-    this.bind("map-browser-location", function(payload) {
+    this.bind("map-browser-location", function (payload) {
       LamMap.goToBrowserLocation();
     });
 
-    this.bind("do-login", function(payload) {
+    this.bind("do-login", function (payload) {
       LamStore.doLogin(payload.username, payload.password);
     });
 
-    this.bind("open-url-location", function(payload) {
+    this.bind("open-url-location", function (payload) {
       LamStore.openUrlTemplate(payload.urlTemplate);
     });
 
-    this.bind("log", function(payload) {
+    this.bind("log", function (payload) {
       if (console) {
         console.log(payload.str);
       }
@@ -143,10 +139,10 @@ var LamDispatcher = (function() {
       }
     });
 
-    this.bind("show-message", function(payload) {
+    this.bind("show-message", function (payload) {
       let msg = {
         html: "",
-        classes: ""
+        classes: "",
       };
       if (payload.message) {
         msg.html += "<div>" + payload.message + "<div>";
@@ -179,7 +175,7 @@ var LamDispatcher = (function() {
   var dispatch = function lamDispatch(payload) {
     if (typeof payload == "string") {
       payload = {
-        eventName: payload
+        eventName: payload,
       };
     }
     LamDispatcher.trigger(payload.eventName, payload);
@@ -187,7 +183,7 @@ var LamDispatcher = (function() {
 
   return {
     dispatch: dispatch,
-    init: init
+    init: init,
   };
 })();
 

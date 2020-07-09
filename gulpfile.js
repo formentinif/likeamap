@@ -49,6 +49,7 @@ function combineAppJs() {
         "./source/js/app-map.js",
         "./source/js/draw-tools.js",
         "./source/js/map-tools.js",
+		"./source/js/measure-tools.js",
         "./source/js/print-tools.js",
         "./source/js/search-tools.js",
         "./source/js/select-tools.js",

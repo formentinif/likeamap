@@ -11,7 +11,7 @@
     <script src="app-state-dashboard.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script>
-      appStateDashboard.loadAppStates(["../states/app-state.json", "../states/app-state_l.json"]);
+      appStateDashboard.loadAppStates(["../states/app-state.json"]);
     </script>
     <style>
       html {
@@ -31,15 +31,17 @@
   </head>
   <body>
     <div id="app" class="container has-margin-top-3">
-      <h1 class="title">Appstates LikeAMap</h1>
+      <h1 class="title">Cruscotto Mappe LikeAMap</h1>
       <div class="columns">
-        <div class="column is-3">
+        <div class="column is-one-fifth">
           <div class="select">
             <select class="select" v-on:change="onItemTypeSelected">
-              <option value="layers">Layers</option>
-              <option value="relations">Relazioni</option>
+              <option value="layers">Mostra Layers</option>
+              <option value="relations">Mostra Relazioni</option>
             </select>
           </div>
+        </div>
+        <div class="column is-one-fifth">
           <div class="select">
             <select class="select" v-on:change="onMapSelected">
               <option value="">Mappa...</option>
@@ -47,7 +49,7 @@
             </select>
           </div>
         </div>
-        <div class="column is-9">
+        <div class="column is-three-fifths">
           <div class="is-scrollable">
             <pre class="appstateUrl">
 Appstates
@@ -138,14 +140,6 @@ Appstates
           <div class="column is-3">
             <input type="text" class="input" placeholder="Relazione..." v-model="searchRelation" />
           </div>
-          <div class="column is-3">
-            <div class="select">
-              <select class="select" v-on:change="onMapSelected">
-                <option value="">Mappa...</option>
-                <option v-for="map in layersMaps" v-bind:value="map">{{map}}</option>
-              </select>
-            </div>
-          </div>
         </div>
         <div class="columns">
           <div id="content" class="column is-12">
@@ -155,6 +149,8 @@ Appstates
                 <th>Gid</th>
                 <th>Mappa</th>
                 <th>Relazione</th>
+                <th>Etichetta</th>
+                <th>Template</th>
               </tr>
               <tr v-for="relation in relationsFiltered" :id="'row_relation_' + relation.gid">
                 <td>
@@ -167,7 +163,13 @@ Appstates
                   {{relation.mapTitle}}
                 </td>
                 <td>
-                  {{relation.groupName}}
+                  {{relation.title}}
+                </td>
+                <td>
+                  {{relation.labelTemplate}}
+                </td>
+                <td>
+                  <a :href="relation.templateUrlParsed" target="_blank">{{relation.templateUrl}}</a>
                 </td>
               </tr>
             </table>

@@ -316,14 +316,29 @@
         "description": "Condividi mappe",
         "type": "boolean"
       },
-      "map-tools-create-url": {
+      "share-tools-create-url": {
         "title": "Condividi",
         "description": "Condividi mappe",
         "type": "boolean"
       },
-      "map-tools": {
-        "title": "Strumenti",
-        "description": "Strumenti mappa",
+      "map-tools-measure": {
+        "title": "Strumenti di misura",
+        "description": "Strumenti di misura",
+        "type": "boolean"
+      },
+      "map-tools-copyCoordinate": {
+        "title": "Copia delle cordinate",
+        "description": "Copia delle cordinate",
+        "type": "boolean"
+      },
+      "map-tools-goLonLat": {
+        "title": "Vai a posizione",
+        "description": "Vai a posizione",
+        "type": "boolean"
+      },
+      "measure-tools": {
+        "title": "Strumenti di misura",
+        "description": "Strumenti di misura",
         "type": "boolean"
       },
       "draw-tools": {

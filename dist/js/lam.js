@@ -2914,40 +2914,40 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamDrawTools = (function() {
+var LamDrawTools = (function () {
   var isRendered = false;
 
   var init = function init() {
-    $("#draw-tools__point").click(function() {
+    $("#draw-tools__point").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Point"
+        type: "Point",
       });
     });
-    $("#draw-tools__polyline").click(function() {
+    $("#draw-tools__polyline").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "LineString"
+        type: "LineString",
       });
     });
-    $("#draw-tools__polygon").click(function() {
+    $("#draw-tools__polygon").click(function () {
       $("#draw-tools__draw-settings").show();
       $("#draw-tools__delete-settings").hide();
       lamDispatch({
         eventName: "set-draw",
-        type: "Polygon"
+        type: "Polygon",
       });
     });
-    $("#draw-tools__delete").click(function() {
+    $("#draw-tools__delete").click(function () {
       $("#draw-tools__draw-settings").hide();
       $("#draw-tools__delete-settings").show();
       lamDispatch({
         eventName: "set-draw-delete",
-        type: "Delete"
+        type: "Delete",
       });
     });
 
@@ -2955,7 +2955,7 @@ var LamDrawTools = (function() {
     LamToolbar.addResetToolsEvent({ eventName: "unset-draw" });
 
     //Events binding
-    LamDispatcher.bind("show-draw-tools", function(payload) {
+    LamDispatcher.bind("show-draw-tools", function (payload) {
       LamToolbar.toggleToolbarItem("draw-tools");
       if (LamToolbar.getCurrentToolbarItem() === "draw-tools") {
         LamStore.setInfoClickEnabled(false);
@@ -2963,29 +2963,30 @@ var LamDrawTools = (function() {
       lamDispatch("clear-layer-info");
     });
 
-    LamDispatcher.bind("set-draw", function(payload) {
+    LamDispatcher.bind("set-draw", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawInteraction(payload.type);
     });
 
-    LamDispatcher.bind("unset-draw", function(payload) {
+    LamDispatcher.bind("unset-draw", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
     });
 
-    LamDispatcher.bind("set-draw-delete", function(payload) {
+    LamDispatcher.bind("set-draw-delete", function (payload) {
       LamMap.removeDrawInteraction();
       LamMap.removeDrawDeleteInteraction();
       LamMap.addDrawDeleteInteraction(payload.type);
     });
 
-    LamDispatcher.bind("delete-draw", function(payload) {
+    LamDispatcher.bind("delete-draw", function (payload) {
       LamMap.deleteDrawFeatures(payload.type);
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
+    if (!LamStore.getAppState().modules["draw-tools"]) return;
     var templateTemp = templateDraw();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -2997,7 +2998,7 @@ var LamDrawTools = (function() {
     isRendered = true;
   };
 
-  var templateDraw = function() {
+  var templateDraw = function () {
     template = "";
     //pannello ricerca via
     template += '<h4 class="lam-title">Disegna</h4>';
@@ -3063,16 +3064,16 @@ var LamDrawTools = (function() {
     return Handlebars.compile(template);
   };
 
-  var setDraw = function(type) {
+  var setDraw = function (type) {
     lamDispatch({
       eventName: "set-draw",
-      type: type
+      type: type,
     });
   };
 
-  var deleteFeatures = function() {
+  var deleteFeatures = function () {
     lamDispatch({
-      eventName: "delete-draw"
+      eventName: "delete-draw",
     });
   };
 
@@ -3081,7 +3082,7 @@ var LamDrawTools = (function() {
     deleteFeatures: deleteFeatures,
     init: init,
     render: render,
-    templateDraw: templateDraw
+    templateDraw: templateDraw,
   };
 })();
 
@@ -3122,17 +3123,33 @@ var LamMapTools = (function () {
       if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
         LamStore.setInfoClickEnabled(false);
       }
+    });
+
+    if (LamStore.getAppState().modules["map-tools-copyCoordinate"]) {
+      $("#map-tools__copyCoordinate").removeClass("lam-hidden");
+      this.bind("start-copy-coordinate", function (payload) {
+        LamMap.startCopyCoordinate();
+      });
 
       LamDispatcher.bind("stop-copy-coordinate", function (payload) {
         LamMapTools.stopCopyCoordinate();
       });
+    }
 
-      lamDispatch("clear-layer-info");
-    });
+    if (LamStore.getAppState().modules["map-tools-goLonLat"]) {
+      $("#map-tools__goToLonLat").removeClass("lam-hidden");
+    }
+    if (LamStore.getAppState().modules["map-tools-measure"]) {
+      $("#map-tools__measure").removeClass("lam-hidden");
+      LamMeasureTools.render();
+      LamToolbar.addResetToolsEvent({ eventName: "stop-measure-tool" });
+    }
+
+    isRendered = true;
   };
 
   var render = function (div) {
-    var templateTemp = templateTools();
+    var templateTemp = templateMapTools();
     var output = templateTemp();
     jQuery("#" + div).html(output);
     if (!isRendered) {
@@ -3151,11 +3168,22 @@ var LamMapTools = (function () {
     isRendered = true;
   };
 
-  var templateTools = function () {
-    template = "";
-    //pannello ricerca via
+  var templateMapTools = function () {
+    let template = "";
     template += '<h4 class="lam-title">Strumenti</h4>';
     template += '<div class="lam-card lam-depth-2">';
+    template += goToLonLatTemplate();
+    template += copyCoordinateTemplate();
+    template += measureTemplate();
+    template += '<div class="div-10"></div>';
+    //template += 'Crea link da condividere con i tuoi colleghi';
+    template += "</div>";
+
+    return Handlebars.compile(template);
+  };
+
+  let goToLonLatTemplate = function () {
+    let template = "<div id='map-tools__goToLonLat' class='lam-hidden'>";
     template += '<h5 class="lam-title-h4">Vai a..</h5>';
     template += '<div id="map-tools__lon-field" class="lam-mb-2" >';
     template += '<label class="lam-label" for="map-tools__lon">Longitune</label>';
@@ -3173,9 +3201,12 @@ var LamMapTools = (function () {
     template += '<button id="search-tools__gotolonlat"  class="lam-btn" onclick="LamMapTools.goToLonLat()">Vai</button>';
     template += "</div>";
     template += "</div>";
-    template += '<div class="div-20"></div>';
+    template += "</div>";
+    return template;
+  };
 
-    template += "<div>";
+  let copyCoordinateTemplate = function () {
+    let template = "<div id='map-tools__copyCoordinate' class='lam-hidden'>";
     template += '<h5 class="lam-title-h4">Copia coordinate</h5>';
     template += '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
     template += '<div class="lam-grid">';
@@ -3189,12 +3220,28 @@ var LamMapTools = (function () {
     template += '<button id="search-tools__copy-url"  class="lam-btn " >Copia</button>';
     template += "</div>";
     template += "</div>";
-
-    template += '<div class="div-10"></div>';
-    //template += 'Crea link da condividere con i tuoi colleghi';
     template += "</div>";
+    return template;
+  };
 
-    return Handlebars.compile(template);
+  let measureTemplate = function () {
+    let template = "<div id='map-tools__measure' class='lam-hidden'>";
+    template += '<h5 class="lam-title-h4">Misura</h5>';
+    template += '<div class="lam-grid lam-no-bg">';
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-start-length" class="lam-btn" onclick="LamMeasureTools.startMeasureLength()">Lunghezza</button>';
+    template += "</div>";
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-start-area" class="lam-btn" onclick="LamMeasureTools.startMeasureArea()">Area</button>';
+    template += "</div>";
+    template += "</div>";
+    template += '<div class="lam-grid lam-no-bg lam-mt-1">';
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-clear" class="lam-btn" onclick="LamMeasureTools.clearMeasures()">Pulisci</button>';
+    template += "</div>";
+    template += "</div>";
+    template += "</div>";
+    return template;
   };
 
   /**
@@ -3257,7 +3304,324 @@ var LamMapTools = (function () {
     goToLonLat: goToLonLat,
     init: init,
     render: render,
-    templateTools: templateTools,
+    templateMapTools: templateMapTools,
+  };
+})();
+
+/*
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
+var LamMeasureTools = (function () {
+  let isRendered = false;
+
+  let init = function init() {
+    LamDispatcher.bind("stop-measure-tool", function (payload) {
+      LamMeasureTools.removeInteraction();
+    });
+
+    createMeasureTooltip();
+    createHelpTooltip();
+    vector.setMap(LamMap.getMap());
+    isRendered = true;
+  };
+
+  let render = function (div) {
+    if (!isRendered) {
+      init();
+    }
+  };
+
+  let source = new ol.source.Vector();
+
+  let vector = new ol.layer.Vector({
+    source: source,
+    style: new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: "rgba(255, 255, 255, 0.2)",
+      }),
+      stroke: new ol.style.Stroke({
+        color: "#0AFF57",
+        width: 2,
+      }),
+      image: new ol.style.Circle({
+        radius: 7,
+        fill: new ol.style.Fill({
+          color: "#0AFF57",
+        }),
+      }),
+    }),
+  });
+
+  /**
+   * Currently drawn feature.
+   * @type {import("../src/ol/Feature.js").default}
+   */
+  let sketch;
+
+  /**
+   * The help tooltip element.
+   * @type {HTMLElement}
+   */
+  let helpTooltipElement;
+
+  /**
+   * Overlay to show the help messages.
+   * @type {ol.Overlay}
+   */
+  let helpTooltip;
+
+  /**
+   * The measure tooltip element.
+   * @type {HTMLElement}
+   */
+  let measureTooltipElement;
+
+  /**
+   * Overlay to show the measurement.
+   * @type {ol.Overlay}
+   */
+  let measureTooltip;
+
+  /**
+   * Message to show when the user is drawing a polygon.
+   * @type {string}
+   */
+  let continuePolygonMsg = "Clicca per continuare a disegnare il poligono";
+
+  /**
+   * Message to show when the user is drawing a line.
+   * @type {string}
+   */
+  let continueLineMsg = "Clicca per continuare a disegnare la linea";
+
+  let pointerMoveHandlerKey;
+  /**
+   * Handle pointer move.
+   * @param {import("../src/ol/MapBrowserEvent").default} evt The event.
+   */
+  let pointerMoveHandler = function (evt) {
+    if (evt.dragging) {
+      return;
+    }
+    /** @type {string} */
+    let helpMsg = "Clicca per iniziare a misurare, doppio click per terminare";
+
+    if (sketch) {
+      let geom = sketch.getGeometry();
+      if (geom instanceof ol.geom.Polygon) {
+        helpMsg = continuePolygonMsg;
+      } else if (geom instanceof ol.geom.LineString) {
+        helpMsg = continueLineMsg;
+      }
+    }
+
+    helpTooltipElement.innerHTML = helpMsg;
+    helpTooltip.setPosition(evt.coordinate);
+
+    helpTooltipElement.classList.remove("hidden");
+  };
+
+  let draw; // global so we can remove it later
+
+  /**
+   * Format length output.
+   * @param {LineString} line The line.
+   * @return {string} The formatted length.
+   */
+  let formatLength = function (line) {
+    let length = ol.sphere.getLength(line);
+    let output;
+    if (length > 100) {
+      output = Math.round((length / 1000) * 100) / 100 + " " + "km";
+    } else {
+      output = Math.round(length * 100) / 100 + " " + "m";
+    }
+    return output;
+  };
+
+  /**
+   * Format area output.
+   * @param {Polygon} polygon The polygon.
+   * @return {string} Formatted area.
+   */
+  let formatArea = function (polygon) {
+    let area = ol.sphere.getArea(polygon);
+    let output;
+    if (area > 10000) {
+      output = Math.round((area / 1000000) * 100) / 100 + " " + "km<sup>2</sup>";
+    } else {
+      output = Math.round(area * 100) / 100 + " " + "m<sup>2</sup>";
+    }
+    return output;
+  };
+
+  let startMeasureLength = function () {
+    try {
+      removeInteraction();
+    } catch (error) {}
+    addInteraction("LineString");
+  };
+  let startMeasureArea = function () {
+    try {
+      removeInteraction();
+    } catch (error) {}
+    addInteraction("Polygon");
+  };
+
+  let removeInteraction = function () {
+    LamMap.getMap().removeInteraction(draw);
+    $(".ol-tooltip-help").remove();
+    ol.Observable.unByKey(pointerMoveHandlerKey);
+  };
+
+  function addInteraction(type) {
+    pointerMoveHandlerKey = LamMap.getMap().on("pointermove", pointerMoveHandler);
+
+    LamMap.getMap()
+      .getViewport()
+      .addEventListener("mouseout", function () {
+        helpTooltipElement.classList.add("hidden");
+      });
+
+    draw = new ol.interaction.Draw({
+      source: source,
+      type: type,
+      style: new ol.style.Style({
+        fill: new ol.style.Fill({
+          color: "rgba(255, 255, 255, 0.2)",
+        }),
+        stroke: new ol.style.Stroke({
+          color: "rgba(0, 255, 0, 0.5)",
+          lineDash: [10, 10],
+          width: 2,
+        }),
+        image: new ol.style.Circle({
+          radius: 5,
+          stroke: new ol.style.Stroke({
+            color: "rgba(0, 255, 0, 0.7)",
+          }),
+          fill: new ol.style.Fill({
+            color: "rgba(255, 255, 255, 0.2)",
+          }),
+        }),
+      }),
+    });
+    LamMap.getMap().addInteraction(draw);
+
+    createMeasureTooltip();
+    createHelpTooltip();
+
+    let listener;
+    draw.on("drawstart", function (evt) {
+      // set sketch
+      sketch = evt.feature;
+
+      /** @type {import("../src/ol/coordinate.js").Coordinate|undefined} */
+      let tooltipCoord = evt.coordinate;
+
+      listener = sketch.getGeometry().on("change", function (evt) {
+        let geom = evt.target;
+        let output;
+        if (geom instanceof ol.geom.Polygon) {
+          output = formatArea(geom);
+          tooltipCoord = geom.getInteriorPoint().getCoordinates();
+        } else if (geom instanceof ol.geom.LineString) {
+          output = formatLength(geom);
+          tooltipCoord = geom.getLastCoordinate();
+        }
+        measureTooltipElement.innerHTML = output;
+        measureTooltip.setPosition(tooltipCoord);
+      });
+    });
+
+    draw.on("drawend", function () {
+      measureTooltipElement.className = "ol-tooltip ol-tooltip-static";
+      measureTooltip.setOffset([0, -7]);
+      // unset sketch
+      sketch = null;
+      // unset tooltip so that a new one can be created
+      measureTooltipElement = null;
+      createMeasureTooltip();
+      ol.Observable.unByKey(listener);
+    });
+  }
+
+  /**
+   * Creates a new help tooltip
+   */
+  let createHelpTooltip = function () {
+    try {
+      if (helpTooltipElement) {
+        helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+      }
+    } catch (error) {}
+
+    helpTooltipElement = document.createElement("div");
+    helpTooltipElement.className = "ol-tooltip ol-tooltip-help hidden";
+    helpTooltip = new ol.Overlay({
+      element: helpTooltipElement,
+      offset: [15, 0],
+      positioning: "center-left",
+    });
+    LamMap.getMap().addOverlay(helpTooltip);
+  };
+
+  /**
+   * Creates a new measure tooltip
+   */
+  let createMeasureTooltip = function () {
+    try {
+      if (measureTooltipElement) {
+        measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+      }
+    } catch (error) {}
+
+    measureTooltipElement = document.createElement("div");
+    measureTooltipElement.className = "ol-tooltip ol-tooltip-measure";
+    measureTooltip = new ol.Overlay({
+      element: measureTooltipElement,
+      offset: [0, -15],
+      positioning: "bottom-center",
+    });
+    LamMap.getMap().addOverlay(measureTooltip);
+  };
+
+  let clearMeasures = function () {
+    $(".ol-tooltip-static").remove();
+    //if (helpTooltipElement) helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+    vector.getSource().clear(true);
+  };
+
+  return {
+    clearMeasures: clearMeasures,
+    render: render,
+    removeInteraction: removeInteraction,
+    startMeasureLength: startMeasureLength,
+    startMeasureArea: startMeasureArea,
   };
 })();
 
@@ -3381,6 +3745,7 @@ var LamPrintTools = (function () {
   };
 
   var render = function (div) {
+    if (!LamStore.getAppState().modules["print-tools"]) return;
     var templateTemp = templatePrint();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -3717,6 +4082,7 @@ var LamSearchTools = (function () {
   };
 
   var render = function (div, provider, providerAddressUrl, providerAddressField, providerHouseNumberUrl, providerHouseNumberField, layers) {
+    if (!LamStore.getAppState().modules["search-tools"]) return;
     searchLayers = layers;
     switch (provider) {
       case "wms_geoserver":
@@ -4706,11 +5072,12 @@ var LamLegendTools = (function () {
   };
 
   var showLegend = function (gid, scaled, showInfoWindow) {
+    var thisLayer = LamStore.getLayer(gid);
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
+    if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
     var urlImg = "";
     //checking custom url
-    var thisLayer = LamStore.getLayer(gid);
     if (!thisLayer.hideLegend) {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
@@ -4752,14 +5119,10 @@ var LamLegendTools = (function () {
         "</i> SHP</a></div>";
     }
     html += "<div>";
-    var layerName = "Legenda ";
-    if (thisLayer) {
-      layerName += " - " + thisLayer.layerName;
-    }
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "");
     }
     return true;
   };
@@ -5013,6 +5376,7 @@ var LamShareTools = (function () {
   };
 
   var render = function (div) {
+    if (!LamStore.getAppState().modules["share-tools"]) return;
     var templateTemp = templateShare();
     var output = templateTemp();
     jQuery("#" + div).html(output);
@@ -5047,7 +5411,7 @@ var LamShareTools = (function () {
 
     template += '<div class="div-20"></div>';
     template += "<div id='share-tools__create_tool' class='";
-    if (!LamStore.getAppState().modules["map-tools-create-url"]) {
+    if (!LamStore.getAppState().modules["share-tools-create-url"]) {
       template += " lam-hidden ";
     }
     template += "'>";
@@ -5227,39 +5591,39 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 //definizione e inizializzazione del LamDispatcher
-var LamDispatcher = (function() {
+var LamDispatcher = (function () {
   var init = function functionName() {
-    this.bind("log", function(payload) {
+    this.bind("log", function (payload) {
       console.log("log", payload);
     });
 
-    this.bind("show-menu", function(payload) {
+    this.bind("show-menu", function (payload) {
       LamToolbar.showMenu();
     });
 
-    this.bind("hide-menu", function(payload) {
+    this.bind("hide-menu", function (payload) {
       LamToolbar.hideMenu();
     });
 
-    this.bind("reset-tools", function(payload) {
+    this.bind("reset-tools", function (payload) {
       LamToolbar.resetTools();
     });
 
-    this.bind("hide-menu-mobile", function(payload) {
+    this.bind("hide-menu-mobile", function (payload) {
       if (LamDom.isMobile()) {
         LamStore.hideMenu();
       }
     });
 
-    this.bind("live-reload", function(payload) {
+    this.bind("live-reload", function (payload) {
       LamStore.liveReload(payload.appState);
     });
 
-    this.bind("zoom-lon-lat", function(payload) {
+    this.bind("zoom-lon-lat", function (payload) {
       LamMap.goToLonLat(payload.lon, payload.lat, payload.zoom);
     });
 
-    this.bind("zoom-geometry", function(payload) {
+    this.bind("zoom-geometry", function (payload) {
       let geometryOl = LamMap.convertGeometryToOl(payload.geometry, LamEnums.geometryFormats().GeoJson);
       LamMap.goToGeometry(geometryOl, payload.srid);
     });
@@ -5271,71 +5635,67 @@ var LamDispatcher = (function() {
     /**
      * {string} paylod.gid Layer Gid
      */
-    this.bind("toggle-layer", function(payload) {
+    this.bind("toggle-layer", function (payload) {
       LamMap.toggleLayer(payload.gid);
       LamStore.toggleLayer(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("toggle-layer-group", function(payload) {
+    this.bind("toggle-layer-group", function (payload) {
       LamStore.toggleLayersInGroup(payload.gid);
       LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
     });
 
-    this.bind("set-layer-visibility", function(payload) {
+    this.bind("set-layer-visibility", function (payload) {
       LamMap.setLayerVisibility(payload.gid, payload.visibility);
       LamStore.setLayerVisibility(payload.gid, payload.visibility);
     });
 
-    this.bind("reset-layers", function(payload) {
+    this.bind("reset-layers", function (payload) {
       LamStore.resetInitialLayers();
     });
 
-    this.bind("start-copy-coordinate", function(payload) {
-      LamMap.startCopyCoordinate();
-    });
-
-    this.bind("map-click", function(payload) {
+    this.bind("map-click", function (payload) {
       LamMapTools.addCoordinate(payload.lon, payload.lat);
     });
 
-    this.bind("init-map-app", function(payload) {
+    this.bind("init-map-app", function (payload) {
       LamInit(payload.mapDiv, payload.appStateUrl, payload.mapTemplateUrl);
     });
 
-    this.bind("map-move-end", function(payload) {
-      LamMap.getMoveEndEvents().forEach(element => {
+    this.bind("map-move-end", function (payload) {
+      LamMap.getMoveEndEvents().forEach((element) => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-end", function(payload) {
-      LamMap.getZoomEndEvents().forEach(element => {
+    this.bind("map-zoom-end", function (payload) {
+      LamMap.getZoomEndEvents().forEach((element) => {
         LamDispatcher.dispatch(element);
       });
     });
 
-    this.bind("map-zoom-in", function(payload) {
+    this.bind("map-zoom-in", function (payload) {
       LamMap.zoomIn();
     });
 
-    this.bind("map-zoom-out", function(payload) {
+    this.bind("map-zoom-out", function (payload) {
       LamMap.zoomOut();
     });
 
-    this.bind("map-browser-location", function(payload) {
+    this.bind("map-browser-location", function (payload) {
       LamMap.goToBrowserLocation();
     });
 
-    this.bind("do-login", function(payload) {
+    this.bind("do-login", function (payload) {
       LamStore.doLogin(payload.username, payload.password);
     });
 
-    this.bind("open-url-location", function(payload) {
+    this.bind("open-url-location", function (payload) {
       LamStore.openUrlTemplate(payload.urlTemplate);
     });
 
-    this.bind("log", function(payload) {
+    this.bind("log", function (payload) {
       if (console) {
         console.log(payload.str);
       }
@@ -5344,10 +5704,10 @@ var LamDispatcher = (function() {
       }
     });
 
-    this.bind("show-message", function(payload) {
+    this.bind("show-message", function (payload) {
       let msg = {
         html: "",
-        classes: ""
+        classes: "",
       };
       if (payload.message) {
         msg.html += "<div>" + payload.message + "<div>";
@@ -5380,7 +5740,7 @@ var LamDispatcher = (function() {
   var dispatch = function lamDispatch(payload) {
     if (typeof payload == "string") {
       payload = {
-        eventName: payload
+        eventName: payload,
       };
     }
     LamDispatcher.trigger(payload.eventName, payload);
@@ -5388,7 +5748,7 @@ var LamDispatcher = (function() {
 
   return {
     dispatch: dispatch,
-    init: init
+    init: init,
   };
 })();
 
@@ -5814,7 +6174,7 @@ var LamDom = (function () {
       setvisibility("#menu-toolbar__search-tools", modules["search-tools"]);
       setvisibility("#menu-toolbar__print-tools", modules["print-tools"]);
       setvisibility("#menu-toolbar__share-tools", modules["share-tools"]);
-      setvisibility("#menu-toolbar__map-tools", modules["map-tools"]);
+      setvisibility("#menu-toolbar__map-tools", modules["map-tools-measure"] || modules["map-tools-copyCoordinate"] || modules["map-tools-goLonLat"]);
       setvisibility("#menu-toolbar__draw-tools", modules["draw-tools"]);
       setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
       if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);
@@ -5913,7 +6273,7 @@ var LamDom = (function () {
       case 3: //InfoWindow
         //if (!elementId)
         elementId = "info-window";
-        LamDispatcher.dispatch("hide-menu");
+        if (LamDom.isMobile()) LamDispatcher.dispatch("hide-menu");
         $("#bottom-info").hide();
         $("#" + elementId + "__content").html(htmlMain);
         $("#" + elementId + "__title").html(title);

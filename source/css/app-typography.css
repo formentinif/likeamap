@@ -3,22 +3,23 @@
 }
 
 .lam-title {
-  margin: 8px 8px;
+  margin: 8px 0px;
   font-size: 2rem;
   font-weight: 500;
 }
 
 .lam-title-h4 {
-  margin: 8px 8px;
+  margin: 8px 0px;
   font-size: 1.25rem;
   line-height: 24px;
   font-weight: 500;
 }
 
 .lam-title-legend {
-  margin: 8px 8px;
-  font-size: 1.25rem;
-  line-height: 1.25rem;
+  margin: 8px 0px;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  font-weight: normal;
   color: var(--lam-btn-color);
 }
 

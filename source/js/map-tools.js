@@ -35,17 +35,33 @@ var LamMapTools = (function () {
       if (LamToolbar.getCurrentToolbarItem() === "map-tools") {
         LamStore.setInfoClickEnabled(false);
       }
+    });
+
+    if (LamStore.getAppState().modules["map-tools-copyCoordinate"]) {
+      $("#map-tools__copyCoordinate").removeClass("lam-hidden");
+      this.bind("start-copy-coordinate", function (payload) {
+        LamMap.startCopyCoordinate();
+      });
 
       LamDispatcher.bind("stop-copy-coordinate", function (payload) {
         LamMapTools.stopCopyCoordinate();
       });
+    }
 
-      lamDispatch("clear-layer-info");
-    });
+    if (LamStore.getAppState().modules["map-tools-goLonLat"]) {
+      $("#map-tools__goToLonLat").removeClass("lam-hidden");
+    }
+    if (LamStore.getAppState().modules["map-tools-measure"]) {
+      $("#map-tools__measure").removeClass("lam-hidden");
+      LamMeasureTools.render();
+      LamToolbar.addResetToolsEvent({ eventName: "stop-measure-tool" });
+    }
+
+    isRendered = true;
   };
 
   var render = function (div) {
-    var templateTemp = templateTools();
+    var templateTemp = templateMapTools();
     var output = templateTemp();
     jQuery("#" + div).html(output);
     if (!isRendered) {
@@ -64,11 +80,22 @@ var LamMapTools = (function () {
     isRendered = true;
   };
 
-  var templateTools = function () {
-    template = "";
-    //pannello ricerca via
+  var templateMapTools = function () {
+    let template = "";
     template += '<h4 class="lam-title">Strumenti</h4>';
     template += '<div class="lam-card lam-depth-2">';
+    template += goToLonLatTemplate();
+    template += copyCoordinateTemplate();
+    template += measureTemplate();
+    template += '<div class="div-10"></div>';
+    //template += 'Crea link da condividere con i tuoi colleghi';
+    template += "</div>";
+
+    return Handlebars.compile(template);
+  };
+
+  let goToLonLatTemplate = function () {
+    let template = "<div id='map-tools__goToLonLat' class='lam-hidden'>";
     template += '<h5 class="lam-title-h4">Vai a..</h5>';
     template += '<div id="map-tools__lon-field" class="lam-mb-2" >';
     template += '<label class="lam-label" for="map-tools__lon">Longitune</label>';
@@ -86,9 +113,12 @@ var LamMapTools = (function () {
     template += '<button id="search-tools__gotolonlat"  class="lam-btn" onclick="LamMapTools.goToLonLat()">Vai</button>';
     template += "</div>";
     template += "</div>";
-    template += '<div class="div-20"></div>';
+    template += "</div>";
+    return template;
+  };
 
-    template += "<div>";
+  let copyCoordinateTemplate = function () {
+    let template = "<div id='map-tools__copyCoordinate' class='lam-hidden'>";
     template += '<h5 class="lam-title-h4">Copia coordinate</h5>';
     template += '<textarea  id="map-tools__coordinate-textarea" rows="6" style="width:95%"></textarea>';
     template += '<div class="lam-grid">';
@@ -102,12 +132,28 @@ var LamMapTools = (function () {
     template += '<button id="search-tools__copy-url"  class="lam-btn " >Copia</button>';
     template += "</div>";
     template += "</div>";
-
-    template += '<div class="div-10"></div>';
-    //template += 'Crea link da condividere con i tuoi colleghi';
     template += "</div>";
+    return template;
+  };
 
-    return Handlebars.compile(template);
+  let measureTemplate = function () {
+    let template = "<div id='map-tools__measure' class='lam-hidden'>";
+    template += '<h5 class="lam-title-h4">Misura</h5>';
+    template += '<div class="lam-grid lam-no-bg">';
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-start-length" class="lam-btn" onclick="LamMeasureTools.startMeasureLength()">Lunghezza</button>';
+    template += "</div>";
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-start-area" class="lam-btn" onclick="LamMeasureTools.startMeasureArea()">Area</button>';
+    template += "</div>";
+    template += "</div>";
+    template += '<div class="lam-grid lam-no-bg lam-mt-1">';
+    template += '<div class="lam-col">';
+    template += '<button id="map-tools__measures-clear" class="lam-btn" onclick="LamMeasureTools.clearMeasures()">Pulisci</button>';
+    template += "</div>";
+    template += "</div>";
+    template += "</div>";
+    return template;
   };
 
   /**
@@ -170,6 +216,6 @@ var LamMapTools = (function () {
     goToLonLat: goToLonLat,
     init: init,
     render: render,
-    templateTools: templateTools,
+    templateMapTools: templateMapTools,
   };
 })();
