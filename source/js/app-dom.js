@@ -144,7 +144,7 @@ var LamDom = (function () {
       case 3: //InfoWindow
         //if (!elementId)
         elementId = "info-window";
-        LamDispatcher.dispatch("hide-menu");
+        if (LamDom.isMobile()) LamDispatcher.dispatch("hide-menu");
         $("#bottom-info").hide();
         $("#" + elementId + "__content").html(htmlMain);
         $("#" + elementId + "__title").html(title);

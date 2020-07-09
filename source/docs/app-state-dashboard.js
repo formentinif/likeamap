@@ -85,6 +85,7 @@ appStateDashboard.loadApplication = function () {
     },
     computed: {
       layersFiltered: function () {
+        $(".code_layer").remove();
         let layersFiltered = this.layers;
         if (this.searchLayer) {
           let filter = this.searchLayer.toLowerCase();
@@ -109,6 +110,7 @@ appStateDashboard.loadApplication = function () {
         return layersFiltered;
       },
       relationsFiltered: function () {
+        $(".code_relation").remove();
         let relationsFiltered = this.relations;
         if (this.searchRelation) {
           let filter = this.searchRelation.toLowerCase();
@@ -168,7 +170,8 @@ appStateDashboard.loadApplication = function () {
           if (row && !code) {
             event.target.innerText = "Nascondi JSON";
             let newRow = document.createElement("tr");
-            newRow.setAttribute("id", "code_" + layer.gid);
+            newRow.setAttribute("id", "code_layer_" + layer.gid);
+            newRow.setAttribute("class", "code_layer");
             let newCell = newRow.insertCell(0);
             newCell.setAttribute("colspan", "100%");
             let newPre = document.createElement("pre");
@@ -180,13 +183,13 @@ appStateDashboard.loadApplication = function () {
         }
       },
       showCodeRelation: function (event, gid) {
-        let layer = this.layers.filter((element) => {
+        let relation = this.relations.filter((element) => {
           return element.gid === gid;
         });
-        if (layer.length) {
-          layer = layer[0];
-          let row = document.querySelector("#row_layer_" + layer.gid);
-          let code = document.querySelector("#code_layer_" + layer.gid);
+        if (relation.length) {
+          relation = relation[0];
+          let row = document.querySelector("#row_relation_" + relation.gid);
+          let code = document.querySelector("#code_relation_" + relation.gid);
           if (code) {
             code.parentNode.removeChild(code);
             event.target.innerText = "Mostra JSON";
@@ -194,11 +197,12 @@ appStateDashboard.loadApplication = function () {
           if (row && !code) {
             event.target.innerText = "Nascondi JSON";
             let newRow = document.createElement("tr");
-            newRow.setAttribute("id", "code_" + layer.gid);
+            newRow.setAttribute("id", "code_relation_" + relation.gid);
+            newRow.setAttribute("class", "code_relation");
             let newCell = newRow.insertCell(0);
             newCell.setAttribute("colspan", "100%");
             let newPre = document.createElement("pre");
-            let newText = document.createTextNode(JSON.stringify(layer, undefined, 4));
+            let newText = document.createTextNode(JSON.stringify(relation, undefined, 4));
             newCell.appendChild(newPre);
             newPre.appendChild(newText);
             row.after(newRow);
