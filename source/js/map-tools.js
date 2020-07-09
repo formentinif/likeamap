@@ -82,8 +82,8 @@ var LamMapTools = (function () {
 
   var templateMapTools = function () {
     let template = "";
-    template = '<div class="lam-card lam-depth-2">';
     template += '<h4 class="lam-title">Strumenti</h4>';
+    template += '<div class="lam-card lam-depth-2">';
     template += goToLonLatTemplate();
     template += copyCoordinateTemplate();
     template += measureTemplate();

@@ -3170,8 +3170,8 @@ var LamMapTools = (function () {
 
   var templateMapTools = function () {
     let template = "";
-    template = '<div class="lam-card lam-depth-2">';
     template += '<h4 class="lam-title">Strumenti</h4>';
+    template += '<div class="lam-card lam-depth-2">';
     template += goToLonLatTemplate();
     template += copyCoordinateTemplate();
     template += measureTemplate();
@@ -5072,11 +5072,12 @@ var LamLegendTools = (function () {
   };
 
   var showLegend = function (gid, scaled, showInfoWindow) {
+    var thisLayer = LamStore.getLayer(gid);
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
+    if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
     var urlImg = "";
     //checking custom url
-    var thisLayer = LamStore.getLayer(gid);
     if (!thisLayer.hideLegend) {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
@@ -5118,14 +5119,10 @@ var LamLegendTools = (function () {
         "</i> SHP</a></div>";
     }
     html += "<div>";
-    var layerName = "Legenda ";
-    if (thisLayer) {
-      layerName += " - " + thisLayer.layerName;
-    }
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, layerName, html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "");
     }
     return true;
   };
