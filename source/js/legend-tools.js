@@ -112,13 +112,24 @@ var LamLegendTools = (function () {
         "', scaled: false })\">Visualizza legenda completa</a></div>";
     }
     if (thisLayer.queryable) {
+      html += "<div class='lam-mt-2' style='display:flow-root;'>";
+      //open attribute table
+      html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";
+      html +=
+        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        thisLayer.gid +
+        "'  }); return false;\"><i class='lam-icon'>" +
+        LamResources.svgTable16 +
+        "</i> Apri tabella</a>";
+      //open csv
       var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "csv");
       html +=
-        "<div class='lam-mt-2' style='display:flow-root;'><a href='" +
+        "<a href='" +
         layerUrl +
         "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
         LamResources.svgDownload16 +
         "</i> CSV</a>";
+      //open shp
       layerUrl = LamMap.getWFSUrlfromLayer(thisLayer);
       html +=
         " <a href='" +

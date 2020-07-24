@@ -336,11 +336,6 @@
         "description": "Vai a posizione",
         "type": "boolean"
       },
-      "measure-tools": {
-        "title": "Strumenti di misura",
-        "description": "Strumenti di misura",
-        "type": "boolean"
-      },
       "draw-tools": {
         "title": "Disegno",
         "description": "Strumenti di disegno",
