@@ -25,29 +25,29 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamRequests = (function() {
+var LamRequests = (function () {
   let requestsData = [];
 
-  let addRequestData = function(key, data) {
+  let addRequestData = function (key, data) {
     requestsData.push({
       key: key,
-      data: data
+      data: data,
     });
   };
 
-  let removeRequestData = function(key) {
-    requestsData = requestsData.filter(function(element) {
+  let removeRequestData = function (key) {
+    requestsData = requestsData.filter(function (element) {
       return element.key != key;
     });
   };
 
-  let getRequestData = function(key) {
-    return requestsData.filter(function(element) {
+  let getRequestData = function (key) {
+    return requestsData.filter(function (element) {
       return element.key == key;
     });
   };
 
-  let getRequestsData = function() {
+  let getRequestsData = function () {
     return requestsData;
   };
 
@@ -55,20 +55,20 @@ var LamRequests = (function() {
    * Sends a preload request using JSONP protocol. Even if JSONP has been replaced by CORS, geoserver sens a 404 response if not
    * authenticated and the Allow-Control-Allow-Origin is not always predictable
    */
-  let sendPreloadRequest = function(url) {
+  let sendPreloadRequest = function (url) {
     $.ajax({
       dataType: "jsonp",
       url: url + "&format_options=callback:LamRequests.parseResponsePreload",
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSearchTools: unable to complete response preload"
+          message: "LamSearchTools: unable to complete response preload",
         });
-      }
+      },
     });
   };
 
-  let parseResponsePreload = function(data) {
+  let parseResponsePreload = function (data) {
     if (!data.features.length) return;
     let layerId = data.features[0].id.split(".")[0];
     var layer = getRequestData(layerId);
@@ -77,13 +77,13 @@ var LamRequests = (function() {
     let vectorSource = new ol.source.Vector({
       format: new ol.format.GeoJSON(),
       features: new ol.format.GeoJSON().readFeatures(data),
-      strategy: ol.loadingstrategy.all
+      strategy: ol.loadingstrategy.all,
     });
     let vector = new ol.layer.Vector({
       //zIndex: parseInt(zIndex),
       source: vectorSource,
       visible: layer.getVisible(),
-      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius)
+      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius),
     });
     try {
       vector.gid = layer.gid + "_preload";
@@ -121,8 +121,7 @@ var LamRequests = (function() {
     getRequestData: getRequestData,
     addRequestData: addRequestData,
     removeRequestData: removeRequestData,
-
     sendPreloadRequest: sendPreloadRequest,
-    parseResponsePreload: parseResponsePreload
+    parseResponsePreload: parseResponsePreload,
   };
 })();

@@ -181,6 +181,27 @@ let LamTemplates = (function () {
     return body;
   };
 
+  let standardTableTemplate = function (props, layer) {
+    if (!props) return "";
+    let body = "<table class='lam-table' >";
+    body += "<tr>";
+    for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
+      body += "<th>" + propertyName + "</th>";
+    }
+    body += "</tr>";
+    body += "{{#each this}}";
+    body += "<tr>";
+    for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
+      body += "<td>{{" + propertyName + "}}</td>";
+    }
+    body += "</tr>";
+    body += "{{/each}}";
+    body += "</table>";
+    return body;
+  };
+
   let featureIconsTemplate = function (index) {
     //icons
     let icons =
@@ -463,6 +484,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTableTemplate: getTableTemplate,
     getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
@@ -474,6 +496,6 @@ let LamTemplates = (function () {
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,
-    templates: templates,
+    standardTableTemplate: standardTableTemplate,
   };
 })();

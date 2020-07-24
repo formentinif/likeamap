@@ -5103,13 +5103,24 @@ var LamLegendTools = (function () {
         "', scaled: false })\">Visualizza legenda completa</a></div>";
     }
     if (thisLayer.queryable) {
+      html += "<div class='lam-mt-2' style='display:flow-root;'>";
+      //open attribute table
+      html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";
+      html +=
+        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        thisLayer.gid +
+        "'  }); return false;\"><i class='lam-icon'>" +
+        LamResources.svgTable16 +
+        "</i> Apri tabella</a>";
+      //open csv
       var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "csv");
       html +=
-        "<div class='lam-mt-2' style='display:flow-root;'><a href='" +
+        "<a href='" +
         layerUrl +
         "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
         LamResources.svgDownload16 +
         "</i> CSV</a>";
+      //open shp
       layerUrl = LamMap.getWFSUrlfromLayer(thisLayer);
       html +=
         " <a href='" +
@@ -5782,10 +5793,14 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
   svgOpen:
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
+  svgTable:
+    '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/><path d="M19,7H9C7.9,7,7,7.9,7,9v10c0,1.1,0.9,2,2,2h10c1.1,0,2-0.9,2-2V9C21,7.9,20.1,7,19,7z M19,9v2H9V9H19z M13,15v-2h2v2H13z M15,17v2h-2v-2H15z M11,15H9v-2h2V15z M17,13h2v2h-2V13z M9,17h2v2H9V17z M17,19v-2h2v2H17z M6,17H5c-1.1,0-2-0.9-2-2V5 c0-1.1,0.9-2,2-2h10c1.1,0,2,0.9,2,2v1h-2V5H5v10h1V17z"/></g></svg>',
+  svgTable16:
+    '<svg xmlns="http://www.w3.org/2000/svg"  height="16" width="16" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/><path d="M19,7H9C7.9,7,7,7.9,7,9v10c0,1.1,0.9,2,2,2h10c1.1,0,2-0.9,2-2V9C21,7.9,20.1,7,19,7z M19,9v2H9V9H19z M13,15v-2h2v2H13z M15,17v2h-2v-2H15z M11,15H9v-2h2V15z M17,13h2v2h-2V13z M9,17h2v2H9V17z M17,19v-2h2v2H17z M6,17H5c-1.1,0-2-0.9-2-2V5 c0-1.1,0.9-2,2-2h10c1.1,0,2,0.9,2,2v1h-2V5H5v10h1V17z"/></g></svg>',
   svgOpen16:
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
   svgDownload16:
-    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>',
 };
 
 var LamCookieConsent = (function () {
@@ -6538,6 +6553,7 @@ var LamLoader = (function () {
     //inizializzazione globale
     LamDom.init();
     LamRelations.init();
+    LamTables.init();
     LamDom.showAppTools();
     //map init
     LamMap.render("lam-map", LamStore.getAppState());
@@ -6667,29 +6683,29 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamRequests = (function() {
+var LamRequests = (function () {
   let requestsData = [];
 
-  let addRequestData = function(key, data) {
+  let addRequestData = function (key, data) {
     requestsData.push({
       key: key,
-      data: data
+      data: data,
     });
   };
 
-  let removeRequestData = function(key) {
-    requestsData = requestsData.filter(function(element) {
+  let removeRequestData = function (key) {
+    requestsData = requestsData.filter(function (element) {
       return element.key != key;
     });
   };
 
-  let getRequestData = function(key) {
-    return requestsData.filter(function(element) {
+  let getRequestData = function (key) {
+    return requestsData.filter(function (element) {
       return element.key == key;
     });
   };
 
-  let getRequestsData = function() {
+  let getRequestsData = function () {
     return requestsData;
   };
 
@@ -6697,20 +6713,20 @@ var LamRequests = (function() {
    * Sends a preload request using JSONP protocol. Even if JSONP has been replaced by CORS, geoserver sens a 404 response if not
    * authenticated and the Allow-Control-Allow-Origin is not always predictable
    */
-  let sendPreloadRequest = function(url) {
+  let sendPreloadRequest = function (url) {
     $.ajax({
       dataType: "jsonp",
       url: url + "&format_options=callback:LamRequests.parseResponsePreload",
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
-          message: "LamSearchTools: unable to complete response preload"
+          message: "LamSearchTools: unable to complete response preload",
         });
-      }
+      },
     });
   };
 
-  let parseResponsePreload = function(data) {
+  let parseResponsePreload = function (data) {
     if (!data.features.length) return;
     let layerId = data.features[0].id.split(".")[0];
     var layer = getRequestData(layerId);
@@ -6719,13 +6735,13 @@ var LamRequests = (function() {
     let vectorSource = new ol.source.Vector({
       format: new ol.format.GeoJSON(),
       features: new ol.format.GeoJSON().readFeatures(data),
-      strategy: ol.loadingstrategy.all
+      strategy: ol.loadingstrategy.all,
     });
     let vector = new ol.layer.Vector({
       //zIndex: parseInt(zIndex),
       source: vectorSource,
       visible: layer.getVisible(),
-      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius)
+      style: LamMapStyles.getPreloadStyle(layer.vectorWidth, layer.vectorRadius),
     });
     try {
       vector.gid = layer.gid + "_preload";
@@ -6763,9 +6779,129 @@ var LamRequests = (function() {
     getRequestData: getRequestData,
     addRequestData: addRequestData,
     removeRequestData: removeRequestData,
-
     sendPreloadRequest: sendPreloadRequest,
-    parseResponsePreload: parseResponsePreload
+    parseResponsePreload: parseResponsePreload,
+  };
+})();
+
+/*
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Copyright 2015-2019 Perspectiva di Formentini Filippo
+Concesso in licenza secondo i termini della Licenza Apache, versione 2.0 (la "Licenza"); è proibito usare questo file se non in conformità alla Licenza. Una copia della Licenza è disponibile all'indirizzo:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Se non richiesto dalla legislazione vigente o concordato per iscritto,
+il software distribuito nei termini della Licenza è distribuito
+"COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, esplicite o implicite.
+Consultare la Licenza per il testo specifico che regola le autorizzazioni e le limitazioni previste dalla medesima.
+
+*/
+
+let LamTables = (function () {
+  let currentLayerGid = 0;
+  let currentPageIndex = 0;
+  let currentPageSize = 25;
+  let sortAttribute = "OGR_FID";
+
+  let init = function () {
+    LamDispatcher.bind("show-attribute-table", function (payload) {
+      let maxFeatures = payload.maxFeatures ? payload.maxFeatures : currentPageSize;
+      currentPageIndex = payload.pageIndex ? payload.pageIndex : 0;
+      let startIndex = payload.pageIndex ? currentPageIndex * currentPageSize : 0;
+      LamTables.getLayerAttributeTable(payload.gid, maxFeatures, startIndex, sortAttribute);
+    });
+  };
+
+  let getLayerAttributeTable = function (layerGid, maxFeatures, startIndex, sortBy) {
+    lamDispatch("show-loader");
+    currentLayerGid = layerGid;
+    let layer = LamStore.getLayer(layerGid);
+    if (!layer) return;
+    let wfsUrl = LamMap.getWFSUrlfromLayer(layer, "text/javascript");
+    //WFS 2
+    wfsUrl = wfsUrl.replace("version=1.0.0", "version=2.0.0");
+    wfsUrl += "&sortBy=" + sortBy;
+    wfsUrl += "&format_options=callback:LamTables.parseResponseTable";
+    if (maxFeatures) wfsUrl += "&count=" + maxFeatures;
+    if (startIndex) wfsUrl += "&startIndex=" + startIndex;
+    $.ajax({
+      dataType: "jsonp",
+      url: wfsUrl,
+      jsonp: true,
+      cache: false,
+      error: function (jqXHR, textStatus, errorThrown) {
+        lamDispatch({
+          eventName: "log",
+          message: "LamTables: unable to complete response",
+        });
+        lamDispatch("hide-loader");
+      },
+    });
+  };
+
+  let parseResponseTable = function (data) {
+    lamDispatch("hide-loader");
+    let layer = LamStore.getLayer(currentLayerGid);
+    if (data.features) {
+      data = data.features;
+    }
+    if (!Array.isArray(data)) data = [data];
+    let propsList = [];
+    for (let i = 0; i < data.length; i++) {
+      let props = data[i].properties ? data[i].properties : data[i];
+      propsList.push(props);
+    }
+    let template = LamTemplates.getTemplate(currentLayerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    let tableTemplate = template ? LamTemplates.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    let title = layer.layerName;
+    let body = "";
+    let compiledTemplate = Handlebars.compile(tableTemplate);
+    body += compiledTemplate(propsList);
+    //pulsanti paginazione
+    body += "<div class='lam-grid lam-no-bg lam-mt-1'>";
+    body += "<div class='lam-col'>";
+    if (currentPageIndex > 0) {
+      body +=
+        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        currentLayerGid +
+        "', pageIndex: " +
+        (currentPageIndex - 1) +
+        ' });"> << </button>';
+    }
+    body += "</div>";
+    body += "<div class='lam-col'>Pag. " + (currentPageIndex + 1) + "</div>";
+    body += "<div class='lam-col'>";
+    if (propsList.length == currentPageSize) {
+      body +=
+        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        currentLayerGid +
+        "', pageIndex:" +
+        (currentPageIndex + 1) +
+        ' });"> >> </button>';
+    }
+    body += "</div>";
+    body += "</div>";
+    LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
+  };
+
+  return {
+    init: init,
+    getLayerAttributeTable: getLayerAttributeTable,
+    parseResponseTable: parseResponseTable,
   };
 })();
 
@@ -7808,6 +7944,27 @@ let LamTemplates = (function () {
     return body;
   };
 
+  let standardTableTemplate = function (props, layer) {
+    if (!props) return "";
+    let body = "<table class='lam-table' >";
+    body += "<tr>";
+    for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
+      body += "<th>" + propertyName + "</th>";
+    }
+    body += "</tr>";
+    body += "{{#each this}}";
+    body += "<tr>";
+    for (let propertyName in props) {
+      if (propertyName === "lamCoordinates") continue;
+      body += "<td>{{" + propertyName + "}}</td>";
+    }
+    body += "</tr>";
+    body += "{{/each}}";
+    body += "</table>";
+    return body;
+  };
+
   let featureIconsTemplate = function (index) {
     //icons
     let icons =
@@ -8090,6 +8247,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTableTemplate: getTableTemplate,
     getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
     getTemplateUrl: getTemplateUrl,
@@ -8101,7 +8259,7 @@ let LamTemplates = (function () {
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,
-    templates: templates,
+    standardTableTemplate: standardTableTemplate,
   };
 })();
 

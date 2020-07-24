@@ -66,6 +66,7 @@ function combineAppJs() {
         "./source/js/app-dom.js",
         "./source/js/app-loader.js",
         "./source/js/app-requests.js",
+		"./source/js/app-tables.js",
         "./source/js/app-store.js",
         "./source/js/app-layer-tree.js",
         "./source/js/app-templates.js",

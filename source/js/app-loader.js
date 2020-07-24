@@ -231,6 +231,7 @@ var LamLoader = (function () {
     //inizializzazione globale
     LamDom.init();
     LamRelations.init();
+    LamTables.init();
     LamDom.showAppTools();
     //map init
     LamMap.render("lam-map", LamStore.getAppState());
