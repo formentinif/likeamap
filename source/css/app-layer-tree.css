@@ -82,6 +82,7 @@
   display: inline-block;
   order: 2;
   flex-grow: 2;
+  padding-left: 2px;
 }
 
 .layertree-group__title--sub1 {

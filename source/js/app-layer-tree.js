@@ -125,7 +125,7 @@ let LamLayerTree = (function () {
     output += formatString(
       '<i id="{0}_i" class="layertree-group__icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
       groupId,
-      groupLayer.visible ? LamResources.svgExpandLess : LamResources.svgExpandMore,
+      groupLayer.visible ? LamResources.svgRemoveBox : LamResources.svgAddBox,
       groupLayer.visible ? "lam-plus" : "lam-minus"
     );
     output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
@@ -195,12 +195,12 @@ let LamLayerTree = (function () {
     if ($(icon).hasClass("lam-plus")) {
       $(icon).removeClass("lam-plus");
       $(icon).addClass("lam-minus");
-      $(icon).html(LamResources.svgExpandMore);
+      $(icon).html(LamResources.svgAddBox);
       return;
     } else {
       $(icon).removeClass("lam-minus");
       $(icon).addClass("lam-plus");
-      $(icon).html(LamResources.svgExpandLess);
+      $(icon).html(LamResources.svgRemoveBox);
       return;
     }
   };
