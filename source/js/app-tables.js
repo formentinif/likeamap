@@ -30,27 +30,32 @@ let LamTables = (function () {
   let currentPageIndex = 0;
   let currentPageSize = 25;
   let sortAttribute = "OGR_FID";
+  let currentFeatureCount = -1;
 
   let init = function () {
     LamDispatcher.bind("show-attribute-table", function (payload) {
-      let maxFeatures = payload.maxFeatures ? payload.maxFeatures : currentPageSize;
-      currentPageIndex = payload.pageIndex ? payload.pageIndex : 0;
-      let startIndex = payload.pageIndex ? currentPageIndex * currentPageSize : 0;
-      LamTables.getLayerAttributeTable(payload.gid, maxFeatures, startIndex, sortAttribute);
+      LamTables.getLayerAttributeTable(payload.gid, payload.maxFeatures, payload.pageIndex, payload.sortBy);
     });
   };
 
-  let getLayerAttributeTable = function (layerGid, maxFeatures, startIndex, sortBy) {
+  let getLayerAttributeTable = function (layerGid, maxFeatures, pageIndex, sortBy) {
+    if (currentLayerGid != layerGid) {
+      currentLayerGid = layerGid;
+      currentFeatureCount = -1;
+    }
+    if (maxFeatures) currentPageSize = maxFeatures;
+    if (sortBy) sortAttribute = sortBy;
+    currentPageIndex = pageIndex ? pageIndex : 0;
+    let startIndex = pageIndex ? currentPageIndex * currentPageSize : 0;
     lamDispatch("show-loader");
-    currentLayerGid = layerGid;
     let layer = LamStore.getLayer(layerGid);
     if (!layer) return;
     let wfsUrl = LamMap.getWFSUrlfromLayer(layer, "text/javascript");
-    //WFS 2
+    //WFS version 2
     wfsUrl = wfsUrl.replace("version=1.0.0", "version=2.0.0");
-    wfsUrl += "&sortBy=" + sortBy;
+    wfsUrl += "&sortBy=" + sortAttribute;
     wfsUrl += "&format_options=callback:LamTables.parseResponseTable";
-    if (maxFeatures) wfsUrl += "&count=" + maxFeatures;
+    if (currentPageSize) wfsUrl += "&count=" + currentPageSize;
     if (startIndex) wfsUrl += "&startIndex=" + startIndex;
     $.ajax({
       dataType: "jsonp",
@@ -70,6 +75,7 @@ let LamTables = (function () {
   let parseResponseTable = function (data) {
     lamDispatch("hide-loader");
     let layer = LamStore.getLayer(currentLayerGid);
+    currentFeatureCount = data.totalFeatures;
     if (data.features) {
       data = data.features;
     }
@@ -80,41 +86,101 @@ let LamTables = (function () {
       propsList.push(props);
     }
     let template = LamTemplates.getTemplate(currentLayerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
-    let tableTemplate = template ? LamTemplates.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    let tableTemplate = template ? LamTables.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
     let title = layer.layerName;
     let body = "";
     let compiledTemplate = Handlebars.compile(tableTemplate);
     body += compiledTemplate(propsList);
     //pulsanti paginazione
     body += "<div class='lam-grid lam-no-bg lam-mt-1'>";
+    let startIndex = currentPageIndex * currentPageSize + 1;
+    body += "<div class='lam-col'> N° ";
+    body += "" + startIndex + "-" + (startIndex + currentPageSize - 1) + " su " + currentFeatureCount;
+    body += "</div>";
+    body += "<div class='lam-col'> Mostra ";
+    body += "<select class='lam-select-small ' onchange='LamTables.updatePageSize(this)'>";
+    for (let index = 25; index <= 100; index += 25) {
+      body += "<option value='" + index + "' " + (index === currentPageSize ? "selected" : "") + ">" + index + "</option>\n";
+    }
+    body += " </select>";
+    body += "</div>";
+    body += "<div class='lam-col'>";
+    body += " Pag. <select class='lam-select-small ' onchange='LamTables.updatePageIndex(this)'>";
+    for (let index = 1; index <= Math.floor(currentFeatureCount / currentPageSize) + 1; index++) {
+      body += "<option value='" + index + "' " + (index === currentPageIndex + 1 ? "selected" : "") + ">" + index + "</option>";
+    }
+    body += " </select>";
+
+    body += "/" + Math.floor(currentFeatureCount / currentPageSize) + 1;
+    body += "</div>";
     body += "<div class='lam-col'>";
     if (currentPageIndex > 0) {
       body +=
-        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "<button class='lam-btn lam-btn-small' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
         currentLayerGid +
         "', pageIndex: " +
         (currentPageIndex - 1) +
-        ' });"> << </button>';
+        ' });"><i class="lam-icon">' +
+        LamResources.svgArrowLeft +
+        "</i></button>";
     }
-    body += "</div>";
-    body += "<div class='lam-col'>Pag. " + (currentPageIndex + 1) + "</div>";
-    body += "<div class='lam-col'>";
     if (propsList.length == currentPageSize) {
       body +=
-        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "<button class='lam-btn lam-btn-small' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
         currentLayerGid +
         "', pageIndex:" +
         (currentPageIndex + 1) +
-        ' });"> >> </button>';
+        ' });"><i class="lam-icon">' +
+        LamResources.svgArrowRight +
+        "</i></button>";
     }
     body += "</div>";
     body += "</div>";
     LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
   };
 
+  let getTableTemplate = function (template, layer) {
+    let str = "<table class='lam-table'>";
+    str += "<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<th class='" + (template.fields[i].field === sortAttribute ? " lam-sorted " : "") + "' >";
+      str +=
+        "<i class='lam-pointer ' onclick=\"lamDispatch({ eventName: 'show-attribute-table', sortBy: '" +
+        (template.fields[i].field === sortAttribute ? template.fields[i].field + " DESC" : template.fields[i].field) +
+        "', gid: '" +
+        layer.gid +
+        "'  }); return false;\">";
+      str += template.fields[i].field === sortAttribute ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
+      str += "</i></a>";
+      str += template.fields[i].label + "</th>";
+    }
+    str += "</tr>";
+    str += "{{#each this}}<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<td>{{" + template.fields[i].field + "}}</td>";
+    }
+    str += "</tr>{{/each}}";
+    str += "</table>";
+    return str;
+  };
+
+  let updatePageSize = function (sender) {
+    if ($(sender).val()) {
+      LamTables.getLayerAttributeTable(currentLayerGid, parseInt($(sender).val()), currentPageIndex, sortAttribute);
+    }
+  };
+  let updatePageIndex = function (sender) {
+    if ($(sender).val()) {
+      LamTables.getLayerAttributeTable(currentLayerGid, currentPageSize, parseInt($(sender).val()) - 1, sortAttribute);
+    }
+  };
+
   return {
     init: init,
     getLayerAttributeTable: getLayerAttributeTable,
+    getTableTemplate: getTableTemplate,
     parseResponseTable: parseResponseTable,
+    updatePageSize: updatePageSize,
+    updatePageIndex: updatePageIndex,
   };
 })();

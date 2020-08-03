@@ -1,4 +1,6 @@
 var LamCookieDescription = (function () {
+  let cookieName = "lamCookieDescriptionDismiss";
+
   function lamCookieFadeIn(elem, display) {
     var el = document.getElementById(elem);
     var ease = 1; //0.02 for fading
@@ -46,12 +48,12 @@ var LamCookieDescription = (function () {
     }
     return null;
   }
-  function eraseCookieDescription(name) {
-    document.cookie = name + "=; Max-Age=-99999999;";
+  function eraseCookieDescription() {
+    document.cookie = cookieName + "=; Max-Age=-99999999;";
   }
 
   function cookieDescription() {
-    if (!getCookieDescription("lamCookieDescriptionDismiss")) {
+    if (!getCookieDescription(cookieName)) {
       document.body.innerHTML +=
         '<div class="lamDescriptionContainer" id="lamDescriptionContainer"><div class="cookieTitle"><a>' +
         LamStore.getAppState().title +
@@ -66,7 +68,7 @@ var LamCookieDescription = (function () {
   }
 
   function lamCookieDescriptionDismiss() {
-    setCookieDescription("lamCookieDescriptionDismiss", "1", 7);
+    setCookieDescription(cookieName, "1", 7);
     lamCookieFadeOut("lamDescriptionContainer");
   }
 
@@ -77,5 +79,7 @@ var LamCookieDescription = (function () {
   return {
     lamCookieDescriptionDismiss: lamCookieDescriptionDismiss,
     cookieDescription: cookieDescription,
+    setCookieDescription: setCookieDescription,
+    eraseCookieDescription: eraseCookieDescription,
   };
 })();

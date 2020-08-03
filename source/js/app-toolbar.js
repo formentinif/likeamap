@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione della toolbar
  */
-let LamToolbar = (function() {
+let LamToolbar = (function () {
   "use strict";
 
   var easingTime = 300;
@@ -36,7 +36,7 @@ let LamToolbar = (function() {
 
   let resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }];
 
-  let init = function() {
+  let init = function () {
     //eseguo degli aggiustamente in caso di browser mobile
     if (LamDom.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
@@ -57,30 +57,30 @@ let LamToolbar = (function() {
    * Resetta tutti i controlli mappa al cambio di menu
    * @return {null} La funzione non restituisce un valore
    */
-  let resetTools = function() {
-    resetToolsPayloads.forEach(function(payload) {
+  let resetTools = function () {
+    resetToolsPayloads.forEach(function (payload) {
       lamDispatch(payload);
     });
   };
 
-  let addResetToolsEvent = function(event) {
+  let addResetToolsEvent = function (event) {
     resetToolsPayloads.push(event);
   };
 
-  let showMenu = function(toolId) {
+  let showMenu = function (toolId) {
     $("#bottom-info").hide();
     $("#panel").animate(
       {
-        width: "show"
+        width: "show",
       },
       {
         duration: easingTime,
-        complete: function() {
+        complete: function () {
           if (toolId) {
             $("#" + toolId).show();
           }
           $("#panel__open").hide();
-        }
+        },
       }
     );
   };
@@ -88,19 +88,19 @@ let LamToolbar = (function() {
   /**
    * Nasconde il pannello del menu
    */
-  var hideMenu = function() {
+  var hideMenu = function () {
     $("#panel").animate(
       {
-        width: "hide"
+        width: "hide",
       },
       easingTime,
-      function() {
+      function () {
         $("#panel__open").show();
       }
     );
   };
 
-  var toggleToolbarItem = function(toolId, keepOpen) {
+  var toggleToolbarItem = function (toolId, keepOpen) {
     LamStore.setInfoClickEnabled(true);
     //verifico se il pannello non è già selezionato
     if (currentToolbarItem != toolId) {
@@ -124,7 +124,7 @@ let LamToolbar = (function() {
     }
   };
 
-  let getCurrentToolbarItem = function() {
+  let getCurrentToolbarItem = function () {
     return currentToolbarItem;
   };
 
@@ -134,6 +134,6 @@ let LamToolbar = (function() {
     hideMenu: hideMenu,
     init: init,
     showMenu: showMenu,
-    toggleToolbarItem: toggleToolbarItem
+    toggleToolbarItem: toggleToolbarItem,
   };
 })();

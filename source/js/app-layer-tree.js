@@ -43,7 +43,7 @@ let LamLayerTree = (function () {
       init();
     }
     let output = "";
-    output += '<h4 class="lam-title">Temi</h4>';
+    output += '<h4 class="lam-title">Oggetti</h4>';
     output += '<div class="layertree">'; //generale
     let index = 0;
     layers.forEach(function (element) {

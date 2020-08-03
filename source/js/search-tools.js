@@ -179,7 +179,7 @@ var LamSearchTools = (function () {
     template += "</div>";
     if (layersNum) {
       template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half" onclick="LamSearchTools.showSearchLayers(); return false;">';
-      template += '<a id="search-tools__button-layers" class="" >Temi</a>';
+      template += '<a id="search-tools__button-layers" class="" >Oggetti</a>';
       template += "</div>";
     }
     template += "</div>";

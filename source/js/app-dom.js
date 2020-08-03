@@ -1,5 +1,12 @@
 var LamDom = (function () {
   var init = function init() {
+    $("#panel__logo").click(function () {
+      if (LamStore.getAppState().description) {
+        LamCookieDescription.eraseCookieDescription();
+        LamCookieDescription.cookieDescription();
+      }
+    });
+
     //events binding
     LamDispatcher.bind("hide-info-window", function (payload) {
       LamDom.hideInfoWindow();
@@ -76,6 +83,9 @@ var LamDom = (function () {
 
     function dragMouseDown(e) {
       e = e || window.event;
+      if (e.srcElement.tagName.toLowerCase() === "select") {
+        return;
+      }
       e.preventDefault();
       // get the mouse cursor position at startup:
       pos3 = e.clientX;

@@ -116,7 +116,7 @@ var LamLegendTools = (function () {
       //open attribute table
       html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";
       html +=
-        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', sortBy: 'OGR_FID', gid: '" +
         thisLayer.gid +
         "'  }); return false;\"><i class='lam-icon'>" +
         LamResources.svgTable16 +
@@ -176,8 +176,8 @@ var LamLegendTools = (function () {
         }
       }
     });
-    let title = "Legenda dei temi attivi";
-    if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
+    let title = "Legenda dei layer attivi";
+    if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più layer.");
     if (showInfoWindow) {
       LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "");
     } else {

@@ -221,7 +221,8 @@ var LamLoader = (function () {
       if (LamStore.getAppState().logoPanelUrl) {
         $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
         $("#panel__logo-img").removeClass("lam-hidden");
-      } else if (LamStore.getAppState().title) {
+      }
+      if (LamStore.getAppState().title) {
         $("#panel__map-title").text(LamStore.getAppState().title);
         $("#panel__map-title").removeClass("lam-hidden");
       }
