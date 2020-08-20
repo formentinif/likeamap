@@ -4168,7 +4168,7 @@ var LamSearchTools = (function () {
     template += "</div>";
     if (layersNum) {
       template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half" onclick="LamSearchTools.showSearchLayers(); return false;">';
-      template += '<a id="search-tools__button-layers" class="" >Temi</a>';
+      template += '<a id="search-tools__button-layers" class="" >Oggetti</a>';
       template += "</div>";
     }
     template += "</div>";
@@ -4900,15 +4900,27 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-let LamLinksTools = (function() {
+let LamLinksTools = (function () {
   let isRendered = false;
 
   let init = function init() {
     //events binding
-    LamDispatcher.bind("show-links", function(payload) {
+
+    LamDispatcher.bind("show-links-toggle", function (payload) {
+      //if legend is visible toggle
+      if ($("#lam-links-container").is(":visible")) {
+        LamToolbar.toggleToolbarItem("links", false);
+        return;
+      }
+      payload.eventName = "show-links";
+      LamDispatcher.dispatch(payload);
+    });
+
+    LamDispatcher.bind("show-links", function (payload) {
       let templateTemp = templateLink();
-      let output = "<ul class='lam-group-list lam-no-padding'>";
-      LamStore.getLinks().forEach(function(link) {
+      let output = "<div id='lam-links-container'>";
+      output += "<ul class='lam-group-list lam-no-padding'>";
+      LamStore.getLinks().forEach(function (link) {
         output += "<li>";
         if (link.links && link.links.length) {
           //is grouped
@@ -4919,10 +4931,11 @@ let LamLinksTools = (function() {
         output += "</li>";
       });
       output += "</ul>";
+      output += "</div>";
       if (LamStore.getAppState().openLinksInInfoWindow) {
-        LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output);
+        LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Links", output, "", "links");
       } else {
-        LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Links", output);
+        LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Links", output, "", "links");
       }
     });
 
@@ -4933,14 +4946,14 @@ let LamLinksTools = (function() {
     $("#app-terms-links").html(output);
   };
 
-  let render = function(div) {
+  let render = function (div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  let renderGroupLink = function(link) {
+  let renderGroupLink = function (link) {
     let templateTemp = templateLink();
     let output = "";
     if (link.title) {
@@ -4953,7 +4966,7 @@ let LamLinksTools = (function() {
       output += "</h5>";
     }
     output += "<ul class='lam-group-list'>";
-    link.links.forEach(function(subLink) {
+    link.links.forEach(function (subLink) {
       output += "<li>";
       if (subLink.links && subLink.links.length) {
         //is grouped
@@ -4967,12 +4980,12 @@ let LamLinksTools = (function() {
     return output;
   };
 
-  let templateLink = function() {
+  let templateLink = function () {
     let template = "<a class='lam-link' href='{{url}}' target='_blank'>{{title}} <i class='lam-feature__icon'>" + LamResources.svgOpen16 + "</i></a>";
     return Handlebars.compile(template);
   };
 
-  let templateTermsLinks = function() {
+  let templateTermsLinks = function () {
     //pannello ricerca via
     let template = "{{#each this}}";
     template += "<a class='lam-link' href='{{url}}' target='_blank'>{{title}}</a>";
@@ -4985,7 +4998,7 @@ let LamLinksTools = (function() {
     init: init,
     render: render,
     templateLink: templateLink,
-    templateTermsLinks: templateTermsLinks
+    templateTermsLinks: templateTermsLinks,
   };
 })();
 
@@ -5031,6 +5044,23 @@ var LamLegendTools = (function () {
      * Helper event to open legend for all layers at the current scale
      */
     LamDispatcher.bind("show-legend-visible-layers", function (payload) {
+      currentLegendPayload = payload;
+      let layers = LamStore.getVisibleLayers();
+      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
+    });
+
+    /**
+     * Helper event to open legend for all layers at the current scale that toggles the main menu
+     *
+     */
+    LamDispatcher.bind("show-legend-visible-layers-toggle", function (payload) {
+      //if legend is visible toggle
+      if ($("#lam-legend-container").is(":visible")) {
+        LamToolbar.toggleToolbarItem("legend", false);
+        return;
+      }
+      //else show legend
+      payload.eventName = "show-legend-visible-layers"; //toggle once
       currentLegendPayload = payload;
       let layers = LamStore.getVisibleLayers();
       LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
@@ -5107,7 +5137,7 @@ var LamLegendTools = (function () {
       //open attribute table
       html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";
       html +=
-        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "onclick=\"lamDispatch({ eventName: 'show-attribute-table', sortBy: 'OGR_FID', gid: '" +
         thisLayer.gid +
         "'  }); return false;\"><i class='lam-icon'>" +
         LamResources.svgTable16 +
@@ -5131,9 +5161,9 @@ var LamLegendTools = (function () {
     }
     html += "<div>";
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "", "legend");
     }
     return true;
   };
@@ -5167,12 +5197,12 @@ var LamLegendTools = (function () {
         }
       }
     });
-    let title = "Legenda dei temi attivi";
-    if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più temi.");
+    let title = "Legenda dei layer attivi";
+    if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più layer.");
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, $("<div>").append(html.clone()).html(), "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, $("<div>").append(html.clone()).html(), "", "legend");
     }
   };
 
@@ -5791,6 +5821,10 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
   svgExpandMore:
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
+  svgExpandLess16:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
+  svgExpandMore16:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
   svgOpen:
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>',
   svgTable:
@@ -5809,6 +5843,14 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" ><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
   svgRemove:
     '<svg xmlns="http://www.w3.org/2000/svg" height="24 " width="24" viewBox="0 0 24 24" ><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13H5v-2h14v2z"/></svg>',
+  svgArrowLeft:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M14 7l-5 5 5 5V7z"/><path d="M24 0v24H0V0h24z" fill="none"/></svg>',
+  svgArrowRight:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M10 17l5-5-5-5v10z"/><path d="M0 24V0h24v24H0z" fill="none"/></svg>',
+  svgChevronLeft:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
+  svgChevronRight:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>',
 };
 
 var LamCookieConsent = (function () {
@@ -5860,7 +5902,7 @@ var LamCookieConsent = (function () {
     return null;
   }
   function eraseCookieConsent(name) {
-    document.cookie = name + "=; Max-Age=-99999999;";
+    setCookieDescription(cookieName, "0", 7);
   }
 
   function cookieConsent() {
@@ -5895,6 +5937,18 @@ var LamCookieConsent = (function () {
 })();
 
 var LamCookieDescription = (function () {
+  let cookieName = "lamCookieDescriptionDismiss";
+
+  var init = function init() {
+    //events binding
+    LamDispatcher.bind("show-lam-description", function (payload) {
+      if (LamStore.getAppState().description) {
+        LamCookieDescription.eraseCookieDescription();
+        LamCookieDescription.cookieDescription();
+      }
+    });
+  };
+
   function lamCookieFadeIn(elem, display) {
     var el = document.getElementById(elem);
     var ease = 1; //0.02 for fading
@@ -5942,27 +5996,33 @@ var LamCookieDescription = (function () {
     }
     return null;
   }
-  function eraseCookieDescription(name) {
-    document.cookie = name + "=; Max-Age=-99999999;";
+  function eraseCookieDescription() {
+    setCookieDescription(cookieName, "0", 7);
   }
 
   function cookieDescription() {
-    if (!getCookieDescription("lamCookieDescriptionDismiss")) {
-      document.body.innerHTML +=
-        '<div class="lamDescriptionContainer" id="lamDescriptionContainer"><div class="cookieTitle"><a>' +
-        LamStore.getAppState().title +
-        '</a></div><div class="cookieDesc"><p>' +
-        LamStore.getAppState().description +
-        " " +
-        '<div class="cookieButton"><a onClick="LamCookieDescription.lamCookieDescriptionDismiss();">' +
-        "Chiudi" +
-        "</a></div></div>";
+    if (getCookieDescription(cookieName) && getCookieDescription(cookieName) != "1") {
+      $("<div>", {
+        id: "lamDescriptionContainer",
+        class: "lamDescriptionContainer",
+      }).appendTo("body");
+
+      $("#lamDescriptionContainer").html(
+        '<div class="cookieTitle"><a>' +
+          LamStore.getAppState().title +
+          '</a></div><div class="cookieDesc"><p>' +
+          LamStore.getAppState().description +
+          " " +
+          '<div class="cookieButton"><a onClick="LamCookieDescription.lamCookieDescriptionDismiss();">' +
+          "Chiudi" +
+          "</a></div>"
+      );
       lamCookieFadeIn("lamDescriptionContainer");
     }
   }
 
   function lamCookieDescriptionDismiss() {
-    setCookieDescription("lamCookieDescriptionDismiss", "1", 7);
+    setCookieDescription(cookieName, "1", 7);
     lamCookieFadeOut("lamDescriptionContainer");
   }
 
@@ -5971,8 +6031,11 @@ var LamCookieDescription = (function () {
   // };
 
   return {
+    init: init,
     lamCookieDescriptionDismiss: lamCookieDescriptionDismiss,
     cookieDescription: cookieDescription,
+    setCookieDescription: setCookieDescription,
+    eraseCookieDescription: eraseCookieDescription,
   };
 })();
 
@@ -6045,7 +6108,15 @@ var AppCustom = (function() {
 })();
 
 var LamRelations = (function () {
-  let relationsResults = {};
+  /**
+   * This object is made of properties
+   * data
+   * template
+   */
+  let relationsResults = {
+    data: null,
+    template: null,
+  };
   let currentRelation; //relation currently evaluating
   var init = function init() {
     //events binding
@@ -6125,6 +6196,7 @@ var LamRelations = (function () {
 
     //single template not active by default, a single template for all items
     if (template.multipleItems && propsList.length > 0) {
+      debugger;
       body += LamTemplates.processTemplate(template, propsList);
     }
     //download
@@ -6228,6 +6300,9 @@ var LamDom = (function () {
 
     function dragMouseDown(e) {
       e = e || window.event;
+      if (e.srcElement.tagName.toLowerCase() === "select") {
+        return;
+      }
       e.preventDefault();
       // get the mouse cursor position at startup:
       pos3 = e.clientX;
@@ -6257,6 +6332,15 @@ var LamDom = (function () {
     }
   };
 
+  /**
+   * Shows the html content that is a rult of an info click, legend, tool etc.
+   * @param {LamEnums.showContentMode} contentMode Set the display mode of the content (Left Panel, Bottom Panel or InfoWindow)
+   * @param {*} title Title of the content
+   * @param {*} htmlMain Main content
+   * @param {*} htmlBottomInfo Content that will be displayed in the bottom panel for mobile readability. If null, the htmlMain will be used instead.
+   * @param {*} toolBarItem Toolbar name that has generated the content. If not visibile it will be displayed
+   * @param {*} elementId Html element id where the content will be displayed. Default will be InfoWindow
+   */
   let showContent = function (contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
     if (!elementId) elementId = "info-results";
     if (!htmlBottomInfo) htmlBottomInfo = htmlMain;
@@ -6276,6 +6360,7 @@ var LamDom = (function () {
           .show();
         LamToolbar.toggleToolbarItem(toolBarItem, true);
         LamDispatcher.dispatch("hide-info-window");
+        $("#" + elementId + "").show();
         //LamDispatcher.dispatch("show-menu");
         $("#bottom-info").hide();
         break;
@@ -6551,7 +6636,8 @@ var LamLoader = (function () {
       if (LamStore.getAppState().logoPanelUrl) {
         $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
         $("#panel__logo-img").removeClass("lam-hidden");
-      } else if (LamStore.getAppState().title) {
+      }
+      if (LamStore.getAppState().title) {
         $("#panel__map-title").text(LamStore.getAppState().title);
         $("#panel__map-title").removeClass("lam-hidden");
       }
@@ -6592,6 +6678,7 @@ var LamLoader = (function () {
     }
     LamLinksTools.init();
     LamLegendTools.init();
+    LamCookieDescription.init();
 
     //loading templates
     LamTemplates.init();
@@ -6824,27 +6911,32 @@ let LamTables = (function () {
   let currentPageIndex = 0;
   let currentPageSize = 25;
   let sortAttribute = "OGR_FID";
+  let currentFeatureCount = -1;
 
   let init = function () {
     LamDispatcher.bind("show-attribute-table", function (payload) {
-      let maxFeatures = payload.maxFeatures ? payload.maxFeatures : currentPageSize;
-      currentPageIndex = payload.pageIndex ? payload.pageIndex : 0;
-      let startIndex = payload.pageIndex ? currentPageIndex * currentPageSize : 0;
-      LamTables.getLayerAttributeTable(payload.gid, maxFeatures, startIndex, sortAttribute);
+      LamTables.getLayerAttributeTable(payload.gid, payload.maxFeatures, payload.pageIndex, payload.sortBy);
     });
   };
 
-  let getLayerAttributeTable = function (layerGid, maxFeatures, startIndex, sortBy) {
+  let getLayerAttributeTable = function (layerGid, maxFeatures, pageIndex, sortBy) {
+    if (currentLayerGid != layerGid) {
+      currentLayerGid = layerGid;
+      currentFeatureCount = -1;
+    }
+    if (maxFeatures) currentPageSize = maxFeatures;
+    if (sortBy) sortAttribute = sortBy;
+    currentPageIndex = pageIndex ? pageIndex : 0;
+    let startIndex = pageIndex ? currentPageIndex * currentPageSize : 0;
     lamDispatch("show-loader");
-    currentLayerGid = layerGid;
     let layer = LamStore.getLayer(layerGid);
     if (!layer) return;
     let wfsUrl = LamMap.getWFSUrlfromLayer(layer, "text/javascript");
-    //WFS 2
+    //WFS version 2
     wfsUrl = wfsUrl.replace("version=1.0.0", "version=2.0.0");
-    wfsUrl += "&sortBy=" + sortBy;
+    wfsUrl += "&sortBy=" + sortAttribute;
     wfsUrl += "&format_options=callback:LamTables.parseResponseTable";
-    if (maxFeatures) wfsUrl += "&count=" + maxFeatures;
+    if (currentPageSize) wfsUrl += "&count=" + currentPageSize;
     if (startIndex) wfsUrl += "&startIndex=" + startIndex;
     $.ajax({
       dataType: "jsonp",
@@ -6864,6 +6956,7 @@ let LamTables = (function () {
   let parseResponseTable = function (data) {
     lamDispatch("hide-loader");
     let layer = LamStore.getLayer(currentLayerGid);
+    currentFeatureCount = data.totalFeatures;
     if (data.features) {
       data = data.features;
     }
@@ -6874,42 +6967,103 @@ let LamTables = (function () {
       propsList.push(props);
     }
     let template = LamTemplates.getTemplate(currentLayerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
-    let tableTemplate = template ? LamTemplates.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    let tableTemplate = template ? LamTables.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
     let title = layer.layerName;
     let body = "";
     let compiledTemplate = Handlebars.compile(tableTemplate);
     body += compiledTemplate(propsList);
     //pulsanti paginazione
     body += "<div class='lam-grid lam-no-bg lam-mt-1'>";
+    let startIndex = currentPageIndex * currentPageSize + 1;
+    body += "<div class='lam-col'> N° ";
+    body +=
+      "" + startIndex + "-" + (startIndex + (currentPageSize > currentFeatureCount) ? currentFeatureCount : currentPageSize - 1) + " su " + currentFeatureCount;
+    body += "</div>";
+    body += "<div class='lam-col'> Mostra ";
+    body += "<select class='lam-select-small ' onchange='LamTables.updatePageSize(this)'>";
+    for (let index = 25; index <= 100; index += 25) {
+      body += "<option value='" + index + "' " + (index === currentPageSize ? "selected" : "") + ">" + index + "</option>\n";
+    }
+    body += " </select>";
+    body += "</div>";
+    body += "<div class='lam-col'>";
+    body += " Pag. <select class='lam-select-small ' onchange='LamTables.updatePageIndex(this)'>";
+    for (let index = 1; index <= Math.floor(currentFeatureCount / currentPageSize) + 1; index++) {
+      body += "<option value='" + index + "' " + (index === currentPageIndex + 1 ? "selected" : "") + ">" + index + "</option>";
+    }
+    body += " </select>";
+
+    body += "/" + Math.floor(currentFeatureCount / currentPageSize) + 1;
+    body += "</div>";
     body += "<div class='lam-col'>";
     if (currentPageIndex > 0) {
       body +=
-        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "<button class='lam-btn lam-btn-small' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
         currentLayerGid +
         "', pageIndex: " +
         (currentPageIndex - 1) +
-        ' });"> << </button>';
+        ' });"><i class="lam-icon">' +
+        LamResources.svgArrowLeft +
+        "</i></button>";
     }
-    body += "</div>";
-    body += "<div class='lam-col'>Pag. " + (currentPageIndex + 1) + "</div>";
-    body += "<div class='lam-col'>";
     if (propsList.length == currentPageSize) {
       body +=
-        "<button class='lam-btn' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
+        "<button class='lam-btn lam-btn-small' onclick=\"lamDispatch({ eventName: 'show-attribute-table', gid: '" +
         currentLayerGid +
         "', pageIndex:" +
         (currentPageIndex + 1) +
-        ' });"> >> </button>';
+        ' });"><i class="lam-icon">' +
+        LamResources.svgArrowRight +
+        "</i></button>";
     }
     body += "</div>";
     body += "</div>";
     LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
   };
 
+  let getTableTemplate = function (template, layer) {
+    let str = "<table class='lam-table'>";
+    str += "<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<th class='" + (template.fields[i].field === sortAttribute ? " lam-sorted " : "") + "' >";
+      str +=
+        "<i class='lam-pointer ' onclick=\"lamDispatch({ eventName: 'show-attribute-table', sortBy: '" +
+        (template.fields[i].field === sortAttribute ? template.fields[i].field + " DESC" : template.fields[i].field) +
+        "', gid: '" +
+        layer.gid +
+        "'  }); return false;\">";
+      str += template.fields[i].field === sortAttribute ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
+      str += "</i></a>";
+      str += template.fields[i].label + "</th>";
+    }
+    str += "</tr>";
+    str += "{{#each this}}<tr>";
+    for (let i = 0; i < template.fields.length; i++) {
+      str += "<td>{{" + template.fields[i].field + "}}</td>";
+    }
+    str += "</tr>{{/each}}";
+    str += "</table>";
+    return str;
+  };
+
+  let updatePageSize = function (sender) {
+    if ($(sender).val()) {
+      LamTables.getLayerAttributeTable(currentLayerGid, parseInt($(sender).val()), currentPageIndex, sortAttribute);
+    }
+  };
+  let updatePageIndex = function (sender) {
+    if ($(sender).val()) {
+      LamTables.getLayerAttributeTable(currentLayerGid, currentPageSize, parseInt($(sender).val()) - 1, sortAttribute);
+    }
+  };
+
   return {
     init: init,
     getLayerAttributeTable: getLayerAttributeTable,
+    getTableTemplate: getTableTemplate,
     parseResponseTable: parseResponseTable,
+    updatePageSize: updatePageSize,
+    updatePageIndex: updatePageIndex,
   };
 })();
 
@@ -7304,15 +7458,19 @@ var LamStore = (function () {
     if (initialAppState.layers) {
       resetLayersArray(initialAppState.layers);
     }
+    //resetting checkboxes
+    LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
   };
 
   var resetLayersArray = function (layers) {
     layers.forEach(function (layer) {
-      lamDispatch({
-        eventName: "set-layer-visibility",
-        gid: layer.gid,
-        visibility: parseInt(layer.visible),
-      });
+      if (layer.layerType != "group") {
+        lamDispatch({
+          eventName: "set-layer-visibility",
+          gid: layer.gid,
+          visibility: parseInt(layer.visible),
+        });
+      }
       if (layer.layers) {
         resetLayersArray(layer.layers);
       }
@@ -7532,7 +7690,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 let LamLayerTree = (function () {
-  let treeDiv = "lam-layer-tree";
+  let treeDiv = "layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
 
@@ -7549,7 +7707,7 @@ let LamLayerTree = (function () {
       init();
     }
     let output = "";
-    output += '<h4 class="lam-title">Temi</h4>';
+    output += '<h4 class="lam-title">Oggetti</h4>';
     output += '<div class="layertree">'; //generale
     let index = 0;
     layers.forEach(function (element) {
@@ -7631,7 +7789,7 @@ let LamLayerTree = (function () {
     output += formatString(
       '<i id="{0}_i" class="layertree-group__icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
       groupId,
-      groupLayer.visible ? LamResources.svgRemoveBox : LamResources.svgAddBox,
+      groupLayer.visible ? LamResources.svgExpandMore : LamResources.svgChevronRight,
       groupLayer.visible ? "lam-plus" : "lam-minus"
     );
     output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
@@ -7701,12 +7859,12 @@ let LamLayerTree = (function () {
     if ($(icon).hasClass("lam-plus")) {
       $(icon).removeClass("lam-plus");
       $(icon).addClass("lam-minus");
-      $(icon).html(LamResources.svgAddBox);
+      $(icon).html(LamResources.svgChevronRight);
       return;
     } else {
       $(icon).removeClass("lam-minus");
       $(icon).addClass("lam-plus");
-      $(icon).html(LamResources.svgRemoveBox);
+      $(icon).html(LamResources.svgExpandMore);
       return;
     }
   };
@@ -8301,7 +8459,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione della toolbar
  */
-let LamToolbar = (function() {
+let LamToolbar = (function () {
   "use strict";
 
   var easingTime = 300;
@@ -8309,7 +8467,7 @@ let LamToolbar = (function() {
 
   let resetToolsPayloads = [{ eventName: "stop-copy-coordinate" }];
 
-  let init = function() {
+  let init = function () {
     //eseguo degli aggiustamente in caso di browser mobile
     if (LamDom.isMobile()) {
       $("#menu-toolbar").css("padding-left", "10px");
@@ -8330,30 +8488,32 @@ let LamToolbar = (function() {
    * Resetta tutti i controlli mappa al cambio di menu
    * @return {null} La funzione non restituisce un valore
    */
-  let resetTools = function() {
-    resetToolsPayloads.forEach(function(payload) {
+  let resetTools = function () {
+    resetToolsPayloads.forEach(function (payload) {
       lamDispatch(payload);
     });
   };
 
-  let addResetToolsEvent = function(event) {
+  let addResetToolsEvent = function (event) {
     resetToolsPayloads.push(event);
   };
 
-  let showMenu = function(toolId) {
+  let showMenu = function (toolId) {
+    $(".lam-toolbar-btn").removeClass("lam-btn-selected");
+    $("#menu-toolbar__" + toolId).addClass("lam-btn-selected");
     $("#bottom-info").hide();
     $("#panel").animate(
       {
-        width: "show"
+        width: "show",
       },
       {
         duration: easingTime,
-        complete: function() {
+        complete: function () {
           if (toolId) {
             $("#" + toolId).show();
           }
           $("#panel__open").hide();
-        }
+        },
       }
     );
   };
@@ -8361,19 +8521,19 @@ let LamToolbar = (function() {
   /**
    * Nasconde il pannello del menu
    */
-  var hideMenu = function() {
+  var hideMenu = function () {
     $("#panel").animate(
       {
-        width: "hide"
+        width: "hide",
       },
       easingTime,
-      function() {
+      function () {
         $("#panel__open").show();
       }
     );
   };
 
-  var toggleToolbarItem = function(toolId, keepOpen) {
+  var toggleToolbarItem = function (toolId, keepOpen) {
     LamStore.setInfoClickEnabled(true);
     //verifico se il pannello non è già selezionato
     if (currentToolbarItem != toolId) {
@@ -8397,7 +8557,7 @@ let LamToolbar = (function() {
     }
   };
 
-  let getCurrentToolbarItem = function() {
+  let getCurrentToolbarItem = function () {
     return currentToolbarItem;
   };
 
@@ -8407,7 +8567,7 @@ let LamToolbar = (function() {
     hideMenu: hideMenu,
     init: init,
     showMenu: showMenu,
-    toggleToolbarItem: toggleToolbarItem
+    toggleToolbarItem: toggleToolbarItem,
   };
 })();
 

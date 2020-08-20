@@ -263,6 +263,7 @@ var LamLoader = (function () {
     }
     LamLinksTools.init();
     LamLegendTools.init();
+    LamCookieDescription.init();
 
     //loading templates
     LamTemplates.init();

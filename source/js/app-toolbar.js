@@ -68,6 +68,8 @@ let LamToolbar = (function () {
   };
 
   let showMenu = function (toolId) {
+    $(".lam-toolbar-btn").removeClass("lam-btn-selected");
+    $("#menu-toolbar__" + toolId).addClass("lam-btn-selected");
     $("#bottom-info").hide();
     $("#panel").animate(
       {

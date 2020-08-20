@@ -140,6 +140,11 @@
   text-align: left;
 }
 
+.lam-sorted {
+  background-color: var(--lam-btn-color);
+  backdrop-filter: brightness(200%) !important;
+}
+
 .lam-background {
   background-color: var(--lam-bg-menu-color);
 }

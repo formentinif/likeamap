@@ -26,7 +26,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 */
 
 let LamLayerTree = (function () {
-  let treeDiv = "lam-layer-tree";
+  let treeDiv = "layer-tree";
   let isRendered = false;
   let layerGroupPrefix = "lt";
 
@@ -125,7 +125,7 @@ let LamLayerTree = (function () {
     output += formatString(
       '<i id="{0}_i" class="layertree-group__icon {2}" onclick="LamLayerTree.toggleGroup(\'{0}\');">{1}</i>',
       groupId,
-      groupLayer.visible ? LamResources.svgRemoveBox : LamResources.svgAddBox,
+      groupLayer.visible ? LamResources.svgExpandMore : LamResources.svgChevronRight,
       groupLayer.visible ? "lam-plus" : "lam-minus"
     );
     output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
@@ -195,12 +195,12 @@ let LamLayerTree = (function () {
     if ($(icon).hasClass("lam-plus")) {
       $(icon).removeClass("lam-plus");
       $(icon).addClass("lam-minus");
-      $(icon).html(LamResources.svgAddBox);
+      $(icon).html(LamResources.svgChevronRight);
       return;
     } else {
       $(icon).removeClass("lam-minus");
       $(icon).addClass("lam-plus");
-      $(icon).html(LamResources.svgRemoveBox);
+      $(icon).html(LamResources.svgExpandMore);
       return;
     }
   };

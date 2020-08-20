@@ -389,15 +389,19 @@ var LamStore = (function () {
     if (initialAppState.layers) {
       resetLayersArray(initialAppState.layers);
     }
+    //resetting checkboxes
+    LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
   };
 
   var resetLayersArray = function (layers) {
     layers.forEach(function (layer) {
-      lamDispatch({
-        eventName: "set-layer-visibility",
-        gid: layer.gid,
-        visibility: parseInt(layer.visible),
-      });
+      if (layer.layerType != "group") {
+        lamDispatch({
+          eventName: "set-layer-visibility",
+          gid: layer.gid,
+          visibility: parseInt(layer.visible),
+        });
+      }
       if (layer.layers) {
         resetLayersArray(layer.layers);
       }

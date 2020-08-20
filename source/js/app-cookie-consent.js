@@ -47,7 +47,7 @@ var LamCookieConsent = (function () {
     return null;
   }
   function eraseCookieConsent(name) {
-    document.cookie = name + "=; Max-Age=-99999999;";
+    setCookieDescription(cookieName, "0", 7);
   }
 
   function cookieConsent() {

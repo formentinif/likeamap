@@ -31,7 +31,7 @@
     display: none;
     position: absolute;
     overflow: auto;
-    width: 500px;
+    width: 60%;
     min-width: 350px;
   }
 }

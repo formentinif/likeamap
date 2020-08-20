@@ -1,12 +1,5 @@
 var LamDom = (function () {
   var init = function init() {
-    $("#panel__logo").click(function () {
-      if (LamStore.getAppState().description) {
-        LamCookieDescription.eraseCookieDescription();
-        LamCookieDescription.cookieDescription();
-      }
-    });
-
     //events binding
     LamDispatcher.bind("hide-info-window", function (payload) {
       LamDom.hideInfoWindow();
@@ -115,6 +108,15 @@ var LamDom = (function () {
     }
   };
 
+  /**
+   * Shows the html content that is a rult of an info click, legend, tool etc.
+   * @param {LamEnums.showContentMode} contentMode Set the display mode of the content (Left Panel, Bottom Panel or InfoWindow)
+   * @param {*} title Title of the content
+   * @param {*} htmlMain Main content
+   * @param {*} htmlBottomInfo Content that will be displayed in the bottom panel for mobile readability. If null, the htmlMain will be used instead.
+   * @param {*} toolBarItem Toolbar name that has generated the content. If not visibile it will be displayed
+   * @param {*} elementId Html element id where the content will be displayed. Default will be InfoWindow
+   */
   let showContent = function (contentMode, title, htmlMain, htmlBottomInfo, toolBarItem, elementId) {
     if (!elementId) elementId = "info-results";
     if (!htmlBottomInfo) htmlBottomInfo = htmlMain;
@@ -134,6 +136,7 @@ var LamDom = (function () {
           .show();
         LamToolbar.toggleToolbarItem(toolBarItem, true);
         LamDispatcher.dispatch("hide-info-window");
+        $("#" + elementId + "").show();
         //LamDispatcher.dispatch("show-menu");
         $("#bottom-info").hide();
         break;

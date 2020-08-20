@@ -1,11 +1,20 @@
 .panel__logo {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
+  cursor: pointer;
+  font-size: 0px;
 }
 
 .panel__map-title {
   font-weight: 500;
-  margin-bottom: 8px;
+  margin: 0px;
+  background-color: var(--lam-btn-color);
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.8rem;
+  color: white;
+  padding: 4px 0;
+  box-sizing: border-box;
 }
 
 .panel__top-margin {

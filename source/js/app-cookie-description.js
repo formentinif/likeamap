@@ -1,6 +1,16 @@
 var LamCookieDescription = (function () {
   let cookieName = "lamCookieDescriptionDismiss";
 
+  var init = function init() {
+    //events binding
+    LamDispatcher.bind("show-lam-description", function (payload) {
+      if (LamStore.getAppState().description) {
+        LamCookieDescription.eraseCookieDescription();
+        LamCookieDescription.cookieDescription();
+      }
+    });
+  };
+
   function lamCookieFadeIn(elem, display) {
     var el = document.getElementById(elem);
     var ease = 1; //0.02 for fading
@@ -49,20 +59,26 @@ var LamCookieDescription = (function () {
     return null;
   }
   function eraseCookieDescription() {
-    document.cookie = cookieName + "=; Max-Age=-99999999;";
+    setCookieDescription(cookieName, "0", 7);
   }
 
   function cookieDescription() {
-    if (!getCookieDescription(cookieName)) {
-      document.body.innerHTML +=
-        '<div class="lamDescriptionContainer" id="lamDescriptionContainer"><div class="cookieTitle"><a>' +
-        LamStore.getAppState().title +
-        '</a></div><div class="cookieDesc"><p>' +
-        LamStore.getAppState().description +
-        " " +
-        '<div class="cookieButton"><a onClick="LamCookieDescription.lamCookieDescriptionDismiss();">' +
-        "Chiudi" +
-        "</a></div></div>";
+    if (getCookieDescription(cookieName) && getCookieDescription(cookieName) != "1") {
+      $("<div>", {
+        id: "lamDescriptionContainer",
+        class: "lamDescriptionContainer",
+      }).appendTo("body");
+
+      $("#lamDescriptionContainer").html(
+        '<div class="cookieTitle"><a>' +
+          LamStore.getAppState().title +
+          '</a></div><div class="cookieDesc"><p>' +
+          LamStore.getAppState().description +
+          " " +
+          '<div class="cookieButton"><a onClick="LamCookieDescription.lamCookieDescriptionDismiss();">' +
+          "Chiudi" +
+          "</a></div>"
+      );
       lamCookieFadeIn("lamDescriptionContainer");
     }
   }
@@ -77,6 +93,7 @@ var LamCookieDescription = (function () {
   // };
 
   return {
+    init: init,
     lamCookieDescriptionDismiss: lamCookieDescriptionDismiss,
     cookieDescription: cookieDescription,
     setCookieDescription: setCookieDescription,

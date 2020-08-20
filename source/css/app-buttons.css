@@ -49,6 +49,10 @@
   font-size: 1.6rem;
 }
 
+.lam-btn-selected {
+  background-color: var(--lam-btn-color-darken);
+}
+
 .lam-btn:hover {
   background-color: var(--lam-btn-color);
 }

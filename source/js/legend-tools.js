@@ -46,6 +46,23 @@ var LamLegendTools = (function () {
     });
 
     /**
+     * Helper event to open legend for all layers at the current scale that toggles the main menu
+     *
+     */
+    LamDispatcher.bind("show-legend-visible-layers-toggle", function (payload) {
+      //if legend is visible toggle
+      if ($("#lam-legend-container").is(":visible")) {
+        LamToolbar.toggleToolbarItem("legend", false);
+        return;
+      }
+      //else show legend
+      payload.eventName = "show-legend-visible-layers"; //toggle once
+      currentLegendPayload = payload;
+      let layers = LamStore.getVisibleLayers();
+      LamLegendTools.showLegendLayers(layers, true, payload.showInfoWindow || LamStore.getAppState().openLegendInInfoWindow);
+    });
+
+    /**
      * Helper event to open legend for all layers with scale parameter
      */
     LamDispatcher.bind("show-full-legend-visible-layers", function (payload) {
@@ -140,9 +157,9 @@ var LamLegendTools = (function () {
     }
     html += "<div>";
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "", "legend");
     }
     return true;
   };
@@ -179,9 +196,9 @@ var LamLegendTools = (function () {
     let title = "Legenda dei layer attivi";
     if (html.html() === "") html.append("Per visualizzare la legenda rendi visibile uno o più layer.");
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, $("<div>").append(html.clone()).html(), "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, $("<div>").append(html.clone()).html(), "");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, title, $("<div>").append(html.clone()).html(), "", "legend");
     }
   };
 

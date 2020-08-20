@@ -1,5 +1,13 @@
 var LamRelations = (function () {
-  let relationsResults = {};
+  /**
+   * This object is made of properties
+   * data
+   * template
+   */
+  let relationsResults = {
+    data: null,
+    template: null,
+  };
   let currentRelation; //relation currently evaluating
   var init = function init() {
     //events binding
@@ -79,6 +87,7 @@ var LamRelations = (function () {
 
     //single template not active by default, a single template for all items
     if (template.multipleItems && propsList.length > 0) {
+      debugger;
       body += LamTemplates.processTemplate(template, propsList);
     }
     //download

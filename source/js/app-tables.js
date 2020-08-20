@@ -95,7 +95,8 @@ let LamTables = (function () {
     body += "<div class='lam-grid lam-no-bg lam-mt-1'>";
     let startIndex = currentPageIndex * currentPageSize + 1;
     body += "<div class='lam-col'> N° ";
-    body += "" + startIndex + "-" + (startIndex + currentPageSize - 1) + " su " + currentFeatureCount;
+    body +=
+      "" + startIndex + "-" + (startIndex + (currentPageSize > currentFeatureCount) ? currentFeatureCount : currentPageSize - 1) + " su " + currentFeatureCount;
     body += "</div>";
     body += "<div class='lam-col'> Mostra ";
     body += "<select class='lam-select-small ' onchange='LamTables.updatePageSize(this)'>";

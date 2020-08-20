@@ -65,7 +65,7 @@
 <div id="menu-toolbar" class="lam-toolbar">
   <button
     id="menu-toolbar__layer-tree"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-layers')"
     title="Elenco dei layer"
   >
@@ -78,7 +78,7 @@
   </button>
   <button
     id="menu-toolbar__search-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-search')"
     title="Ricerca indirizzi e layer"
   >
@@ -93,7 +93,7 @@
   </button>
   <button
     id="menu-toolbar__print-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-print-tools')"
     title="Stampa"
   >
@@ -108,7 +108,7 @@
   </button>
   <button
     id="menu-toolbar__share-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-share')"
     title="Condividi mappa"
   >
@@ -123,7 +123,7 @@
   </button>
   <button
     id="menu-toolbar__map-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-map-tools')"
     title="Strumenti mappa"
   >
@@ -138,7 +138,7 @@
   </button>
   <button
     id="menu-toolbar__draw-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-draw-tools')"
     title="Disegno"
   >
@@ -153,8 +153,8 @@
   </button>
   <button
     id="menu-toolbar__links-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
-    onClick="lamDispatch('show-links')"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
+    onClick="lamDispatch('show-links-toggle')"
     title="Elenco dei link"
   >
     <i class="lam-icon">
@@ -166,7 +166,7 @@
   </button>
   <button
     id="menu-toolbar__gps-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
     onClick="lamDispatch('show-gps-tools')"
     title="Strumenti GPS"
   >
@@ -179,8 +179,8 @@
   </button>
   <button
     id="menu-toolbar__legend-tools"
-    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1"
-    onClick="lamDispatch('show-legend-visible-layers')"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
+    onClick="lamDispatch('show-legend-visible-layers-toggle')"
     title="Legenda"
   >
     <i class="lam-icon">
@@ -195,11 +195,11 @@
 </div>
 <div id="panel" class="lam-panel">
   <div id="panel__content" class="lam-panel-content">
-    <div id="panel__logo" class="lam-hidden panel__logo">
-      <img src="" id="panel__logo-img" class="lam-hidden" />
+    <div id="panel__logo" class="lam-hidden panel__logo" onclick="lamDispatch('show-lam-description'); return false;">
+      <img src="" id="panel__logo-img" class="lam-hidden" alt="panel logo" tooltip="Informazioni sulla mappa" />
       <h1 id="panel__map-title" class="lam-hidden panel__map-title"></h1>
     </div>
-    <div id="lam-layer-tree" class="lam-panel-content-item lam-visible"></div>
+    <div id="layer-tree" class="lam-panel-content-item lam-visible"></div>
 
     <div id="info-results" class="lam-panel-content-item">
       <h4 id="info-results__title" class="lam-title"></h4>

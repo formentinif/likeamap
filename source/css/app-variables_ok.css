@@ -48,16 +48,15 @@ body {
 :root {
   --lam-bg-color: rgba(252, 252, 252, 0.9);
   --lam-bg-color-no-alpha: rgba(252, 252, 252);
-  --lam-bg-menu-color: #4a4a4a;
-  --lam-btn-color: #4a4a4a;
-  --lam-btn-color-darken: #0e0d0d;
+  --lam-bg-menu-color: #63818f;
+  --lam-btn-color: #63818f;
+  --lam-btn-color-darken: #40535b;
   --lam-btn-color-lighter: #87afc1;
+  /*426678 8BA1AB 63818F 426678 2a4f60*/
 }
-
 .ol-attribution {
   bottom: 70px !important;
 }
-
 .app-terms-links {
   position: absolute;
   bottom: 0px;
@@ -68,34 +67,6 @@ body {
 
 .lam-background {
   background-color: var(--lam-bg-menu-color);
-}
-
-.layertree-group__title--sub1 {
-  backdrop-filter: brightness(100%) !important;
-}
-
-.layertree-group__title--sub2 {
-  backdrop-filter: brightness(180%) !important;
-}
-
-.layertree-group__title--sub2 .layertree-group__title-text {
-  padding-left: 12px !important;
-}
-
-.layertree-group__title--sub3 {
-  backdrop-filter: brightness(230%) !important;
-}
-
-.layertree-group__title--sub3 .layertree-group__title-text {
-  padding-left: 24px !important;
-}
-
-.layertree-group__title--sub4 {
-  backdrop-filter: brightness(300%) !important;
-}
-
-.layertree-group__title--sub4 .layertree-group__title-text {
-  padding-left: 36px !important;
 }
 
 /*

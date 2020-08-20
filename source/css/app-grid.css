@@ -24,6 +24,7 @@ Open source under the MIT License.
 .lam-col {
   box-sizing: border-box;
   flex: 1;
+  overflow: auto;
 }
 
 .lam-bigger {
