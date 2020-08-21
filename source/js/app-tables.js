@@ -34,11 +34,11 @@ let LamTables = (function () {
 
   let init = function () {
     LamDispatcher.bind("show-attribute-table", function (payload) {
-      LamTables.getLayerAttributeTable(payload.gid, payload.maxFeatures, payload.pageIndex, payload.sortBy);
+      LamTables.renderLayerAttributeTable(payload.gid, payload.maxFeatures, payload.pageIndex, payload.sortBy);
     });
   };
 
-  let getLayerAttributeTable = function (layerGid, maxFeatures, pageIndex, sortBy) {
+  let renderLayerAttributeTable = function (layerGid, maxFeatures, pageIndex, sortBy) {
     if (currentLayerGid != layerGid) {
       currentLayerGid = layerGid;
       currentFeatureCount = -1;
@@ -46,6 +46,13 @@ let LamTables = (function () {
     if (maxFeatures) currentPageSize = maxFeatures;
     if (sortBy) sortAttribute = sortBy;
     currentPageIndex = pageIndex ? pageIndex : 0;
+    //page index should be reset when overflows the feature count
+    if (currentFeatureCount === -1) {
+      currentPageIndex = 0;
+    } else {
+      if (currentFeatureCount < currentPageIndex * currentPageSize) currentPageIndex = 0;
+    }
+
     let startIndex = pageIndex ? currentPageIndex * currentPageSize : 0;
     lamDispatch("show-loader");
     let layer = LamStore.getLayer(layerGid);
@@ -96,7 +103,12 @@ let LamTables = (function () {
     let startIndex = currentPageIndex * currentPageSize + 1;
     body += "<div class='lam-col'> N° ";
     body +=
-      "" + startIndex + "-" + (startIndex + (currentPageSize > currentFeatureCount) ? currentFeatureCount : currentPageSize - 1) + " su " + currentFeatureCount;
+      "" +
+      startIndex +
+      "-" +
+      ((currentPageIndex + 1) * currentPageSize > currentFeatureCount ? currentFeatureCount : startIndex + currentPageSize - 1) +
+      " su " +
+      currentFeatureCount;
     body += "</div>";
     body += "<div class='lam-col'> Mostra ";
     body += "<select class='lam-select-small ' onchange='LamTables.updatePageSize(this)'>";
@@ -112,7 +124,7 @@ let LamTables = (function () {
     }
     body += " </select>";
 
-    body += "/" + Math.floor(currentFeatureCount / currentPageSize) + 1;
+    body += "/" + (Math.floor(currentFeatureCount / currentPageSize) + 1);
     body += "</div>";
     body += "<div class='lam-col'>";
     if (currentPageIndex > 0) {
@@ -141,17 +153,19 @@ let LamTables = (function () {
   };
 
   let getTableTemplate = function (template, layer) {
+    let attribute = getNormalizedSortAttribute();
+
     let str = "<table class='lam-table'>";
     str += "<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      str += "<th class='" + (template.fields[i].field === sortAttribute ? " lam-sorted " : "") + "' >";
+      str += "<th class='" + (template.fields[i].field === attribute ? " lam-sorted " : "") + "' >";
       str +=
         "<i class='lam-pointer ' onclick=\"lamDispatch({ eventName: 'show-attribute-table', sortBy: '" +
         (template.fields[i].field === sortAttribute ? template.fields[i].field + " DESC" : template.fields[i].field) +
         "', gid: '" +
         layer.gid +
         "'  }); return false;\">";
-      str += template.fields[i].field === sortAttribute ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
+      str += template.fields[i].field === attribute && !sortAttributeIsDescending(sortAttribute) ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
       str += "</i></a>";
       str += template.fields[i].label + "</th>";
     }
@@ -167,18 +181,30 @@ let LamTables = (function () {
 
   let updatePageSize = function (sender) {
     if ($(sender).val()) {
-      LamTables.getLayerAttributeTable(currentLayerGid, parseInt($(sender).val()), currentPageIndex, sortAttribute);
+      LamTables.renderLayerAttributeTable(currentLayerGid, parseInt($(sender).val()), currentPageIndex, sortAttribute);
     }
   };
   let updatePageIndex = function (sender) {
     if ($(sender).val()) {
-      LamTables.getLayerAttributeTable(currentLayerGid, currentPageSize, parseInt($(sender).val()) - 1, sortAttribute);
+      LamTables.renderLayerAttributeTable(currentLayerGid, currentPageSize, parseInt($(sender).val()) - 1, sortAttribute);
     }
+  };
+
+  let getNormalizedSortAttribute = function () {
+    let attributeName = sortAttribute || "";
+    if (sortAttributeIsDescending(attributeName)) {
+      attributeName = sortAttribute.slice(0, -5); //Descending
+    }
+    return attributeName;
+  };
+
+  let sortAttributeIsDescending = function (attribute) {
+    return attribute.indexOf(" DESC", attribute.length - " DESC".length) !== -1;
   };
 
   return {
     init: init,
-    getLayerAttributeTable: getLayerAttributeTable,
+    renderLayerAttributeTable: renderLayerAttributeTable,
     getTableTemplate: getTableTemplate,
     parseResponseTable: parseResponseTable,
     updatePageSize: updatePageSize,

@@ -25,24 +25,24 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-var LamDownloadTools = (function() {
+var LamDownloadTools = (function () {
   var isRendered = false;
 
   var init = function init() {
     //events binding
-    LamDispatcher.bind("download-relation-results", function(payload) {
-      LamDownloadTools.downloadResults();
+    LamDispatcher.bind("download-relation-results", function (payload) {
+      LamDownloadTools.downloadRelationResults();
     });
   };
 
-  var render = function(div) {
+  var render = function (div) {
     if (!isRendered) {
       init();
     }
     isRendered = true;
   };
 
-  let downloadResults = function() {
+  let downloadRelationResults = function () {
     var results = LamRelations.getRelationResults();
     if (!results.data || !results.template) return;
     let propsList = [];
@@ -50,12 +50,12 @@ var LamDownloadTools = (function() {
     for (let i = 0; i < results.data.length; i++) {
       propsList.push(results.data[i].properties ? results.data[i].properties : results.data[i]);
     }
-    results.template.fields.forEach(function(field) {
+    results.template.fields.forEach(function (field) {
       csv += '"' + field.label + '";';
     });
     csv += "\n";
-    propsList.forEach(function(row) {
-      results.template.fields.forEach(function(field) {
+    propsList.forEach(function (row) {
+      results.template.fields.forEach(function (field) {
         csv += '"' + row[field.field] + '";';
       });
       csv += "\n";
@@ -71,6 +71,6 @@ var LamDownloadTools = (function() {
   return {
     init: init,
     render: render,
-    downloadResults: downloadResults
+    downloadRelationResults: downloadRelationResults,
   };
 })();
