@@ -1639,7 +1639,7 @@ let LamMap = (function () {
     if (srid) wfsUrl += "&srsName=EPSG:" + srid;
     return wfsUrl;
   };
-
+ 
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
@@ -5142,14 +5142,14 @@ var LamLegendTools = (function () {
         "'  }); return false;\"><i class='lam-icon'>" +
         LamResources.svgTable16 +
         "</i> Apri tabella</a>";
-      //open csv
-      var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "csv");
+      //open xslx
+      var layerUrl = LamMap.getWFSUrlfromLayer(thisLayer, "excel2007");
       html +=
         "<a href='" +
         layerUrl +
         "' target='_blank' class='lam-btn lam-btn-small lam-depth-1'><i class='lam-icon'>" +
         LamResources.svgDownload16 +
-        "</i> CSV</a>";
+        "</i> XSLX</a>";
       //open shp
       layerUrl = LamMap.getWFSUrlfromLayer(thisLayer);
       html +=

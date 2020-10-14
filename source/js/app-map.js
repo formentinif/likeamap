@@ -515,7 +515,7 @@ let LamMap = (function () {
     if (srid) wfsUrl += "&srsName=EPSG:" + srid;
     return wfsUrl;
   };
-
+ 
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
