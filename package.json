@@ -20,7 +20,7 @@
     "gulp-sass": "^4.0.2",
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.2",
-    "handlebars": "^4.5.2",
+    "handlebars": "^4.5.3",
     "lite-server": "^2.5.3",
     "proj4": "^2.6.0",
     "minimist": ">=1.2.2"
