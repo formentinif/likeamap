@@ -37,6 +37,11 @@
   padding: 0px 0px 0px 0px;
   resize: both;
 }
+@media print {
+  .lam-panel {
+    display: none !important;
+  }
+}
 
 .lam-panel .lam-panel-content {
   box-sizing: border-box;

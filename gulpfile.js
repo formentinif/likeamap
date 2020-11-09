@@ -20,6 +20,7 @@ function copyDist() {
   gulp.src("./source/index-embed.html").pipe(gulp.dest("./dist/"));
   gulp.src("./source/embed.html").pipe(gulp.dest("./dist/"));
   gulp.src("./source/map.html").pipe(gulp.dest("./dist/"));
+  gulp.src("./source/map-print.html").pipe(gulp.dest("./dist/"));
   //gulp.src("./source/vendor/lib/*").pipe(gulp.dest("./dist/js"));
   //gulp.src("./source/vendor/css/*").pipe(gulp.dest("./dist/css"));
   //gulp.src("./source/js/*").pipe(gulp.dest("./dist/js"));
@@ -91,11 +92,12 @@ function combineCss() {
       "./source/css/app-layer-tree.css",
       "./source/css/app-panel.css",
       "./source/css/app-shadows.css",
+	  "./source/css/app-print.css",
       "./source/css/app-tooltip.css",
       "./source/css/app-typography.css",
       "./source/css/app-cookie-consent.css",
       "./source/css/app-cookie-description.css",
-      "./source/css/app-vendor.css",
+	  "./source/css/app-vendor.css",
       "./source/vendor/css/ol.css",
     ])
     .pipe(cleanCSS())

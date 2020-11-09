@@ -190,7 +190,6 @@ var LamRelations = (function () {
     let attribute = getNormalizedSortAttribute();
     let str = "<table class='lam-table'>";
     str += "<tr>";
-    debugger;
     for (let i = 0; i < template.fields.length; i++) {
       str += "<th class='" + (template.fields[i].field === attribute ? " lam-sorted " : "") + "' >";
       str +=
@@ -234,7 +233,25 @@ var LamRelations = (function () {
     return attribute.indexOf(" DESC", attribute.length - " DESC".length) !== -1;
   };
 
+  /**
+   * Filters the relations by id keeping only the relations given
+   * This method is only called outside the app
+   */
+  let allowRelations = function (relationsToKeep) {
+    if (LamStore.getAppState()) {
+      let relationsFiltered = LamStore.getAppState().relations.filter(function (relation) {
+        return relationsToKeep.includes(relation.gid);
+      });
+      LamStore.getAppState().relations = relationsFiltered;
+    } else {
+      setTimeout(function () {
+        LamRelations.allowRelations(relationsToKeep);
+      }, 3000);
+    }
+  };
+
   return {
+    allowRelations: allowRelations,
     init: init,
     getRelations: getRelations,
     getRelation: getRelation,

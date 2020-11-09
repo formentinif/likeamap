@@ -23,6 +23,12 @@
       "description": "Logo della mappa, visualizzato in alto a destra. Inserire un url assoluto o relativo.",
       "type": "string"
     },
+    "hideLogo": {
+      "title": "Hide Logo",
+      "description": "Nasconde il logo della mappa",
+      "default": false,
+      "type": "boolean"
+    },
     "logoPanelUrl": {
       "title": "Logo del pannello",
       "description": "Logo che viene visualizzato nel pannello laterale a scomparsa.  Inserire un url assoluto o relativo.",

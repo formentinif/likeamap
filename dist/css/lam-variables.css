@@ -36,7 +36,7 @@ body {
 }
 
 body {
-  background-color: #fff;
+  background-color: #ececec;
 }
 
 #lam-app {
@@ -119,4 +119,25 @@ sample class for styling fonts and icons
 }
 .layer-red .layertree-layer__icon {
   fill: black !important;
+}
+
+/*print*/
+.lam-app-print-a4-portrait {
+  width: 794px !important;
+  height: 1123px !important;
+}
+
+.lam-app-print-a4-landscape {
+  width: 1123px !important;
+  height: 794px !important;
+}
+
+.lam-app-print-a3-portrait {
+  width: 1123px !important;
+  height: 1587px !important;
+}
+
+.lam-app-print-a3-landscape {
+  width: 1587px !important;
+  height: 1123px !important;
 }
