@@ -25,7 +25,11 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-//definizione e inizializzazione del LamDispatcher
+/**
+ * The Dispatcher emits events that can be used by the UI controls to modify the AppState, map and other controls.
+ * UI controls should never call Javascript Objects directly but they must use the dispatcher methods.
+ * The Dispatcher can be extended by other modules.
+ */
 var LamDispatcher = (function () {
   var init = function functionName() {
     this.bind("log", function (payload) {
@@ -164,7 +168,6 @@ var LamDispatcher = (function () {
           msg.classes = "lam-secondary";
           M.toast(msg);
           break;
-
         default:
           M.toast(msg);
           break;

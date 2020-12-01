@@ -5461,7 +5461,11 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 */
 
-//definizione e inizializzazione del LamDispatcher
+/**
+ * The Dispatcher emits events that can be used by the UI controls to modify the AppState, map and other controls.
+ * UI controls should never call Javascript Objects directly but they must use the dispatcher methods.
+ * The Dispatcher can be extended by other modules.
+ */
 var LamDispatcher = (function () {
   var init = function functionName() {
     this.bind("log", function (payload) {
@@ -5600,7 +5604,6 @@ var LamDispatcher = (function () {
           msg.classes = "lam-secondary";
           M.toast(msg);
           break;
-
         default:
           M.toast(msg);
           break;
@@ -6430,11 +6433,11 @@ let LamLoader = (function () {
   /**
    * Init map function
    * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
-   * @param {*} appStateInline Url of the appstate, inline json string o print. 
+   * @param {*} appStateInline Url of the appstate, inline json string o print.
    *                            Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
    * @param {*} mapTemplateUrl Url of the map template to load.
    */
-  let lamInit = function(mapDiv, appStateInline, mapTemplateUrl) {
+  let lamInit = function (mapDiv, appStateInline, mapTemplateUrl) {
     LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
     LamStore.setMapTemplateUrl(mapTemplateUrl);
     //appstate loader
@@ -6447,17 +6450,17 @@ let LamLoader = (function () {
       decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
       null;
     let appStateUrl = null;
-    
+
     //decoding appstate inline
-    if(appStateInline){
-      if(appStateIniline==="print"){
+    if (appStateInline) {
+      if (appStateIniline === "print") {
         //setting appstateprint from sessionstorage
-        appStateJson = sessionStorage.getItem('appStatePrint');
-        if(!appStateJson){
+        appStateJson = sessionStorage.getItem("appStatePrint");
+        if (!appStateJson) {
           lamDispatch("Unable to get the appStatePrint object for printing");
           return;
         }
-      }else{
+      } else {
         //setting url
         appStateUrl = appStateIniline;
       }
@@ -6529,6 +6532,7 @@ let LamLoader = (function () {
     function loadLamState(appstate) {
       //normalizing appstate
       LamStore.setAppState(appstate);
+      LamStore.setInitialAppState(appstate);
       if (LamStore.getAppState().authentication.requireAuthentication) {
         LamAuthTools.render("login-container");
       }
@@ -6544,29 +6548,27 @@ let LamLoader = (function () {
       }
       lamTemplateMapinit();
     }
-  }
+  };
 
   /**
    * Updates CSS classes based on the appstate configuration
    */
-let cssUpdatesFromState = function(){
-$("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
-//definizione dei loghi
-if (LamStore.getAppState().logoUrl) {
-  $("#lam-logo__img").attr("src", state.logoUrl);
-}
-if(LamStore.getAppState().hideLogo){
-  $("#lam-logo").addClass("lam-hidden"); 
-}
-}
-
+  let cssUpdatesFromState = function () {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    //definizione dei loghi
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", state.logoUrl);
+    }
+    if (LamStore.getAppState().hideLogo) {
+      $("#lam-logo").addClass("lam-hidden");
+    }
+  };
 
   /**
    * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
    * After that calls the mapInit
    */
-let lamTemplateMapinit = function () {
-   
+  let lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",
       url: LamStore.getMapTemplateUrl(),
@@ -6641,7 +6643,7 @@ let lamTemplateMapinit = function () {
   var mapInit = function (callback) {
     registerHandlebarsHelpers();
     cssUpdatesFromState();
-   
+
     if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
       if (LamStore.getAppState().logoPanelUrl) {
         $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
@@ -6742,6 +6744,7 @@ let lamTemplateMapinit = function () {
         .always(function (data) {
           countRequest--;
           if (countRequest === 0) {
+            debugger;
             LamStore.setInitialAppState(LamStore.getAppState());
             if (callback) callback();
           }
@@ -7183,9 +7186,6 @@ var LamStore = (function () {
    */
   var setAppState = function (currentAppState) {
     appState = normalizeAppState(currentAppState);
-    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
-      appState = normalizeMobile(appState);
-    }
   };
 
   /**
@@ -7194,9 +7194,6 @@ var LamStore = (function () {
   var setInitialAppState = function (appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
     initialAppState = normalizeAppState(initialAppState);
-    if (LamDom.isMobile() && initialAppState.improveMobileBehaviour) {
-      initialAppState = normalizeMobile(initialAppState);
-    }
   };
 
   /**
@@ -7208,6 +7205,9 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
+      appState = normalizeMobile(appState);
+    }
     return appstate;
   };
 
@@ -7354,8 +7354,9 @@ var LamStore = (function () {
   }
 
   /**
-   * Restituisce tutti i layer abilitati all'interrogazione
-   * @return {array} Array dei layer interrogabili
+   * Returns the layers with queryable property set to true
+   * Query is the click Info on the map
+   * @return {Array} Query (info) layer array
    */
   var getQueryLayers = function () {
     let layers = getQueryLayersArray(appState.layers);
@@ -7381,8 +7382,35 @@ var LamStore = (function () {
   };
 
   /**
-   * Restituisce tutti i layer abilitati alla ricerca
-   * @return {array} Array dei layer ricercarbili
+   * Returns the layers based on the layer name given
+   * @return {array}  Search layer array
+   */
+  var getLayersByName = function (search) {
+    let layers = getLayersByNameArray(search, appState.layers);
+    layers.sort(SortByLayerName);
+    return layers;
+  };
+
+  /**
+   * Function needed for getting layers by name recursively
+   * @param {Object} layers
+   */
+  var getLayersByNameArray = function (search, layers) {
+    var layersFound = [];
+    layers.forEach(function (layer) {
+      if (layer.layerName && layer.layerName.includes(search)) {
+        layersFound.push(layer);
+      }
+      if (layer.layers) {
+        layersFound = layersFound.concat(getLayersByNameArray(search, layer.layers));
+      }
+    });
+    return layersFound;
+  };
+
+  /**
+   * Returns the layers with searchable property set to true
+   * @return {array}  Search layer array
    */
   var getSearchLayers = function () {
     let layers = getSearchLayersArray(appState.layers);
@@ -7435,7 +7463,7 @@ var LamStore = (function () {
   };
 
   /**
-   * Get Group Layer bu Layer Gid
+   * Get Group Layer by Layer Gid
    * @param {string} gid Layer gid
    */
   var getGroupLayerByLayerGid = function (gid) {
@@ -7491,8 +7519,8 @@ var LamStore = (function () {
    * @return {null} Nessun valore restituito
    */
   var resetInitialLayers = function () {
-    if (initialAppState.layers) {
-      resetLayersArray(initialAppState.layers);
+    if (LamStore.getInitialAppState().layers) {
+      resetLayersArray(LamStore.getInitialAppState().layers);
     }
     //resetting checkboxes
     LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
@@ -7670,6 +7698,7 @@ var LamStore = (function () {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLayersByName: getLayersByName,
     getLayers: getLayers,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
@@ -7727,6 +7756,8 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 
 let LamLayerTree = (function () {
   let treeDiv = "layer-tree";
+  let treeLayerDiv = "layer-tree__layers";
+  let treeToolDiv = "layer-tree__tools";
   let isRendered = false;
   let layerGroupPrefix = "lt";
 
@@ -7742,27 +7773,17 @@ let LamLayerTree = (function () {
     if (!isRendered) {
       init();
     }
-    let output = "";
-    output += '<h4 class="lam-title">Oggetti</h4>';
-    output += '<div class="layertree">'; //generale
-    let index = 0;
-    layers.forEach(function (element) {
-      output += renderGroup(element, layerGroupPrefix + "_" + index);
-      index++;
-    });
-    //sezione funzioni generali
-    output += '<div class="layertree-item-bottom">';
-    output +=
-      '<button class="lam-btn lam-btn-small lam-btn-floating lam-right lam-depth-1 ripple" alt="Reset dei layer" title="Reset dei layer" onClick="LamDispatcher.dispatch({eventName:\'reset-layers\'})"><i class="lam-icon">' +
-      LamResources.svgRefreshMap +
-      "</i></button>";
-    output += "</div>";
-    output += '<div class="layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
-    output += "</div>"; //generale
 
-    jQuery("#" + treeDiv).html(output);
+    let output = "<div id='" + treeDiv + "'><div id='" + treeLayerDiv + "'></div><div id='" + treeToolDiv + "'></div></div>";
+    $("#" + treeDiv).html(output);
+    output = renderLayerTree(layers);
+    $("#" + treeLayerDiv).html(output);
+
+    output = renderLayersTreeBottomFunctions();
+    $("#" + treeToolDiv).html(output);
 
     updateCheckBoxesStates(LamStore.getAppState().layers);
+
     if (LamStore.getAppState().showLayerTreeOnLoad && !isRendered) {
       LamDispatcher.dispatch({
         eventName: "show-layers",
@@ -7771,6 +7792,42 @@ let LamLayerTree = (function () {
     isRendered = true;
   };
 
+  /**
+   * Renders the layer-tree with grouping enabled
+   * @param {Array} layers The tree will be generated by the layers given
+   */
+  let renderLayerTree = function (layers) {
+    let output = '<h4 class="lam-title">Oggetti</h4>';
+    output += '<div class="layertree">'; //generale
+    let index = 0;
+    layers.forEach(function (element) {
+      output += renderGroup(element, layerGroupPrefix + "_" + index);
+      index++;
+    });
+    return output;
+  };
+
+  /**
+   * Renders the layer-tree in a flat style without grouping enabled
+   * @param {Array} layers The list will be generated by the layers given
+   */
+  let renderLayerTreeFlat = function (layers) {
+    let output = '<h4 class="lam-title">Oggetti</h4>';
+    output += '<div class="layertree">'; //generale
+    let index = 0;
+    layers.forEach(function (element) {
+      output += renderLayer(element, layerGroupPrefix + "_" + index);
+      index++;
+    });
+    return output;
+  };
+
+  /**
+   * Renders the layer html code
+   * TODO All the render function should be replaced by a more efficient templating system.
+   * @param {Object} layer Layer Object
+   * @param {string} layerId Layer Unique HTML ID. The ID is generated appending system suffix at renderding time
+   */
   let renderLayer = function (layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
@@ -7869,6 +7926,22 @@ let LamLayerTree = (function () {
     return output;
   };
 
+  /**
+   * Renders the html of the bottom functions of the layer tree
+   */
+  let renderLayersTreeBottomFunctions = function () {
+    let output = '<div class="layertree-item-bottom">';
+    output = "<input type='search' id='lamFilterLayers' onkeyup='LamLayerTree.filterLayers()' onclick='LamLayerTree.filterLayers()'>";
+    output +=
+      '<button class="lam-btn lam-btn-small lam-btn-floating lam-right lam-depth-1 ripple" alt="Reset dei layer" title="Reset dei layer" onClick="LamDispatcher.dispatch({eventName:\'reset-layers\'})"><i class="lam-icon">' +
+      LamResources.svgRefreshMap +
+      "</i></button>";
+    output += "</div>";
+    output += '<div class="layertree-item-bottom lam-scroll-padding"></div>'; //spaziatore
+    output += "</div>"; //generale
+    return output;
+  };
+
   let setCheckVisibility = function (layerGid, visibility) {
     const item = "#" + layerGid + "_c";
     if (visibility) {
@@ -7953,7 +8026,24 @@ let LamLayerTree = (function () {
     }
   };
 
+  /**
+   * Filters the layers
+   */
+  let filterLayers = function () {
+    let term = $("#lamFilterLayers").val();
+    if (!term || term.length < 2) {
+      LamLayerTree.updateCheckBoxesStates();
+      output = renderLayerTree(LamStore.getAppState().layers);
+      $("#" + treeLayerDiv).html(output);
+      return;
+    }
+    var layers = LamStore.getLayersByName(term);
+    let output = renderLayerTreeFlat(layers);
+    jQuery("#" + treeLayerDiv).html(output);
+  };
+
   return {
+    filterLayers: filterLayers,
     formatString: formatString,
     render: render,
     init: init,

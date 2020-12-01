@@ -78,9 +78,6 @@ var LamStore = (function () {
    */
   var setAppState = function (currentAppState) {
     appState = normalizeAppState(currentAppState);
-    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
-      appState = normalizeMobile(appState);
-    }
   };
 
   /**
@@ -89,9 +86,6 @@ var LamStore = (function () {
   var setInitialAppState = function (appState) {
     initialAppState = JSON.parse(JSON.stringify(appState));
     initialAppState = normalizeAppState(initialAppState);
-    if (LamDom.isMobile() && initialAppState.improveMobileBehaviour) {
-      initialAppState = normalizeMobile(initialAppState);
-    }
   };
 
   /**
@@ -103,6 +97,9 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+    if (LamDom.isMobile() && appState.improveMobileBehaviour) {
+      appState = normalizeMobile(appState);
+    }
     return appstate;
   };
 
@@ -249,8 +246,9 @@ var LamStore = (function () {
   }
 
   /**
-   * Restituisce tutti i layer abilitati all'interrogazione
-   * @return {array} Array dei layer interrogabili
+   * Returns the layers with queryable property set to true
+   * Query is the click Info on the map
+   * @return {Array} Query (info) layer array
    */
   var getQueryLayers = function () {
     let layers = getQueryLayersArray(appState.layers);
@@ -276,8 +274,35 @@ var LamStore = (function () {
   };
 
   /**
-   * Restituisce tutti i layer abilitati alla ricerca
-   * @return {array} Array dei layer ricercarbili
+   * Returns the layers based on the layer name given
+   * @return {array}  Search layer array
+   */
+  var getLayersByName = function (search) {
+    let layers = getLayersByNameArray(search, appState.layers);
+    layers.sort(SortByLayerName);
+    return layers;
+  };
+
+  /**
+   * Function needed for getting layers by name recursively
+   * @param {Object} layers
+   */
+  var getLayersByNameArray = function (search, layers) {
+    var layersFound = [];
+    layers.forEach(function (layer) {
+      if (layer.layerName && layer.layerName.includes(search)) {
+        layersFound.push(layer);
+      }
+      if (layer.layers) {
+        layersFound = layersFound.concat(getLayersByNameArray(search, layer.layers));
+      }
+    });
+    return layersFound;
+  };
+
+  /**
+   * Returns the layers with searchable property set to true
+   * @return {array}  Search layer array
    */
   var getSearchLayers = function () {
     let layers = getSearchLayersArray(appState.layers);
@@ -330,7 +355,7 @@ var LamStore = (function () {
   };
 
   /**
-   * Get Group Layer bu Layer Gid
+   * Get Group Layer by Layer Gid
    * @param {string} gid Layer gid
    */
   var getGroupLayerByLayerGid = function (gid) {
@@ -386,8 +411,8 @@ var LamStore = (function () {
    * @return {null} Nessun valore restituito
    */
   var resetInitialLayers = function () {
-    if (initialAppState.layers) {
-      resetLayersArray(initialAppState.layers);
+    if (LamStore.getInitialAppState().layers) {
+      resetLayersArray(LamStore.getInitialAppState().layers);
     }
     //resetting checkboxes
     LamLayerTree.updateCheckBoxesStates(LamStore.getAppState().layers);
@@ -565,6 +590,7 @@ var LamStore = (function () {
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,
     getLayerByName: getLayerByName,
+    getLayersByName: getLayersByName,
     getLayers: getLayers,
     getLinks: getLinks,
     getMapDiv: getMapDiv,
