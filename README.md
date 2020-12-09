@@ -44,12 +44,12 @@ La mappa può essere inclusa tramite un IFRAME impostando l'url della mappa. Agg
 
 L'url della mappa può essere richiamato impostato con i seguenti parametri custom:
 
-**lon** Longitudine iniziale
-**lat** Latitudine iniziale
-**zoom** Zoom iniziale
-**layers** Elenco dei layer separato da virgole con gli identificativi univoci (gid) dei layer che saranno visisibili all'avvio
-**appstate** Url dell'appstate da caricare nella mappa
-**appstatejson** Codice JSON dell'appstate da caricare
+**lon** Longitudine iniziale  
+**lat** Latitudine iniziale  
+**zoom** Zoom iniziale  
+**layers** Elenco dei layer separato da virgole con gli identificativi univoci (gid) dei layer che saranno visisibili all'avvio  
+**appstate** Url dell'appstate da caricare nella mappa  
+**appstatejson** Codice JSON dell'appstate da caricare  
 
 Le proprietà dell'appstate possono essere modificate tramite parametri querystring anteponendo il prefisso _prop-_ alla proprietà.
 
