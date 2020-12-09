@@ -515,7 +515,7 @@ let LamMap = (function () {
     if (srid) wfsUrl += "&srsName=EPSG:" + srid;
     return wfsUrl;
   };
- 
+
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
@@ -583,9 +583,9 @@ let LamMap = (function () {
   /**
    * Map initialization function
    * @param {*} divMap Html element for the map
-   * @param {*} mapConfig AppState Config
+   * @param {*} appState AppState Config
    */
-  let render = function render(divMap, mapConfig) {
+  let render = function render(divMap, appState) {
     log("Creazione della mappa in corso");
     if (!isRendered) {
       init();
@@ -646,7 +646,7 @@ let LamMap = (function () {
       }),
     });
 
-    loadConfig(mapConfig);
+    loadConfig(appState);
 
     LamMapInfo.init(); //info initialization
 
@@ -717,13 +717,11 @@ let LamMap = (function () {
     }
   };
 
+  /**
+   * Carica l'oggetto di configurazione sulla mappa
+   * @param {Object} config Oggetto con i parametri di configurazione
+   */
   let loadConfig = function loadConfig(config) {
-    /// <summary>
-    /// Carica l'oggetto di configurazione sulla mappa
-    /// </summary>
-    /// <param name="config">Oggetto con i parametri di configurazione</param>
-    /// <returns type=""></returns>
-
     //ricavo i parametri per il posizionamento custom da querystring
     let initLon = getUriParameter("lon");
     let initLat = getUriParameter("lat");

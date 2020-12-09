@@ -1639,7 +1639,7 @@ let LamMap = (function () {
     if (srid) wfsUrl += "&srsName=EPSG:" + srid;
     return wfsUrl;
   };
- 
+
   /**
    * [[Description]]
    * @param {int} gid [[Codice numerico del layer]]
@@ -1707,9 +1707,9 @@ let LamMap = (function () {
   /**
    * Map initialization function
    * @param {*} divMap Html element for the map
-   * @param {*} mapConfig AppState Config
+   * @param {*} appState AppState Config
    */
-  let render = function render(divMap, mapConfig) {
+  let render = function render(divMap, appState) {
     log("Creazione della mappa in corso");
     if (!isRendered) {
       init();
@@ -1770,7 +1770,7 @@ let LamMap = (function () {
       }),
     });
 
-    loadConfig(mapConfig);
+    loadConfig(appState);
 
     LamMapInfo.init(); //info initialization
 
@@ -1841,13 +1841,11 @@ let LamMap = (function () {
     }
   };
 
+  /**
+   * Carica l'oggetto di configurazione sulla mappa
+   * @param {Object} config Oggetto con i parametri di configurazione
+   */
   let loadConfig = function loadConfig(config) {
-    /// <summary>
-    /// Carica l'oggetto di configurazione sulla mappa
-    /// </summary>
-    /// <param name="config">Oggetto con i parametri di configurazione</param>
-    /// <returns type=""></returns>
-
     //ricavo i parametri per il posizionamento custom da querystring
     let initLon = getUriParameter("lon");
     let initLat = getUriParameter("lat");
@@ -5736,6 +5734,7 @@ var LamCookieConsent = (function () {
   }
 
   function cookieConsent() {
+    if (!LamStore.getAppState().cookieConsent) return;
     if (!getCookieConsent("lamCookieDismiss")) {
       document.body.innerHTML +=
         '<div class="lamConsentContainer" id="lamConsentContainer"><div class="cookieTitle"><a>' +
@@ -6430,34 +6429,34 @@ let LamLoader = (function () {
   /**
    * Init map function
    * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
-   * @param {*} appStateInline Url of the appstate, inline json string o print. 
-   *                            Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
+   * @param {*} appStateInline Url of the appstate, inline json string or custom value for print (experimental).
+   *                            If the appstate or appstatejson parameter is given in the url it will have priority over this.
+   *                            Otherwise standard url states/app-state.json will be used
    * @param {*} mapTemplateUrl Url of the map template to load.
    */
-  let lamInit = function(mapDiv, appStateInline, mapTemplateUrl) {
+  let lamInit = function (mapDiv, appStateInline, mapTemplateUrl) {
     LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
     LamStore.setMapTemplateUrl(mapTemplateUrl);
     //appstate loader
-    //appstate with filename
+    //appstate given in url with filename
     var appStateId =
       decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
-
-    //appstate json inline with url
+    //appstate given in url with full json
     var appStateJson =
       decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
       null;
     let appStateUrl = null;
-    
+
     //decoding appstate inline
-    if(appStateInline){
-      if(appStateIniline==="print"){
+    if (appStateInline) {
+      if (appStateIniline === "print") {
         //setting appstateprint from sessionstorage
-        appStateJson = sessionStorage.getItem('appStatePrint');
-        if(!appStateJson){
+        appStateJson = sessionStorage.getItem("appStatePrint");
+        if (!appStateJson) {
           lamDispatch("Unable to get the appStatePrint object for printing");
           return;
         }
-      }else{
+      } else {
         //setting url
         appStateUrl = appStateIniline;
       }
@@ -6544,29 +6543,27 @@ let LamLoader = (function () {
       }
       lamTemplateMapinit();
     }
-  }
+  };
 
   /**
    * Updates CSS classes based on the appstate configuration
    */
-let cssUpdatesFromState = function(){
-$("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
-//definizione dei loghi
-if (LamStore.getAppState().logoUrl) {
-  $("#lam-logo__img").attr("src", state.logoUrl);
-}
-if(LamStore.getAppState().hideLogo){
-  $("#lam-logo").addClass("lam-hidden"); 
-}
-}
-
+  let cssUpdatesFromState = function () {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    //definizione dei loghi
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", LamStore.getAppState().logoUrl);
+    }
+    if (LamStore.getAppState().hideLogo) {
+      $("#lam-logo").addClass("lam-hidden");
+    }
+  };
 
   /**
    * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
    * After that calls the mapInit
    */
-let lamTemplateMapinit = function () {
-   
+  let lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",
       url: LamStore.getMapTemplateUrl(),
@@ -6641,7 +6638,7 @@ let lamTemplateMapinit = function () {
   var mapInit = function (callback) {
     registerHandlebarsHelpers();
     cssUpdatesFromState();
-   
+
     if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
       if (LamStore.getAppState().logoPanelUrl) {
         $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
@@ -7208,6 +7205,25 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+
+    //if some parameters are defined in the querystring they will be inherited in the appstate
+    let searchArray = location.search.replace("?", "").split("&");
+    searchArray.forEach(function (parameter) {
+      if (parameter.indexOf("prop-") == 0) {
+        let parameterArray = parameter.split("=");
+        if (parameterArray.length == 2) {
+          appstate[parameterArray[0].replace("prop-", "")] = getNormalizedParameter(parameterArray[1]);
+        }
+      }
+    });
+    if (appstate.embed) {
+      //embed the map
+      appstate.termsLinks = null;
+      appstate.hideLogo = true;
+      appstate.cookieConsent = null;
+      appstate.modules["print-tools"] = false;
+      appstate.modules["draw-tools"] = false;
+    }
     return appstate;
   };
 
@@ -7230,6 +7246,19 @@ var LamStore = (function () {
     normalizeMobileArray(appstate.layers);
     appState.disableAjaxRequestInfo = 0;
     return appstate;
+  };
+
+  /**
+   * Trasform
+   * @param {string} parameter  Url parameter
+   */
+  let getNormalizedParameter = function (parameter) {
+    if (!isNaN(parameter)) {
+      return parseFloat(parameter) % 1 === 0 ? parseInt(parameter) : parseFloat(parameter);
+    }
+    if (parameter.toLowerCase === "true") return true;
+    if (parameter.toLowerCase === "false") return false;
+    return parameter;
   };
 
   /**

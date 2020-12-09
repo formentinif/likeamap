@@ -1,28 +1,65 @@
-# likeamap
+# LikeAMap
+
 LikeAMap è un visualizzatore di servizi web geografici. Permette la creazione di progetti personalizzati per aggregare servizi web WMS provenienti da fonti differenti.
 
+## File di configurazione (AppState)
+
 LikeAMap in base ad un file di configurazione JSON, permette di configurare mappe per la visualizzazione, ricerca e interrogazione di dati geografici.
+
 Lo schema per il file di configurazione è disponibile map/js/app-state-schema.json
 
-Mappa embedded
-Per includere la mappa in un div includere:
-	JQuery 3+
-		
-    <link rel="stylesheet" href="css/lam.css" />
-	<link rel="stylesheet" href="css/lam-variables.css" /> //(css per colori e impostazioni custom può essere inserito in linea)
-    <script src="js/lam-libs.js"></script> //(include openlayers e handlebars)
-    <script src="js/lam.js"></script>
-	
-	//lo script per inizializzare la mappa è il seguente
-	<script>
-      //LamInit({id del div mappa}, {url dell'appstate}, {url del template mappa});
-      LamInit("lam-app", null, null);
-    </script>
+## Mappa embedded con Javascript
 
-RoadMap
+La mappa può essere emeddata in una pagina tramite javascript.
+Sono da includere i seguenti file:
+JQuery 3+
 
+```html
+<!--css per colori e impostazioni custom può essere inserito in linea-->
+<link rel="stylesheet" href="css/lam.css" /> <link rel="stylesheet" href="css/lam-variables.css" />
+<!--Librerie di terze parti include openlayers e handlebars-->
+<script src="js/lam-libs.js"></script>
+<!--Codice di LikeAMap-->
+<script src="js/lam.js"></script>
+```
 
+Lo script per inizializzare la mappa è il seguente. Passare come paramertri l'url dell'appstate di configurazione o una eventuale mappa custom.
 
+```html
+<script>
+  //LamInit({id del div mappa}, {url dell'appstate}, {url del template mappa});
+  LamInit("lam-app", null, null);
+</script>
+```
 
-Author  Perspectiva di Formentini Filippo
+## Mappa embedded con IFRAME
+
+La mappa può essere inclusa tramite un IFRAME impostando l'url della mappa. Aggiungere il parametro querystring _prop-embed=1_ per configurare in automatico alcune proprietà della mappa più adatte alla visualizzazione embedded.
+
+```html
+<iframe src="http://localhost:3000/?prop-embed=1" frameborder="0" width="500" height="600"></iframe>
+```
+
+## Parametri querystring
+
+L'url della mappa può essere richiamato impostato con i seguenti parametri custom:
+
+**lon** Longitudine iniziale
+**lat** Latitudine iniziale
+**zoom** Zoom iniziale
+**layers** Elenco dei layer separato da virgole con gli identificativi univoci (gid) dei layer che saranno visisibili all'avvio
+**appstate** Url dell'appstate da caricare nella mappa
+**appstatejson** Codice JSON dell'appstate da caricare
+
+Le proprietà dell'appstate possono essere modificate tramite parametri querystring anteponendo il prefisso _prop-_ alla proprietà.
+
+```html
+<iframe src="http://localhost:3000/?prop-embed=1&prop-title=Mia Mappa" frameborder="0" width="500" height="600"></iframe>
+```
+
+Per l'elenco delle proprietà consultare il file map/js/app-state-schema.json. Sono supportate solo le proprietà di primo livello, non è possibile impostare le proprietà degli oggetti nidificati.
+
+## RoadMap
+
+Author Perspectiva di Formentini Filippo
 Licensed Apache License 2.0
