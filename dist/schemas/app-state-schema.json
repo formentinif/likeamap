@@ -29,6 +29,12 @@
       "default": false,
       "type": "boolean"
     },
+    "embed": {
+      "title": "Embedded map",
+      "description": "Nasconde in automatico il logo, stampa e disegno, il link della privacy, il cookie consent per la mappa embedded",
+      "default": false,
+      "type": "boolean"
+    },
     "logoPanelUrl": {
       "title": "Logo del pannello",
       "description": "Logo che viene visualizzato nel pannello laterale a scomparsa.  Inserire un url assoluto o relativo.",

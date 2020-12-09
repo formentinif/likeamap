@@ -103,6 +103,25 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+
+    //if some parameters are defined in the querystring they will be inherited in the appstate
+    let searchArray = location.search.replace("?", "").split("&");
+    searchArray.forEach(function (parameter) {
+      if (parameter.indexOf("prop-") == 0) {
+        let parameterArray = parameter.split("=");
+        if (parameterArray.length == 2) {
+          appstate[parameterArray[0].replace("prop-", "")] = getNormalizedParameter(parameterArray[1]);
+        }
+      }
+    });
+    if (appstate.embed) {
+      //embed the map
+      appstate.termsLinks = null;
+      appstate.hideLogo = true;
+      appstate.cookieConsent = null;
+      appstate.modules["print-tools"] = false;
+      appstate.modules["draw-tools"] = false;
+    }
     return appstate;
   };
 
@@ -125,6 +144,19 @@ var LamStore = (function () {
     normalizeMobileArray(appstate.layers);
     appState.disableAjaxRequestInfo = 0;
     return appstate;
+  };
+
+  /**
+   * Trasform
+   * @param {string} parameter  Url parameter
+   */
+  let getNormalizedParameter = function (parameter) {
+    if (!isNaN(parameter)) {
+      return parseFloat(parameter) % 1 === 0 ? parseInt(parameter) : parseFloat(parameter);
+    }
+    if (parameter.toLowerCase === "true") return true;
+    if (parameter.toLowerCase === "false") return false;
+    return parameter;
   };
 
   /**

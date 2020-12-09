@@ -34,34 +34,34 @@ let LamLoader = (function () {
   /**
    * Init map function
    * @param {string} mapDiv Target Id of the div where the map will be rendered in.  Default is lam-app
-   * @param {*} appStateInline Url of the appstate, inline json string o print. 
-   *                            Appstate given in the url will have priority over this. Otherwise states/app-state.json will be used
+   * @param {*} appStateInline Url of the appstate, inline json string or custom value for print (experimental).
+   *                            If the appstate or appstatejson parameter is given in the url it will have priority over this.
+   *                            Otherwise standard url states/app-state.json will be used
    * @param {*} mapTemplateUrl Url of the map template to load.
    */
-  let lamInit = function(mapDiv, appStateInline, mapTemplateUrl) {
+  let lamInit = function (mapDiv, appStateInline, mapTemplateUrl) {
     LamStore.setMapDiv(!mapDiv ? "lam-app" : mapDiv);
     LamStore.setMapTemplateUrl(mapTemplateUrl);
     //appstate loader
-    //appstate with filename
+    //appstate given in url with filename
     var appStateId =
       decodeURIComponent((new RegExp("[?|&]" + "appstate" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) || null;
-
-    //appstate json inline with url
+    //appstate given in url with full json
     var appStateJson =
       decodeURIComponent((new RegExp("[?|&]" + "appstatejson" + "=" + "([^&;]+?)(&|#|;|$)").exec(location.search) || [null, ""])[1].replace(/\+/g, "%20")) ||
       null;
     let appStateUrl = null;
-    
+
     //decoding appstate inline
-    if(appStateInline){
-      if(appStateIniline==="print"){
+    if (appStateInline) {
+      if (appStateIniline === "print") {
         //setting appstateprint from sessionstorage
-        appStateJson = sessionStorage.getItem('appStatePrint');
-        if(!appStateJson){
+        appStateJson = sessionStorage.getItem("appStatePrint");
+        if (!appStateJson) {
           lamDispatch("Unable to get the appStatePrint object for printing");
           return;
         }
-      }else{
+      } else {
         //setting url
         appStateUrl = appStateIniline;
       }
@@ -148,29 +148,27 @@ let LamLoader = (function () {
       }
       lamTemplateMapinit();
     }
-  }
+  };
 
   /**
    * Updates CSS classes based on the appstate configuration
    */
-let cssUpdatesFromState = function(){
-$("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
-//definizione dei loghi
-if (LamStore.getAppState().logoUrl) {
-  $("#lam-logo__img").attr("src", state.logoUrl);
-}
-if(LamStore.getAppState().hideLogo){
-  $("#lam-logo").addClass("lam-hidden"); 
-}
-}
-
+  let cssUpdatesFromState = function () {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    //definizione dei loghi
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", LamStore.getAppState().logoUrl);
+    }
+    if (LamStore.getAppState().hideLogo) {
+      $("#lam-logo").addClass("lam-hidden");
+    }
+  };
 
   /**
    * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
    * After that calls the mapInit
    */
-let lamTemplateMapinit = function () {
-   
+  let lamTemplateMapinit = function () {
     $.ajax({
       dataType: "text",
       url: LamStore.getMapTemplateUrl(),
@@ -245,7 +243,7 @@ let lamTemplateMapinit = function () {
   var mapInit = function (callback) {
     registerHandlebarsHelpers();
     cssUpdatesFromState();
-   
+
     if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
       if (LamStore.getAppState().logoPanelUrl) {
         $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);

@@ -51,6 +51,7 @@ var LamCookieConsent = (function () {
   }
 
   function cookieConsent() {
+    if (!LamStore.getAppState().cookieConsent) return;
     if (!getCookieConsent("lamCookieDismiss")) {
       document.body.innerHTML +=
         '<div class="lamConsentContainer" id="lamConsentContainer"><div class="cookieTitle"><a>' +
