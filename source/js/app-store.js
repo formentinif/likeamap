@@ -624,3 +624,5 @@ var LamStore = (function () {
     toggleLayersInGroup: toggleLayersInGroup,
   };
 })();
+
+exports.LamStore = LamStore;

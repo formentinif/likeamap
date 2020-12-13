@@ -38,6 +38,30 @@ var LamDom = (function () {
     }
   };
 
+  /**
+   * Updates html and CSS classes based on the appstate configuration
+   */
+  let domUpdatesFromState = function () {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", LamStore.getAppState().logoUrl);
+    }
+    if (LamStore.getAppState().hideLogo) {
+      $("#lam-logo").addClass("lam-hidden");
+    }
+    if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
+      if (LamStore.getAppState().logoPanelUrl) {
+        $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
+        $("#panel__logo-img").removeClass("lam-hidden");
+      }
+      if (LamStore.getAppState().title) {
+        $("#panel__map-title").text(LamStore.getAppState().title);
+        $("#panel__map-title").removeClass("lam-hidden");
+      }
+      $("#panel__logo").removeClass("lam-hidden");
+    }
+  };
+
   var showAppTools = function () {
     var modules = LamStore.getAppState().modules;
     if (modules) {
@@ -178,6 +202,7 @@ var LamDom = (function () {
   };
 
   return {
+    domUpdatesFromState: domUpdatesFromState,
     dragElement: dragElement,
     init: init,
     isMobile: isMobile,
