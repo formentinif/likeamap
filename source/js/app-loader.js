@@ -174,10 +174,10 @@ let LamLoader = (function () {
 
   /**
    * Initialize application
-   * @param {fucntion} callback Function to be called after the map is loaded
+   * @param {function} callback Function to be called after the map is loaded
    */
   var appInit = function (callback) {
-    registerHandlebarsHelpers();
+    LamHandlebars.registerHandlebarsHelpers();
     LamDom.domUpdatesFromState();
 
     //inizializzazione globale
@@ -288,4 +288,4 @@ let LamLoader = (function () {
   };
 })();
 
-exports.LamLoader = LamLoader;
+//exports.LamLoader = LamLoader;

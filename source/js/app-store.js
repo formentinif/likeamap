@@ -625,4 +625,4 @@ var LamStore = (function () {
   };
 })();
 
-exports.LamStore = LamStore;
+//exports.LamStore = LamStore;

@@ -2885,6 +2885,66 @@ let LamMap = (function () {
   };
 })();
 
+let LamHandlebars = (function () {
+  let init = function init() {
+    registerHandlebarsHelpers();
+  };
+
+  let registerHandlebarsHelpers = function () {
+    Handlebars.registerHelper("ifequals", function (a, b, options) {
+      if (a == b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+
+    Handlebars.registerHelper("ifnotequals", function (a, b, options) {
+      if (a != b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
+    });
+
+    Handlebars.registerHelper("get_point_x", function (options) {
+      try {
+        return options.data.root.lamCoordinates[0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_point_y", function (options) {
+      try {
+        return options.data.root.lamCoordinates[1];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_coordinate_x", function (index, options) {
+      try {
+        if (index === "undefined") return options.data.lamCoordinates[0];
+        return options.data.root.lamCoordinates[index][0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_coordinate_y", function (index, options) {
+      try {
+        if (index === "undefined") return options.data.lamCoordinates[1];
+        return options.data.root.lamCoordinates[index][1];
+      } catch (error) {
+        return "";
+      }
+    });
+  };
+  return {
+    init: init,
+    registerHandlebarsHelpers: registerHandlebarsHelpers,
+  };
+})();
+
 /*
 Copyright 2015-2019 Perspectiva di Formentini Filippo
 
@@ -6242,6 +6302,30 @@ var LamDom = (function () {
     }
   };
 
+  /**
+   * Updates html and CSS classes based on the appstate configuration
+   */
+  let domUpdatesFromState = function () {
+    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
+    if (LamStore.getAppState().logoUrl) {
+      $("#lam-logo__img").attr("src", LamStore.getAppState().logoUrl);
+    }
+    if (LamStore.getAppState().hideLogo) {
+      $("#lam-logo").addClass("lam-hidden");
+    }
+    if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
+      if (LamStore.getAppState().logoPanelUrl) {
+        $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
+        $("#panel__logo-img").removeClass("lam-hidden");
+      }
+      if (LamStore.getAppState().title) {
+        $("#panel__map-title").text(LamStore.getAppState().title);
+        $("#panel__map-title").removeClass("lam-hidden");
+      }
+      $("#panel__logo").removeClass("lam-hidden");
+    }
+  };
+
   var showAppTools = function () {
     var modules = LamStore.getAppState().modules;
     if (modules) {
@@ -6382,6 +6466,7 @@ var LamDom = (function () {
   };
 
   return {
+    domUpdatesFromState: domUpdatesFromState,
     dragElement: dragElement,
     init: init,
     isMobile: isMobile,
@@ -6423,8 +6508,8 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
  * Global Istance that manages application loading
  */
 let LamLoader = (function () {
-  let layerUriCount = 0;
-  let countRequest = 0;
+  let layerUriCount = 0; //stores the total remote layers number
+  let countRequest = 0; //stores the cuont of call made to retrieve remote layers
 
   /**
    * Init map function
@@ -6526,7 +6611,6 @@ let LamLoader = (function () {
     }
 
     function loadLamState(appstate) {
-      //normalizing appstate
       LamStore.setAppState(appstate);
       if (LamStore.getAppState().authentication.requireAuthentication) {
         LamAuthTools.render("login-container");
@@ -6541,29 +6625,15 @@ let LamLoader = (function () {
       if (LamStore.getAppState().description) {
         LamCookieDescription.cookieDescription();
       }
-      lamTemplateMapinit();
+      lamTemplateMapHtml();
     }
   };
 
   /**
-   * Updates CSS classes based on the appstate configuration
+   * This functions load the html map using ajax into the given id element and then start the function
+   * that loads the layers recusively. After that calls the appInit function given as a callback
    */
-  let cssUpdatesFromState = function () {
-    $("#" + LamStore.getMapDiv()).removeClass("lam-hidden");
-    //definizione dei loghi
-    if (LamStore.getAppState().logoUrl) {
-      $("#lam-logo__img").attr("src", LamStore.getAppState().logoUrl);
-    }
-    if (LamStore.getAppState().hideLogo) {
-      $("#lam-logo").addClass("lam-hidden");
-    }
-  };
-
-  /**
-   * This functions load the html map using ajax and then start the function that loads the layers configured as a template.
-   * After that calls the mapInit
-   */
-  let lamTemplateMapinit = function () {
+  let lamTemplateMapHtml = function () {
     $.ajax({
       dataType: "text",
       url: LamStore.getMapTemplateUrl(),
@@ -6572,7 +6642,7 @@ let LamLoader = (function () {
       .done(function (data) {
         $("#" + LamStore.getMapDiv()).html(data);
         //loading all remote layers
-        loadRemoteLayers(LamLoader.mapInit);
+        loadRemoteLayers(LamLoader.appInit);
       })
       .fail(function (data) {
         lamDispatch({
@@ -6582,76 +6652,16 @@ let LamLoader = (function () {
       });
   };
 
-  let registerHandlebarsHelpers = function () {
-    Handlebars.registerHelper("ifequals", function (a, b, options) {
-      if (a == b) {
-        return options.fn(this);
-      }
-      return options.inverse(this);
-    });
-
-    Handlebars.registerHelper("ifnotequals", function (a, b, options) {
-      if (a != b) {
-        return options.fn(this);
-      }
-      return options.inverse(this);
-    });
-
-    Handlebars.registerHelper("get_point_x", function (options) {
-      try {
-        return options.data.root.lamCoordinates[0];
-      } catch (error) {
-        return "";
-      }
-    });
-
-    Handlebars.registerHelper("get_point_y", function (options) {
-      try {
-        return options.data.root.lamCoordinates[1];
-      } catch (error) {
-        return "";
-      }
-    });
-
-    Handlebars.registerHelper("get_coordinate_x", function (index, options) {
-      try {
-        if (index === "undefined") return options.data.lamCoordinates[0];
-        return options.data.root.lamCoordinates[index][0];
-      } catch (error) {
-        return "";
-      }
-    });
-
-    Handlebars.registerHelper("get_coordinate_y", function (index, options) {
-      try {
-        if (index === "undefined") return options.data.lamCoordinates[1];
-        return options.data.root.lamCoordinates[index][1];
-      } catch (error) {
-        return "";
-      }
-    });
-  };
-
-  /*
-  Funzione di inizializzazione dell'applicazione in cui può essere passato uno state alternativo
-  */
-  var mapInit = function (callback) {
-    registerHandlebarsHelpers();
-    cssUpdatesFromState();
-
-    if (LamStore.getAppState().logoPanelUrl || LamStore.getAppState().title) {
-      if (LamStore.getAppState().logoPanelUrl) {
-        $("#panel__logo-img").attr("src", LamStore.getAppState().logoPanelUrl);
-        $("#panel__logo-img").removeClass("lam-hidden");
-      }
-      if (LamStore.getAppState().title) {
-        $("#panel__map-title").text(LamStore.getAppState().title);
-        $("#panel__map-title").removeClass("lam-hidden");
-      }
-      $("#panel__logo").removeClass("lam-hidden");
-    }
+  /**
+   * Initialize application
+   * @param {function} callback Function to be called after the map is loaded
+   */
+  var appInit = function (callback) {
+    LamHandlebars.registerHandlebarsHelpers();
+    LamDom.domUpdatesFromState();
 
     //inizializzazione globale
+    LamHandlebars.init();
     LamDom.init();
     LamRelations.init();
     LamTables.init();
@@ -6754,9 +6764,11 @@ let LamLoader = (function () {
     lamInit: lamInit,
     loadLayersUri: loadLayersUri,
     loadRemoteLayers: loadRemoteLayers,
-    mapInit: mapInit,
+    appInit: appInit,
   };
 })();
+
+//exports.LamLoader = LamLoader;
 
 /*
 Copyright 2015-2019 Perspectiva di Formentini Filippo
@@ -7726,6 +7738,8 @@ var LamStore = (function () {
     toggleLayersInGroup: toggleLayersInGroup,
   };
 })();
+
+//exports.LamStore = LamStore;
 
 /*
 Copyright 2015-2019 Perspectiva di Formentini Filippo
