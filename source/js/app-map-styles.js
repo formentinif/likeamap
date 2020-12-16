@@ -28,7 +28,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let LamMapStyles = (function() {
+let LamMapStyles = (function () {
   "use strict";
 
   /**
@@ -36,22 +36,22 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getPreloadStyle = function(width, radius) {
+  let getPreloadStyle = function (width, radius) {
     if (!width) width = 4;
     if (!radius) radius = 10;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 255, 255, 0.01]
+        color: [255, 255, 255, 0.01],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 255, 255, 0.01],
-        width: width
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 255, 255, 0.01]
-        })
+          color: [255, 255, 255, 0.01],
+        }),
       }),
       text: new ol.style.Text({
         text: "",
@@ -59,31 +59,31 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getDrawStyle = function() {
+  let getDrawStyle = function () {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [68, 138, 255, 0.2]
+        color: [68, 138, 255, 0.2],
       }),
       stroke: new ol.style.Stroke({
         color: [68, 138, 255, 1],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [68, 138, 255, 1]
-        })
+          color: [68, 138, 255, 1],
+        }),
       }),
       text: new ol.style.Text({
         text: "pippo",
@@ -91,50 +91,50 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getSelectionStyle = function() {
+  let getSelectionStyle = function () {
     let styleSelection = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.2]
+        color: [255, 216, 0, 0.2],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 1],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 1]
-        })
-      })
+          color: [255, 216, 0, 1],
+        }),
+      }),
     });
     return styleSelection;
   };
 
-  let getSelectionMaskStyle = function() {
+  let getSelectionMaskStyle = function () {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.1]
+        color: [255, 216, 0, 0.1],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 0.5],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 0.5]
-        })
+          color: [255, 216, 0, 0.5],
+        }),
       }),
       text: new ol.style.Text({
         text: "",
@@ -142,26 +142,26 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getModifyStyle = function() {
+  let getModifyStyle = function () {
     let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
-        color: [255, 0, 0, 1]
+        color: [255, 0, 0, 1],
       }),
       fill: new ol.style.Stroke({
-        color: [255, 0, 0, 0.2]
-      })
+        color: [255, 0, 0, 0.2],
+      }),
     });
     return style_modify;
   };
@@ -171,23 +171,23 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getInfoStyle = function(width, radius) {
+  let getInfoStyle = function (width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [0, 255, 255, 0.2]
+        color: [255, 125, 0, 0.2],
       }),
       stroke: new ol.style.Stroke({
-        color: [0, 255, 255, 1],
-        width: width
+        color: [255, 125, 0, 1],
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [0, 255, 255, 1]
-        })
-      })
+          color: [255, 125, 0, 1],
+        }),
+      }),
     });
     return style;
   };
@@ -197,23 +197,23 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getFlashStyle = function(width, radius) {
+  let getFlashStyle = function (width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 125, 0, 1]
+        color: [255, 0, 0, 1],
       }),
       stroke: new ol.style.Stroke({
-        color: [255, 125, 0, 1],
-        width: width
+        color: [255, 0, 0, 1],
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 125, 0, 1]
-        })
-      })
+          color: [255, 0, 0, 1],
+        }),
+      }),
     });
     return style;
   };
@@ -260,6 +260,6 @@ let LamMapStyles = (function() {
     getPreloadStyle: getPreloadStyle,
     getSelectionStyle: getSelectionStyle,
     getSelectionMaskStyle: getSelectionMaskStyle,
-    getDrawStyle: getDrawStyle
+    getDrawStyle: getDrawStyle,
   };
 })();
