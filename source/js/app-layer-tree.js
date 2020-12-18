@@ -74,10 +74,17 @@ let LamLayerTree = (function () {
   let renderLayer = function (layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
+    let layerNameIcon = "";
+    if (layer.iconSvg) {
+      layerNameIcon = '<svg width="16" height="16" class="lam-mr-1 lam-layer-icon">' + layer.iconSvg + "</svg>";
+    }
+    if (layer.iconUrl) {
+      layerNameIcon = '<img width="16" height="16" class="lam-mr-1 lam-layer-icon" alt="Layer icon" src="' + layer.iconUrl + '" />';
+    }
     if (layer.showDescriptionInLayerTree && layer.layerDescription) {
-      output += formatString('<div class="layertree-layer__title-text">{0} - {1}</div>', layer.layerName, layer.layerDescription);
+      output += formatString('<div class="layertree-layer__title-text">{2}{0} - {1}</div>', layer.layerName, layer.layerDescription, layerNameIcon);
     } else {
-      output += formatString('<div class="layertree-layer__title-text">{0}</div>', layer.layerName);
+      output += formatString('<div class="layertree-layer__title-text">{1}{0}</div>', layer.layerName, layerNameIcon);
     }
     output += '<div class="layertree-layer__layers-icons">';
     output += formatString(

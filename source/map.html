@@ -192,6 +192,20 @@
       </svg>
     </i>
   </button>
+  <a
+    id="menu-toolbar__open-full"
+    class="lam-hidden lam-btn lam-btn-floating lam-ripple lam-depth-1 lam-toolbar-btn"
+    onClick="lamDispatch('show-legend-visible-layers-toggle')"
+    title="Apri applicazione completa"
+    target="_blank"
+  >
+    <i class="lam-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <rect fill="none" height="24" width="24" />
+        <polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" />
+      </svg>
+    </i>
+  </a>
 </div>
 <div id="panel" class="lam-panel">
   <div id="panel__content" class="lam-panel-content">
@@ -243,13 +257,9 @@
     <div id="info-window__title" class="lam-info-window__title">
       <h2 id="info-window__title" class="">Info</h2>
     </div>
-    <div id="info-window__content" class="">
-      Info
-    </div>
+    <div id="info-window__content" class="">Info</div>
     <div class="lam-mt-1">
-      <a class="lam-btn lam-depth-1" onclick="LamDispatcher.dispatch('hide-info-window')">
-        Chiudi
-      </a>
+      <a class="lam-btn lam-depth-1" onclick="LamDispatcher.dispatch('hide-info-window')"> Chiudi </a>
     </div>
   </div>
 </div>

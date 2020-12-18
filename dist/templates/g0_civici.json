@@ -7,6 +7,14 @@
     {
       "field": "TOPONIMO",
       "label": "Via",
+      "type": "link",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
       "type": "string",
       "header": "",
       "footer": "",

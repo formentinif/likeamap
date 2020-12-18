@@ -93,6 +93,11 @@
   margin: 0 0.2rem;
 }
 
+.lam-layer-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .lam-layer-description {
   box-sizing: border-box;
   width: 100%;
