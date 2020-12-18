@@ -50,6 +50,11 @@ var LamDom = (function () {
       setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
       if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);
       if (modules["legend-tools"]) setvisibility("#menu-toolbar__legend-tools", modules["legend-tools"]);
+      if (modules["open-full"]) {
+        let url = window.location.href.replace("prop-embed=", "");
+        $("#menu-toolbar__open-full").attr("href", url);
+        setvisibility("#menu-toolbar__open-full", modules["open-full"]);
+      }
     }
   };
 
@@ -171,7 +176,8 @@ var LamDom = (function () {
    */
   let setvisibility = function (element, status) {
     if (status) {
-      $(element).show();
+      //$(element).show();
+      $(element).css("display", "inline-block");
     } else {
       $(element).hide();
     }

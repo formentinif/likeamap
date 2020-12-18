@@ -114,13 +114,25 @@ var LamStore = (function () {
         }
       }
     });
+
     if (appstate.embed) {
       //embed the map
       appstate.termsLinks = null;
       appstate.hideLogo = true;
+      appstate.showLegendOnLoad = false;
+      appstate.showLayerTreeOnLoad = false;
       appstate.cookieConsent = null;
-      appstate.modules["print-tools"] = false;
-      appstate.modules["draw-tools"] = false;
+      for (var prop in appstate.modules) {
+        //disable all modules
+        if (Object.prototype.hasOwnProperty.call(appstate.modules, prop)) {
+          appstate.modules[prop] = false;
+        }
+        //enable only layer tree and open full
+        appstate.modules["layer-tree"] = true;
+        appstate.modules["open-full"] = true;
+      }
+    } else {
+      appstate.modules["open-full"] = false;
     }
     return appstate;
   };

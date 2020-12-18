@@ -110,7 +110,7 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
 /**
  * Classe per la gestione delle funzionalità di info
  */
-let LamMapStyles = (function() {
+let LamMapStyles = (function () {
   "use strict";
 
   /**
@@ -118,22 +118,22 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getPreloadStyle = function(width, radius) {
+  let getPreloadStyle = function (width, radius) {
     if (!width) width = 4;
     if (!radius) radius = 10;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 255, 255, 0.01]
+        color: [255, 255, 255, 0.01],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 255, 255, 0.01],
-        width: width
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 255, 255, 0.01]
-        })
+          color: [255, 255, 255, 0.01],
+        }),
       }),
       text: new ol.style.Text({
         text: "",
@@ -141,31 +141,31 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getDrawStyle = function() {
+  let getDrawStyle = function () {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [68, 138, 255, 0.2]
+        color: [68, 138, 255, 0.2],
       }),
       stroke: new ol.style.Stroke({
         color: [68, 138, 255, 1],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [68, 138, 255, 1]
-        })
+          color: [68, 138, 255, 1],
+        }),
       }),
       text: new ol.style.Text({
         text: "pippo",
@@ -173,50 +173,50 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getSelectionStyle = function() {
+  let getSelectionStyle = function () {
     let styleSelection = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.2]
+        color: [255, 216, 0, 0.2],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 1],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 1]
-        })
-      })
+          color: [255, 216, 0, 1],
+        }),
+      }),
     });
     return styleSelection;
   };
 
-  let getSelectionMaskStyle = function() {
+  let getSelectionMaskStyle = function () {
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 216, 0, 0.1]
+        color: [255, 216, 0, 0.1],
       }),
       stroke: new ol.style.Stroke({
         color: [255, 216, 0, 0.5],
-        width: 2
+        width: 2,
       }),
       image: new ol.style.Circle({
         radius: 7,
         fill: new ol.style.Fill({
-          color: [255, 216, 0, 0.5]
-        })
+          color: [255, 216, 0, 0.5],
+        }),
       }),
       text: new ol.style.Text({
         text: "",
@@ -224,26 +224,26 @@ let LamMapStyles = (function() {
         textAlign: "Left",
         textBaseline: "Top",
         fill: new ol.style.Fill({
-          color: "#000000"
+          color: "#000000",
         }),
         stroke: new ol.style.Stroke({
           color: "#FFFFFF",
-          width: 3.5
-        })
-      })
+          width: 3.5,
+        }),
+      }),
     });
     return style;
   };
 
-  let getModifyStyle = function() {
+  let getModifyStyle = function () {
     let style_modify = new ol.style.Style({
       stroke: new ol.style.Stroke({
         width: 2,
-        color: [255, 0, 0, 1]
+        color: [255, 0, 0, 1],
       }),
       fill: new ol.style.Stroke({
-        color: [255, 0, 0, 0.2]
-      })
+        color: [255, 0, 0, 0.2],
+      }),
     });
     return style_modify;
   };
@@ -253,23 +253,23 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getInfoStyle = function(width, radius) {
+  let getInfoStyle = function (width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [0, 255, 255, 0.2]
+        color: [255, 125, 0, 0.2],
       }),
       stroke: new ol.style.Stroke({
-        color: [0, 255, 255, 1],
-        width: width
+        color: [255, 125, 0, 1],
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [0, 255, 255, 1]
-        })
-      })
+          color: [255, 125, 0, 1],
+        }),
+      }),
     });
     return style;
   };
@@ -279,23 +279,23 @@ let LamMapStyles = (function() {
    * @param {int} width Width of the line
    * @param {int} radius Radius of the circle
    */
-  let getFlashStyle = function(width, radius) {
+  let getFlashStyle = function (width, radius) {
     if (!width) width = 3;
     if (!radius) radius = 7;
     let style = new ol.style.Style({
       fill: new ol.style.Fill({
-        color: [255, 125, 0, 1]
+        color: [255, 0, 0, 1],
       }),
       stroke: new ol.style.Stroke({
-        color: [255, 125, 0, 1],
-        width: width
+        color: [255, 0, 0, 1],
+        width: width,
       }),
       image: new ol.style.Circle({
         radius: radius,
         fill: new ol.style.Fill({
-          color: [255, 125, 0, 1]
-        })
-      })
+          color: [255, 0, 0, 1],
+        }),
+      }),
     });
     return style;
   };
@@ -342,7 +342,7 @@ let LamMapStyles = (function() {
     getPreloadStyle: getPreloadStyle,
     getSelectionStyle: getSelectionStyle,
     getSelectionMaskStyle: getSelectionMaskStyle,
-    getDrawStyle: getDrawStyle
+    getDrawStyle: getDrawStyle,
   };
 })();
 
@@ -6254,6 +6254,11 @@ var LamDom = (function () {
       setvisibility("#menu-toolbar__gps-tools", modules["gps-tools"]);
       if (modules["links-tools"]) setvisibility("#menu-toolbar__links-tools", modules["links-tools"]);
       if (modules["legend-tools"]) setvisibility("#menu-toolbar__legend-tools", modules["legend-tools"]);
+      if (modules["open-full"]) {
+        let url = window.location.href.replace("prop-embed=", "");
+        $("#menu-toolbar__open-full").attr("href", url);
+        setvisibility("#menu-toolbar__open-full", modules["open-full"]);
+      }
     }
   };
 
@@ -6375,7 +6380,8 @@ var LamDom = (function () {
    */
   let setvisibility = function (element, status) {
     if (status) {
-      $(element).show();
+      //$(element).show();
+      $(element).css("display", "inline-block");
     } else {
       $(element).hide();
     }
@@ -7216,13 +7222,25 @@ var LamStore = (function () {
         }
       }
     });
+
     if (appstate.embed) {
       //embed the map
       appstate.termsLinks = null;
       appstate.hideLogo = true;
+      appstate.showLegendOnLoad = false;
+      appstate.showLayerTreeOnLoad = false;
       appstate.cookieConsent = null;
-      appstate.modules["print-tools"] = false;
-      appstate.modules["draw-tools"] = false;
+      for (var prop in appstate.modules) {
+        //disable all modules
+        if (Object.prototype.hasOwnProperty.call(appstate.modules, prop)) {
+          appstate.modules[prop] = false;
+        }
+        //enable only layer tree and open full
+        appstate.modules["layer-tree"] = true;
+        appstate.modules["open-full"] = true;
+      }
+    } else {
+      appstate.modules["open-full"] = false;
     }
     return appstate;
   };
@@ -7803,10 +7821,17 @@ let LamLayerTree = (function () {
   let renderLayer = function (layer, layerId) {
     let output = "";
     output += formatString('<div id="{0}" class="layertree-layer layertree-layer-border {1}">', layerId, layer.cssClass ? layer.cssClass : "");
+    let layerNameIcon = "";
+    if (layer.iconSvg) {
+      layerNameIcon = '<svg width="16" height="16" class="lam-mr-1 lam-layer-icon">' + layer.iconSvg + "</svg>";
+    }
+    if (layer.iconUrl) {
+      layerNameIcon = '<img width="16" height="16" class="lam-mr-1 lam-layer-icon" alt="Layer icon" src="' + layer.iconUrl + '" />';
+    }
     if (layer.showDescriptionInLayerTree && layer.layerDescription) {
-      output += formatString('<div class="layertree-layer__title-text">{0} - {1}</div>', layer.layerName, layer.layerDescription);
+      output += formatString('<div class="layertree-layer__title-text">{2}{0} - {1}</div>', layer.layerName, layer.layerDescription, layerNameIcon);
     } else {
-      output += formatString('<div class="layertree-layer__title-text">{0}</div>', layer.layerName);
+      output += formatString('<div class="layertree-layer__title-text">{1}{0}</div>', layer.layerName, layerNameIcon);
     }
     output += '<div class="layertree-layer__layers-icons">';
     output += formatString(
@@ -8358,6 +8383,7 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
+          if (!field.field) break;
           str += '<div class="lam-feature-content lam-col"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
           break;
       }

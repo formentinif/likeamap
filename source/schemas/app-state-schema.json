@@ -377,6 +377,11 @@
         "title": "Login",
         "description": "Accesso tramite login",
         "type": "boolean"
+      },
+      "open-full": {
+        "title": "Open Full",
+        "description": "Apri applicazione completa",
+        "type": "boolean"
       }
     }
   },
