@@ -364,8 +364,13 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
-          debugger;
           str += '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
+          break;
+        case "phone":
+          str += '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
+          break;
+        case "email":
+          str += '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
       }
       str += "</div>";

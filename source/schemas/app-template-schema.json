@@ -64,7 +64,7 @@
             "title": "Tipologia",
             "description": "Tipo di campo",
             "type": "string",
-            "enum": ["string", "int", "yesno", "moreinfo", "array", "link"]
+            "enum": ["string", "int", "yesno", "moreinfo", "array", "link", "phone", "email"]
           },
           "header": {
             "title": "Intestazione",
@@ -85,6 +85,6 @@
         "required": ["field", "label", "type"]
       }
     }
-  } ,
+  },
   "required": ["title", "layer", "layerGid", "templateType", "fields"]
 }
