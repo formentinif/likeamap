@@ -48,6 +48,7 @@ function combineAppJs() {
         "./source/js/app-map-tooltip.js",
         "./source/js/app-map-info.js",
         "./source/js/app-map.js",
+		"./source/js/app-handlebars.js",
         "./source/js/draw-tools.js",
         "./source/js/map-tools.js",
 		"./source/js/measure-tools.js",
