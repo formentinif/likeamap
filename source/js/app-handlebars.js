@@ -51,7 +51,19 @@ let LamHandlebars = (function () {
         return "";
       }
     });
+
+    Handlebars.registerHelper("format_url", function (url, label) {
+      try {
+        debugger;
+        if (!url) return "";
+        if (url.indexOf("http") !== 0) url = "https://" + url;
+        return "<a href='" + url + "' target='_blank'>" + label + "</a>";
+      } catch (error) {
+        return "";
+      }
+    });
   };
+
   return {
     init: init,
     registerHandlebarsHelpers: registerHandlebarsHelpers,

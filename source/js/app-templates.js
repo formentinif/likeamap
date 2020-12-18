@@ -364,8 +364,8 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
-          if (!field.field) break;
-          str += '<div class="lam-feature-content lam-col"><a href="{{' + field.field + '}}" target="_blank">' + field.label + "</a></div>";
+          debugger;
+          str += '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
           break;
       }
       str += "</div>";
