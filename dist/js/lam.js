@@ -2908,6 +2908,7 @@ let LamHandlebars = (function () {
 
     Handlebars.registerHelper("phone_link", function (phone) {
       try {
+        if (!phone) return "";
         return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgPhone16 + "</i>" + "<a href='tel:" + phone + "'>" + phone + "</a>";
       } catch (error) {
         return "";
@@ -2916,6 +2917,7 @@ let LamHandlebars = (function () {
 
     Handlebars.registerHelper("email_link", function (email) {
       try {
+        if (!email) return "";
         return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgMail16 + "</i>" + "<a href='mailto:" + email + "'>" + email + "</a>";
       } catch (error) {
         return "";
@@ -8446,7 +8448,6 @@ let LamTemplates = (function () {
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);
-        debugger;
         if (!featureTemplate) featureTemplate = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
 

@@ -421,7 +421,6 @@ let LamTemplates = (function () {
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);
-        debugger;
         if (!featureTemplate) featureTemplate = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
 

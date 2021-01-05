@@ -5,7 +5,7 @@
   "templateType": "simple",
   "fields": [
     {
-      "field": "TOPONIMO",
+      "field": "TOPONIMOe",
       "label": "Via",
       "type": "phone",
       "header": "",
@@ -13,7 +13,7 @@
       "itemTemplate": ""
     },
     {
-      "field": "TOPONIMO",
+      "field": "TOPONIMOe",
       "label": "Via",
       "type": "email",
       "header": "",
