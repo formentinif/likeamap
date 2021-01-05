@@ -7,6 +7,22 @@
     {
       "field": "TOPONIMO",
       "label": "Via",
+      "type": "phone",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
+      "type": "email",
+      "header": "",
+      "footer": "",
+      "itemTemplate": ""
+    },
+    {
+      "field": "TOPONIMO",
+      "label": "Via",
       "type": "link",
       "header": "",
       "footer": "",
