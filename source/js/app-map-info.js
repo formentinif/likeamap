@@ -59,9 +59,11 @@ let LamMapInfo = (function () {
     LamDispatcher.bind("show-info-items", function (payload) {
       LamMapInfo.showRequestInfoFeatures(payload.features, payload.element);
     });
+
     LamDispatcher.bind("show-info-geometries", function (payload) {
       LamMapInfo.showRequestInfoFeaturesGeometries(payload.features);
     });
+
     LamDispatcher.bind("flash-feature", function (payload) {
       let featureOl = LamMap.convertGeoJsonFeatureToOl(payload.feature);
       featureOl = LamMap.transform3857(featureOl, featureOl.srid);
@@ -70,6 +72,7 @@ let LamMapInfo = (function () {
         LamMapInfo.clearLayerFlash();
       }, 800);
     });
+
     LamDispatcher.bind("show-mobile-info-results", function (payload) {
       //LamToolbar.toggleToolbarItem("info-results", true);
       LamToolbar.showMenu();
@@ -187,10 +190,7 @@ let LamMapInfo = (function () {
         }
       });
     }
-    // if (featuresInfoClicked.length > 0) {
-    //   showInfoFeatureTooltipAtPixel(featuresInfoClicked[0], pixel);
-    //   return;
-    // }
+
     if (featuresClicked.length > 0) {
       //verifing info behaviour
       if (LamStore.getAppState().infoSelectBehaviour == LamEnums.infoSelectBehaviours().SingleFeature) {
@@ -235,7 +235,6 @@ let LamMapInfo = (function () {
   let getFeatureInfoRequest = function () {
     let url = "";
     //ricavo l'url corrente dalla coda globale e setto il layer come completato
-    //TODO refactor whe IE support will drop
     for (let i = 0; i < requestQueue.layers.length; i++) {
       if (!requestQueue.layers[i].sent) {
         requestQueue.layers[i].sent = true;
@@ -244,6 +243,7 @@ let LamMapInfo = (function () {
         break;
       }
     }
+
     if (!url) {
       //the loop has ended
       requestQueue.ajaxPending = false;
@@ -262,24 +262,14 @@ let LamMapInfo = (function () {
             features: requestQueueData,
           },
         });
-        // lamDispatch({
-        //   eventName: "show-map-tooltip",
-        //   features: {
-        //     features: requestQueueData[0]
-        //   }
-        // });
       } else {
         showInfoWindow("Risultati", LamTemplates.getInfoResultEmpty());
       }
       return;
     }
+
     //adding the right callback on request
     url += "&format_options=callback:LamMapInfo.processRequestInfoAll";
-    //if (requestQueue.visibleLayers) {
-    //  url += "&format_options=callback:LamMapInfo.processRequestInfo";
-    //} else {
-    //  url += "&format_options=callback:LamMapInfo.processRequestInfoAll";
-    //}
     requestQueue.ajaxPending = true;
     lamDispatch("show-loader");
     $.ajax({
@@ -303,38 +293,6 @@ let LamMapInfo = (function () {
     });
   };
 
-  // /**
-  //  * Process the results after an info click on the map
-  //  * @param {object} featureCollection Object with the results. It must have a features property with the array of features
-  //  */
-  // let processRequestInfo = function processRequestInfo(featureCollection) {
-  //   requestQueue.ajaxPending = false;
-  //   lamDispatch("hide-loader");
-  //   //se il dato è presente lo visualizzo
-  //   if (featureCollection && featureCollection.features.length > 0) {
-  //     if (featureCollection.features[0].geometry) {
-  //       let srid = LamMap.getSRIDfromCRSName(featureCollection.crs.properties.name);
-  //       addGeometryInfoToMap(featureCollection.features[0].geometry, srid, LamMap.getGeometryFormats().GeoJson);
-  //     }
-  //     for (let i = 0; i < featureCollection.features.length; i++) {
-  //       featureCollection.features[i].layerGid = requestQueue.layers[requestQueue.currentLayerIndex].gid;
-  //     }
-  //     LamDispatcher.dispatch({
-  //       eventName: "show-info-items",
-  //       data: featureCollection
-  //     });
-  //   }
-
-  //   if (requestQueue.mustRestart) {
-  //     requestQueue.mustRestart = false;
-  //     getFeatureInfoRequest();
-  //   }
-  //   //se il dato a questo punto è nullo procedo al secondo step nella coda delle richieste
-  //   if (!featureCollection || featureCollection.features.length == 0) {
-  //     getFeatureInfoRequest();
-  //   }
-  // };
-
   /**
    * Process the next step on a Request Queue
    * @param {object} featureCollection Object with the results. It must have a features property with the array of features
@@ -357,7 +315,6 @@ let LamMapInfo = (function () {
       requestQueue.mustRestart = false;
       getFeatureInfoRequest();
     }
-    //getFeatureInfoRequest(false);
   };
 
   /**

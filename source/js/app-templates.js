@@ -414,16 +414,18 @@ let LamTemplates = (function () {
     LamStore.getAppState().currentInfoItems = featureInfoCollection;
     let index = 0;
     featureInfoCollection.features.forEach(function (feature) {
+      let featureTemplate = template;
       let props = feature.properties ? feature.properties : feature;
       //adding the coords as properties
       if (feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);
-        if (!template) template = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+        debugger;
+        if (!featureTemplate) featureTemplate = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
       }
 
-      let tempBody = LamTemplates.processTemplate(template, props, layer);
+      let tempBody = LamTemplates.processTemplate(featureTemplate, props, layer);
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
