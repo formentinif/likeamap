@@ -74,6 +74,40 @@ Nel caso di **Group Layer** di GeoServer la configurazione dei template richiede
   Il template da associare sarà quindi selezionato tramite il nome del layer di Geoserver.
   **Nota:** è supportato un solo nome di layer Geoserver per applicazione. Se due template hanno lo stesso valore nella proprietà _layer_, sarà preso il primo disponibile indipendentemente dall'associazione a livello di layer.
 
+## Icone dei layer
+
+È possibile inserire una icona prima dei titoli dei layer utilizzando le proprietà _iconSvg_ e _iconUrl_ dei layer.
+
+La proprietà _iconUrl_ accetta un URI ad una immagine.
+
+La proprietà _iconSvg_ accetta un codice html svg come da questi esempi:
+
+Cerchio
+
+```html
+<circle cx="8" cy="8" r="8" fill="yellow" />
+```
+
+Quadrato
+
+```html
+<rect width="16" height="16" fill="red" />
+```
+
+Rombo
+
+```html
+<polygon points="8,0 16,8 8,16 0,8" fill="blue" />
+```
+
+Triangolo
+
+```html
+<polygon points="0,16 8,0 16,16 " fill="green" />
+```
+
+**Nota:** non inserire il tag _svg_ ma solo il codice delle geometrie.
+
 ## RoadMap
 
 Marzo 2021 sarà rimosso definitivamente il supporto a IE 11
