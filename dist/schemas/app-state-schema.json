@@ -578,8 +578,13 @@
               },
               "templateUrl": {
                 "title": "Url del template",
-                "description": "Url assoluto o nome del file del repo. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repository di base.",
+                "description": "Url assoluto. Se lasciato vuoto viene impostato il gid del layer con estensione .json utilizzando il repository di base.",
                 "type": "string"
+              },
+              "groupTemplateUrls": {
+                "title": "Url del template nel caso si tratti di un grouplayer",
+                "description": "Lista degli Url assoluti dei template dei layer in caso si tratti di un layer raggruppato. Tutti i template saranno caricati all'avvio dell'applicazione. Al momento dell'interrogazione l'associazione tra la feature e il template sarà effettuata tramite la proprietà id della feature (geoserver) e la proprietà layer del template che dovrà essere obbligatoriamente impostata.",
+                "type": "array"
               },
               "secured": {
                 "title": "Autorizzazione richiesta",

@@ -1,7 +1,7 @@
 {
   "title": "SIT_CIVICI",
-  "layer": "SIT_CIVICI",
-  "layerGid": "g0_civici",
+  "layer": "SIT_CIVICI_",
+  "layerGid": "g0_civici_",
   "templateType": "simple",
   "fields": [
     {

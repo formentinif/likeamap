@@ -49,7 +49,7 @@ L'url della mappa può essere richiamato impostato con i seguenti parametri cust
 **zoom** Zoom iniziale  
 **layers** Elenco dei layer separato da virgole con gli identificativi univoci (gid) dei layer che saranno visisibili all'avvio  
 **appstate** Url dell'appstate da caricare nella mappa  
-**appstatejson** Codice JSON dell'appstate da caricare  
+**appstatejson** Codice JSON dell'appstate da caricare
 
 Le proprietà dell'appstate possono essere modificate tramite parametri querystring anteponendo il prefisso _prop-_ alla proprietà.
 
@@ -59,7 +59,15 @@ Le proprietà dell'appstate possono essere modificate tramite parametri querystr
 
 Per l'elenco delle proprietà consultare il file map/js/app-state-schema.json. Sono supportate solo le proprietà di primo livello, non è possibile impostare le proprietà degli oggetti nidificati.
 
+## Template
+
+Il formato dei risultati dell'interrogazione e ricerca può essere personalizzato tramite l'associazione di un template. Il template è un file JSON, il cui schema è definito nella file _./schemas/app-template-schema.json_
+L'associazione tra il layer e il relativo schema può essere definita in due modi:
+Definendo la proprietà
+
 ## RoadMap
+
+Marzo 2021 sarà rimosso definitivamente il supporto a IE 11
 
 Author Perspectiva di Formentini Filippo
 Licensed Apache License 2.0
