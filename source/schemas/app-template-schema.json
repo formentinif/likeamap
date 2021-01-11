@@ -14,8 +14,8 @@
       "type": "string"
     },
     "layer": {
-      "title": "Layer",
-      "description": "Identificativo del layer WMS, senza workspace DEPRECATED",
+      "title": "Layer Geoserver",
+      "description": "Identificativo del layer WMS/ WFS di Geoserver, senza workspace. L'utilizzo di questa proprietà è necessaria solo nel caso di Layer Group di Geoserver, per i quali è necessario utilizzare il nome del layer di Geoserver per trovare il template correlato.",
       "type": "string"
     },
     "layerGid": {

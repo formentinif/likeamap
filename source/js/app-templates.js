@@ -39,18 +39,15 @@ let LamTemplates = (function () {
     loadRelationsTemplates(tempRelations, repoTemplatesUrl);
   };
 
+  /**
+   * Load all the layer templates in memory, retrieving by ajax
+   * @param {Array} layers Layers array
+   * @param {string} repoTemplatesUrl base url of the template repository
+   */
   let loadLayersTemplates = function (layers, repoTemplatesUrl) {
     layers.forEach(function (layer) {
       if (layer.queryable || layer.preload || layer.searchable) {
-        let templateUrl = getTemplateUrl(layer.gid, layer.templateUrl, repoTemplatesUrl);
-        layer.templateUrlParsed = templateUrl;
-        let template = templates.filter(function (el) {
-          return el.templateUrl === templateUrl;
-        });
-        if (template.length === 0) {
-          //aggiungo il layer vi ajax
-          loadTemplateAjax(templateUrl);
-        }
+        loadLayerTemplates(layer, repoTemplatesUrl);
       }
       if (layer.layers) loadLayersTemplates(layer.layers, repoTemplatesUrl);
     });
@@ -70,6 +67,33 @@ let LamTemplates = (function () {
     }
   };
 
+  /**
+   * Load the templates defined for a layer
+   * @param {Object} layer
+   * @param {string} repoTemplatesUrl base url of the template repository
+   */
+  let loadLayerTemplates = function (layer, repoTemplatesUrl) {
+    //transforming the templateUrl property into an array
+    let templateUrlList = [];
+    if (layer.templateUrl) templateUrlList.push(layer.templateUrl);
+    if (layer.groupTemplateUrls) templateUrlList = templateUrlList.concat(layer.groupTemplateUrls);
+    templateUrlList.forEach(function (templateUrl) {
+      let templateUrlParsed = getTemplateUrl(layer.gid, templateUrl, repoTemplatesUrl);
+      layer.templateUrlParsed = templateUrlParsed;
+      let template = templates.filter(function (el) {
+        return el.templateUrl === templateUrlParsed;
+      });
+      if (template.length === 0) {
+        //aggiungo il layer via ajax
+        loadTemplateAjax(templateUrlParsed);
+      }
+    });
+  };
+
+  /**
+   * Add the template json object into the template collection. The template il loaded using ajax.
+   * @param {string} templateUrl Absolute url of the template
+   */
   let loadTemplateAjax = function (templateUrl) {
     $.ajax({
       dataType: "json",
@@ -101,8 +125,8 @@ let LamTemplates = (function () {
   /**
    * Gets the uri of the template to be loaded by ajax
    * @param {object} layer Oggetto del layer/relation
-   * @param {templateUrl} layer Url completo del template. Senza https aggiunge il @repoUrl come prefisso
-   * @param {string} repoUrl Url del repository
+   * @param {templateUrl} templateUrl Url completo del template. Senza https aggiunge il @repoUrl come prefisso
+   * @param {string} repoUrl Url del repository dove sono contenuti i templates
    */
   let getTemplateUrl = function (gid, templateUrl, repoUrl) {
     if (templateUrl) {
@@ -125,6 +149,12 @@ let LamTemplates = (function () {
     return template;
   };
 
+  /**
+   *
+   * @param {string} gid
+   * @param {string} templateUrl
+   * @param {string} repoUrl
+   */
   let getTemplate = function (gid, templateUrl, repoUrl) {
     let templatesFilter = templates.filter(function (el) {
       return el.templateUrl === getTemplateUrl(gid, templateUrl, repoUrl);
@@ -133,6 +163,23 @@ let LamTemplates = (function () {
       return templatesFilter[0];
     }
     return null;
+  };
+
+  /**
+   * @param {string} featureId FeatureID di goserver. Viene utilizzato nel caso di layer group
+   *                                  di geoserver, in quanto non ci sono alternative per identificare 
+   *                                  il layer della feature. Generalmente è composta dal nome del layer
+   *                                  e da un identificativo univoco
+       
+   */
+  let getTemplateByGeoserverFeatureId = function (featureId) {
+    if (!featureId) return null;
+    let layerId = featureId.split(".").shift();
+    //get the template from
+    let template = LamTemplates.getTemplates().find(function (element) {
+      return element.layer === layerId;
+    });
+    return template;
   };
 
   let processTemplate = function (template, props, layer) {
@@ -422,6 +469,9 @@ let LamTemplates = (function () {
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);
         if (!featureTemplate) featureTemplate = LamTemplates.getTemplate(feature.layerGid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+        if (!featureTemplate) {
+          featureTemplate = LamTemplates.getTemplateByGeoserverFeatureId(feature.id);
+        }
       }
 
       let tempBody = LamTemplates.processTemplate(featureTemplate, props, layer);
@@ -491,6 +541,7 @@ let LamTemplates = (function () {
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
     getTemplate: getTemplate,
+    getTemplateByGeoserverFeatureId: getTemplateByGeoserverFeatureId,
     getTableTemplate: getTableTemplate,
     getTemplates: getTemplates,
     getTemplateMetadata: getTemplateMetadata,
