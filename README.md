@@ -63,7 +63,16 @@ Per l'elenco delle proprietà consultare il file map/js/app-state-schema.json. S
 
 Il formato dei risultati dell'interrogazione e ricerca può essere personalizzato tramite l'associazione di un template. Il template è un file JSON, il cui schema è definito nella file _./schemas/app-template-schema.json_
 L'associazione tra il layer e il relativo schema può essere definita in due modi:
-Definendo la proprietà
+
+- Tramite la proprietà _templateUrl_ del layer in cui è possibile definire l'URI assoluto del template;
+- Se viene definita la proprietà _templatesRepositoryUrl_ a livello di applicazione, sarà caricato il template il cui nome equivale alla proprietà _gid_ del layer (es. /templates/_gid_.json);
+
+Nel caso di **Group Layer** di GeoServer la configurazione dei template richiede alcuni passaggi aggiuntivi:
+
+- Nel layer deve essere compilata la proprietà _groupTemplateUrls_ con l'elenco di tutti gli URI dei template associati ai livelli che compongono il group layer.
+- Nei file di configurazione dei singoli template deve essere impostata la proprietà _layer_ con indicato il nome del layer di Geoserver.
+  Il template da associare sarà quindi selezionato tramite il nome del layer di Geoserver.
+  **Nota:** è supportato un solo nome di layer Geoserver per applicazione. Se due template hanno lo stesso valore nella proprietà _layer_, sarà preso il primo disponibile indipendentemente dall'associazione a livello di layer.
 
 ## RoadMap
 
