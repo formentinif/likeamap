@@ -178,10 +178,26 @@ var LamStore = (function () {
    */
   var toggleLayer = function (gid) {
     let layer = getLayer(gid);
+    let groupLayer = getGroupLayerByLayerGid(gid);
     if (layer) {
       layer.visible = 1 - layer.visible;
     }
     LamLayerTree.setCheckVisibility(gid, layer.visible);
+    //hide all other layer based on the groupLayerProperty
+    if (groupLayer != null && groupLayer.childLayersSelectionMode == 1 && layer.visible) {
+      groupLayer.layers
+        .filter(function (item) {
+          return item.gid != gid;
+        })
+        .forEach(function (item) {
+          if (item.layerType != "group") {
+            LamMap.setLayerVisibility(item.gid, false);
+            LamStore.setLayerVisibility(item.gid, false);
+          } else {
+            setLayersVisibilityInGroup(item.gid, false);
+          }
+        });
+    }
   };
 
   /**

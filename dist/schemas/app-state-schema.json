@@ -439,6 +439,12 @@
           "enum": [0, 1],
           "type": "integer"
         },
+        "childLayersSelectionMode": {
+          "title": "Modalita di selezione dei layer (singola o multipla)",
+          "description": "Modalita di selezione dei layer 0 Selezione multipla (default) - 1 selezione singola",
+          "enum": [0, 1],
+          "type": "integer"
+        },
         "cssClass": {
           "title": "Classe CSS del gruppo/layer",
           "description": "Classe CSS specifica da assegnare al gruppo. Utilizzare il modficatore !important per sovreascrivere i default ",

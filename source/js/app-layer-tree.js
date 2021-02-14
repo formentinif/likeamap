@@ -137,11 +137,14 @@ let LamLayerTree = (function () {
     );
     output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
     output += '<div class="layertree-group__layers-icons">';
-    output += formatString(
-      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-group__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
-      groupLayer.gid,
-      LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
-    );
+    if (groupLayer.childLayersSelectionMode != 1) {
+      //single selection layer
+      output += formatString(
+        '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-group__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+        groupLayer.gid,
+        LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+      );
+    }
     output += "</div>";
     output += "</div>";
     output += "</div>";

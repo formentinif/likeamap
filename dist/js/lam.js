@@ -5992,6 +5992,7 @@ var AppCustom = (function() {
 
 var LamRelations = (function () {
   let currentRelation; //relation currently evaluating
+  let currentRelationItem; //item on which the relation is evaluated
   let currentPageIndex = 0;
   let currentPageSize = 25;
   let sortAttribute = null;
@@ -6040,10 +6041,11 @@ var LamRelations = (function () {
 
   var showRelation = function (relationGid, resultIndex) {
     lamDispatch("show-loader");
-    var item = LamStore.getCurrentInfoItems().features[resultIndex];
+    debugger;
+    currentRelationItem = LamStore.getCurrentInfoItems().features[resultIndex];
     currentRelation = LamRelations.getRelation(relationGid);
     var templateUrl = Handlebars.compile(currentRelation.serviceUrlTemplate);
-    var urlService = templateUrl(item.properties);
+    var urlService = templateUrl(currentRelationItem.properties);
     $.ajax({
       dataType: "jsonp",
       url: urlService + "&format_options=callback:LamRelations.parseResponseRelation",
@@ -6078,7 +6080,8 @@ var LamRelations = (function () {
   };
 
   let renderRelationTable = function (pageSize, pageIndex, sortBy) {
-    let title = currentRelation.title;
+    debugger;
+    let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
     let body = "";
 
     if (pageIndex != null) currentPageIndex = pageIndex;
@@ -7292,10 +7295,26 @@ var LamStore = (function () {
    */
   var toggleLayer = function (gid) {
     let layer = getLayer(gid);
+    let groupLayer = getGroupLayerByLayerGid(gid);
     if (layer) {
       layer.visible = 1 - layer.visible;
     }
     LamLayerTree.setCheckVisibility(gid, layer.visible);
+    //hide all other layer based on the groupLayerProperty
+    if (groupLayer != null && groupLayer.childLayersSelectionMode == 1 && layer.visible) {
+      groupLayer.layers
+        .filter(function (item) {
+          return item.gid != gid;
+        })
+        .forEach(function (item) {
+          if (item.layerType != "group") {
+            LamMap.setLayerVisibility(item.gid, false);
+            LamStore.setLayerVisibility(item.gid, false);
+          } else {
+            setLayersVisibilityInGroup(item.gid, false);
+          }
+        });
+    }
   };
 
   /**
@@ -7892,11 +7911,14 @@ let LamLayerTree = (function () {
     );
     output += "<span class='layertree-group__title-text'>" + groupLayer.layerName + "</span>";
     output += '<div class="layertree-group__layers-icons">';
-    output += formatString(
-      '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-group__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
-      groupLayer.gid,
-      LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
-    );
+    if (groupLayer.childLayersSelectionMode != 1) {
+      //single selection layer
+      output += formatString(
+        '<i title="Mostra/Nascondi tutti i layer" id="{0}_c" class="layertree-group__icon lam-right" onclick="LamDispatcher.dispatch({eventName:\'toggle-layer-group\',gid:\'{0}\'})">{1}</i>',
+        groupLayer.gid,
+        LamResources.svgCheckboxOutline //groupLayer.visible ? LamResources.svgCheckbox : LamResources.svgCheckboxOutline
+      );
+    }
     output += "</div>";
     output += "</div>";
     output += "</div>";

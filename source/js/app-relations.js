@@ -1,5 +1,6 @@
 var LamRelations = (function () {
   let currentRelation; //relation currently evaluating
+  let currentRelationItem; //item on which the relation is evaluated
   let currentPageIndex = 0;
   let currentPageSize = 25;
   let sortAttribute = null;
@@ -48,10 +49,11 @@ var LamRelations = (function () {
 
   var showRelation = function (relationGid, resultIndex) {
     lamDispatch("show-loader");
-    var item = LamStore.getCurrentInfoItems().features[resultIndex];
+    debugger;
+    currentRelationItem = LamStore.getCurrentInfoItems().features[resultIndex];
     currentRelation = LamRelations.getRelation(relationGid);
     var templateUrl = Handlebars.compile(currentRelation.serviceUrlTemplate);
-    var urlService = templateUrl(item.properties);
+    var urlService = templateUrl(currentRelationItem.properties);
     $.ajax({
       dataType: "jsonp",
       url: urlService + "&format_options=callback:LamRelations.parseResponseRelation",
@@ -86,7 +88,8 @@ var LamRelations = (function () {
   };
 
   let renderRelationTable = function (pageSize, pageIndex, sortBy) {
-    let title = currentRelation.title;
+    debugger;
+    let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
     let body = "";
 
     if (pageIndex != null) currentPageIndex = pageIndex;

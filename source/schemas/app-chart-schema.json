@@ -1,0 +1,68 @@
+{
+  "$schema": "http://www.perspectiva.it/schemas/likeamap_links",
+  "type": "object",
+  "title": "Configurazione Links LikeAMap",
+
+  "properties": {
+    "gid": {
+      "title": "Gid del chart",
+      "description": "Gid del chart",
+      "type": "string"
+    },
+    "layerGid": {
+      "title": "Gid del layer collegato",
+      "description": "Gid del layer collegato",
+      "type": "string"
+    },
+    "grafico": {
+      "title": "Grafico",
+      "description": "Proprietà di grafico da visualizzare",
+      "type": "object",
+      "properties": {
+        "gid": {
+          "title": "Identificativo univoco",
+          "description": "Identificatore globale del grafico",
+          "type": "string"
+        },
+        "tipologia": {
+          "title": "Tipologia",
+          "description": "Tipologia del grafico",
+          "type": "string",
+          "enum": ["line", "bar", "radar", "pie", "doughnut", "polar", "bubble", "scatter"],
+          "default": "wmstiled"
+        }
+      }
+    },
+    "serieDati": {
+      "title": "Serie di dati",
+      "description": "Serie di dati da inserire nel grafico",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "Livello",
+        "properties": {
+          "gid": {
+            "title": "Identificativo univoco",
+            "description": "Identificatore globale univoco",
+            "type": "string"
+          },
+          "campoValore": {
+            "title": "Campo con i valori da visualizzare",
+            "description": "Campo con i valori da visualizzare",
+            "type": "string"
+          },
+          "campoLabel": {
+            "title": "Campo con le etichette",
+            "description": "Campo con le etichette",
+            "type": "string"
+          },
+          "campoOrdine": {
+            "title": "Campo per l'ordinamento",
+            "description": "Campo per l'ordinamento",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
