@@ -79,6 +79,51 @@ let LamHandlebars = (function () {
         return "";
       }
     });
+
+    Handlebars.registerHelper("format_date_string_geoserver", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        let dateArr = dateStr.split(",");
+        return dateArr[0];
+      } catch (error) {}
+      return "";
+    });
+
+    Handlebars.registerHelper("format_date_time_string", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        //TODO LOCALIZE
+        let date = new Date(Date.parse(dateStr));
+        let dd = date.getDate();
+        let mm = date.getMonth() + 1;
+        let yyyy = date.getFullYear();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let seconds = date.getSeconds();
+        if (dd < 10) dd = "0" + dd;
+        if (mm < 10) mm = "0" + mm;
+        if (hours < 10) hours = "0" + hours;
+        if (minutes < 10) minutes = "0" + minutes;
+        if (seconds < 10) seconds = "0" + seconds;
+        return dd + "/" + mm + "/" + yyyy + " " + hours + ":" + minutes + ":" + seconds;
+      } catch (error) {}
+      return "";
+    });
+
+    Handlebars.registerHelper("format_date_string", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        //TODO LOCALIZE
+        let date = new Date(Date.parse(dateStr));
+        let dd = date.getDate();
+        let mm = date.getMonth() + 1;
+        let yyyy = date.getFullYear();
+        if (dd < 10) dd = "0" + dd;
+        if (mm < 10) mm = "0" + mm;
+        return dd + "/" + mm + "/" + yyyy;
+      } catch (error) {}
+      return "";
+    });
   };
 
   return {

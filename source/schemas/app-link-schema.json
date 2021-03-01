@@ -2,7 +2,6 @@
   "$schema": "http://www.perspectiva.it/schemas/likeamap_links",
   "type": "object",
   "title": "Configurazione Links LikeAMap",
-
   "properties": {
     "gid": {
       "title": "Gid del link",

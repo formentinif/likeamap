@@ -104,7 +104,7 @@ var LamLegendTools = (function () {
     if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
     var urlImg = "";
     //checking custom url
-    if (!thisLayer.hideLegend) {
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
       } else {
@@ -122,11 +122,13 @@ var LamLegendTools = (function () {
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
-    if (scaled) {
-      html +=
-        "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
-        gid +
-        "', scaled: false })\">Visualizza legenda completa</a></div>";
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
+      if (scaled) {
+        html +=
+          "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+          gid +
+          "', scaled: false })\">Visualizza legenda completa</a></div>";
+      }
     }
     if (thisLayer.queryable) {
       html += "<div class='lam-mt-2' style='display:flow-root;'>";
@@ -156,10 +158,16 @@ var LamLegendTools = (function () {
         "</i> SHP</a></div>";
     }
     html += "<div>";
+
+    let layerCharts = LamCharts.getCharts().filter(function (chart) {
+      return $.inArray(gid, chart.layerGids) >= 0 && chart.target == 1;
+    });
+    if (layerCharts.length) html += LamTemplates.chartsTemplateButton(layerCharts);
+
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "", "legend");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Informazioni", html, "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "", "legend");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Informazioni", html, "", "legend");
     }
     return true;
   };
