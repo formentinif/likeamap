@@ -295,25 +295,69 @@ let LamTemplates = (function () {
 
   let relationsTemplate = function (relations, props, index) {
     let result = "";
-    if (relations.length > 0) {
-      result += '<div class="lam-feature__relations">';
-      relations.map(function (relation) {
-        result += '<div class="lam-mb-2 col s12">';
-        result +=
-          '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          '<i class="lam-feature__icon">' +
-          LamResources.svgOpen16 +
-          "</i>" +
-          relation.labelTemplate +
-          "</a>"; //' + relation.gid + ' //relation.labelTemplate
-        result += "</div>";
-      });
+    if (!relations.length) return "";
+    result += '<div class="lam-feature__relations">';
+    relations.map(function (relation) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
+        relation.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-feature__icon">' +
+        LamResources.svgOpen16 +
+        "</i>" +
+        relation.labelTemplate +
+        "</a>";
       result += "</div>";
-    }
+    });
+    result += "</div>";
+    return result;
+  };
+
+  let chartsTemplate = function (charts, index) {
+    let result = "";
+    if (!charts.length) return "";
+    result += '<div class="lam-feature__charts">';
+    charts.map(function (chart) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-link" onclick="LamCharts.showChart(\'' +
+        chart.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-feature__icon">' +
+        LamResources.svgChart16 +
+        "</i>" +
+        chart.labelTemplate +
+        "</a>";
+      result += "</div>";
+    });
+    result += "</div>";
+    return result;
+  };
+
+  let chartsTemplateButton = function (charts, index) {
+    let result = "";
+    if (!charts.length) return "";
+    charts.map(function (chart) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-btn lam-btn-small lam-depth-1" onclick="LamCharts.showChart(\'' +
+        chart.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-icon">' +
+        LamResources.svgChart16 +
+        "</i>" +
+        chart.labelTemplate +
+        "</a>";
+      result += "</div>";
+    });
+
     return result;
   };
 
@@ -389,6 +433,30 @@ let LamTemplates = (function () {
             ":</div><div class='lam-feature-content lam-col'>{{#if " +
             field.field +
             "}}Sì{{else}}No{{/if}}</div>";
+          break;
+        case "date":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string " +
+            field.field +
+            "}}}</div>";
+          break;
+        case "datetime":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_time_string " +
+            field.field +
+            "}}}</div>";
+          break;
+        case "date_geoserver":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " +
+            field.field +
+            "}}}</div>";
           break;
         /*  case "moreinfo":
             str +=
@@ -483,7 +551,12 @@ let LamTemplates = (function () {
       let layerRelations = LamRelations.getRelations().filter(function (relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
-      tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+      if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+      //sezione charts
+      let layerCharts = LamCharts.getCharts().filter(function (chart) {
+        return $.inArray(feature.layerGid, chart.layerGids) >= 0 && !chart.target;
+      });
+      if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
       tempBody += LamTemplates.featureIconsTemplate(index);
 
       body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + tempBody + "</div>";
@@ -551,6 +624,8 @@ let LamTemplates = (function () {
     loadTemplateAjax: loadTemplateAjax,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
+    chartsTemplate: chartsTemplate,
+    chartsTemplateButton: chartsTemplateButton,
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,

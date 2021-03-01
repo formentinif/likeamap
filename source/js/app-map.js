@@ -577,7 +577,7 @@ let LamMap = (function () {
   let init = function () {
     //events binding
     //if mobile go to user location
-    if (LamDom.isMobile()) goToBrowserLocation();
+    if (LamStore.getAppState().enableBrowserLocationOnMobile) if (LamDom.isMobile()) goToBrowserLocation();
   };
 
   /**

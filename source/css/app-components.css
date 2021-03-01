@@ -80,6 +80,10 @@
   padding: 4px 4px;
   font-size: 1rem;
 }
+.lam-feature__charts {
+  padding: 4px 4px;
+  font-size: 1rem;
+}
 
 .lam-feature__icons {
   padding: 0.1rem 0.3rem;
@@ -91,6 +95,7 @@
   fill: var(--lam-btn-color);
   cursor: pointer;
   margin: 0 0.2rem;
+  vertical-align: middle;
 }
 
 .lam-layer-icon {

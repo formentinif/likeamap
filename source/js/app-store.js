@@ -103,6 +103,7 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+    if (!appstate.charts) appstate.charts = [];
 
     //if some parameters are defined in the querystring they will be inherited in the appstate
     let searchArray = location.search.replace("?", "").split("&");

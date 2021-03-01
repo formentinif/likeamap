@@ -162,6 +162,13 @@
       "enum": [0, 1],
       "type": "integer"
     },
+    "enableBrowserLocationOnMobile": {
+      "title": "Posizionamento automatico per i dispositivi mobili",
+      "description": "Abilita il posizionamento automatico con la posizione del browser nel caso di dispositivi mobili.",
+      "default": 0,
+      "enum": [0, 1],
+      "type": "integer"
+    },
     "disableAjaxRequestInfo": {
       "title": "Disabilita tutte le interrogazioni",
       "description": "Disabilita tutte le interrogazioni al click del mouse o altre richieste ajax. Da utilizzare ai solo fini di DEBUG.",
@@ -578,8 +585,13 @@
                 "type": "string"
               },
               "hideLegend": {
-                "title": "Nascondi Legenda",
-                "description": "Nasconde la legenda se non disponibile.",
+                "title": "Nascondi Legenda/Info sul layer",
+                "description": "Nasconde il link alle info del layer e la legenda se non disponibile.",
+                "type": "boolean"
+              },
+              "hideLegendImage": {
+                "title": "Nascondi immagine della legenda",
+                "description": "Nasconde solo l'immagine della legenda se non disponibile.",
                 "type": "boolean"
               },
               "templateUrl": {
@@ -654,6 +666,14 @@
     "description": "Elenco delle relations dell'applicazione. Consultare lo schema dedicato.",
     "type": "array",
     "title": "Relazioni",
+    "items": {
+      "type": "object"
+    }
+  },
+  "charts": {
+    "description": "Elenco dei grafici dell'applicazione. Consultare lo schema dedicato.",
+    "type": "array",
+    "title": "Grafici",
     "items": {
       "type": "object"
     }

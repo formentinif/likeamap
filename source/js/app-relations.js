@@ -39,18 +39,27 @@ var LamRelations = (function () {
     };
   };
 
-  // /**
-  //  * Sets the last relation result.
-  //  * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
-  //  */
-  // var setRelationResults = function (results) {
-  //   relationsResults = results;
-  // };
-
+  /**
+   * Shows the relation from an infobox item
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
   var showRelation = function (relationGid, resultIndex) {
+    showRelationByItem(relationGid, LamStore.getCurrentInfoItems().features[resultIndex]);
+  };
+
+  /**
+   * Shows the relation from a relation's table results
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
+  var showConcatenatedRelation = function (relationGid, resultIndex) {
+    showRelationByItem(relationGid, currentResults[resultIndex]);
+  };
+
+  var showRelationByItem = function (relationGid, resultItem) {
     lamDispatch("show-loader");
-    debugger;
-    currentRelationItem = LamStore.getCurrentInfoItems().features[resultIndex];
+    currentRelationItem = resultItem;
     currentRelation = LamRelations.getRelation(relationGid);
     var templateUrl = Handlebars.compile(currentRelation.serviceUrlTemplate);
     var urlService = templateUrl(currentRelationItem.properties);
@@ -88,17 +97,16 @@ var LamRelations = (function () {
   };
 
   let renderRelationTable = function (pageSize, pageIndex, sortBy) {
-    debugger;
-    let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
+    //let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
+    var titleCompiled = Handlebars.compile(currentRelation.title);
+    let title = titleCompiled(currentRelationItem.properties);
+
     let body = "";
-
     if (pageIndex != null) currentPageIndex = pageIndex;
-
     if (pageSize) {
       currentPageSize = pageSize;
       if (currentPageSize * currentPageIndex > currentResults.length) currentPageIndex = 0;
     }
-
     if (sortBy) {
       sortAttribute = sortBy;
       if (sortAttributeIsDescending(sortAttribute)) {
@@ -132,6 +140,7 @@ var LamRelations = (function () {
     let maxIndex = (currentPageIndex + 1) * currentPageSize > currentFeatureCount ? currentFeatureCount : (currentPageIndex + 1) * currentPageSize;
     for (let i = currentPageIndex * currentPageSize; i < maxIndex; i++) {
       var props = currentResults[i].properties ? currentResults[i].properties : currentResults[i];
+      props.relationIndex = i;
       propsList.push(props);
     }
     let compiledTemplate = Handlebars.compile(currentRelationTableTemplate);
@@ -206,7 +215,19 @@ var LamRelations = (function () {
     str += "</tr>";
     str += "{{#each this}}<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      str += "<td>{{" + template.fields[i].field + "}}</td>";
+      switch (template.fields[i].type) {
+        case "relation":
+          str +=
+            "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
+            template.fields[i].relationGid +
+            "\", {{relationIndex}});return false;'>" +
+            template.fields[i].label +
+            "</td>";
+          break;
+        default:
+          str += "<td>{{" + template.fields[i].field + "}}</td>";
+          break;
+      }
     }
     str += "</tr>{{/each}}";
     str += "</table>";
@@ -261,6 +282,7 @@ var LamRelations = (function () {
     getRelationResults: getRelationResults,
     parseResponseRelation: parseResponseRelation,
     renderRelationTable: renderRelationTable,
+    showConcatenatedRelation: showConcatenatedRelation,
     showRelation: showRelation,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,

@@ -9,57 +9,84 @@
       "description": "Gid del chart",
       "type": "string"
     },
-    "layerGid": {
-      "title": "Gid del layer collegato",
-      "description": "Gid del layer collegato",
+    "layerGids": {
+      "title": "Gid dei layer di origine",
+      "propertyOrder": 1,
+      "description": "Gid dei layer di origine",
+      "type": "array"
+    },
+    "title": {
+      "title": "Titolo del grafico",
+      "description": "Titolo del grafico",
       "type": "string"
     },
-    "grafico": {
-      "title": "Grafico",
-      "description": "Proprietà di grafico da visualizzare",
-      "type": "object",
-      "properties": {
-        "gid": {
-          "title": "Identificativo univoco",
-          "description": "Identificatore globale del grafico",
-          "type": "string"
-        },
-        "tipologia": {
-          "title": "Tipologia",
-          "description": "Tipologia del grafico",
-          "type": "string",
-          "enum": ["line", "bar", "radar", "pie", "doughnut", "polar", "bubble", "scatter"],
-          "default": "wmstiled"
-        }
-      }
+    "serviceUrlTemplate": {
+      "title": "Url del servizio",
+      "propertyOrder": 2,
+      "description": "Url del servizio",
+      "type": "string"
     },
-    "serieDati": {
+    "labelTemplate": {
+      "title": "Template del link da visualizzare",
+      "propertyOrder": 3,
+      "description": "Template del link da visualizzare",
+      "type": "string"
+    },
+    "chartType": {
+      "title": "Tipologia",
+      "description": "Tipologia del grafico. bubble e scatter non sono ancora stati implementati",
+      "type": "string",
+      "enum": ["line", "bar", "horizontalBar", "radar", "pie", "doughnut", "polar", "bubble", "scatter"],
+      "default": "bar"
+    },
+    "target": {
+      "title": "Destinazione del diagramma",
+      "description": "Definisce dove sarà visualizzato il diagramma. 0 infobox (target) 1 info del layer",
+      "type": "int",
+      "enum": ["0", "1"]
+    },
+    "labelField": {
+      "title": "Etichette",
+      "description": "Template per le etichette. I valori dei campi possono essere forniti tra doppie parentesi graffe. Può essere fornito un array",
+      "type": "array"
+    },
+    "sortField": {
+      "title": "Campo per l'ordinamento",
+      "description": "Campo per l'ordinamento",
+      "type": "string"
+    },
+    "datasets": {
       "title": "Serie di dati",
       "description": "Serie di dati da inserire nel grafico",
       "type": "array",
       "items": {
         "type": "object",
-        "title": "Livello",
+        "title": "Serie di dati da visualizzare",
         "properties": {
-          "gid": {
-            "title": "Identificativo univoco",
-            "description": "Identificatore globale univoco",
+          "title": {
+            "title": "Titolo del dataset",
+            "description": "Titolo del dataset",
             "type": "string"
           },
-          "campoValore": {
-            "title": "Campo con i valori da visualizzare",
-            "description": "Campo con i valori da visualizzare",
+          "valueField": {
+            "title": "Campo o funzione con i valori da visualizzare",
+            "description": "Campo con i valori da visualizzare o array dei campi. Può essere fornito il nome di un campo della feature o una funzione. Per la funzione iniziare con il carattere = seguito da una fuzione matematica. I nomi dei campi devono essere compresi tra doppie parentesi graffe. Es ={{totale}}/100 ",
+            "type": "array"
+          },
+          "backgroundColor": {
+            "title": "Colore dello sfondo",
+            "description": "Colore dello sfondo in formato rgba es. 255,0,0,1. Se viene fornito un array devono essere forniti i colori per tutti gli elementi visualizzati",
+            "type": "array"
+          },
+          "borderColor": {
+            "title": "Colore del bordo",
+            "description": "Colore del bordo in formato rgba es. 255,0,0,1",
             "type": "string"
           },
-          "campoLabel": {
-            "title": "Campo con le etichette",
-            "description": "Campo con le etichette",
-            "type": "string"
-          },
-          "campoOrdine": {
-            "title": "Campo per l'ordinamento",
-            "description": "Campo per l'ordinamento",
-            "type": "string"
+          "borderWidth": {
+            "title": "Dimensione del Bordo",
+            "description": "Dimensione del bordo in pixel",
+            "type": "int"
           }
         }
       }
