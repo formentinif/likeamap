@@ -405,7 +405,7 @@ var LamSearchTools = (function () {
     var itemStr = $("#search-tools__search-layers").val();
     //ricavo l'elenco dei layer da interrogare
     var currentLayer = $("#search-tools__select-layers option:selected").val();
-    if (itemStr.length > 0) {
+    if (itemStr.length > 2) {
       showSearchResults("");
       let layer = searchLayers.filter(function (element) {
         return element.gid == currentLayer;
