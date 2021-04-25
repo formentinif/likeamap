@@ -29,8 +29,9 @@ let LamLinksTools = (function () {
   let isRendered = false;
 
   let init = function init() {
+    //loading remote relations
+    LamStore.loadRemoteLinks();
     //events binding
-
     LamDispatcher.bind("show-links-toggle", function (payload) {
       //if legend is visible toggle
       if ($("#lam-links-container").is(":visible")) {
@@ -65,7 +66,6 @@ let LamLinksTools = (function () {
     });
 
     //terms links load
-
     let templateTerms = templateTermsLinks();
     output = templateTerms(LamStore.getTermsLinks());
     $("#app-terms-links").html(output);

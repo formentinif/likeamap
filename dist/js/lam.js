@@ -1658,7 +1658,7 @@ let LamMap = (function () {
   let init = function () {
     //events binding
     //if mobile go to user location
-    if (LamDom.isMobile()) goToBrowserLocation();
+    if (LamStore.getAppState().enableBrowserLocationOnMobile) if (LamDom.isMobile()) goToBrowserLocation();
   };
 
   /**
@@ -2922,6 +2922,53 @@ let LamHandlebars = (function () {
       } catch (error) {
         return "";
       }
+    });
+
+    Handlebars.registerHelper("format_date_string_geoserver", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        let dateArr = dateStr.split(",");
+        return dateArr[0];
+      } catch (error) {}
+      return "";
+    });
+
+    Handlebars.registerHelper("format_date_time_string", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        //TODO LOCALIZE
+        if (dateStr.endsWith("Z")) dateStr = dateStr.replace("Z", "");
+        let date = new Date(Date.parse(dateStr));
+        let dd = date.getDate();
+        let mm = date.getMonth() + 1;
+        let yyyy = date.getFullYear();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let seconds = date.getSeconds();
+        if (dd < 10) dd = "0" + dd;
+        if (mm < 10) mm = "0" + mm;
+        if (hours < 10) hours = "0" + hours;
+        if (minutes < 10) minutes = "0" + minutes;
+        if (seconds < 10) seconds = "0" + seconds;
+        return dd + "/" + mm + "/" + yyyy + " " + hours + ":" + minutes + ":" + seconds;
+      } catch (error) {}
+      return "";
+    });
+
+    Handlebars.registerHelper("format_date_string", function (dateStr) {
+      if (!dateStr) return "";
+      try {
+        //TODO LOCALIZE
+        if (dateStr.endsWith("Z")) dateStr = dateStr.replace("Z", "");
+        let date = new Date(Date.parse(dateStr));
+        let dd = date.getDate();
+        let mm = date.getMonth() + 1;
+        let yyyy = date.getFullYear();
+        if (dd < 10) dd = "0" + dd;
+        if (mm < 10) mm = "0" + mm;
+        return dd + "/" + mm + "/" + yyyy;
+      } catch (error) {}
+      return "";
     });
   };
 
@@ -4245,6 +4292,10 @@ var LamSearchTools = (function () {
     var template = isPoint
       ? LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
       : LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    let layerGid = isPoint ? LamStore.getAppState().searchProviderHouseNumberLayerGid : LamStore.getAppState().searchProviderAddressLayerGid;
+    data.features.forEach(function (feature) {
+      feature.layerGid = layerGid;
+    });
     lamDispatch({
       eventName: "show-search-items",
       features: data,
@@ -4778,8 +4829,9 @@ let LamLinksTools = (function () {
   let isRendered = false;
 
   let init = function init() {
+    //loading remote relations
+    LamStore.loadRemoteLinks();
     //events binding
-
     LamDispatcher.bind("show-links-toggle", function (payload) {
       //if legend is visible toggle
       if ($("#lam-links-container").is(":visible")) {
@@ -4814,7 +4866,6 @@ let LamLinksTools = (function () {
     });
 
     //terms links load
-
     let templateTerms = templateTermsLinks();
     output = templateTerms(LamStore.getTermsLinks());
     $("#app-terms-links").html(output);
@@ -4982,7 +5033,7 @@ var LamLegendTools = (function () {
     if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
     var urlImg = "";
     //checking custom url
-    if (!thisLayer.hideLegend) {
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
       if (thisLayer.legendUrl) {
         urlImg = thisLayer.legendUrl;
       } else {
@@ -5000,11 +5051,13 @@ var LamLegendTools = (function () {
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
-    if (scaled) {
-      html +=
-        "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
-        gid +
-        "', scaled: false })\">Visualizza legenda completa</a></div>";
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
+      if (scaled) {
+        html +=
+          "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
+          gid +
+          "', scaled: false })\">Visualizza legenda completa</a></div>";
+      }
     }
     if (thisLayer.queryable) {
       html += "<div class='lam-mt-2' style='display:flow-root;'>";
@@ -5034,10 +5087,16 @@ var LamLegendTools = (function () {
         "</i> SHP</a></div>";
     }
     html += "<div>";
+
+    let layerCharts = LamCharts.getCharts().filter(function (chart) {
+      return $.inArray(gid, chart.layerGids) >= 0 && chart.target == 1;
+    });
+    if (layerCharts.length) html += LamTemplates.chartsTemplateButton(layerCharts);
+
     if (showInfoWindow) {
-      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Legenda", html, "", "legend");
+      LamDom.showContent(LamEnums.showContentMode().InfoWindow, "Informazioni", html, "", "legend");
     } else {
-      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Legenda", html, "", "legend");
+      LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Informazioni", html, "", "legend");
     }
     return true;
   };
@@ -5733,6 +5792,10 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>',
   svgPhone16:
     '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>',
+  svgChart16:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>',
+  svgChart24:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>',
 };
 
 var LamCookieConsent = (function () {
@@ -6005,6 +6068,8 @@ var LamRelations = (function () {
     LamDispatcher.bind("render-relation-table", function (payload) {
       LamRelations.renderRelationTable(payload.pageSize, payload.pageIndex, payload.sortBy);
     });
+    //loading remote relations
+    LamStore.loadRemoteRelations();
   };
 
   var getRelations = function () {
@@ -6031,18 +6096,27 @@ var LamRelations = (function () {
     };
   };
 
-  // /**
-  //  * Sets the last relation result.
-  //  * @param {Object} results must have a data attribute with a data array and a template attribute with the template to process
-  //  */
-  // var setRelationResults = function (results) {
-  //   relationsResults = results;
-  // };
-
+  /**
+   * Shows the relation from an infobox item
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
   var showRelation = function (relationGid, resultIndex) {
+    showRelationByItem(relationGid, LamStore.getCurrentInfoItems().features[resultIndex]);
+  };
+
+  /**
+   * Shows the relation from a relation's table results
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
+  var showConcatenatedRelation = function (relationGid, resultIndex) {
+    showRelationByItem(relationGid, currentResults[resultIndex]);
+  };
+
+  var showRelationByItem = function (relationGid, resultItem) {
     lamDispatch("show-loader");
-    debugger;
-    currentRelationItem = LamStore.getCurrentInfoItems().features[resultIndex];
+    currentRelationItem = resultItem;
     currentRelation = LamRelations.getRelation(relationGid);
     var templateUrl = Handlebars.compile(currentRelation.serviceUrlTemplate);
     var urlService = templateUrl(currentRelationItem.properties);
@@ -6080,17 +6154,16 @@ var LamRelations = (function () {
   };
 
   let renderRelationTable = function (pageSize, pageIndex, sortBy) {
-    debugger;
-    let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
+    //let title = currentRelationItem.toolTip ? currentRelationItem.toolTip + " - " : "" + currentRelation.title;
+    var titleCompiled = Handlebars.compile(currentRelation.title);
+    let title = titleCompiled(currentRelationItem.properties);
+
     let body = "";
-
     if (pageIndex != null) currentPageIndex = pageIndex;
-
     if (pageSize) {
       currentPageSize = pageSize;
       if (currentPageSize * currentPageIndex > currentResults.length) currentPageIndex = 0;
     }
-
     if (sortBy) {
       sortAttribute = sortBy;
       if (sortAttributeIsDescending(sortAttribute)) {
@@ -6124,6 +6197,7 @@ var LamRelations = (function () {
     let maxIndex = (currentPageIndex + 1) * currentPageSize > currentFeatureCount ? currentFeatureCount : (currentPageIndex + 1) * currentPageSize;
     for (let i = currentPageIndex * currentPageSize; i < maxIndex; i++) {
       var props = currentResults[i].properties ? currentResults[i].properties : currentResults[i];
+      props.relationIndex = i;
       propsList.push(props);
     }
     let compiledTemplate = Handlebars.compile(currentRelationTableTemplate);
@@ -6193,12 +6267,24 @@ var LamRelations = (function () {
         "'  }); return false;\">";
       str += template.fields[i].field === attribute && !sortAttributeIsDescending(sortAttribute) ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
       str += "</i></a>";
-      str += template.fields[i].label + "</th>";
+      str += (!template.fields[i].header ? template.fields[i].label : template.fields[i].header) + "</th>";
     }
     str += "</tr>";
     str += "{{#each this}}<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      str += "<td>{{" + template.fields[i].field + "}}</td>";
+      switch (template.fields[i].type) {
+        case "relation":
+          str +=
+            "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
+            template.fields[i].relationGid +
+            "\", {{relationIndex}});return false;'>" +
+            template.fields[i].label +
+            "</td>";
+          break;
+        default:
+          str += "<td>{{" + template.fields[i].field + "}}</td>";
+          break;
+      }
     }
     str += "</tr>{{/each}}";
     str += "</table>";
@@ -6229,15 +6315,21 @@ var LamRelations = (function () {
   };
 
   /**
-   * Filters the relations by id keeping only the relations given
+   * Filters the relations by keeping only the relations given, checking relation gid or autorization
    * This method is only called outside the app
    */
   let allowRelations = function (relationsToKeep) {
     if (LamStore.getAppState()) {
-      let relationsFiltered = LamStore.getAppState().relations.filter(function (relation) {
-        return relationsToKeep.includes(relation.gid);
+      // let relationsFiltered = LamStore.getAppState().relations.filter(function (relation) {
+      //   return relationsToKeep.includes(relation.gid);
+      // });
+      let relationsFilteredAuth = LamStore.getAppState().relations.filter(function (relation) {
+        if (!relation.authorization) return false;
+        var arrAuthorization = relation.authorization.split(",");
+        return relationsToKeep.some((r) => arrAuthorization.includes(r));
       });
-      LamStore.getAppState().relations = relationsFiltered;
+      //LamStore.getAppState().relations = [...new Set([...relationsFiltered, ...relationsFilteredAuth])];
+      LamStore.getAppState().relations = relationsFilteredAuth;
     } else {
       setTimeout(function () {
         LamRelations.allowRelations(relationsToKeep);
@@ -6253,9 +6345,214 @@ var LamRelations = (function () {
     getRelationResults: getRelationResults,
     parseResponseRelation: parseResponseRelation,
     renderRelationTable: renderRelationTable,
+    showConcatenatedRelation: showConcatenatedRelation,
     showRelation: showRelation,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,
+  };
+})();
+
+var LamCharts = (function () {
+  let currentChart; //relation currently evaluating
+  let currentChartItem; //item on which the chart is evaluated
+  let currentResults = null;
+  var init = function init() {
+    //loading remote charts
+    LamStore.loadRemoteCharts();
+  };
+
+  var getCharts = function () {
+    return LamStore.getAppState().charts;
+  };
+
+  var getChart = function (gid) {
+    let chartResult = LamStore.getAppState().charts.filter(function (el) {
+      return el.gid == gid;
+    });
+    return chartResult[0];
+  };
+
+  var showChart = function (chartGid, resultIndex) {
+    lamDispatch("show-loader");
+    if (typeof resultIndex === "undefined" || resultIndex < 0) {
+      currentChartItem = {};
+      currentChartItem.properties = {};
+    } else {
+      currentChartItem = LamStore.getCurrentInfoItems().features[resultIndex];
+    }
+    currentChart = LamCharts.getChart(chartGid);
+    var templateUrl = Handlebars.compile(currentChart.serviceUrlTemplate);
+    var urlService = templateUrl(currentChartItem.properties);
+    $.ajax({
+      dataType: "jsonp",
+      url: urlService + "&format_options=callback:LamCharts.parseResponseChart",
+      jsonp: true,
+      cache: false,
+      error: function (jqXHR, textStatus, errorThrown) {
+        lamDispatch({
+          eventName: "log",
+          message: "LamCharts: unable to complete response",
+        });
+        lamDispatch("hide-loader");
+      },
+    });
+  };
+
+  let parseResponseChart = function (data) {
+    if (data.features) {
+      data = data.features;
+    }
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+    currentResults = data;
+    var titleCompiled = Handlebars.compile(currentChart.title);
+    let title = titleCompiled(currentChartItem.properties);
+    let body = "<canvas id='lam-chart-canvas'></canvas>";
+    //mostro il contenuto per avere renderizzato prima il canvas da riempire
+    LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
+    //renderizzo il grafico
+    renderChart(getChartData());
+    lamDispatch("hide-loader");
+  };
+
+  let renderChart = function (chartData, options) {
+    if (!options) {
+      options = {
+        responsive: true,
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: false,
+          text: "",
+        },
+      };
+      switch (currentChart.chartType) {
+        case "bubble":
+        case "pie":
+          break;
+        case "horizontalBar":
+          options.scales = {
+            xAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          };
+          break;
+        default:
+          options.scales = {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          };
+          break;
+      }
+    }
+    var ctx = document.getElementById("lam-chart-canvas").getContext("2d");
+    window.myBar = new Chart(ctx, {
+      type: currentChart.chartType ? currentChart.chartType : "bar",
+      data: chartData,
+      options: options,
+    });
+  };
+
+  let getChartData = function () {
+    let chartConfig = {};
+    chartConfig.datasets = [];
+    //sorting values
+    currentResults.sort((a, b) =>
+      a.properties[currentChart.sortField] > b.properties[currentChart.sortField]
+        ? 1
+        : b.properties[currentChart.sortField] > a.properties[currentChart.sortField]
+        ? -1
+        : 0
+    );
+    if (!Array.isArray(currentChart.labelField)) {
+      let labelCompiled = Handlebars.compile(currentChart.labelField);
+      chartConfig.labels = currentResults.map(function (element) {
+        return labelCompiled(element.properties);
+      });
+    } else {
+      chartConfig.labels = [];
+      currentChart.labelField.forEach(function (label) {
+        let labelCompiled = Handlebars.compile(label);
+        chartConfig.labels.push(labelCompiled(currentResults[0].properties));
+      });
+    }
+
+    currentChart.datasets.forEach(function (element) {
+      if (!Array.isArray(element.valueField)) {
+        let dataSet = datasetFactoryCreate(element);
+        dataSet.data = currentResults.map(function (item) {
+          return getDatasetValue(element.valueField, item);
+        });
+        chartConfig.datasets.push(dataSet);
+      } else {
+        currentResults.forEach(function (item) {
+          let dataSet = datasetFactoryCreate(element, item);
+          dataSet.data = [];
+          element.valueField.forEach(function (itemSerieValue) {
+            dataSet.data.push(getDatasetValue(itemSerieValue, item));
+          });
+          chartConfig.datasets.push(dataSet);
+        });
+      }
+    });
+    return chartConfig;
+  };
+
+  let datasetFactoryCreate = function (datasetConfig) {
+    let dataSet = {};
+    if (datasetConfig.title) dataSet.label = datasetConfig.title;
+    if (datasetConfig.backgroundColor) {
+      dataSet.backgroundColor = [];
+      if (!Array.isArray(datasetConfig.backgroundColor)) {
+        dataSet.backgroundColor = "rgba(" + datasetConfig.backgroundColor + ")";
+      } else {
+        datasetConfig.backgroundColor.forEach(function (background) {
+          dataSet.backgroundColor.push("rgba(" + background + ")");
+        });
+      }
+    }
+    if (datasetConfig.borderColor) dataSet.borderColor = "rgba(" + datasetConfig.borderColor + ")";
+    if (datasetConfig.borderWidth) dataSet.borderWidth = datasetConfig.borderWidth;
+    return dataSet;
+  };
+
+  let getDatasetValue = function (field, item) {
+    if (field.indexOf("=") === 0) {
+      var functionTemplate = field.replace("=", "");
+      var functionCompiled = Handlebars.compile(functionTemplate);
+      let itemFunction = functionCompiled(item.properties);
+      try {
+        let val = eval(itemFunction);
+        return val;
+      } catch (e) {
+        lamDispatch({
+          eventName: "log",
+          message: "LamCharts: non è stato possibile calcolare il dato per " + itemFunction,
+        });
+        return 0;
+      }
+    }
+    return item.properties[field];
+  };
+
+  return {
+    getChart: getChart,
+    getCharts: getCharts,
+    showChart: showChart,
+    init: init,
+    parseResponseChart: parseResponseChart,
+    renderChart: renderChart,
   };
 })();
 
@@ -6667,6 +6964,7 @@ let LamLoader = (function () {
     LamHandlebars.init();
     LamDom.init();
     LamRelations.init();
+    LamCharts.init();
     LamTables.init();
     LamDom.showAppTools();
     //map init
@@ -7220,6 +7518,7 @@ var LamStore = (function () {
     if (!appstate.currentInfoItems) appstate.currentInfoItems = [];
     if (!appstate.infoSelectBehaviour) appstate.infoSelectBehaviour = 2;
     if (!appstate.relations) appstate.relations = [];
+    if (!appstate.charts) appstate.charts = [];
 
     //if some parameters are defined in the querystring they will be inherited in the appstate
     let searchArray = location.search.replace("?", "").split("&");
@@ -7729,6 +8028,95 @@ var LamStore = (function () {
     });
   };
 
+  let loadRemoteCharts = function () {
+    if (!appState.chartsUrl) return;
+    if (!Array.isArray(appState.chartsUrl)) {
+      appState.chartsUrl = [appState.chartsUrl];
+    }
+    if (!appState.charts) appState.charts = [];
+    let chartsUrl = [...appState.chartsUrl]; //cloning...
+    function loadChartsRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          appState.charts = appState.charts.concat(data);
+          if (chartsUrl.length) {
+            loadChartsRecursively(chartsUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load chartsUrl " + url,
+          });
+        });
+    }
+    loadChartsRecursively(chartsUrl.shift());
+  };
+
+  let loadRemoteLinks = function () {
+    if (!appState.linksUrl) return;
+    if (!Array.isArray(appState.linksUrl)) {
+      appState.linksUrl = [appState.linksUrl];
+    }
+    if (!appState.links) appState.links = [];
+    let linksUrl = [...appState.linksUrl]; //cloning...
+    function loadLinkRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          appState.links = appState.links.concat(data);
+          if (linksUrl.length) {
+            loadLinkRecursively(linksUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load linksUrl " + url,
+          });
+        });
+    }
+    loadLinkRecursively(linksUrl.shift());
+  };
+
+  let loadRemoteRelations = function () {
+    if (!appState.relationsUrl) return;
+    if (!Array.isArray(appState.relationsUrl)) {
+      appState.relationsUrl = [appState.relationsUrl];
+    }
+    if (!appState.relations) appState.relations = [];
+    let relationsUrl = [...appState.relationsUrl]; //cloning...
+    function loadRelationRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          //loading templates
+          LamTemplates.loadRelationsTemplates(data, appState.templatesRepositoryUrl);
+          appState.relations = appState.relations.concat(data);
+          if (relationsUrl.length) {
+            loadRelationRecursively(relationsUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load relationsUrl " + url,
+          });
+        });
+    }
+    loadRelationRecursively(relationsUrl.shift());
+  };
+
   return {
     doLogin: doLogin,
     getAppState: getAppState,
@@ -7755,6 +8143,9 @@ var LamStore = (function () {
     setInfoClickEnabled: setInfoClickEnabled,
     mapReload: mapReload,
     liveReload: liveReload,
+    loadRemoteCharts: loadRemoteCharts,
+    loadRemoteLinks: loadRemoteLinks,
+    loadRemoteRelations: loadRemoteRelations,
     openUrlTemplate: openUrlTemplate,
     getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     parseResponse: parseResponse,
@@ -8344,25 +8735,69 @@ let LamTemplates = (function () {
 
   let relationsTemplate = function (relations, props, index) {
     let result = "";
-    if (relations.length > 0) {
-      result += '<div class="lam-feature__relations">';
-      relations.map(function (relation) {
-        result += '<div class="lam-mb-2 col s12">';
-        result +=
-          '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
-          relation.gid +
-          "', " +
-          index +
-          ')">' +
-          '<i class="lam-feature__icon">' +
-          LamResources.svgOpen16 +
-          "</i>" +
-          relation.labelTemplate +
-          "</a>"; //' + relation.gid + ' //relation.labelTemplate
-        result += "</div>";
-      });
+    if (!relations.length) return "";
+    result += '<div class="lam-feature__relations">';
+    relations.map(function (relation) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-link" onclick="LamRelations.showRelation(\'' +
+        relation.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-feature__icon">' +
+        LamResources.svgOpen16 +
+        "</i>" +
+        relation.labelTemplate +
+        "</a>";
       result += "</div>";
-    }
+    });
+    result += "</div>";
+    return result;
+  };
+
+  let chartsTemplate = function (charts, index) {
+    let result = "";
+    if (!charts.length) return "";
+    result += '<div class="lam-feature__charts">';
+    charts.map(function (chart) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-link" onclick="LamCharts.showChart(\'' +
+        chart.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-feature__icon">' +
+        LamResources.svgChart16 +
+        "</i>" +
+        chart.labelTemplate +
+        "</a>";
+      result += "</div>";
+    });
+    result += "</div>";
+    return result;
+  };
+
+  let chartsTemplateButton = function (charts, index) {
+    let result = "";
+    if (!charts.length) return "";
+    charts.map(function (chart) {
+      result += '<div class="lam-mb-2 col s12">';
+      result +=
+        '<a href="#" class="lam-btn lam-btn-small lam-depth-1" onclick="LamCharts.showChart(\'' +
+        chart.gid +
+        "', " +
+        index +
+        ')">' +
+        '<i class="lam-icon">' +
+        LamResources.svgChart16 +
+        "</i>" +
+        chart.labelTemplate +
+        "</a>";
+      result += "</div>";
+    });
+
     return result;
   };
 
@@ -8438,6 +8873,47 @@ let LamTemplates = (function () {
             ":</div><div class='lam-feature-content lam-col'>{{#if " +
             field.field +
             "}}Sì{{else}}No{{/if}}</div>";
+          break;
+        case "date":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string " +
+            field.field +
+            "}}}</div>";
+          break;
+        case "datetime":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_time_string " +
+            field.field +
+            "}}}</div>";
+          break;
+        case "date_geoserver":
+          str +=
+            "<div class='lam-feature-title lam-col'>" +
+            field.label +
+            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " +
+            field.field +
+            "}}}</div>";
+          break;
+        case "file":
+          str +=
+            "<div class='lam-feature-content lam-col'><a class='lam-link' href='{{{" +
+            field.field +
+            "}}}' target='_blank'><i class='lam-feature__icon'>" +
+            LamResources.svgDownload16 +
+            "</i>" +
+            field.label +
+            "</a></div>";
+          break;
+        case "file_preview":
+          str += "<div class='lam-feature-content lam-col lam-center'>";
+          field.field.split(",").forEach(function (element) {
+            str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+          });
+          str += "</div>";
           break;
         /*  case "moreinfo":
             str +=
@@ -8527,12 +9003,16 @@ let LamTemplates = (function () {
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
-
       //sezione relations
       let layerRelations = LamRelations.getRelations().filter(function (relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
       });
-      tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+      if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+      //sezione charts
+      let layerCharts = LamCharts.getCharts().filter(function (chart) {
+        return $.inArray(feature.layerGid, chart.layerGids) >= 0 && !chart.target;
+      });
+      if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
       tempBody += LamTemplates.featureIconsTemplate(index);
 
       body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + tempBody + "</div>";
@@ -8598,8 +9078,11 @@ let LamTemplates = (function () {
     getTemplateEmpty: getTemplateEmpty,
     featureIconsTemplate: featureIconsTemplate,
     loadTemplateAjax: loadTemplateAjax,
+    loadRelationsTemplates: loadRelationsTemplates,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
+    chartsTemplate: chartsTemplate,
+    chartsTemplateButton: chartsTemplateButton,
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,

@@ -93,6 +93,7 @@ let LamHandlebars = (function () {
       if (!dateStr) return "";
       try {
         //TODO LOCALIZE
+        if (dateStr.endsWith("Z")) dateStr = dateStr.replace("Z", "");
         let date = new Date(Date.parse(dateStr));
         let dd = date.getDate();
         let mm = date.getMonth() + 1;
@@ -114,6 +115,7 @@ let LamHandlebars = (function () {
       if (!dateStr) return "";
       try {
         //TODO LOCALIZE
+        if (dateStr.endsWith("Z")) dateStr = dateStr.replace("Z", "");
         let date = new Date(Date.parse(dateStr));
         let dd = date.getDate();
         let mm = date.getMonth() + 1;

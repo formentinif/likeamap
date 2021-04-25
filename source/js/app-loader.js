@@ -184,6 +184,7 @@ let LamLoader = (function () {
     LamHandlebars.init();
     LamDom.init();
     LamRelations.init();
+    LamCharts.init();
     LamTables.init();
     LamDom.showAppTools();
     //map init

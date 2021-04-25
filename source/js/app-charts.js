@@ -2,7 +2,10 @@ var LamCharts = (function () {
   let currentChart; //relation currently evaluating
   let currentChartItem; //item on which the chart is evaluated
   let currentResults = null;
-  var init = function init() {};
+  var init = function init() {
+    //loading remote charts
+    LamStore.loadRemoteCharts();
+  };
 
   var getCharts = function () {
     return LamStore.getAppState().charts;
@@ -55,16 +58,13 @@ var LamCharts = (function () {
     //mostro il contenuto per avere renderizzato prima il canvas da riempire
     LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
     //renderizzo il grafico
-    renderChart(getChartConfig());
+    renderChart(getChartData());
     lamDispatch("hide-loader");
   };
 
-  let renderChart = function (chartData) {
-    var ctx = document.getElementById("lam-chart-canvas").getContext("2d");
-    window.myBar = new Chart(ctx, {
-      type: currentChart.chartType ? currentChart.chartType : "bar",
-      data: chartData,
-      options: {
+  let renderChart = function (chartData, options) {
+    if (!options) {
+      options = {
         responsive: true,
         legend: {
           position: "top",
@@ -73,11 +73,44 @@ var LamCharts = (function () {
           display: false,
           text: "",
         },
-      },
+      };
+      switch (currentChart.chartType) {
+        case "bubble":
+        case "pie":
+          break;
+        case "horizontalBar":
+          options.scales = {
+            xAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          };
+          break;
+        default:
+          options.scales = {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          };
+          break;
+      }
+    }
+    var ctx = document.getElementById("lam-chart-canvas").getContext("2d");
+    window.myBar = new Chart(ctx, {
+      type: currentChart.chartType ? currentChart.chartType : "bar",
+      data: chartData,
+      options: options,
     });
   };
 
-  let getChartConfig = function () {
+  let getChartData = function () {
     let chartConfig = {};
     chartConfig.datasets = [];
     //sorting values

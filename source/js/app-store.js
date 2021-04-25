@@ -613,6 +613,95 @@ var LamStore = (function () {
     });
   };
 
+  let loadRemoteCharts = function () {
+    if (!appState.chartsUrl) return;
+    if (!Array.isArray(appState.chartsUrl)) {
+      appState.chartsUrl = [appState.chartsUrl];
+    }
+    if (!appState.charts) appState.charts = [];
+    let chartsUrl = [...appState.chartsUrl]; //cloning...
+    function loadChartsRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          appState.charts = appState.charts.concat(data);
+          if (chartsUrl.length) {
+            loadChartsRecursively(chartsUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load chartsUrl " + url,
+          });
+        });
+    }
+    loadChartsRecursively(chartsUrl.shift());
+  };
+
+  let loadRemoteLinks = function () {
+    if (!appState.linksUrl) return;
+    if (!Array.isArray(appState.linksUrl)) {
+      appState.linksUrl = [appState.linksUrl];
+    }
+    if (!appState.links) appState.links = [];
+    let linksUrl = [...appState.linksUrl]; //cloning...
+    function loadLinkRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          appState.links = appState.links.concat(data);
+          if (linksUrl.length) {
+            loadLinkRecursively(linksUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load linksUrl " + url,
+          });
+        });
+    }
+    loadLinkRecursively(linksUrl.shift());
+  };
+
+  let loadRemoteRelations = function () {
+    if (!appState.relationsUrl) return;
+    if (!Array.isArray(appState.relationsUrl)) {
+      appState.relationsUrl = [appState.relationsUrl];
+    }
+    if (!appState.relations) appState.relations = [];
+    let relationsUrl = [...appState.relationsUrl]; //cloning...
+    function loadRelationRecursively(url) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        cache: false,
+      })
+        .done(function (data) {
+          //loading templates
+          LamTemplates.loadRelationsTemplates(data, appState.templatesRepositoryUrl);
+          appState.relations = appState.relations.concat(data);
+          if (relationsUrl.length) {
+            loadRelationRecursively(relationsUrl.shift());
+          }
+        })
+        .fail(function (data) {
+          lamDispatch({
+            eventName: "log",
+            message: "LamStore: Unable to load relationsUrl " + url,
+          });
+        });
+    }
+    loadRelationRecursively(relationsUrl.shift());
+  };
+
   return {
     doLogin: doLogin,
     getAppState: getAppState,
@@ -639,6 +728,9 @@ var LamStore = (function () {
     setInfoClickEnabled: setInfoClickEnabled,
     mapReload: mapReload,
     liveReload: liveReload,
+    loadRemoteCharts: loadRemoteCharts,
+    loadRemoteLinks: loadRemoteLinks,
+    loadRemoteRelations: loadRemoteRelations,
     openUrlTemplate: openUrlTemplate,
     getOpenResultInInfoWindow: getOpenResultInInfoWindow,
     parseResponse: parseResponse,

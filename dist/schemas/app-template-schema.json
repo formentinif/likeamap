@@ -62,9 +62,24 @@
           },
           "type": {
             "title": "Tipologia",
-            "description": "Tipo di campo",
+            "description": "Tipo di campo. Il tipo file_preview può essere inserito come valori separati da virgola.",
             "type": "string",
-            "enum": ["string", "int", "yesno", "moreinfo", "array", "link", "phone", "email"]
+            "enum": [
+              "string",
+              "int",
+              "date",
+              "datetime",
+              "date_geoserver",
+              "yesno",
+              "moreinfo",
+              "array",
+              "link",
+              "phone",
+              "email",
+              "relation",
+              "file",
+              "file_preview"
+            ]
           },
           "header": {
             "title": "Intestazione",
@@ -79,6 +94,11 @@
           "itemTemplate": {
             "title": "Oggetto",
             "description": "Template handlebars del singolo oggetto. (Solo per tipologia 'array')",
+            "type": "string"
+          },
+          "relationGid": {
+            "title": "Codice univoco della relazione",
+            "description": "Crea un link alla relazione (Solo per tipologia 'relation')",
             "type": "string"
           }
         },

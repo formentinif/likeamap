@@ -62,9 +62,24 @@
           },
           "type": {
             "title": "Tipologia",
-            "description": "Tipo di campo",
+            "description": "Tipo di campo. Il tipo file_preview può essere inserito come valori separati da virgola.",
             "type": "string",
-            "enum": ["string", "int", "date", "datetime", "date_geoserver", "yesno", "moreinfo", "array", "link", "phone", "email", "relation"]
+            "enum": [
+              "string",
+              "int",
+              "date",
+              "datetime",
+              "date_geoserver",
+              "yesno",
+              "moreinfo",
+              "array",
+              "link",
+              "phone",
+              "email",
+              "relation",
+              "file",
+              "file_preview"
+            ]
           },
           "header": {
             "title": "Intestazione",

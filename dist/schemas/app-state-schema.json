@@ -162,6 +162,13 @@
       "enum": [0, 1],
       "type": "integer"
     },
+    "enableBrowserLocationOnMobile": {
+      "title": "Posizionamento automatico per i dispositivi mobili",
+      "description": "Abilita il posizionamento automatico con la posizione del browser nel caso di dispositivi mobili.",
+      "default": 0,
+      "enum": [0, 1],
+      "type": "integer"
+    },
     "disableAjaxRequestInfo": {
       "title": "Disabilita tutte le interrogazioni",
       "description": "Disabilita tutte le interrogazioni al click del mouse o altre richieste ajax. Da utilizzare ai solo fini di DEBUG.",
@@ -190,6 +197,11 @@
       "description": "Template per la visualizzazione dei risultati delle vie. Può essere fornito un template tramite url assoluto, relativo o inline in formato Handlebars.",
       "type": "string"
     },
+    "searchProviderAddressLayerGid": {
+      "title": "Gid del layer collegato",
+      "description": "Fornendo l'identificativo di un layer saranno ereditate relazioni e grafici",
+      "type": "string"
+    },
     "searchProviderHouseNumberUrl": {
       "title": "Url del provider di ricerca civici",
       "description": "Url del servizio WFS di ricerca per i civici",
@@ -203,6 +215,11 @@
     "searchProviderHouseNumberTemplateUrl": {
       "title": "Template per il rendering dei civici",
       "description": "Template per la visualizzazione dei risultati dei civici. Può essere fornito un template tramite url assoluto, relativo o inline in formato Handlebars.",
+      "type": "string"
+    },
+    "searchProviderHouseNumberLayerGid": {
+      "title": "Gid del layer collegato",
+      "description": "Fornendo l'identificativo di un layer saranno ereditate relazioni e grafici",
       "type": "string"
     },
     "metaDataServiceUrlTemplate": {
@@ -578,8 +595,13 @@
                 "type": "string"
               },
               "hideLegend": {
-                "title": "Nascondi Legenda",
-                "description": "Nasconde la legenda se non disponibile.",
+                "title": "Nascondi Legenda/Info sul layer",
+                "description": "Nasconde il link alle info del layer e la legenda se non disponibile.",
+                "type": "boolean"
+              },
+              "hideLegendImage": {
+                "title": "Nascondi immagine della legenda",
+                "description": "Nasconde solo l'immagine della legenda se non disponibile.",
                 "type": "boolean"
               },
               "templateUrl": {
@@ -658,6 +680,24 @@
       "type": "object"
     }
   },
+  "relationsUrl": {
+    "description": "Url con un array di relazioni che saranno caricate all'avvio dell'applicazione aggiunte a quelle presenti nella proprità relations",
+    "type": "string",
+    "title": "Relazioni URL"
+  },
+  "charts": {
+    "description": "Elenco dei grafici dell'applicazione. Consultare lo schema dedicato.",
+    "type": "array",
+    "title": "Grafici",
+    "items": {
+      "type": "object"
+    }
+  },
+  "chartsUrl": {
+    "description": "Url con un array di grafici che saranno caricate all'avvio dell'applicazione aggiunte a quelli presenti nella proprità charts",
+    "type": "string",
+    "title": "GRAFICI URL"
+  },
   "link": {
     "description": "Elenco dei link dell'applicazione. Consultare lo schema dedicato.",
     "type": "array",
@@ -665,6 +705,11 @@
     "items": {
       "type": "object"
     }
+  },
+  "linksUrl": {
+    "description": "Url con un array di link che saranno caricate all'avvio dell'applicazione aggiunte a quelli presenti nella proprità links",
+    "type": "string",
+    "title": "LINKS URL"
   },
   "termsLinks": {
     "description": "Elenco dei link per termini di utilizzo, privacy, cookies. Consultare lo schema dedicato.",

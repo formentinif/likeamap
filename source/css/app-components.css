@@ -202,6 +202,10 @@
   padding: 0px;
 }
 
+.lam-center {
+  text-align: center;
+}
+
 .lam-label {
   font-weight: 500;
   font-size: 1rem;

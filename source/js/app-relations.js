@@ -13,6 +13,8 @@ var LamRelations = (function () {
     LamDispatcher.bind("render-relation-table", function (payload) {
       LamRelations.renderRelationTable(payload.pageSize, payload.pageIndex, payload.sortBy);
     });
+    //loading remote relations
+    LamStore.loadRemoteRelations();
   };
 
   var getRelations = function () {
@@ -210,7 +212,7 @@ var LamRelations = (function () {
         "'  }); return false;\">";
       str += template.fields[i].field === attribute && !sortAttributeIsDescending(sortAttribute) ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
       str += "</i></a>";
-      str += template.fields[i].label + "</th>";
+      str += (!template.fields[i].header ? template.fields[i].label : template.fields[i].header) + "</th>";
     }
     str += "</tr>";
     str += "{{#each this}}<tr>";
@@ -258,15 +260,21 @@ var LamRelations = (function () {
   };
 
   /**
-   * Filters the relations by id keeping only the relations given
+   * Filters the relations by keeping only the relations given, checking relation gid or autorization
    * This method is only called outside the app
    */
   let allowRelations = function (relationsToKeep) {
     if (LamStore.getAppState()) {
-      let relationsFiltered = LamStore.getAppState().relations.filter(function (relation) {
-        return relationsToKeep.includes(relation.gid);
+      // let relationsFiltered = LamStore.getAppState().relations.filter(function (relation) {
+      //   return relationsToKeep.includes(relation.gid);
+      // });
+      let relationsFilteredAuth = LamStore.getAppState().relations.filter(function (relation) {
+        if (!relation.authorization) return false;
+        var arrAuthorization = relation.authorization.split(",");
+        return relationsToKeep.some((r) => arrAuthorization.includes(r));
       });
-      LamStore.getAppState().relations = relationsFiltered;
+      //LamStore.getAppState().relations = [...new Set([...relationsFiltered, ...relationsFilteredAuth])];
+      LamStore.getAppState().relations = relationsFilteredAuth;
     } else {
       setTimeout(function () {
         LamRelations.allowRelations(relationsToKeep);

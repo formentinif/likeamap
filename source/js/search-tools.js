@@ -382,6 +382,10 @@ var LamSearchTools = (function () {
     var template = isPoint
       ? LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderHouseNumberTemplateUrl, LamStore.getAppState().templatesRepositoryUrl)
       : LamTemplates.getTemplate(null, LamStore.getAppState().searchProviderAddressTemplateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    let layerGid = isPoint ? LamStore.getAppState().searchProviderHouseNumberLayerGid : LamStore.getAppState().searchProviderAddressLayerGid;
+    data.features.forEach(function (feature) {
+      feature.layerGid = layerGid;
+    });
     lamDispatch({
       eventName: "show-search-items",
       features: data,

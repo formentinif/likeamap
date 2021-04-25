@@ -98,6 +98,22 @@
   display: none;
 }
 
+.lam-thumb {
+  max-width: 200px;
+  max-height: 50px;
+  align-self: center;
+  text-align: center;
+  border: 1px solid transparent;
+  padding: 2px;
+  margin-right: 4px;
+}
+
+.lam-thumb:hover {
+  border: 1px solid;
+  border-color: var(--lam-btn-color);
+  border-radius: 3px;
+}
+
 @media screen and (min-width: 801px) {
   .login-container__access {
     padding-top: 5rem;

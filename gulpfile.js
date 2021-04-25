@@ -65,6 +65,7 @@ function combineAppJs() {
         "./source/js/app-cookie-description.js",
         "./source/js/app-custom.js",
         "./source/js/app-relations.js",
+		"./source/js/app-charts.js",
         "./source/js/app-dom.js",
         "./source/js/app-loader.js",
         "./source/js/app-requests.js",

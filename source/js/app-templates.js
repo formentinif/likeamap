@@ -458,6 +458,23 @@ let LamTemplates = (function () {
             field.field +
             "}}}</div>";
           break;
+        case "file":
+          str +=
+            "<div class='lam-feature-content lam-col'><a class='lam-link' href='{{{" +
+            field.field +
+            "}}}' target='_blank'><i class='lam-feature__icon'>" +
+            LamResources.svgDownload16 +
+            "</i>" +
+            field.label +
+            "</a></div>";
+          break;
+        case "file_preview":
+          str += "<div class='lam-feature-content lam-col lam-center'>";
+          field.field.split(",").forEach(function (element) {
+            str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+          });
+          str += "</div>";
+          break;
         /*  case "moreinfo":
             str +=
               '<tr><td colspan="2"><a href="#" onclick="lamDispatch({ eventName: \'more-info\', gid: \'{{' +
@@ -546,7 +563,6 @@ let LamTemplates = (function () {
       if (!tempBody) {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
-
       //sezione relations
       let layerRelations = LamRelations.getRelations().filter(function (relation) {
         return $.inArray(feature.layerGid, relation.layerGids) >= 0;
@@ -622,6 +638,7 @@ let LamTemplates = (function () {
     getTemplateEmpty: getTemplateEmpty,
     featureIconsTemplate: featureIconsTemplate,
     loadTemplateAjax: loadTemplateAjax,
+    loadRelationsTemplates: loadRelationsTemplates,
     processTemplate: processTemplate,
     relationsTemplate: relationsTemplate,
     chartsTemplate: chartsTemplate,
