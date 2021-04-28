@@ -115,6 +115,7 @@ var LamSearchTools = (function () {
           $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
           //controllo del form custom
           if (layer.searchCustomEvent) {
+            debugger;
             //esecuzione della funzione custom
             LamDispatcher.dispatch(layer.searchCustomEvent);
           } else {
