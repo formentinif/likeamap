@@ -157,8 +157,16 @@ var LamLegendTools = (function () {
         LamResources.svgDownload16 +
         "</i> SHP</a></div>";
     }
-    html += "<div>";
 
+    html += "<div class='lam-mt-2 lam-mb-2' style='display:flow-root;'>";
+    html += "<div class='lam-slidecontainer'>";
+    html += "Trasparenza del layer <br />";
+    var layerOpacity = thisLayer.opacity * 100;
+    html += "<input type='range' id='lam-layer-opacity' min='0' max='100' value='" + layerOpacity + "' class='lam-slider'>";
+    html += "</div>";
+    html += "</div>";
+
+    html += "<div>";
     let layerCharts = LamCharts.getCharts().filter(function (chart) {
       return $.inArray(gid, chart.layerGids) >= 0 && chart.target == 1;
     });
@@ -169,6 +177,12 @@ var LamLegendTools = (function () {
     } else {
       LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Informazioni", html, "", "legend");
     }
+
+    //bind degli oggetti
+    $("#lam-layer-opacity").change(function (e) {
+      thisLayer.opacity = parseFloat($("#lam-layer-opacity").val() / 100);
+      LamMap.setLayerOpacity(gid, thisLayer.opacity);
+    });
     return true;
   };
 

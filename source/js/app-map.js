@@ -1692,6 +1692,13 @@ let LamMap = (function () {
     zoomEndPayloads.push(payload);
   };
 
+  let setLayerOpacity = function setLayerOpacity(gid, opacity) {
+    var layer = getLayer(gid);
+    if (layer != null) {
+      layer.setOpacity(opacity);
+    }
+  };
+
   return {
     //addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
@@ -1750,6 +1757,7 @@ let LamMap = (function () {
     removeDrawDeleteInteraction: removeDrawDeleteInteraction,
     removeSelectInteraction: removeSelectInteraction,
     setLayerVisibility: setLayerVisibility,
+    setLayerOpacity: setLayerOpacity,
     showBrowserLocation: showBrowserLocation,
     startCopyCoordinate: startCopyCoordinate,
     stopCopyCoordinate: stopCopyCoordinate,

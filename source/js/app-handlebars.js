@@ -56,7 +56,7 @@ let LamHandlebars = (function () {
       try {
         if (!url) return "";
         if (url.indexOf("http") !== 0) url = "https://" + url;
-        return "<a href='" + url + "' target='_blank'>" + label + "</a>";
+        return "<a class='lam-link-url' href='" + url + "' target='_blank'>" + label + "</a>";
       } catch (error) {
         return "";
       }
@@ -65,7 +65,16 @@ let LamHandlebars = (function () {
     Handlebars.registerHelper("phone_link", function (phone) {
       try {
         if (!phone) return "";
-        return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgPhone16 + "</i>" + "<a href='tel:" + phone + "'>" + phone + "</a>";
+        return (
+          "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" +
+          LamResources.svgPhone16 +
+          "</i>" +
+          "<a class='lam-link-url' href='tel:" +
+          phone +
+          "'>" +
+          phone +
+          "</a>"
+        );
       } catch (error) {
         return "";
       }
@@ -74,7 +83,16 @@ let LamHandlebars = (function () {
     Handlebars.registerHelper("email_link", function (email) {
       try {
         if (!email) return "";
-        return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgMail16 + "</i>" + "<a href='mailto:" + email + "'>" + email + "</a>";
+        return (
+          "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" +
+          LamResources.svgMail16 +
+          "</i>" +
+          "<a class='lam-link-url' href='mailto:" +
+          email +
+          "'>" +
+          email +
+          "</a>"
+        );
       } catch (error) {
         return "";
       }
