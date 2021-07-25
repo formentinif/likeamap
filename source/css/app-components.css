@@ -227,3 +227,41 @@ a.lam-link:active {
   color: var(--lam-btn-color);
   text-decoration: none;
 }
+
+.lam-slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+.lam-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: var(--lam-btn-color);
+  height: 5px;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.lam-slider:hover {
+  opacity: 1;
+}
+
+.lam-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background: var(--lam-btn-color);
+  cursor: pointer;
+}
+
+.lam-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background: var(--lam-btn-color);
+  cursor: pointer;
+}
