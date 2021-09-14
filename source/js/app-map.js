@@ -41,6 +41,9 @@ let LamMap = (function () {
     OTM: {
       gid: 1002,
     },
+    OSMG: {
+      gid: 1003,
+    },
   };
 
   let mainMap;
@@ -243,6 +246,9 @@ let LamMap = (function () {
       case "otm":
         thisLayer = getLayerOTM(apikey);
         break;
+      case "osmg":
+        thisLayer = getLayerOSMG();
+        break;
       case "wms":
         thisLayer = getLayerWMS(gid, uri, params, attribution, secured);
         break;
@@ -332,6 +338,18 @@ let LamMap = (function () {
     });
     otm.gid = defaultLayers.OTM.gid;
     return otm;
+  };
+
+  let getLayerOSMG = function () {
+    var grayOsmLayer = new ol.layer.Tile({
+      source: new ol.source.OSM(),
+    });
+    grayOsmLayer.on("postrender", function (event) {
+      try {
+        greyscaleTile(event.context);
+      } catch (error) {}
+    });
+    return grayOsmLayer;
   };
 
   let getLayerWMS = function (gid, uri, params, attribution) {
@@ -1697,6 +1715,32 @@ let LamMap = (function () {
     if (layer != null) {
       layer.setOpacity(opacity);
     }
+  };
+
+  /**
+   * // function applies greyscale to every pixel in canvas
+   * @param {*} context
+   */
+  let greyscaleTile = function (context) {
+    var canvas = context.canvas;
+    var width = canvas.width;
+    var height = canvas.height;
+    var imageData = context.getImageData(0, 0, width, height);
+    var data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      var r = data[i];
+      var g = data[i + 1];
+      var b = data[i + 2];
+      // CIE luminance for the RGB
+      var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      // Show white color instead of black color while loading new tiles:
+      if (v === 0.0) v = 255.0;
+      data[i + 0] = v; // Red
+      data[i + 1] = v; // Green
+      data[i + 2] = v; // Blue
+      data[i + 3] = 255; // Alpha
+    }
+    context.putImageData(imageData, 0, 0);
   };
 
   return {
