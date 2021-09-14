@@ -2773,6 +2773,13 @@ let LamMap = (function () {
     zoomEndPayloads.push(payload);
   };
 
+  let setLayerOpacity = function setLayerOpacity(gid, opacity) {
+    var layer = getLayer(gid);
+    if (layer != null) {
+      layer.setOpacity(opacity);
+    }
+  };
+
   return {
     //addContextMenu: addContextMenu,
     addDrawInteraction: addDrawInteraction,
@@ -2831,6 +2838,7 @@ let LamMap = (function () {
     removeDrawDeleteInteraction: removeDrawDeleteInteraction,
     removeSelectInteraction: removeSelectInteraction,
     setLayerVisibility: setLayerVisibility,
+    setLayerOpacity: setLayerOpacity,
     showBrowserLocation: showBrowserLocation,
     startCopyCoordinate: startCopyCoordinate,
     stopCopyCoordinate: stopCopyCoordinate,
@@ -2900,7 +2908,7 @@ let LamHandlebars = (function () {
       try {
         if (!url) return "";
         if (url.indexOf("http") !== 0) url = "https://" + url;
-        return "<a href='" + url + "' target='_blank'>" + label + "</a>";
+        return "<a class='lam-link-url' href='" + url + "' target='_blank'>" + label + "</a>";
       } catch (error) {
         return "";
       }
@@ -2909,7 +2917,16 @@ let LamHandlebars = (function () {
     Handlebars.registerHelper("phone_link", function (phone) {
       try {
         if (!phone) return "";
-        return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgPhone16 + "</i>" + "<a href='tel:" + phone + "'>" + phone + "</a>";
+        return (
+          "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" +
+          LamResources.svgPhone16 +
+          "</i>" +
+          "<a class='lam-link-url' href='tel:" +
+          phone +
+          "'>" +
+          phone +
+          "</a>"
+        );
       } catch (error) {
         return "";
       }
@@ -2918,7 +2935,16 @@ let LamHandlebars = (function () {
     Handlebars.registerHelper("email_link", function (email) {
       try {
         if (!email) return "";
-        return "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" + LamResources.svgMail16 + "</i>" + "<a href='mailto:" + email + "'>" + email + "</a>";
+        return (
+          "<i class='lam-icon-primary lam-icon-info lam-mr-1'>" +
+          LamResources.svgMail16 +
+          "</i>" +
+          "<a class='lam-link-url' href='mailto:" +
+          email +
+          "'>" +
+          email +
+          "</a>"
+        );
       } catch (error) {
         return "";
       }
@@ -5086,8 +5112,16 @@ var LamLegendTools = (function () {
         LamResources.svgDownload16 +
         "</i> SHP</a></div>";
     }
-    html += "<div>";
 
+    html += "<div class='lam-mt-2 lam-mb-2' style='display:flow-root;'>";
+    html += "<div class='lam-slidecontainer'>";
+    html += "Trasparenza del layer <br />";
+    var layerOpacity = thisLayer.opacity * 100;
+    html += "<input type='range' id='lam-layer-opacity' min='0' max='100' value='" + layerOpacity + "' class='lam-slider'>";
+    html += "</div>";
+    html += "</div>";
+
+    html += "<div>";
     let layerCharts = LamCharts.getCharts().filter(function (chart) {
       return $.inArray(gid, chart.layerGids) >= 0 && chart.target == 1;
     });
@@ -5098,6 +5132,12 @@ var LamLegendTools = (function () {
     } else {
       LamDom.showContent(LamEnums.showContentMode().LeftPanel, "Informazioni", html, "", "legend");
     }
+
+    //bind degli oggetti
+    $("#lam-layer-opacity").change(function (e) {
+      thisLayer.opacity = parseFloat($("#lam-layer-opacity").val() / 100);
+      LamMap.setLayerOpacity(gid, thisLayer.opacity);
+    });
     return true;
   };
 
@@ -5782,6 +5822,8 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M10 17l5-5-5-5v10z"/><path d="M0 24V0h24v24H0z" fill="none"/></svg>',
   svgChevronLeft:
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
+  svgChevronLeft16:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
   svgChevronRight:
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>',
   svgMail:
@@ -6062,12 +6104,17 @@ var LamRelations = (function () {
   let currentTemplate = null;
   let currentRelationTableTemplate = null;
   let currentResults = null;
+  let relationHistory = [];
 
   var init = function init() {
     //events binding
     LamDispatcher.bind("render-relation-table", function (payload) {
       LamRelations.renderRelationTable(payload.pageSize, payload.pageIndex, payload.sortBy);
     });
+    LamDispatcher.bind("render-previous-relation", function (payload) {
+      LamRelations.showPrevRelation();
+    });
+
     //loading remote relations
     LamStore.loadRemoteRelations();
   };
@@ -6101,7 +6148,21 @@ var LamRelations = (function () {
    * @param {string} relationGid
    * @param {int} resultIndex
    */
+  var showPrevRelation = function (relationGid, resultIndex) {
+    relationHistory.pop();
+    showRelationByItem(relationHistory[relationHistory.length - 1].relationGid, relationHistory[relationHistory.length - 1].resultItem);
+  };
+
+  /**
+   * Shows the relation from an infobox item
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
   var showRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: LamStore.getCurrentInfoItems().features[resultIndex],
+    });
     showRelationByItem(relationGid, LamStore.getCurrentInfoItems().features[resultIndex]);
   };
 
@@ -6111,6 +6172,10 @@ var LamRelations = (function () {
    * @param {int} resultIndex
    */
   var showConcatenatedRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: currentResults[resultIndex],
+    });
     showRelationByItem(relationGid, currentResults[resultIndex]);
   };
 
@@ -6159,6 +6224,13 @@ var LamRelations = (function () {
     let title = titleCompiled(currentRelationItem.properties);
 
     let body = "";
+    if (relationHistory.length > 1) {
+      body += "";
+      body +=
+        "<button type='button' class='lam-btn lam-depth-1 lam-mb-2' onclick=\"lamDispatch({ eventName: 'render-previous-relation'});\" ><i class='lam-icon'>" +
+        LamResources.svgChevronLeft16 +
+        "</i> Indietro</button>";
+    }
     if (pageIndex != null) currentPageIndex = pageIndex;
     if (pageSize) {
       currentPageSize = pageSize;
@@ -6281,6 +6353,47 @@ var LamRelations = (function () {
             template.fields[i].label +
             "</td>";
           break;
+        case "int":
+          str += "<td>{{{" + template.fields[i].field + "}}}</td>";
+          break;
+        case "yesno":
+          str += "<td>{{#if " + template.fields[i].field + "}}Sì{{else}}No{{/if}}</td>";
+          break;
+        case "date":
+          str += "<td>{{{format_date_string " + template.fields[i].field + "}}}</td>";
+          break;
+        case "datetime":
+          str += "<td>{{{format_date_time_string " + template.fields[i].field + "}}}</td>";
+          break;
+        case "date_geoserver":
+          str += "<td>{{{format_date_string_geoserver " + template.fields[i].field + "}}}</td>";
+          break;
+        case "file":
+          str +=
+            "<td><a class='lam-link' href='{{{" +
+            template.fields[i].field +
+            "}}}' target='_blank'><i class='lam-feature__icon'>" +
+            LamResources.svgDownload16 +
+            "</i>" +
+            template.fields[i].label +
+            "</a></td>";
+          break;
+        case "file_preview":
+          str += "<td>";
+          template.fields[i].field.split(",").forEach(function (element) {
+            str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+          });
+          str += "</td>";
+          break;
+        case "link":
+          str += "<td>{{{format_url " + template.fields[i].field + " '" + template.fields[i].label + "'}}}</td>";
+          break;
+        case "phone":
+          str += "<td>{{{phone_link " + template.fields[i].field + " }}}</td>";
+          break;
+        case "email":
+          str += "<td>{{{email_link " + template.fields[i].field + " }}}</td>";
+          break;
         default:
           str += "<td>{{" + template.fields[i].field + "}}</td>";
           break;
@@ -6346,6 +6459,7 @@ var LamRelations = (function () {
     parseResponseRelation: parseResponseRelation,
     renderRelationTable: renderRelationTable,
     showConcatenatedRelation: showConcatenatedRelation,
+    showPrevRelation: showPrevRelation,
     showRelation: showRelation,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,

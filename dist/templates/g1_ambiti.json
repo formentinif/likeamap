@@ -39,7 +39,7 @@
     {
       "field": "times",
       "label": "times",
-      "type": "datetime",
+      "type": "link",
       "header": "",
       "footer": "",
       "itemTemplate": ""
@@ -47,7 +47,7 @@
     {
       "field": "data_t",
       "label": "data_t",
-      "type": "date_geoserver",
+      "type": "phone",
       "header": "",
       "footer": "",
       "itemTemplate": ""
