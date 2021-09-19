@@ -150,23 +150,23 @@ var LamDispatcher = (function () {
       switch (payload.type) {
         case "error":
           msg.classes = "lam-error";
-          M.toast(msg);
+          //M.toast(msg);
           break;
         case "info":
           msg.classes = "lam-info";
-          M.toast(msg);
+          //M.toast(msg);
           break;
         case "warning":
           msg.classes = "lam-warning";
-          M.toast(msg);
+          //M.toast(msg);
           break;
         case "notice":
           msg.classes = "lam-secondary";
-          M.toast(msg);
+          //M.toast(msg);
           break;
 
         default:
-          M.toast(msg);
+          //M.toast(msg);
           break;
       }
     });

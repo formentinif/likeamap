@@ -212,7 +212,7 @@ let LamLoader = (function () {
     //carico gli strumenti di disegno
     LamDrawTools.render("draw-tools");
     if (LamStore.getAppState().modules["select-tools"]) {
-      LamSelectTools.render(getQueryLayers());
+      LamSelectTools.render(LamStore.getQueryLayers());
     }
     LamLinksTools.init();
     LamLegendTools.init();

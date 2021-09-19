@@ -29,30 +29,34 @@ let LamSelectTools = (function () {
   let isRendered = false;
   let selectLayers = [];
   let selectionResult = [];
+  let currentSearchDate = new Date().getTime();
 
   let init = function init(layers) {
     selectLayers = layers.filter(function (layer) {
       return layer.labelField != null && layer.labelField != "";
     });
 
-    let btn = $("<button/>", {
-      class: "lam-btn lam-btn-floating lam-btn-large",
-      click: function (e) {
-        e.preventDefault();
-        lamDispatch("show-select-tools");
-      },
-    }).append("<i class='large lam-icon '>select_all</i>");
-    $("#menu-toolbar").append(btn);
+    // let btn = $("<button/>", {
+    //   class: "lam-btn lam-btn-floating lam-btn-large",
+    //   click: function (e) {
+    //     e.preventDefault();
+    //     lamDispatch("show-select-tools");
+    //   },
+    // }).append("<i class='large lam-icon '>select_all</i>");
+    // $("#menu-toolbar").append(btn);
 
     let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
     $("#panel__content").append(divSelect);
 
     LamDispatcher.bind("show-select-tools", function (payload) {
       LamToolbar.toggleToolbarItem("select-tools");
+
       if (LamToolbar.getCurrentToolbarItem() === "select-tools") {
+        LamStore.setInfoClickEnabled(false);
         lamDispatch("set-select");
       } else {
         lamDispatch("unset-select");
+        LamStore.setInfoClickEnabled(true);
       }
       lamDispatch("clear-layer-info");
     });
@@ -85,7 +89,7 @@ let LamSelectTools = (function () {
         });
         return;
       }
-      LamSelectTools.doSelectionLayers(coords, layerName);
+      LamSelectTools.doSelectionLayers(coords);
     });
 
     LamToolbar.addResetToolsEvent({
@@ -139,7 +143,7 @@ let LamSelectTools = (function () {
       template += '<option value="' + layer.layer + '">' + layer.layerName + "</option>";
     });
     template += "</select>";
-    template += "<p>Disegna un poligono sulla mappa per avviare la selezione</p>";
+    template += "<p>Disegna un poligono sulla mappa. Doppio click per completare poligono e avviare la selezione</p>";
     template += "<div id='select-tools__results'></div>";
 
     return template;
@@ -175,82 +179,31 @@ let LamSelectTools = (function () {
    * Start the selection on the specified layer
    * @param {Array} coords coordinate of the selected polygon
    */
-  let doSelectionLayers = function (coords, currentLayer) {
+  let doSelectionLayers = function (coords) {
+    let currentLayer = getCurrentSelectLayerName();
     if (Array.isArray(coords)) coords = coords[0];
     let coordsString = coords
       .map(function (coord) {
         return coord[0] + " " + coord[1];
       })
       .join(",");
-    let cql = "INTERSECTS(ORA_GEOMETRY, Polygon((" + coordsString + ")))";
-
-    let currentSearchDate = new Date().getTime();
-    let searchDate = new Date().getTime();
+    let cql = "INTERSECTS(" + LamStore.getLayerGeometryName(currentLayer) + ", Polygon((" + coordsString + ")))";
 
     jQuery("#select-tools__results").html("");
-    let layers = selectLayers.filter(function (layer) {
-      return layer.layer == currentLayer;
-    });
-    if (layers.length == 0) {
-      lamDispatch({ eventName: "log", message: "Layer " + currentLayer + "non valido" });
-      return;
-    }
-
-    let layer = layers[0];
+    let layer = getCurrentSelectLayer();
     let url = layer.mapUri;
     url =
       url.replace("/wms", "/") +
       "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" +
       layer.layer +
-      "&maxFeatures=50&outputFormat=text%2Fjavascript&cql_filter=" +
+      "&maxFeatures=9999999&outputFormat=text%2Fjavascript&cql_filter=" +
       cql;
 
     $.ajax({
       dataType: "jsonp",
-      url: url,
+      url: url + "&format_options=callback:LamSelectTools.parseResponseSelect",
       cache: false,
       jsonp: true,
-      success: function (data) {
-        //verifica che la ricerca sia ancora valida
-        if (currentSearchDate > searchDate) {
-          return;
-        }
-        let results = [];
-        if (data.features.length > 0) {
-          let resultsIndex = [];
-          let results = [];
-          for (let i = 0; i < data.features.length; i++) {
-            if ($.inArray(data.features[i].properties[layer.labelField], resultsIndex) === -1) {
-              //aggiungo la feature alla mappa
-              LamMap.addFeatureSelectionToMap(data.features[i].geometry, data.crs);
-              let cent = null;
-              if (data.features[i].geometry.coordinates[0][0]) {
-                cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
-              } else {
-                cent = data.features[i].geometry.coordinates;
-              }
-              let item = data.features[i];
-              item.crs = data.crs; //salvo il crs della feature
-              item.layerGid = layer.gid;
-              //item.id = currentLayer;
-              results.push({
-                display_name: data.features[i].properties[layer.labelField],
-                lon: cent[0],
-                lat: cent[1],
-                item: item,
-              });
-              resultsIndex.push(data.features[i].properties[layer.labelField]);
-            }
-          }
-          selectionResult = results.sort(sortByDisplayName);
-          //renderizzo i risultati
-          let templateTemp = templateSelectionResults();
-          let output = templateTemp(selectionResult);
-          jQuery("#select-tools__results").append(output);
-        } else {
-          jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
-        }
-      },
       error: function (jqXHR, textStatus, errorThrown) {
         lamDispatch({
           eventName: "log",
@@ -264,6 +217,60 @@ let LamSelectTools = (function () {
     });
   };
 
+  let parseResponseSelect = function (data) {
+    //verifica che la ricerca sia ancora valida
+    let searchDate = new Date().getTime();
+    if (currentSearchDate > searchDate) {
+      return;
+    }
+    let layer = getCurrentSelectLayer();
+    if (data.features.length > 0) {
+      let resultsIndex = [];
+      let results = [];
+      for (let i = 0; i < data.features.length; i++) {
+        //aggiungo la feature alla mappa
+        LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
+        let cent = null;
+        if (data.features[i].geometry.coordinates[0][0]) {
+          cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
+        } else {
+          cent = data.features[i].geometry.coordinates;
+        }
+        let item = data.features[i];
+        item.crs = data.crs; //salvo il crs della feature
+        item.layerGid = layer.gid;
+        //item.id = currentLayer;
+        results.push({
+          display_name: data.features[i].properties[layer.labelField],
+          lon: cent[0],
+          lat: cent[1],
+          item: item,
+        });
+        resultsIndex.push(data.features[i].properties[layer.labelField]);
+      }
+      selectionResult = results.sort(sortByDisplayName);
+      //renderizzo i risultati
+      let templateTemp = templateSelectionResults();
+      let output = templateTemp(selectionResult);
+      jQuery("#select-tools__results").append(output);
+    } else {
+      jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
+    }
+  };
+
+  let getCurrentSelectLayerName = function () {
+    return $("#select-tools__layers option:selected").val();
+  };
+  let getCurrentSelectLayer = function () {
+    let layers = selectLayers.filter(function (layer) {
+      return layer.layer == getCurrentSelectLayerName();
+    });
+    if (layers.length == 0) {
+      lamDispatch({ eventName: "log", message: "Layer " + getCurrentSelectLayerName() + "non valido" });
+      return;
+    }
+    return layers[0];
+  };
   /**
    * Zoom the map to the lon-lat given and show the infobox of the given item index
    * @param {float} lon
@@ -355,7 +362,10 @@ let LamSelectTools = (function () {
     convertToCSV: convertToCSV,
     doSelectionLayers: doSelectionLayers,
     exportCSVFile: exportCSVFile,
+    getCurrentSelectLayerName: getCurrentSelectLayerName,
+    getCurrentSelectLayer: getCurrentSelectLayer,
     init: init,
+    parseResponseSelect: parseResponseSelect,
     render: render,
     templateSelect: templateSelect,
     zoomToItem: zoomToItem,

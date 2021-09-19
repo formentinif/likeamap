@@ -1,33 +1,9 @@
 {
   "title": "SIT_CIVICI",
-  "layer": "SIT_CIVICI_",
-  "layerGid": "g0_civici_",
+  "layer": "SIT_CIVICI",
+  "layerGid": "g0_civici",
   "templateType": "simple",
   "fields": [
-    {
-      "field": "TOPONIMOe",
-      "label": "Via",
-      "type": "phone",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "TOPONIMOe",
-      "label": "Via",
-      "type": "email",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "TOPONIMO",
-      "label": "Via",
-      "type": "link",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
     {
       "field": "TOPONIMO",
       "label": "Via",

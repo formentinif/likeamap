@@ -1311,8 +1311,9 @@ let LamMap = (function () {
     return result;
   };
 
-  let addFeatureSelectionToMap = function (geometry, srid, layerGid) {
-    return addGeometryToMap(geometry, srid, vectorSelection, layerGid);
+  let addFeatureSelectionToMap = function (feature, srid, layerGid) {
+    let featureOl = LamMap.convertGeoJsonFeatureToOl(feature);
+    return addFeatureToMap(featureOl, srid, vectorSelection, layerGid);
   };
 
   /* SEZIONE DRAWING    *************************************/
