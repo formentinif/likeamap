@@ -49,6 +49,7 @@ function combineAppJs() {
         "./source/js/app-map-info.js",
         "./source/js/app-map.js",
 		"./source/js/app-handlebars.js",
+		"./source/js/app-alerts.js",
         "./source/js/draw-tools.js",
         "./source/js/map-tools.js",
 		"./source/js/measure-tools.js",
@@ -99,6 +100,7 @@ function combineCss() {
       "./source/css/app-typography.css",
       "./source/css/app-cookie-consent.css",
       "./source/css/app-cookie-description.css",
+	  "./source/css/app-alerts.css",
 	  "./source/css/app-vendor.css",
       "./source/vendor/css/ol.css",
     ])
