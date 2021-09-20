@@ -187,6 +187,7 @@ let LamLoader = (function () {
     LamCharts.init();
     LamTables.init();
     LamDom.showAppTools();
+    LamAlerts.init();
     //map init
     LamMap.render("lam-map", LamStore.getAppState());
     LamMapTooltip.init();

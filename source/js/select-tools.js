@@ -82,10 +82,11 @@ let LamSelectTools = (function () {
       if (!layerName) {
         layerName = $("#select-tools__layers option:selected").val();
       }
-      if (!coords || !layerName) {
+      if (!layerName) {
         lamDispatch({
-          eventName: "log",
-          message: "Parametri per la selezione non validi",
+          eventName: "show-message",
+          message: "Selezionare un layer tra quelli disponibili",
+          type: "warning",
         });
         return;
       }
@@ -140,7 +141,7 @@ let LamSelectTools = (function () {
     template += '<select id="select-tools__layers" class="lam-input">';
     template += '<option value="">Seleziona layer</option>';
     selectLayers.forEach(function (layer) {
-      template += '<option value="' + layer.layer + '">' + layer.layerName + "</option>";
+      template += '<option value="' + layer.gid + '">' + layer.layerName + "</option>";
     });
     template += "</select>";
     template += "<p>Disegna un poligono sulla mappa. Doppio click per completare poligono e avviare la selezione</p>";
@@ -180,17 +181,17 @@ let LamSelectTools = (function () {
    * @param {Array} coords coordinate of the selected polygon
    */
   let doSelectionLayers = function (coords) {
-    let currentLayer = getCurrentSelectLayerName();
+    if (!coords) return;
+    let layer = getCurrentSelectLayer();
     if (Array.isArray(coords)) coords = coords[0];
     let coordsString = coords
       .map(function (coord) {
         return coord[0] + " " + coord[1];
       })
       .join(",");
-    let cql = "INTERSECTS(" + LamStore.getLayerGeometryName(currentLayer) + ", Polygon((" + coordsString + ")))";
+    let cql = "INTERSECTS(" + LamStore.getLayerGeometryName(layer.gid) + ", Polygon((" + coordsString + ")))";
 
     jQuery("#select-tools__results").html("");
-    let layer = getCurrentSelectLayer();
     let url = layer.mapUri;
     url =
       url.replace("/wms", "/") +
@@ -205,25 +206,26 @@ let LamSelectTools = (function () {
       cache: false,
       jsonp: true,
       error: function (jqXHR, textStatus, errorThrown) {
-        lamDispatch({
-          eventName: "log",
-          message: "LamSelectTools: unable to complete response",
-        });
-        lamDispatch({
-          eventName: "show-message",
-          message: "Non è stato possibile completare la richiesta.",
-        });
+        // lamDispatch({
+        //   eventName: "log",
+        //   message: "LamSelectTools: unable to complete response",
+        // });
       },
     });
   };
 
   let parseResponseSelect = function (data) {
+    lamDispatch("hide-loader");
     //verifica che la ricerca sia ancora valida
     let searchDate = new Date().getTime();
     if (currentSearchDate > searchDate) {
       return;
     }
     let layer = getCurrentSelectLayer();
+    if (!data.features.length) {
+      jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
+      return;
+    }
     if (data.features.length > 0) {
       let resultsIndex = [];
       let results = [];
@@ -239,7 +241,6 @@ let LamSelectTools = (function () {
         let item = data.features[i];
         item.crs = data.crs; //salvo il crs della feature
         item.layerGid = layer.gid;
-        //item.id = currentLayer;
         results.push({
           display_name: data.features[i].properties[layer.labelField],
           lon: cent[0],
@@ -250,23 +251,43 @@ let LamSelectTools = (function () {
       }
       selectionResult = results.sort(sortByDisplayName);
       //renderizzo i risultati
-      let templateTemp = templateSelectionResults();
-      let output = templateTemp(selectionResult);
-      jQuery("#select-tools__results").append(output);
-    } else {
-      jQuery("#select-tools__results").html(LamTemplates.getResultEmpty());
+      parseSelectTable(selectionResult);
+      // let templateTemp = templateSelectionResults();
+      // let output = templateTemp(selectionResult);
+      //jQuery("#select-tools__results").append(output);
     }
   };
 
-  let getCurrentSelectLayerName = function () {
+  let parseSelectTable = function (data) {
+    let layer = getCurrentSelectLayer();
+    currentFeatureCount = data.totalFeatures;
+    if (data.features) {
+      data = data.features;
+    }
+    if (!Array.isArray(data)) data = [data];
+    let propsList = [];
+    for (let i = 0; i < data.length; i++) {
+      let props = data[i].properties ? data[i].properties : data[i];
+      propsList.push(props);
+    }
+    let template = LamTemplates.getTemplate(layer.gid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
+    let tableTemplate = template ? LamTables.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    let title = layer.layerName;
+    let body = "";
+    let compiledTemplate = Handlebars.compile(tableTemplate);
+    body += compiledTemplate(propsList);
+    LamDom.showContent(LamEnums.showContentMode().InfoWindow, title, body);
+  };
+
+  let getCurrentSelectLayerGid = function () {
     return $("#select-tools__layers option:selected").val();
   };
   let getCurrentSelectLayer = function () {
     let layers = selectLayers.filter(function (layer) {
-      return layer.layer == getCurrentSelectLayerName();
+      return layer.gid == getCurrentSelectLayerGid();
     });
     if (layers.length == 0) {
-      lamDispatch({ eventName: "log", message: "Layer " + getCurrentSelectLayerName() + "non valido" });
+      lamDispatch({ eventName: "log", message: "Layer " + getCurrentSelectLayerGid() + "non valido" });
       return;
     }
     return layers[0];
@@ -362,7 +383,7 @@ let LamSelectTools = (function () {
     convertToCSV: convertToCSV,
     doSelectionLayers: doSelectionLayers,
     exportCSVFile: exportCSVFile,
-    getCurrentSelectLayerName: getCurrentSelectLayerName,
+    getCurrentSelectLayerGid: getCurrentSelectLayerGid,
     getCurrentSelectLayer: getCurrentSelectLayer,
     init: init,
     parseResponseSelect: parseResponseSelect,
