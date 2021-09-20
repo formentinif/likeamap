@@ -27,46 +27,6 @@
       "header": "",
       "footer": "",
       "itemTemplate": ""
-    },
-    {
-      "field": "datas",
-      "label": "datas",
-      "type": "date",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "times",
-      "label": "times",
-      "type": "datetime",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "data_t",
-      "label": "data_t",
-      "type": "date_geoserver",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "file_dati",
-      "label": "file_dati",
-      "type": "file",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
-    },
-    {
-      "field": "file_dati,file_dati2",
-      "label": "file_dati",
-      "type": "file_preview",
-      "header": "",
-      "footer": "",
-      "itemTemplate": ""
     }
   ]
 }

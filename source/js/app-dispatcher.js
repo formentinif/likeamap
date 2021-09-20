@@ -140,35 +140,7 @@ var LamDispatcher = (function () {
     });
 
     this.bind("show-message", function (payload) {
-      let msg = {
-        html: "",
-        classes: "",
-      };
-      if (payload.message) {
-        msg.html += "<div>" + payload.message + "<div>";
-      }
-      switch (payload.type) {
-        case "error":
-          msg.classes = "lam-error";
-          M.toast(msg);
-          break;
-        case "info":
-          msg.classes = "lam-info";
-          M.toast(msg);
-          break;
-        case "warning":
-          msg.classes = "lam-warning";
-          M.toast(msg);
-          break;
-        case "notice":
-          msg.classes = "lam-secondary";
-          M.toast(msg);
-          break;
-
-        default:
-          M.toast(msg);
-          break;
-      }
+      LamAlerts.showMessage(payload.title, payload.message, payload.type, { timeout: 3000 });
     });
   };
 

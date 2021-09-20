@@ -281,6 +281,16 @@ var LamStore = (function () {
   };
 
   /**
+   * Funzione che restituisce il nome del campo geometria del layer
+   * Al momento non è implementato
+   * @param {string} gid
+   * @returns string
+   */
+  var getLayerGeometryName = function (gid) {
+    return "the_geom";
+  };
+
+  /**
    * Restituisce il layer dall'identificativo
    * @param  {string} gid identificativo del layer
    * @return {object}     Layer
@@ -711,6 +721,7 @@ var LamStore = (function () {
     getGroupLayerByLayerGid: getGroupLayerByLayerGid,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
+    getLayerGeometryName: getLayerGeometryName,
     getLayer: getLayer,
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,

@@ -187,6 +187,7 @@ let LamLoader = (function () {
     LamCharts.init();
     LamTables.init();
     LamDom.showAppTools();
+    LamAlerts.init();
     //map init
     LamMap.render("lam-map", LamStore.getAppState());
     LamMapTooltip.init();
@@ -212,7 +213,7 @@ let LamLoader = (function () {
     //carico gli strumenti di disegno
     LamDrawTools.render("draw-tools");
     if (LamStore.getAppState().modules["select-tools"]) {
-      LamSelectTools.render(getQueryLayers());
+      LamSelectTools.render(LamStore.getQueryLayers());
     }
     LamLinksTools.init();
     LamLegendTools.init();
