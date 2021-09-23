@@ -329,6 +329,7 @@ var LamRelations = (function () {
     getRelations: getRelations,
     getRelation: getRelation,
     getRelationResults: getRelationResults,
+    getRelationTemplate: getRelationTemplate,
     parseResponseRelation: parseResponseRelation,
     renderRelationTable: renderRelationTable,
     showConcatenatedRelation: showConcatenatedRelation,

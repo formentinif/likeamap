@@ -288,6 +288,7 @@ var LamStore = (function () {
    */
   var getLayerGeometryName = function (gid) {
     return "the_geom";
+    return "ora_geometry";
   };
 
   /**
