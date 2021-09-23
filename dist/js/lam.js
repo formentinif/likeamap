@@ -1425,10 +1425,22 @@ let LamMap = (function () {
     var grayOsmLayer = new ol.layer.Tile({
       source: new ol.source.OSM(),
     });
-    grayOsmLayer.on("postrender", function (event) {
-      try {
-        greyscaleTile(event.context);
-      } catch (error) {}
+
+    grayOsmLayer.on("postrender", function (evt) {
+      var background = 125;
+      evt.context.globalCompositeOperation = "color";
+      // check browser supports globalCompositeOperation
+      if (evt.context.globalCompositeOperation == "color") {
+        evt.context.fillStyle = "rgba(255,255,255," + 1 + ")";
+        evt.context.fillRect(0, 0, evt.context.canvas.width, evt.context.canvas.height);
+      }
+      evt.context.globalCompositeOperation = "overlay";
+      // check browser supports globalCompositeOperation
+      if (evt.context.globalCompositeOperation == "overlay") {
+        evt.context.fillStyle = "rgb(" + [background, background, background].toString() + ")";
+        evt.context.fillRect(0, 0, evt.context.canvas.width, evt.context.canvas.height);
+      }
+      evt.context.globalCompositeOperation = "source-over";
     });
     return grayOsmLayer;
   };
@@ -2797,32 +2809,6 @@ let LamMap = (function () {
     if (layer != null) {
       layer.setOpacity(opacity);
     }
-  };
-
-  /**
-   * // function applies greyscale to every pixel in canvas
-   * @param {*} context
-   */
-  let greyscaleTile = function (context) {
-    var canvas = context.canvas;
-    var width = canvas.width;
-    var height = canvas.height;
-    var imageData = context.getImageData(0, 0, width, height);
-    var data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      var r = data[i];
-      var g = data[i + 1];
-      var b = data[i + 2];
-      // CIE luminance for the RGB
-      var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      // Show white color instead of black color while loading new tiles:
-      if (v === 0.0) v = 255.0;
-      data[i + 0] = v; // Red
-      data[i + 1] = v; // Green
-      data[i + 2] = v; // Blue
-      data[i + 3] = 255; // Alpha
-    }
-    context.putImageData(imageData, 0, 0);
   };
 
   return {
@@ -6551,6 +6537,7 @@ var LamRelations = (function () {
     getRelations: getRelations,
     getRelation: getRelation,
     getRelationResults: getRelationResults,
+    getRelationTemplate: getRelationTemplate,
     parseResponseRelation: parseResponseRelation,
     renderRelationTable: renderRelationTable,
     showConcatenatedRelation: showConcatenatedRelation,
@@ -7913,6 +7900,7 @@ var LamStore = (function () {
    */
   var getLayerGeometryName = function (gid) {
     return "the_geom";
+    return "ora_geometry";
   };
 
   /**
