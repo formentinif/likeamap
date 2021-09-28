@@ -227,34 +227,32 @@ let LamSelectTools = (function () {
       return;
     }
     if (data.features.length > 0) {
-      let resultsIndex = [];
-      let results = [];
-      for (let i = 0; i < data.features.length; i++) {
-        //aggiungo la feature alla mappa
-        LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
-        let cent = null;
-        if (data.features[i].geometry.coordinates[0][0]) {
-          cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
-        } else {
-          cent = data.features[i].geometry.coordinates;
-        }
-        let item = data.features[i];
-        item.crs = data.crs; //salvo il crs della feature
-        item.layerGid = layer.gid;
-        results.push({
-          display_name: data.features[i].properties[layer.labelField],
-          lon: cent[0],
-          lat: cent[1],
-          item: item,
-        });
-        resultsIndex.push(data.features[i].properties[layer.labelField]);
-      }
-      selectionResult = results.sort(sortByDisplayName);
-      //renderizzo i risultati
-      parseSelectTable(selectionResult);
-      // let templateTemp = templateSelectionResults();
-      // let output = templateTemp(selectionResult);
-      //jQuery("#select-tools__results").append(output);
+      parseSelectTable(data);
+
+      // let resultsIndex = [];
+      // let results = [];
+      // for (let i = 0; i < data.features.length; i++) {
+      //   //aggiungo la feature alla mappa
+      //   LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
+      //   let cent = null;
+      //   if (data.features[i].geometry.coordinates[0][0]) {
+      //     cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
+      //   } else {
+      //     cent = data.features[i].geometry.coordinates;
+      //   }
+      //   let item = data.features[i];
+      //   item.crs = data.crs; //salvo il crs della feature
+      //   item.layerGid = layer.gid;
+      //   results.push({
+      //     display_name: data.features[i].properties[layer.labelField],
+      //     lon: cent[0],
+      //     lat: cent[1],
+      //     item: item,
+      //   });
+      //   resultsIndex.push(data.features[i].properties[layer.labelField]);
+      // }
+      // selectionResult = results.sort(sortByDisplayName);
+      // parseSelectTable(selectionResult);
     }
   };
 
@@ -272,6 +270,7 @@ let LamSelectTools = (function () {
     }
     let template = LamTemplates.getTemplate(layer.gid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
     let tableTemplate = template ? LamTables.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    debugger;
     let title = layer.layerName;
     let body = "";
     let compiledTemplate = Handlebars.compile(tableTemplate);

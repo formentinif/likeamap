@@ -4797,34 +4797,32 @@ let LamSelectTools = (function () {
       return;
     }
     if (data.features.length > 0) {
-      let resultsIndex = [];
-      let results = [];
-      for (let i = 0; i < data.features.length; i++) {
-        //aggiungo la feature alla mappa
-        LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
-        let cent = null;
-        if (data.features[i].geometry.coordinates[0][0]) {
-          cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
-        } else {
-          cent = data.features[i].geometry.coordinates;
-        }
-        let item = data.features[i];
-        item.crs = data.crs; //salvo il crs della feature
-        item.layerGid = layer.gid;
-        results.push({
-          display_name: data.features[i].properties[layer.labelField],
-          lon: cent[0],
-          lat: cent[1],
-          item: item,
-        });
-        resultsIndex.push(data.features[i].properties[layer.labelField]);
-      }
-      selectionResult = results.sort(sortByDisplayName);
-      //renderizzo i risultati
-      parseSelectTable(selectionResult);
-      // let templateTemp = templateSelectionResults();
-      // let output = templateTemp(selectionResult);
-      //jQuery("#select-tools__results").append(output);
+      parseSelectTable(data);
+
+      // let resultsIndex = [];
+      // let results = [];
+      // for (let i = 0; i < data.features.length; i++) {
+      //   //aggiungo la feature alla mappa
+      //   LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
+      //   let cent = null;
+      //   if (data.features[i].geometry.coordinates[0][0]) {
+      //     cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
+      //   } else {
+      //     cent = data.features[i].geometry.coordinates;
+      //   }
+      //   let item = data.features[i];
+      //   item.crs = data.crs; //salvo il crs della feature
+      //   item.layerGid = layer.gid;
+      //   results.push({
+      //     display_name: data.features[i].properties[layer.labelField],
+      //     lon: cent[0],
+      //     lat: cent[1],
+      //     item: item,
+      //   });
+      //   resultsIndex.push(data.features[i].properties[layer.labelField]);
+      // }
+      // selectionResult = results.sort(sortByDisplayName);
+      // parseSelectTable(selectionResult);
     }
   };
 
@@ -4842,6 +4840,7 @@ let LamSelectTools = (function () {
     }
     let template = LamTemplates.getTemplate(layer.gid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
     let tableTemplate = template ? LamTables.getTableTemplate(template, layer) : LamTemplates.standardTableTemplate(propsList[0], layer);
+    debugger;
     let title = layer.layerName;
     let body = "";
     let compiledTemplate = Handlebars.compile(tableTemplate);
@@ -6425,64 +6424,68 @@ var LamRelations = (function () {
     str += "</tr>";
     str += "{{#each this}}<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      switch (template.fields[i].type) {
-        case "relation":
-          str +=
-            "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
-            template.fields[i].relationGid +
-            "\", {{relationIndex}});return false;'>" +
-            template.fields[i].label +
-            "</td>";
-          break;
-        case "int":
-          str += "<td>{{{" + template.fields[i].field + "}}}</td>";
-          break;
-        case "yesno":
-          str += "<td>{{#if " + template.fields[i].field + "}}Sì{{else}}No{{/if}}</td>";
-          break;
-        case "date":
-          str += "<td>{{{format_date_string " + template.fields[i].field + "}}}</td>";
-          break;
-        case "datetime":
-          str += "<td>{{{format_date_time_string " + template.fields[i].field + "}}}</td>";
-          break;
-        case "date_geoserver":
-          str += "<td>{{{format_date_string_geoserver " + template.fields[i].field + "}}}</td>";
-          break;
-        case "file":
-          str +=
-            "<td><a class='lam-link' href='{{{" +
-            template.fields[i].field +
-            "}}}' target='_blank'><i class='lam-feature__icon'>" +
-            LamResources.svgDownload16 +
-            "</i>" +
-            template.fields[i].label +
-            "</a></td>";
-          break;
-        case "file_preview":
-          str += "<td>";
-          template.fields[i].field.split(",").forEach(function (element) {
-            str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
-          });
-          str += "</td>";
-          break;
-        case "link":
-          str += "<td>{{{format_url " + template.fields[i].field + " '" + template.fields[i].label + "'}}}</td>";
-          break;
-        case "phone":
-          str += "<td>{{{phone_link " + template.fields[i].field + " }}}</td>";
-          break;
-        case "email":
-          str += "<td>{{{email_link " + template.fields[i].field + " }}}</td>";
-          break;
-        default:
-          str += "<td>{{" + template.fields[i].field + "}}</td>";
-          break;
-      }
+      renderTemplateField(template.fields[i]);
     }
     str += "</tr>{{/each}}";
     str += "</table>";
     return str;
+  };
+
+  let renderTemplateField = function (templateField) {
+    switch (templateField[i].type) {
+      case "relation":
+        str +=
+          "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
+          templateField[i].relationGid +
+          "\", {{relationIndex}});return false;'>" +
+          templateField[i].label +
+          "</td>";
+        break;
+      case "int":
+        str += "<td>{{{" + templateField[i].field + "}}}</td>";
+        break;
+      case "yesno":
+        str += "<td>{{#if " + templateField[i].field + "}}Sì{{else}}No{{/if}}</td>";
+        break;
+      case "date":
+        str += "<td>{{{format_date_string " + templateField[i].field + "}}}</td>";
+        break;
+      case "datetime":
+        str += "<td>{{{format_date_time_string " + templateField[i].field + "}}}</td>";
+        break;
+      case "date_geoserver":
+        str += "<td>{{{format_date_string_geoserver " + templateField[i].field + "}}}</td>";
+        break;
+      case "file":
+        str +=
+          "<td><a class='lam-link' href='{{{" +
+          templateField[i].field +
+          "}}}' target='_blank'><i class='lam-feature__icon'>" +
+          LamResources.svgDownload16 +
+          "</i>" +
+          templateField[i].label +
+          "</a></td>";
+        break;
+      case "file_preview":
+        str += "<td>";
+        templateField[i].field.split(",").forEach(function (element) {
+          str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+        });
+        str += "</td>";
+        break;
+      case "link":
+        str += "<td>{{{format_url " + templateField[i].field + " '" + templateField[i].label + "'}}}</td>";
+        break;
+      case "phone":
+        str += "<td>{{{phone_link " + templateField[i].field + " }}}</td>";
+        break;
+      case "email":
+        str += "<td>{{{email_link " + templateField[i].field + " }}}</td>";
+        break;
+      default:
+        str += "<td>{{" + templateField[i].field + "}}</td>";
+        break;
+    }
   };
 
   let updatePageSize = function (sender) {

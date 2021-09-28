@@ -217,64 +217,68 @@ var LamRelations = (function () {
     str += "</tr>";
     str += "{{#each this}}<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      switch (template.fields[i].type) {
-        case "relation":
-          str +=
-            "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
-            template.fields[i].relationGid +
-            "\", {{relationIndex}});return false;'>" +
-            template.fields[i].label +
-            "</td>";
-          break;
-        case "int":
-          str += "<td>{{{" + template.fields[i].field + "}}}</td>";
-          break;
-        case "yesno":
-          str += "<td>{{#if " + template.fields[i].field + "}}Sì{{else}}No{{/if}}</td>";
-          break;
-        case "date":
-          str += "<td>{{{format_date_string " + template.fields[i].field + "}}}</td>";
-          break;
-        case "datetime":
-          str += "<td>{{{format_date_time_string " + template.fields[i].field + "}}}</td>";
-          break;
-        case "date_geoserver":
-          str += "<td>{{{format_date_string_geoserver " + template.fields[i].field + "}}}</td>";
-          break;
-        case "file":
-          str +=
-            "<td><a class='lam-link' href='{{{" +
-            template.fields[i].field +
-            "}}}' target='_blank'><i class='lam-feature__icon'>" +
-            LamResources.svgDownload16 +
-            "</i>" +
-            template.fields[i].label +
-            "</a></td>";
-          break;
-        case "file_preview":
-          str += "<td>";
-          template.fields[i].field.split(",").forEach(function (element) {
-            str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
-          });
-          str += "</td>";
-          break;
-        case "link":
-          str += "<td>{{{format_url " + template.fields[i].field + " '" + template.fields[i].label + "'}}}</td>";
-          break;
-        case "phone":
-          str += "<td>{{{phone_link " + template.fields[i].field + " }}}</td>";
-          break;
-        case "email":
-          str += "<td>{{{email_link " + template.fields[i].field + " }}}</td>";
-          break;
-        default:
-          str += "<td>{{" + template.fields[i].field + "}}</td>";
-          break;
-      }
+      renderTemplateField(template.fields[i]);
     }
     str += "</tr>{{/each}}";
     str += "</table>";
     return str;
+  };
+
+  let renderTemplateField = function (templateField) {
+    switch (templateField[i].type) {
+      case "relation":
+        str +=
+          "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
+          templateField[i].relationGid +
+          "\", {{relationIndex}});return false;'>" +
+          templateField[i].label +
+          "</td>";
+        break;
+      case "int":
+        str += "<td>{{{" + templateField[i].field + "}}}</td>";
+        break;
+      case "yesno":
+        str += "<td>{{#if " + templateField[i].field + "}}Sì{{else}}No{{/if}}</td>";
+        break;
+      case "date":
+        str += "<td>{{{format_date_string " + templateField[i].field + "}}}</td>";
+        break;
+      case "datetime":
+        str += "<td>{{{format_date_time_string " + templateField[i].field + "}}}</td>";
+        break;
+      case "date_geoserver":
+        str += "<td>{{{format_date_string_geoserver " + templateField[i].field + "}}}</td>";
+        break;
+      case "file":
+        str +=
+          "<td><a class='lam-link' href='{{{" +
+          templateField[i].field +
+          "}}}' target='_blank'><i class='lam-feature__icon'>" +
+          LamResources.svgDownload16 +
+          "</i>" +
+          templateField[i].label +
+          "</a></td>";
+        break;
+      case "file_preview":
+        str += "<td>";
+        templateField[i].field.split(",").forEach(function (element) {
+          str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+        });
+        str += "</td>";
+        break;
+      case "link":
+        str += "<td>{{{format_url " + templateField[i].field + " '" + templateField[i].label + "'}}}</td>";
+        break;
+      case "phone":
+        str += "<td>{{{phone_link " + templateField[i].field + " }}}</td>";
+        break;
+      case "email":
+        str += "<td>{{{email_link " + templateField[i].field + " }}}</td>";
+        break;
+      default:
+        str += "<td>{{" + templateField[i].field + "}}</td>";
+        break;
+    }
   };
 
   let updatePageSize = function (sender) {
