@@ -206,6 +206,7 @@ let LamTables = (function () {
     init: init,
     renderLayerAttributeTable: renderLayerAttributeTable,
     getTableTemplate: getTableTemplate,
+    getNormalizedSortAttribute: getNormalizedSortAttribute,
     parseResponseTable: parseResponseTable,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,

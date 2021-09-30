@@ -114,7 +114,7 @@ var LamRelations = (function () {
       if (sortAttributeIsDescending(sortAttribute)) {
         //Descending
         currentResults.sort(function compare(a, b) {
-          let attributeName = getNormalizedSortAttribute();
+          let attributeName = LamTables.getNormalizedSortAttribute();
           if (a.properties[attributeName] < b.properties[attributeName]) {
             return 1;
           }
@@ -201,7 +201,7 @@ var LamRelations = (function () {
   };
 
   let getRelationTemplate = function (template) {
-    let attribute = getNormalizedSortAttribute();
+    let attribute = LamTables.getNormalizedSortAttribute();
     let str = "<table class='lam-table'>";
     str += "<tr>";
     for (let i = 0; i < template.fields.length; i++) {
@@ -217,68 +217,11 @@ var LamRelations = (function () {
     str += "</tr>";
     str += "{{#each this}}<tr>";
     for (let i = 0; i < template.fields.length; i++) {
-      renderTemplateField(template.fields[i]);
+      str += LamTemplates.getFieldTemplate(template.fields[i]);
     }
     str += "</tr>{{/each}}";
     str += "</table>";
     return str;
-  };
-
-  let renderTemplateField = function (templateField) {
-    switch (templateField[i].type) {
-      case "relation":
-        str +=
-          "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
-          templateField[i].relationGid +
-          "\", {{relationIndex}});return false;'>" +
-          templateField[i].label +
-          "</td>";
-        break;
-      case "int":
-        str += "<td>{{{" + templateField[i].field + "}}}</td>";
-        break;
-      case "yesno":
-        str += "<td>{{#if " + templateField[i].field + "}}Sì{{else}}No{{/if}}</td>";
-        break;
-      case "date":
-        str += "<td>{{{format_date_string " + templateField[i].field + "}}}</td>";
-        break;
-      case "datetime":
-        str += "<td>{{{format_date_time_string " + templateField[i].field + "}}}</td>";
-        break;
-      case "date_geoserver":
-        str += "<td>{{{format_date_string_geoserver " + templateField[i].field + "}}}</td>";
-        break;
-      case "file":
-        str +=
-          "<td><a class='lam-link' href='{{{" +
-          templateField[i].field +
-          "}}}' target='_blank'><i class='lam-feature__icon'>" +
-          LamResources.svgDownload16 +
-          "</i>" +
-          templateField[i].label +
-          "</a></td>";
-        break;
-      case "file_preview":
-        str += "<td>";
-        templateField[i].field.split(",").forEach(function (element) {
-          str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
-        });
-        str += "</td>";
-        break;
-      case "link":
-        str += "<td>{{{format_url " + templateField[i].field + " '" + templateField[i].label + "'}}}</td>";
-        break;
-      case "phone":
-        str += "<td>{{{phone_link " + templateField[i].field + " }}}</td>";
-        break;
-      case "email":
-        str += "<td>{{{email_link " + templateField[i].field + " }}}</td>";
-        break;
-      default:
-        str += "<td>{{" + templateField[i].field + "}}</td>";
-        break;
-    }
   };
 
   let updatePageSize = function (sender) {
@@ -290,14 +233,6 @@ var LamRelations = (function () {
     if ($(sender).val()) {
       LamRelations.renderRelationTable(currentPageSize, parseInt($(sender).val()) - 1);
     }
-  };
-
-  let getNormalizedSortAttribute = function () {
-    let attributeName = sortAttribute || "";
-    if (sortAttributeIsDescending(attributeName)) {
-      attributeName = sortAttribute.slice(0, -5); //Descending
-    }
-    return attributeName;
   };
 
   let sortAttributeIsDescending = function (attribute) {

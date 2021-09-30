@@ -294,6 +294,7 @@ let LamTemplates = (function () {
   };
 
   let relationsTemplate = function (relations, props, index) {
+    if (index === null) index = "{{@index}}";
     let result = "";
     if (!relations.length) return "";
     result += '<div class="lam-feature__relations">';
@@ -317,6 +318,7 @@ let LamTemplates = (function () {
   };
 
   let chartsTemplate = function (charts, index) {
+    if (index === null) index = "{{@index}}";
     let result = "";
     if (!charts.length) return "";
     result += '<div class="lam-feature__charts">';
@@ -340,6 +342,7 @@ let LamTemplates = (function () {
   };
 
   let chartsTemplateButton = function (charts, index) {
+    if (index === null) index = "{{@index}}";
     let result = "";
     if (!charts.length) return "";
     charts.map(function (chart) {
@@ -564,15 +567,12 @@ let LamTemplates = (function () {
         tempBody += LamTemplates.standardTemplate(props, layer);
       }
       //sezione relations
-      let layerRelations = LamRelations.getRelations().filter(function (relation) {
-        return $.inArray(feature.layerGid, relation.layerGids) >= 0;
-      });
+      let layerRelations = getLayerRelations(feature.layerGid);
       if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
       //sezione charts
-      let layerCharts = LamCharts.getCharts().filter(function (chart) {
-        return $.inArray(feature.layerGid, chart.layerGids) >= 0 && !chart.target;
-      });
+      let layerCharts = getLayerCharts(feature.layerGid);
       if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+
       tempBody += LamTemplates.featureIconsTemplate(index);
 
       body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + tempBody + "</div>";
@@ -623,12 +623,88 @@ let LamTemplates = (function () {
     return Handlebars.compile(template);
   };
 
+  let getFieldTemplate = function (templateField) {
+    let str = "";
+    switch (templateField.type) {
+      case "relation":
+        str +=
+          "<td><a href='#' onclick='LamRelations.showConcatenatedRelation(\"" +
+          templateField.relationGid +
+          "\", {{relationIndex}});return false;'>" +
+          templateField.label +
+          "</td>";
+        break;
+      case "int":
+        str += "<td>{{{" + templateField.field + "}}}</td>";
+        break;
+      case "yesno":
+        str += "<td>{{#if " + templateField.field + "}}Sì{{else}}No{{/if}}</td>";
+        break;
+      case "date":
+        str += "<td>{{{format_date_string " + templateField.field + "}}}</td>";
+        break;
+      case "datetime":
+        str += "<td>{{{format_date_time_string " + templateField.field + "}}}</td>";
+        break;
+      case "date_geoserver":
+        str += "<td>{{{format_date_string_geoserver " + templateField.field + "}}}</td>";
+        break;
+      case "file":
+        str +=
+          "<td><a class='lam-link' href='{{{" +
+          templateField.field +
+          "}}}' target='_blank'><i class='lam-feature__icon'>" +
+          LamResources.svgDownload16 +
+          "</i>" +
+          templateField.label +
+          "</a></td>";
+        break;
+      case "file_preview":
+        str += "<td>";
+        templateField.field.split(",").forEach(function (element) {
+          str += "<a class='lam-link' href='{{{" + element + "}}}' target='_blank'><img class='lam-thumb' src='{{{" + element + "}}}'/></a>";
+        });
+        str += "</td>";
+        break;
+      case "link":
+        str += "<td>{{{format_url " + templateField.field + " '" + templateField.label + "'}}}</td>";
+        break;
+      case "phone":
+        str += "<td>{{{phone_link " + templateField.field + " }}}</td>";
+        break;
+      case "email":
+        str += "<td>{{{email_link " + templateField.field + " }}}</td>";
+        break;
+      default:
+        str += "<td>{{" + templateField.field + "}}</td>";
+        break;
+    }
+    return str;
+  };
+
+  let getLayerRelations = function (layerGid) {
+    let layerRelations = LamRelations.getRelations().filter(function (relation) {
+      return $.inArray(layerGid, relation.layerGids) >= 0;
+    });
+    return layerRelations;
+  };
+
+  let getLayerCharts = function (layerGid) {
+    let layerCharts = LamCharts.getCharts().filter(function (chart) {
+      return $.inArray(layerGid, chart.layerGids) >= 0 && !chart.target;
+    });
+    return layerCharts;
+  };
+
   return {
     init: init,
     generateTemplate: generateTemplate,
     getLabelFeature: getLabelFeature,
+    getLayerRelations: getLayerRelations,
+    getLayerCharts: getLayerCharts,
     getInfoResultEmpty: getInfoResultEmpty,
     getResultEmpty: getResultEmpty,
+    getFieldTemplate: getFieldTemplate,
     getTemplate: getTemplate,
     getTemplateByGeoserverFeatureId: getTemplateByGeoserverFeatureId,
     getTableTemplate: getTableTemplate,

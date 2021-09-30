@@ -68,8 +68,48 @@ var LamDownloadTools = (function () {
     hiddenElement.click();
   };
 
+  let convertToCSV = function (objArray, template) {
+    var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
+    var str = "";
+
+    template.fields.forEach(function (field) {
+      str += '"' + field.label + '";';
+    });
+    str += "\n";
+
+    array.forEach(function (row) {
+      template.fields.forEach(function (field) {
+        str += '"' + row[field.field] + '";';
+      });
+      str += "\r\n";
+    });
+    return str;
+  };
+
+  let downloadCSVFile = function (fileName, jsonObject, template) {
+    var csv = LamDownloadTools.convertToCSV(jsonObject, template);
+    var exportedFilenmae = fileName + ".csv";
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    if (navigator.msSaveBlob) {
+      navigator.msSaveBlob(blob, exportedFilenmae); // IE 10+
+    } else {
+      var link = document.createElement("a");
+      if (link.download !== undefined) {
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", exportedFilenmae);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  };
+
   return {
     init: init,
+    convertToCSV: convertToCSV,
+    downloadCSVFile: downloadCSVFile,
     render: render,
     downloadRelationResults: downloadRelationResults,
   };
