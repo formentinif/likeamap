@@ -41,7 +41,7 @@ let LamMapInfo = (function () {
       features: [],
     }),
     style: LamMapStyles.getInfoStyle(),
-    zIndex: 100,
+    zIndex: 104,
   });
 
   let vectorFlash = new ol.layer.Vector({
@@ -49,7 +49,7 @@ let LamMapInfo = (function () {
       features: [],
     }),
     style: LamMapStyles.getFlashStyle(),
-    zIndex: 101,
+    zIndex: 105,
   });
 
   let init = function () {

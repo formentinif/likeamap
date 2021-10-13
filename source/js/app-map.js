@@ -799,6 +799,7 @@ let LamMap = (function () {
         features: featuresWKT,
       }),
       style: LamMapStyles.getDrawStyle(),
+      zIndex: 100,
     });
 
     vectorSelectionMask = new ol.layer.Vector({
@@ -806,6 +807,7 @@ let LamMap = (function () {
         features: featuresSelectionMask,
       }),
       style: LamMapStyles.getSelectionMaskStyle(),
+      zIndex: 101,
     });
 
     vectorSelection = new ol.layer.Vector({
@@ -813,6 +815,7 @@ let LamMap = (function () {
         features: featuresSelection,
       }),
       style: LamMapStyles.getSelectionStyle(),
+      zIndex: 102,
     });
 
     vectorDraw.setMap(mainMap);

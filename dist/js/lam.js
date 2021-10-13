@@ -547,7 +547,7 @@ let LamMapInfo = (function () {
       features: [],
     }),
     style: LamMapStyles.getInfoStyle(),
-    zIndex: 100,
+    zIndex: 104,
   });
 
   let vectorFlash = new ol.layer.Vector({
@@ -555,7 +555,7 @@ let LamMapInfo = (function () {
       features: [],
     }),
     style: LamMapStyles.getFlashStyle(),
-    zIndex: 101,
+    zIndex: 105,
   });
 
   let init = function () {
@@ -1880,6 +1880,7 @@ let LamMap = (function () {
         features: featuresWKT,
       }),
       style: LamMapStyles.getDrawStyle(),
+      zIndex: 100,
     });
 
     vectorSelectionMask = new ol.layer.Vector({
@@ -1887,6 +1888,7 @@ let LamMap = (function () {
         features: featuresSelectionMask,
       }),
       style: LamMapStyles.getSelectionMaskStyle(),
+      zIndex: 101,
     });
 
     vectorSelection = new ol.layer.Vector({
@@ -1894,6 +1896,7 @@ let LamMap = (function () {
         features: featuresSelection,
       }),
       style: LamMapStyles.getSelectionStyle(),
+      zIndex: 102,
     });
 
     vectorDraw.setMap(mainMap);
@@ -4603,23 +4606,23 @@ let LamSelectTools = (function () {
   let currentSelectCoordinates;
   let sortAttribute = null;
   let init = function init(layers) {
-    selectLayers = layers.filter(function (layer) {
-      return layer.labelField != null && layer.labelField != "";
-    });
-
-    // let btn = $("<button/>", {
-    //   class: "lam-btn lam-btn-floating lam-btn-large",
-    //   click: function (e) {
-    //     e.preventDefault();
-    //     lamDispatch("show-select-tools");
-    //   },
-    // }).append("<i class='large lam-icon '>select_all</i>");
-    // $("#menu-toolbar").append(btn);
+    selectLayers = layers;
 
     let divSelect = $("<div />", { id: "select-tools", class: "lam-panel-content-item" });
     $("#panel__content").append(divSelect);
 
     LamDispatcher.bind("show-select-tools", function (payload) {
+      selectLayers = LamStore.getQueryLayers().filter(function (layer) {
+        return layer.visible;
+      });
+      var $select = $("#select-tools__layers");
+      $select.find("option").remove().end().append('<option value="">Seleziona layer...</option>');
+
+      for (let index = 0; index < selectLayers.length; index++) {
+        var o = $("<option/>", { value: selectLayers[index].gid }).text(selectLayers[index].layerName);
+        o.appendTo($select);
+      }
+
       LamToolbar.toggleToolbarItem("select-tools");
 
       if (LamToolbar.getCurrentToolbarItem() === "select-tools") {
@@ -4670,7 +4673,11 @@ let LamSelectTools = (function () {
     });
   };
 
-  let render = function (layers) {
+  let render = function () {
+    let layers = LamStore.getQueryLayers().filter(function (layer) {
+      return layer.visible;
+    });
+
     if (!isRendered) {
       init(layers);
     }
@@ -4716,7 +4723,8 @@ let LamSelectTools = (function () {
       template += '<option value="' + layer.gid + '">' + layer.layerName + "</option>";
     });
     template += "</select>";
-    template += "<p>Disegna un poligono sulla mappa. Doppio click per completare poligono e avviare la selezione</p>";
+    template +=
+      "<p>Seleziona uno tra i layer visibili e disegna un poligono sulla mappa. Esegui un doppio click per completare poligono e avviare la selezione.</p>";
     template += "<div><button class='lam-btn' onclick='LamSelectTools.reloadSelection();'>Ricarica</button></div>";
     template += "<div id='select-tools__results'></div>";
 
@@ -4762,7 +4770,7 @@ let LamSelectTools = (function () {
         return coord[0] + " " + coord[1];
       })
       .join(",");
-    let cql = "INTERSECTS(" + LamStore.getLayerGeometryName(layer.gid) + ", Polygon((" + coordsString + ")))";
+    let cql = "INTERSECTS(" + LamStore.getLayerGeometryFieldName(layer.gid) + ", SRID=4326;Polygon((" + coordsString + ")))";
 
     jQuery("#select-tools__results").html("");
     let url = layer.mapUri;
@@ -4775,7 +4783,7 @@ let LamSelectTools = (function () {
 
     $.ajax({
       dataType: "jsonp",
-      url: url + "&format_options=callback:LamSelectTools.parseResponseSelect",
+      url: url + "&format_options=callback:LamSelectTools.parseResponseSelect&srsName=EPSG:4326",
       cache: false,
       jsonp: true,
       error: function (jqXHR, textStatus, errorThrown) {
@@ -4801,33 +4809,17 @@ let LamSelectTools = (function () {
     }
     if (data.features.length > 0) {
       parseSelectTable(data);
+      for (let i = 0; i < data.features.length; i++) {
+        data.features[i].layerGid = layer.gid;
+        data.features[i].srid = 4326;
+      }
 
-      let resultsIndex = [];
-      let results = [];
       for (let i = 0; i < data.features.length; i++) {
         //aggiungo la feature alla mappa
         LamStore.getAppState().currentInfoItems = data;
         selectionResult = data;
         LamMap.addFeatureSelectionToMap(data.features[i], data.crs, layer.gid);
-        //   let cent = null;
-        //   if (data.features[i].geometry.coordinates[0][0]) {
-        //     cent = LamMap.getCentroid(data.features[i].geometry.coordinates[0]);
-        //   } else {
-        //     cent = data.features[i].geometry.coordinates;
-        //   }
-        //   let item = data.features[i];
-        //   item.crs = data.crs; //salvo il crs della feature
-        //   item.layerGid = layer.gid;
-        //   results.push({
-        //     display_name: data.features[i].properties[layer.labelField],
-        //     lon: cent[0],
-        //     lat: cent[1],
-        //     item: item,
-        //   });
-        //   resultsIndex.push(data.features[i].properties[layer.labelField]);
       }
-      // selectionResult = results.sort(sortByDisplayName);
-      // parseSelectTable(selectionResult);
     }
   };
 
@@ -7221,7 +7213,7 @@ let LamLoader = (function () {
     //carico gli strumenti di disegno
     LamDrawTools.render("draw-tools");
     if (LamStore.getAppState().modules["select-tools"]) {
-      LamSelectTools.render(LamStore.getQueryLayers());
+      LamSelectTools.render();
     }
     LamLinksTools.init();
     LamLegendTools.init();
@@ -7931,9 +7923,11 @@ var LamStore = (function () {
    * @param {string} gid
    * @returns string
    */
-  var getLayerGeometryName = function (gid) {
-    return "the_geom";
-    return "ora_geometry";
+  var getLayerGeometryFieldName = function (gid) {
+    let layer = getLayer(gid);
+    if (layer.geometryFieldName) return layer.geometryFieldName;
+    if (LamStore.getAppState().geometryFieldName) return LamStore.getAppState().geometryFieldName;
+    return "ORA_GEOMETRY";
   };
 
   /**
@@ -8367,7 +8361,7 @@ var LamStore = (function () {
     getGroupLayerByLayerGid: getGroupLayerByLayerGid,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
-    getLayerGeometryName: getLayerGeometryName,
+    getLayerGeometryFieldName: getLayerGeometryFieldName,
     getLayer: getLayer,
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,

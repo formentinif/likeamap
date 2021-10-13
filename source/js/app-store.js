@@ -286,9 +286,11 @@ var LamStore = (function () {
    * @param {string} gid
    * @returns string
    */
-  var getLayerGeometryName = function (gid) {
-    return "the_geom";
-    return "ora_geometry";
+  var getLayerGeometryFieldName = function (gid) {
+    let layer = getLayer(gid);
+    if (layer.geometryFieldName) return layer.geometryFieldName;
+    if (LamStore.getAppState().geometryFieldName) return LamStore.getAppState().geometryFieldName;
+    return "ORA_GEOMETRY";
   };
 
   /**
@@ -722,7 +724,7 @@ var LamStore = (function () {
     getGroupLayerByLayerGid: getGroupLayerByLayerGid,
     getInfoClickEnabled: getInfoClickEnabled,
     getInitialAppState: getInitialAppState,
-    getLayerGeometryName: getLayerGeometryName,
+    getLayerGeometryFieldName: getLayerGeometryFieldName,
     getLayer: getLayer,
     getLayerArray: getLayerArray,
     getLayerArrayByName: getLayerArrayByName,

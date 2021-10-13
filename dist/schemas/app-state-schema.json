@@ -112,6 +112,11 @@
       "type": "array",
       "items": {}
     },
+    "geometryFieldName": {
+      "title": "Nome del campo che contiene la geometria",
+      "description": "Viene utilizzato nelle funzioni di tipo spaziale, in quanto non è possibile sapere in anticipo quale campo contiene la geometria. Valore di default ORA_GEOMETRY",
+      "type": "string"
+    },
     "showMapScale": {
       "title": "Scala della mappa",
       "description": "Visualizza la scala della mappa in basso a destra.",
@@ -521,6 +526,11 @@
                 "title": "SRID del layer",
                 "description": "Spatial reference ID del layer. Es: 3857 (al momento è supportato solo il 3857)",
                 "enum": ["3857"],
+                "type": "string"
+              },
+              "geometryFieldName": {
+                "title": "Nome del campo che contiene la geometria",
+                "description": "Viene utilizzato nelle funzioni di tipo spaziale, in quanto non è possibile sapere in anticipo quale campo contiene la geometria. Sovrascrive la proprietà globale",
                 "type": "string"
               },
               "opacity": {
