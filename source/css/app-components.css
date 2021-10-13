@@ -228,6 +228,22 @@ a.lam-link:active {
   text-decoration: none;
 }
 
+a.lam-link-blue {
+  color: #005889;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a.lam-link-blue:hover {
+  color: #112288;
+  text-decoration: underline;
+}
+
+a.lam-link-blue:active {
+  color: #005889;
+  text-decoration: none;
+}
+
 .lam-slidecontainer {
   width: 100%; /* Width of the outside container */
 }
