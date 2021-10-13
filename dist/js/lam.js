@@ -4879,7 +4879,7 @@ let LamSelectTools = (function () {
     for (let i = 0; i < template.fields.length; i++) {
       str += "<th class='" + (template.fields[i].field === attribute ? " lam-sorted " : "") + "' >";
       str +=
-        "<i class='lam-pointer ' onclick=\"lamDispatch({ eventName: 'render-relation-table', sortBy: '" +
+        "<i class='lam-link-blue lam-pointer ' onclick=\"lamDispatch({ eventName: 'render-relation-table', sortBy: '" +
         (template.fields[i].field === sortAttribute ? template.fields[i].field + " DESC" : template.fields[i].field) +
         "'  }); return false;\">";
       str += template.fields[i].field === attribute && !sortAttributeIsDescending(sortAttribute) ? LamResources.svgExpandLess16 : LamResources.svgExpandMore16;
@@ -4900,12 +4900,12 @@ let LamSelectTools = (function () {
       "</i></div>";
     str += "</td>";
     if (layerRelations.length) {
-      str += "<td><a class='lam-link lam-pointer' onclick='LamSelectTools.toggle(this)'>Relazioni</a><div class='lam-hidden'>";
+      str += "<td><a class='lam-link-blue lam-pointer' onclick='LamSelectTools.toggle(this)'>Relazioni</a><div class='lam-hidden'>";
       if (layerRelations.length) str += LamTemplates.relationsTemplate(layerRelations, null, null);
       str += "</div></td>";
     }
     if (layerCharts.length) {
-      str += "<td><a class='lam-link lam-pointer' onclick='LamSelectTools.toggle(this)'>Grafici</a><div class='lam-hidden'>";
+      str += "<td><a class='lam-link-blue lam-pointer' onclick='LamSelectTools.toggle(this)'>Grafici</a><div class='lam-hidden'>";
       if (layerCharts.length) str += LamTemplates.chartsTemplate(layerCharts, null);
       str += "</div></td>";
     }
@@ -4913,9 +4913,13 @@ let LamSelectTools = (function () {
     for (let i = 0; i < template.fields.length; i++) {
       str += LamTemplates.getFieldTemplate(template.fields[i]);
     }
+
     str += "</tr>{{/each}}";
     str += "</table>";
-    str += "<div><button class='lam-btn' onclick='LamSelectTools.exportCSVFile();'>Esporta risultati</button></div>";
+    str +=
+      "<div class='lam-mt-1'><button class='lam-btn lam-right lam-depth-1' onclick='LamSelectTools.exportCSVFile();'><i class='lam-icon'>" +
+      LamResources.svgDownload16 +
+      "</i> Esporta risultati</button></div>";
     return str;
   };
 
