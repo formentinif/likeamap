@@ -7,12 +7,18 @@ var LamRelations = (function () {
   let currentTemplate = null;
   let currentRelationTableTemplate = null;
   let currentResults = null;
+  let relationHistory = [];
 
   var init = function init() {
     //events binding
     LamDispatcher.bind("render-relation-table", function (payload) {
       LamRelations.renderRelationTable(payload.pageSize, payload.pageIndex, payload.sortBy);
     });
+
+    LamDispatcher.bind("render-previous-relation", function (payload) {
+      LamRelations.showPrevRelation();
+    });
+
     //loading remote relations
     LamStore.loadRemoteRelations();
   };
@@ -46,7 +52,21 @@ var LamRelations = (function () {
    * @param {string} relationGid
    * @param {int} resultIndex
    */
+  var showPrevRelation = function (relationGid, resultIndex) {
+    relationHistory.pop();
+    showRelationByItem(relationHistory[relationHistory.length - 1].relationGid, relationHistory[relationHistory.length - 1].resultItem);
+  };
+
+  /**
+   * Shows the relation from an infobox item
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
   var showRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: LamStore.getCurrentInfoItems().features[resultIndex],
+    });
     showRelationByItem(relationGid, LamStore.getCurrentInfoItems().features[resultIndex]);
   };
 
@@ -56,6 +76,10 @@ var LamRelations = (function () {
    * @param {int} resultIndex
    */
   var showConcatenatedRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: currentResults[resultIndex],
+    });
     showRelationByItem(relationGid, currentResults[resultIndex]);
   };
 
@@ -104,6 +128,15 @@ var LamRelations = (function () {
     let title = titleCompiled(currentRelationItem.properties);
 
     let body = "";
+
+    if (relationHistory.length > 1) {
+      body += "";
+      body +=
+        "<button type='button' class='lam-btn lam-depth-1 lam-mb-2' onclick=\"lamDispatch({ eventName: 'render-previous-relation'});\" ><i class='lam-icon'>" +
+        LamResources.svgChevronLeft16 +
+        "</i> Indietro</button>";
+    }
+
     if (pageIndex != null) currentPageIndex = pageIndex;
     if (pageSize) {
       currentPageSize = pageSize;
@@ -273,6 +306,7 @@ var LamRelations = (function () {
     renderRelationTable: renderRelationTable,
     showConcatenatedRelation: showConcatenatedRelation,
     showRelation: showRelation,
+    showPrevRelation: showPrevRelation,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,
   };

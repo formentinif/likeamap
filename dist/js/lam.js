@@ -6022,6 +6022,8 @@ var LamResources = {
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M10 17l5-5-5-5v10z"/><path d="M0 24V0h24v24H0z" fill="none"/></svg>',
   svgChevronLeft:
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
+  svgChevronLeft16:
+    '<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
   svgChevronRight:
     '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>',
   svgMail:
@@ -6304,12 +6306,18 @@ var LamRelations = (function () {
   let currentTemplate = null;
   let currentRelationTableTemplate = null;
   let currentResults = null;
+  let relationHistory = [];
 
   var init = function init() {
     //events binding
     LamDispatcher.bind("render-relation-table", function (payload) {
       LamRelations.renderRelationTable(payload.pageSize, payload.pageIndex, payload.sortBy);
     });
+
+    LamDispatcher.bind("render-previous-relation", function (payload) {
+      LamRelations.showPrevRelation();
+    });
+
     //loading remote relations
     LamStore.loadRemoteRelations();
   };
@@ -6343,7 +6351,21 @@ var LamRelations = (function () {
    * @param {string} relationGid
    * @param {int} resultIndex
    */
+  var showPrevRelation = function (relationGid, resultIndex) {
+    relationHistory.pop();
+    showRelationByItem(relationHistory[relationHistory.length - 1].relationGid, relationHistory[relationHistory.length - 1].resultItem);
+  };
+
+  /**
+   * Shows the relation from an infobox item
+   * @param {string} relationGid
+   * @param {int} resultIndex
+   */
   var showRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: LamStore.getCurrentInfoItems().features[resultIndex],
+    });
     showRelationByItem(relationGid, LamStore.getCurrentInfoItems().features[resultIndex]);
   };
 
@@ -6353,6 +6375,10 @@ var LamRelations = (function () {
    * @param {int} resultIndex
    */
   var showConcatenatedRelation = function (relationGid, resultIndex) {
+    relationHistory.push({
+      relationGid: relationGid,
+      resultItem: currentResults[resultIndex],
+    });
     showRelationByItem(relationGid, currentResults[resultIndex]);
   };
 
@@ -6401,6 +6427,15 @@ var LamRelations = (function () {
     let title = titleCompiled(currentRelationItem.properties);
 
     let body = "";
+
+    if (relationHistory.length > 1) {
+      body += "";
+      body +=
+        "<button type='button' class='lam-btn lam-depth-1 lam-mb-2' onclick=\"lamDispatch({ eventName: 'render-previous-relation'});\" ><i class='lam-icon'>" +
+        LamResources.svgChevronLeft16 +
+        "</i> Indietro</button>";
+    }
+
     if (pageIndex != null) currentPageIndex = pageIndex;
     if (pageSize) {
       currentPageSize = pageSize;
@@ -6570,6 +6605,7 @@ var LamRelations = (function () {
     renderRelationTable: renderRelationTable,
     showConcatenatedRelation: showConcatenatedRelation,
     showRelation: showRelation,
+    showPrevRelation: showPrevRelation,
     updatePageSize: updatePageSize,
     updatePageIndex: updatePageIndex,
   };
