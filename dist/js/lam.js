@@ -4366,7 +4366,6 @@ var LamSearchTools = (function () {
     via = via.trim().replace("'", " ");
     let street = "";
     let civico = "";
-    debugger;
     if (via.indexOf(",") > -1) {
       let viaArr = via.split(",");
       street = viaArr[0];
