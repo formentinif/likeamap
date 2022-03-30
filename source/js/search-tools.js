@@ -311,21 +311,22 @@ var LamSearchTools = (function () {
    * Start the search in the WFS Geoserver Provider
    * @param {Object} ev key click event result
    */
-  var doSearchAddress = function (ev) {
+  let doSearchAddress = function (ev) {
     if (ev.keyCode == 13) {
       $("#search-tools__search-address").blur();
     }
-    var via = $("#search-tools__search-address").val();
-    var street = "";
-    var civico = "";
+    let via = $("#search-tools__search-address").val();
+    via = via.trim().replace("'", " ");
+    let street = "";
+    let civico = "";
     debugger;
     if (via.indexOf(",") > -1) {
-      var viaArr = via.split(",");
+      let viaArr = via.split(",");
       street = viaArr[0];
       civico = viaArr[1];
     } else {
-      var arrTerms = via.split(" ");
-      for (var i = 0; i < arrTerms.length; i++) {
+      let arrTerms = via.split(" ");
+      for (let i = 0; i < arrTerms.length; i++) {
         //verifica dei civici e dei barrati
         if (isNaN(arrTerms[i])) {
           if (arrTerms[i].indexOf("/") > -1) {
@@ -339,34 +340,33 @@ var LamSearchTools = (function () {
       }
     }
 
-    var arrStreet = street.split(" ");
+    let arrStreet = street.trim().split(" ");
     //rimozione degli elementi invalidi
     arrStreet = arrStreet.filter(function (item) {
       return invalidAdrressTerms.indexOf(item.toLowerCase()) === -1;
     });
 
-    var url = searchAddressProviderUrl;
+    let url = searchAddressProviderUrl;
+    let streetCqlFilter = "";
+    for (let i = 0; i < arrStreet.length; i++) {
+      if (!streetCqlFilter) {
+        streetCqlFilter = "[" + searchAddressProviderField + "]ilike%27%25" + arrStreet[i].trim() + "%25%27";
+      } else {
+        streetCqlFilter += "%20AND%20[" + searchAddressProviderField + "]ilike%27%25" + arrStreet[i].trim() + "%25%27";
+      }
+    }
+    let civicoCqlFilter = "%20AND%20" + searchHouseNumberProviderField + "%20ILIKE%20%27" + civico.trim() + "%25%27";
+
     if (!civico) {
       //solo ricerca via
-      url += "&cql_filter=[" + searchAddressProviderField + "]ilike%27%25" + street.trim() + "%25%27";
+      url += "&cql_filter=" + streetCqlFilter;
     } else {
       //ricerca via e civico
-      var url = searchHouseNumberProviderUrl;
-      url +=
-        "&cql_filter=" +
-        searchAddressProviderField +
-        "%20ilike%20%27%25" +
-        street.trim() +
-        "%25%27%20AND%20" +
-        searchHouseNumberProviderField +
-        "%20ILIKE%20%27" +
-        civico +
-        "%25%27";
+      url = searchHouseNumberProviderUrl + "&cql_filter=" + streetCqlFilter + civicoCqlFilter;
     }
     if (url.toLowerCase().indexOf("srsname") < 0 && LamStore.getAppState().srid) {
       url += "&srsName=EPSG:" + LamStore.getAppState().srid;
     }
-    via = via.replace("'", " ");
     $.ajax({
       dataType: "jsonp",
       url: url + "&format_options=callback:LamSearchTools.parseResponseAddress",
