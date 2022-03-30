@@ -4084,6 +4084,25 @@ var LamSearchTools = (function () {
   var timeout = 500;
   var timer;
   var searchResultsDiv = "search-tools__search-results";
+  var invalidAdrressTerms = [
+    "aut",
+    "rione",
+    "corso",
+    "piazzale",
+    "piazzetta",
+    "passeggiata",
+    "strada",
+    "largo",
+    "galleria",
+    "stradello",
+    "rtd",
+    "via",
+    "stradone",
+    "parco",
+    "piazza",
+    "vicolo",
+    "viale",
+  ];
 
   var init = function init() {
     Handlebars.registerHelper("hasLayers", function (options) {
@@ -4344,36 +4363,35 @@ var LamSearchTools = (function () {
       $("#search-tools__search-address").blur();
     }
     var via = $("#search-tools__search-address").val();
-    var cql = "";
-    var arrTerms = via.split(" ");
     var street = "";
     var civico = "";
-
+    debugger;
     if (via.indexOf(",") > -1) {
       var viaArr = via.split(",");
       street = viaArr[0];
       civico = viaArr[1];
     } else {
+      var arrTerms = via.split(" ");
       for (var i = 0; i < arrTerms.length; i++) {
         //verifica dei civici e dei barrati
         if (isNaN(arrTerms[i])) {
           if (arrTerms[i].indexOf("/") > -1) {
             civico += arrTerms[i];
-          } else if (arrTerms[i].length === 1) {
-            civico += arrTerms[i];
           } else {
             street += arrTerms[i] + " ";
           }
         } else {
-          if (i === 0) {
-            //se ho il primo elemento numerico lo tratto come una via
-            street += arrTerms[i];
-          } else {
-            civico += arrTerms[i];
-          }
+          civico += arrTerms[i] + " ";
         }
       }
     }
+
+    var arrStreet = street.split(" ");
+    //rimozione degli elementi invalidi
+    arrStreet = arrStreet.filter(function (item) {
+      return invalidAdrressTerms.indexOf(item.toLowerCase()) === -1;
+    });
+
     var url = searchAddressProviderUrl;
     if (!civico) {
       //solo ricerca via
