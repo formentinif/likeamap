@@ -1,11 +1,10 @@
 const gulp = require("gulp"),
   concat = require("gulp-concat"),
   clean = require("gulp-clean"),
-  sass = require("gulp-sass"),
   uglify = require("gulp-uglify"),
   cleanCSS = require("gulp-clean-css"),
   { series } = require("gulp");
-sass.compiler = require("node-sass");
+
 
 function dist(callback) {
   callback();
@@ -133,16 +132,10 @@ function watchScripts(cb) {
   });
 }
 
-function renderSass() {
-  return gulp
-    .src(["./node_modules/materialize-css/sass/materialize.scss"])
-    .pipe(sass().on("error", sass.logError))
-    .pipe(gulp.dest("./source/vendor/css/", { overwrite: true }));
-}
+
 
 exports.default = dist;
 exports.clean = cleanDist;
 exports.copy = copyDist;
 exports.scripts = series(combineAppJs, combineCss, combineLibs, copyDist);
 exports.watch = watchScripts;
-exports.sass = renderSass;
