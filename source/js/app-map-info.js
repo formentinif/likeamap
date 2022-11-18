@@ -30,7 +30,10 @@ Consultare la Licenza per il testo specifico che regola le autorizzazioni e le l
  */
 let LamMapInfo = (function () {
   "use strict";
-
+  //Last coordinate clicked
+  let lastCoordinateClicked = [0, 0];
+  //Last coordinate clicked
+  let lastPixelClicked = [0, 0];
   //Array with the requests to elaborate
   let requestQueue = {};
   //Array with the requests results. Data are features of different types.
@@ -172,6 +175,8 @@ let LamMapInfo = (function () {
    * @param {boolean} visibleLayers Visibile Layers
    */
   let getRequestInfo = function getRequestInfo(coordinate, pixel, visibleLayers) {
+    lastCoordinateClicked = coordinate;
+    lastPixelClicked = pixel;
     if (!LamStore.getInfoClickEnabled()) {
       return;
     }
@@ -478,11 +483,21 @@ let LamMapInfo = (function () {
    * @param {int} srid
    */
   let addFeatureInfoToMap = function (feature) {
+    debugger;
+    let tooltip = null;
+    let srid = feature.srid;
     if (feature.layerGid) {
       let layer = LamStore.getLayer(feature.layerGid);
-      feature.tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+      tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
+      if (layer.showPointClickedAsGeometry) {
+        feature = new ol.Feature({
+          geometry: new ol.geom.Point(lastCoordinateClicked),
+        });
+        srid = LamStore.getAppState().srid;
+      }
     }
-    return LamMap.addFeatureToMap(feature, feature.srid, vectorInfo);
+    feature.tooltip = tooltip;
+    return LamMap.addFeatureToMap(feature, srid, vectorInfo);
   };
 
   /**

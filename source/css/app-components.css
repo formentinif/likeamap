@@ -98,6 +98,11 @@
   vertical-align: middle;
 }
 
+.lam-feature__group-features {
+  padding: 0.3rem 0.5rem;
+}
+
+
 .lam-layer-icon {
   display: inline-block;
   vertical-align: middle;

@@ -204,6 +204,7 @@ let LamTemplates = (function () {
   };
 
   let standardTemplate = function (props, layer) {
+    debugger;
     let body = "";
     if (layer) {
       body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
@@ -531,11 +532,10 @@ let LamTemplates = (function () {
     }
     str += "</tr>{{/each}}";
     str += "</table>";
-    return str;
   };
 
   /**
-   * Render te given collection into HTML format
+   * Render te given collection into HTML fmat
    * @param {Object} featureInfoCollection GeoJson Collection
    */
   let renderInfoFeatures = function (featureInfoCollection, template) {
@@ -564,6 +564,8 @@ let LamTemplates = (function () {
       }
       feature.featureTemplate = featureTemplate;
       feature.lamLayer = layer;
+      feature.index = index;
+      index++;
     });
 
     //defining sub features
@@ -572,25 +574,24 @@ let LamTemplates = (function () {
       let featureGroupCollection = [];
       featureInfoCollection.features.forEach(function (featureGroup) {
         let layerId = feature.id.split(".").shift();
-        if (layerId === featureGroup.featureTemplate.layerGroup) {
-          featureGroupCollection.push(featureGroup);
-        };
-        if (feature.layerGid === featureGroup.featureTemplate.layerGroup) {
-          featureGroupCollection.push(featureGroup);
-        };
+        if (featureGroup.featureTemplate) {
+          if (layerId === featureGroup.featureTemplate.layerGroup) {
+            featureGroupCollection.push(featureGroup);
+          }
+          if (feature.layerGid === featureGroup.featureTemplate.layerGroup) {
+            featureGroupCollection.push(featureGroup);
+          }
+        }
       });
       feature.featureGroupCollection = featureGroupCollection;
     });
 
     //renders the feature html
     featureInfoCollection.features.forEach(function (feature) {
-      //check: if the layergroup template property is defined the feature shoul not be processed 
-      if (feature.featureTemplate.layerGroup)
-        return;
-      body += renderBodyFeature(feature);
-      index++;
+      //check: if the layergroup template property is defined the feature shoul not be processed
+      if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
+      body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + renderBodyFeature(feature) + "</div>";
     });
-    body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + body + "</div>";
     return body;
   };
 
@@ -599,15 +600,15 @@ let LamTemplates = (function () {
    * featureTemplate
    * featureGroupCollection
    * lamLayer
-   * 
-   * @param {Object} feature 
+   *
+   * @param {Object} feature
    */
-  let renderBodyFeature = function (feature) {
-    debugger
+  let renderBodyFeature = function (feature, index) {
+    debugger;
     let props = feature.properties ? feature.properties : feature;
-    let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, lamLayer.lamlayer);
+    let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
-      tempBody += LamTemplates.standardTemplate(props, lamLayer.lamlayer);
+      tempBody += LamTemplates.standardTemplate(props, feature.lamLayer);
     }
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
@@ -615,17 +616,49 @@ let LamTemplates = (function () {
     //sezione charts
     let layerCharts = getLayerCharts(feature.layerGid);
     if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
-    tempBody += LamTemplates.featureIconsTemplate(index);
+    tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
     //rendering the related features
     let tempBodySub = "";
-    if (featureGroupCollection.length) {
-      featureGroupCollection.features.forEach(function (featureGroup) {
+    if (feature.featureGroupCollection.length) {
+      feature.featureGroupCollection.forEach(function (featureGroup) {
+        tempBodySub += renderBodyGroupFeature(featureGroup);
+      });
+    }
+    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+  };
+
+  /**
+   * Renders the html body of a group feature. The feature needs to have the following custom properties:
+   * featureTemplate
+   * featureGroupCollection
+   * lamLayer
+   *
+   * @param {Object} feature
+   */
+  let renderBodyGroupFeature = function (feature, index) {
+    debugger;
+    let props = feature.properties ? feature.properties : feature;
+    let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
+    if (!tempBody) {
+      tempBody += LamTemplates.standardTemplate(props, feature.lamLayer);
+    }
+    //sezione relations
+    let layerRelations = getLayerRelations(feature.layerGid);
+    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+    //sezione charts
+    let layerCharts = getLayerCharts(feature.layerGid);
+    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+
+    //rendering the related features
+    let tempBodySub = "";
+    if (feature.featureGroupCollection.length) {
+      feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyFeature(featureGroup);
       });
     }
-    return tempBody + tempBodySub;
-  }
+    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+  };
 
   let renderInfoFeaturesMobile = function (featureInfoCollection) {
     let body = "";
