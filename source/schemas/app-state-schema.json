@@ -659,6 +659,11 @@
                 "title": "Classe css del gruppo/layer",
                 "description": "Classe specifica da assegnare al testo del layer nell'albero dei livelli. Utilizzare il modficatore !important per sovreascrivere i default ",
                 "type": "string"
+              },
+              "showPointClickedAsGeometry": {
+                "title": "Mostra il punto cliccato con il mouse al posto della geometria",
+                "description": "Visualizza un punto nella posizione cliccata con il mouse al posto della geometria. Consigliato per la gestione dei grouplayers",
+                "type": "boolean"
               }
             },
             "required": [
