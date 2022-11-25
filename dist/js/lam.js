@@ -544,7 +544,8 @@ let LamMapInfo = (function () {
   let requestQueue = {};
   //Array with the requests results. Data are features of different types.
   let requestQueueData = [];
-
+  let lowestResolution = 0.0005831682455839253;
+  //let lowestResolution = 0.000000000005831682455839253;
   let vectorInfo = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: [],
@@ -722,6 +723,10 @@ let LamMapInfo = (function () {
     LamMap.getMap()
       .getLayers()
       .forEach(function (layer) {
+        var lamlayer = LamStore.getLayer(layer.gid);
+        if (lamlayer.showPointClickedAsGeometry) {
+          viewResolution = lowestResolution;
+        }
         if (layer.queryable) {
           if (!requestQueue.visibleLayers || layer.getVisible()) {
             let url = getFeatureInfoUrl(layer, coordinate, viewResolution, "text/javascript", 50);
@@ -989,7 +994,6 @@ let LamMapInfo = (function () {
    * @param {int} srid
    */
   let addFeatureInfoToMap = function (feature) {
-    debugger;
     let tooltip = null;
     let srid = feature.srid;
     if (feature.layerGid) {
@@ -2157,7 +2161,6 @@ let LamMap = (function () {
    * @param {Ol/Vector} vector Vector layer destination
    */
   let addFeatureToMap = function (feature, srid, vector) {
-    debugger;
     try {
       feature = transform3857(feature, srid);
       //feature.getGeometry().transform(projection, 'EPSG:3857');
@@ -8953,7 +8956,6 @@ let LamTemplates = (function () {
   };
 
   let standardTemplate = function (props, layer) {
-    debugger;
     let body = "";
     if (layer) {
       body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
@@ -9353,7 +9355,6 @@ let LamTemplates = (function () {
    * @param {Object} feature
    */
   let renderBodyFeature = function (feature, index) {
-    debugger;
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -9386,7 +9387,6 @@ let LamTemplates = (function () {
    * @param {Object} feature
    */
   let renderBodyGroupFeature = function (feature, index) {
-    debugger;
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {

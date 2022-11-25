@@ -204,7 +204,6 @@ let LamTemplates = (function () {
   };
 
   let standardTemplate = function (props, layer) {
-    debugger;
     let body = "";
     if (layer) {
       body += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + (layer.layerName || "");
@@ -604,7 +603,6 @@ let LamTemplates = (function () {
    * @param {Object} feature
    */
   let renderBodyFeature = function (feature, index) {
-    debugger;
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -637,7 +635,6 @@ let LamTemplates = (function () {
    * @param {Object} feature
    */
   let renderBodyGroupFeature = function (feature, index) {
-    debugger;
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {

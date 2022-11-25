@@ -1061,7 +1061,6 @@ let LamMap = (function () {
    * @param {Ol/Vector} vector Vector layer destination
    */
   let addFeatureToMap = function (feature, srid, vector) {
-    debugger;
     try {
       feature = transform3857(feature, srid);
       //feature.getGeometry().transform(projection, 'EPSG:3857');
