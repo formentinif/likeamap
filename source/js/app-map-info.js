@@ -218,7 +218,7 @@ let LamMapInfo = (function () {
       .getLayers()
       .forEach(function (layer) {
         var lamlayer = LamStore.getLayer(layer.gid);
-        if (lamlayer.showPointClickedAsGeometry) {
+        if (lamlayer && lamlayer.hasOwnProperty("showPointClickedAsGeometry") && lamlayer.showPointClickedAsGeometry) {
           viewResolution = lowestResolution;
         }
         if (layer.queryable) {
@@ -493,7 +493,7 @@ let LamMapInfo = (function () {
     if (feature.layerGid) {
       let layer = LamStore.getLayer(feature.layerGid);
       tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
-      if (layer.showPointClickedAsGeometry) {
+      if (layer && layer.hasOwnProperty("showPointClickedAsGeometry") && layer.showPointClickedAsGeometry) {
         feature = new ol.Feature({
           geometry: new ol.geom.Point(lastCoordinateClicked),
         });

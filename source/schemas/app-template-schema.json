@@ -36,11 +36,7 @@
     "templateType": {
       "title": "Tipologia",
       "description": "Tipologia del template",
-      "enum": [
-        "simple",
-        "table",
-        "string"
-      ],
+      "enum": ["simple", "table", "string"],
       "type": "string"
     },
     "templateString": {
@@ -73,6 +69,7 @@
             "title": "Tipologia",
             "description": "Tipo di campo. Il tipo file_preview può essere inserito come valori separati da virgola.",
             "type": "string",
+            "hideLabel": "boolean",
             "enum": [
               "string",
               "int",
@@ -111,19 +108,9 @@
             "type": "string"
           }
         },
-        "required": [
-          "field",
-          "label",
-          "type"
-        ]
+        "required": ["field", "label", "type"]
       }
     }
   },
-  "required": [
-    "title",
-    "layer",
-    "layerGid",
-    "templateType",
-    "fields"
-  ]
+  "required": ["title", "layer", "layerGid", "templateType", "fields"]
 }

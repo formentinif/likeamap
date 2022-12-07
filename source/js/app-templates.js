@@ -418,48 +418,35 @@ let LamTemplates = (function () {
    * @param {Object} layer
    */
   let getSimpleTemplate = function (template, layer) {
-    let str = "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
+    let str = "";
+    if (template && template.hasOwnProperty("title") && template.title) {
+      str += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
+    }
     for (let i = 0; i < template.fields.length; i++) {
       str += "<div class='lam-grid lam-mb-1'>";
       let field = template.fields[i];
+      var strLabel = "";
+      if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+        strLabel = "<div class='lam-feature-title lam-col'>" + field.label + ":</div>";
+      }
       switch (field.type) {
         case "int":
-          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          str += "<div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
           break;
         case "string":
-          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
           break;
         case "yesno":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{#if " +
-            field.field +
-            "}}Sì{{else}}No{{/if}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</div>";
           break;
         case "date":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_string " + field.field + "}}}</div>";
           break;
         case "datetime":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_time_string " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_time_string " + field.field + "}}}</div>";
           break;
         case "date_geoserver":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " + field.field + "}}}</div>";
           break;
         case "file":
           str +=
@@ -572,9 +559,12 @@ let LamTemplates = (function () {
       //section feature with layer group that are related to this feature
       let featureGroupCollection = [];
       featureInfoCollection.features.forEach(function (featureGroup) {
-        let layerId = feature.id.split(".").shift();
+        let layerId = "";
+        if (feature.id) {
+          layerId = feature.id.split(".").shift();
+        }
         if (featureGroup.featureTemplate) {
-          if (layerId === featureGroup.featureTemplate.layerGroup) {
+          if (layerId && layerId === featureGroup.featureTemplate.layerGroup) {
             featureGroupCollection.push(featureGroup);
           }
           if (feature.layerGid === featureGroup.featureTemplate.layerGroup) {

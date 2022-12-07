@@ -102,6 +102,17 @@
   padding: 0.3rem 0.5rem;
 }
 
+.lam-feature__group-features .lam-feature-content {
+  font-size: 0.9rem;
+}
+
+.lam-feature__group-features .lam-feature-title {
+  font-size: 0.9rem;
+}
+.lam-feature__group-features .lam-feature-heading {
+  font-size: 1rem;
+}
+
 
 .lam-layer-icon {
   display: inline-block;
