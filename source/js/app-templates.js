@@ -521,11 +521,11 @@ let LamTemplates = (function () {
   };
 
   /**
-   * Render te given collection into HTML fmat
-   * @param {Object} featureInfoCollection GeoJson Collection
+   * Prepare the features grouping by templates
+   * @param {Array} featureInfoCollection list of features
+   * @param {Object} template default template
    */
-  let renderInfoFeatures = function (featureInfoCollection, template) {
-    let body = "";
+  let groupFeatureByTemplate = function (featureInfoCollection, template) {
     //single feature sent
     if (!featureInfoCollection.features) {
       featureInfoCollection = {
@@ -574,13 +574,32 @@ let LamTemplates = (function () {
       });
       feature.featureGroupCollection = featureGroupCollection;
     });
+    var featureCount = 0;
+    //TODO semplificare non è necessario un loop
+    featureInfoCollection.features.forEach(function (feature) {
+      if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
+      featureCount++;
+    });
+    LamDispatcher.dispatch({
+      eventName: "set-featureinfo-count",
+      featureInfoCount: featureCount,
+    });
+    return featureInfoCollection;
+  };
 
+  /**
+   * Render te given collection into HTML format
+   * @param {Object} featureInfoCollection GeoJson Collection
+   */
+  let renderInfoFeatures = function (featureInfoCollection) {
+    let body = "";
     //renders the feature html
     featureInfoCollection.features.forEach(function (feature) {
       //check: if the layergroup template property is defined the feature shoul not be processed
       if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + renderBodyFeature(feature) + "</div>";
     });
+
     return body;
   };
 
@@ -607,13 +626,23 @@ let LamTemplates = (function () {
     tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
     //rendering the related features
-    let tempBodySub = "";
     if (feature.featureGroupCollection.length) {
+      let tempBodySub = "";
+      if (feature.featureTemplate && feature.featureTemplate.hasOwnProperty("groupTitle")) {
+        tempBodySub +=
+          "<div class='lam-feature__group-features__title'>" +
+          "<i title='Informazioni sul layer' class='layertree-layer__icon lam-left lam-mr-1'>" +
+          LamResources.svgInfo +
+          "</i> " +
+          feature.featureTemplate.groupTitle +
+          "</div>";
+      }
       feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyGroupFeature(featureGroup);
       });
+      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }
-    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+    return tempBody;
   };
 
   /**
@@ -638,13 +667,14 @@ let LamTemplates = (function () {
     if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
 
     //rendering the related features
-    let tempBodySub = "";
     if (feature.featureGroupCollection.length) {
+      let tempBodySub = "";
       feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyFeature(featureGroup);
       });
+      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }
-    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+    return tempBody;
   };
 
   let renderInfoFeaturesMobile = function (featureInfoCollection) {
@@ -656,6 +686,7 @@ let LamTemplates = (function () {
       };
     }
     featureInfoCollection.features.forEach(function (feature, index) {
+      if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       //let props = feature.properties ? feature.properties : feature;
       //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
@@ -785,6 +816,7 @@ let LamTemplates = (function () {
     relationsTemplate: relationsTemplate,
     chartsTemplate: chartsTemplate,
     chartsTemplateButton: chartsTemplateButton,
+    groupFeatureByTemplate: groupFeatureByTemplate,
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,

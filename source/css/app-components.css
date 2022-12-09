@@ -99,11 +99,33 @@
 }
 
 .lam-feature__group-features {
-  padding: 0.3rem 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.3rem 0.3rem;
+
+}
+
+.lam-feature__group-features .lam-grid {
+  background-color: #fff !important;
+}
+
+.lam-feature__group-features__title {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+  margin-bottom: 0.3rem;
+  vertical-align: middle;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  /* border-bottom: 1px solid rgba(160, 160, 160, 0.2); */
 }
 
 .lam-feature__group-features .lam-feature-content {
   font-size: 0.9rem;
+  padding: 2px 2px;
 }
 
 .lam-feature__group-features .lam-feature-title {

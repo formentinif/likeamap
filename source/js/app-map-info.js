@@ -34,12 +34,13 @@ let LamMapInfo = (function () {
   let lastCoordinateClicked = [0, 0];
   //Last coordinate clicked
   let lastPixelClicked = [0, 0];
+  let featureInfoCount = 0;
+
   //Array with the requests to elaborate
   let requestQueue = {};
   //Array with the requests results. Data are features of different types.
   let requestQueueData = [];
   let lowestResolution = 0.0005831682455839253;
-  //let lowestResolution = 0.000000000005831682455839253;
   let vectorInfo = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: [],
@@ -66,6 +67,10 @@ let LamMapInfo = (function () {
 
     LamDispatcher.bind("show-info-geometries", function (payload) {
       LamMapInfo.showRequestInfoFeaturesGeometries(payload.features);
+    });
+
+    LamDispatcher.bind("set-featureinfo-count", function (payload) {
+      featureInfoCount = payload.featureInfoCount;
     });
 
     LamDispatcher.bind("flash-feature", function (payload) {
@@ -389,11 +394,13 @@ let LamMapInfo = (function () {
     if (!featureInfoCollection) {
       return;
     }
-    if (featureInfoCollection.features.length > 0) {
-      title += " (" + featureInfoCollection.features.length + ")";
-    }
+    featureInfoCount = featureInfoCollection.features.length;
+    featureInfoCollection = LamTemplates.groupFeatureByTemplate(featureInfoCollection, template);
     var body = LamTemplates.renderInfoFeatures(featureInfoCollection, template);
     var bodyMobile = LamTemplates.renderInfoFeaturesMobile(featureInfoCollection);
+    if (featureInfoCount > 0) {
+      title += " (" + featureInfoCount + ")";
+    }
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 

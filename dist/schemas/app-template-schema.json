@@ -28,6 +28,11 @@
       "description": "Nome del layer di Geoserver che raggruppa questo elemento. I risultati delle infobox saranno raggruppati. Non è necessario che un layer sia all'interno di un grouplayer, ma se non viene trovata la geometria 'madre' non saranno visualizzati i risultati.",
       "type": "string"
     },
+    "groupTitle": {
+      "title": "Titolo delle informaizioni di dettaglio",
+      "description": "Titolo da visualizzare come intestazione delle informazioni raggruppate",
+      "type": "string"
+    },
     "multipleItems": {
       "title": "Template per array di oggetti",
       "description": "Elabora gli oggetti con un singolo template. Valido solo per il valore templateType string o table",
@@ -36,11 +41,7 @@
     "templateType": {
       "title": "Tipologia",
       "description": "Tipologia del template",
-      "enum": [
-        "simple",
-        "table",
-        "string"
-      ],
+      "enum": ["simple", "table", "string"],
       "type": "string"
     },
     "templateString": {
@@ -73,6 +74,7 @@
             "title": "Tipologia",
             "description": "Tipo di campo. Il tipo file_preview può essere inserito come valori separati da virgola.",
             "type": "string",
+            "hideLabel": "boolean",
             "enum": [
               "string",
               "int",
@@ -111,19 +113,9 @@
             "type": "string"
           }
         },
-        "required": [
-          "field",
-          "label",
-          "type"
-        ]
+        "required": ["field", "label", "type"]
       }
     }
   },
-  "required": [
-    "title",
-    "layer",
-    "layerGid",
-    "templateType",
-    "fields"
-  ]
+  "required": ["title", "layer", "layerGid", "templateType", "fields"]
 }

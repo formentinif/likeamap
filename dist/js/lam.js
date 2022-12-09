@@ -540,12 +540,13 @@ let LamMapInfo = (function () {
   let lastCoordinateClicked = [0, 0];
   //Last coordinate clicked
   let lastPixelClicked = [0, 0];
+  let featureInfoCount = 0;
+
   //Array with the requests to elaborate
   let requestQueue = {};
   //Array with the requests results. Data are features of different types.
   let requestQueueData = [];
   let lowestResolution = 0.0005831682455839253;
-  //let lowestResolution = 0.000000000005831682455839253;
   let vectorInfo = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: [],
@@ -572,6 +573,10 @@ let LamMapInfo = (function () {
 
     LamDispatcher.bind("show-info-geometries", function (payload) {
       LamMapInfo.showRequestInfoFeaturesGeometries(payload.features);
+    });
+
+    LamDispatcher.bind("set-featureinfo-count", function (payload) {
+      featureInfoCount = payload.featureInfoCount;
     });
 
     LamDispatcher.bind("flash-feature", function (payload) {
@@ -724,7 +729,7 @@ let LamMapInfo = (function () {
       .getLayers()
       .forEach(function (layer) {
         var lamlayer = LamStore.getLayer(layer.gid);
-        if (lamlayer.showPointClickedAsGeometry) {
+        if (lamlayer && lamlayer.hasOwnProperty("showPointClickedAsGeometry") && lamlayer.showPointClickedAsGeometry) {
           viewResolution = lowestResolution;
         }
         if (layer.queryable) {
@@ -895,11 +900,13 @@ let LamMapInfo = (function () {
     if (!featureInfoCollection) {
       return;
     }
-    if (featureInfoCollection.features.length > 0) {
-      title += " (" + featureInfoCollection.features.length + ")";
-    }
+    featureInfoCount = featureInfoCollection.features.length;
+    featureInfoCollection = LamTemplates.groupFeatureByTemplate(featureInfoCollection, template);
     var body = LamTemplates.renderInfoFeatures(featureInfoCollection, template);
     var bodyMobile = LamTemplates.renderInfoFeaturesMobile(featureInfoCollection);
+    if (featureInfoCount > 0) {
+      title += " (" + featureInfoCount + ")";
+    }
     LamMapInfo.showInfoWindow(title, body, bodyMobile, "info-results");
   };
 
@@ -999,7 +1006,7 @@ let LamMapInfo = (function () {
     if (feature.layerGid) {
       let layer = LamStore.getLayer(feature.layerGid);
       tooltip = LamTemplates.getLabelFeature(feature.getProperties(), layer.labelField, layer.layerName);
-      if (layer.showPointClickedAsGeometry) {
+      if (layer && layer.hasOwnProperty("showPointClickedAsGeometry") && layer.showPointClickedAsGeometry) {
         feature = new ol.Feature({
           geometry: new ol.geom.Point(lastCoordinateClicked),
         });
@@ -9170,48 +9177,35 @@ let LamTemplates = (function () {
    * @param {Object} layer
    */
   let getSimpleTemplate = function (template, layer) {
-    let str = "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
+    let str = "";
+    if (template && template.hasOwnProperty("title") && template.title) {
+      str += "<div class='lam-grid lam-feature-heading' ><div class='lam-col'>" + template.title + "</div></div>";
+    }
     for (let i = 0; i < template.fields.length; i++) {
       str += "<div class='lam-grid lam-mb-1'>";
       let field = template.fields[i];
+      var strLabel = "";
+      if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+        strLabel = "<div class='lam-feature-title lam-col'>" + field.label + ":</div>";
+      }
       switch (field.type) {
         case "int":
-          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          str += "<div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
           break;
         case "string":
-          str += "<div class='lam-feature-title lam-col'>" + field.label + ":</div><div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{" + field.field + "}}}</div>";
           break;
         case "yesno":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{#if " +
-            field.field +
-            "}}Sì{{else}}No{{/if}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{#if " + field.field + "}}Sì{{else}}No{{/if}}</div>";
           break;
         case "date":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_string " + field.field + "}}}</div>";
           break;
         case "datetime":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_time_string " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_time_string " + field.field + "}}}</div>";
           break;
         case "date_geoserver":
-          str +=
-            "<div class='lam-feature-title lam-col'>" +
-            field.label +
-            ":</div><div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " +
-            field.field +
-            "}}}</div>";
+          str += strLabel + "<div class='lam-feature-content lam-col'>{{{format_date_string_geoserver " + field.field + "}}}</div>";
           break;
         case "file":
           str +=
@@ -9286,11 +9280,11 @@ let LamTemplates = (function () {
   };
 
   /**
-   * Render te given collection into HTML fmat
-   * @param {Object} featureInfoCollection GeoJson Collection
+   * Prepare the features grouping by templates
+   * @param {Array} featureInfoCollection list of features
+   * @param {Object} template default template
    */
-  let renderInfoFeatures = function (featureInfoCollection, template) {
-    let body = "";
+  let groupFeatureByTemplate = function (featureInfoCollection, template) {
     //single feature sent
     if (!featureInfoCollection.features) {
       featureInfoCollection = {
@@ -9324,9 +9318,12 @@ let LamTemplates = (function () {
       //section feature with layer group that are related to this feature
       let featureGroupCollection = [];
       featureInfoCollection.features.forEach(function (featureGroup) {
-        let layerId = feature.id.split(".").shift();
+        let layerId = "";
+        if (feature.id) {
+          layerId = feature.id.split(".").shift();
+        }
         if (featureGroup.featureTemplate) {
-          if (layerId === featureGroup.featureTemplate.layerGroup) {
+          if (layerId && layerId === featureGroup.featureTemplate.layerGroup) {
             featureGroupCollection.push(featureGroup);
           }
           if (feature.layerGid === featureGroup.featureTemplate.layerGroup) {
@@ -9336,13 +9333,32 @@ let LamTemplates = (function () {
       });
       feature.featureGroupCollection = featureGroupCollection;
     });
+    var featureCount = 0;
+    //TODO semplificare non è necessario un loop
+    featureInfoCollection.features.forEach(function (feature) {
+      if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
+      featureCount++;
+    });
+    LamDispatcher.dispatch({
+      eventName: "set-featureinfo-count",
+      featureInfoCount: featureCount,
+    });
+    return featureInfoCollection;
+  };
 
+  /**
+   * Render te given collection into HTML format
+   * @param {Object} featureInfoCollection GeoJson Collection
+   */
+  let renderInfoFeatures = function (featureInfoCollection) {
+    let body = "";
     //renders the feature html
     featureInfoCollection.features.forEach(function (feature) {
       //check: if the layergroup template property is defined the feature shoul not be processed
       if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       body += "<div class='lam-feature lam-depth-1 lam-mb-3'>" + renderBodyFeature(feature) + "</div>";
     });
+
     return body;
   };
 
@@ -9369,13 +9385,23 @@ let LamTemplates = (function () {
     tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
     //rendering the related features
-    let tempBodySub = "";
     if (feature.featureGroupCollection.length) {
+      let tempBodySub = "";
+      if (feature.featureTemplate && feature.featureTemplate.hasOwnProperty("groupTitle")) {
+        tempBodySub +=
+          "<div class='lam-feature__group-features__title'>" +
+          "<i title='Informazioni sul layer' class='layertree-layer__icon lam-left lam-mr-1'>" +
+          LamResources.svgInfo +
+          "</i> " +
+          feature.featureTemplate.groupTitle +
+          "</div>";
+      }
       feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyGroupFeature(featureGroup);
       });
+      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }
-    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+    return tempBody;
   };
 
   /**
@@ -9400,13 +9426,14 @@ let LamTemplates = (function () {
     if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
 
     //rendering the related features
-    let tempBodySub = "";
     if (feature.featureGroupCollection.length) {
+      let tempBodySub = "";
       feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyFeature(featureGroup);
       });
+      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }
-    return tempBody + "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+    return tempBody;
   };
 
   let renderInfoFeaturesMobile = function (featureInfoCollection) {
@@ -9418,6 +9445,7 @@ let LamTemplates = (function () {
       };
     }
     featureInfoCollection.features.forEach(function (feature, index) {
+      if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       //let props = feature.properties ? feature.properties : feature;
       //let layer = LamStore.getLayer(feature.layerGid);
       let tempBody = "";
@@ -9547,6 +9575,7 @@ let LamTemplates = (function () {
     relationsTemplate: relationsTemplate,
     chartsTemplate: chartsTemplate,
     chartsTemplateButton: chartsTemplateButton,
+    groupFeatureByTemplate: groupFeatureByTemplate,
     renderInfoFeatures: renderInfoFeatures,
     renderInfoFeaturesMobile: renderInfoFeaturesMobile,
     standardTemplate: standardTemplate,
