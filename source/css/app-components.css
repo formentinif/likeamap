@@ -57,7 +57,7 @@
 
 .lam-feature-heading {
   color: rgba(0, 0, 0, 0.87);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 500;
   padding: 0.3rem 0.1rem 0.2rem 0.3rem;
   margin-bottom: 0.6rem;
@@ -100,6 +100,7 @@
 
 .lam-feature__group-features {
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   border-bottom: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.3rem 0.3rem;
@@ -112,7 +113,7 @@
 
 .lam-feature__group-features__title {
   color: rgba(0, 0, 0, 0.87);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 500;
   padding: 0.1rem 0.1rem 0.1rem 0.1rem;
   margin-bottom: 0.3rem;

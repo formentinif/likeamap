@@ -427,7 +427,7 @@ let LamTemplates = (function () {
       let field = template.fields[i];
       var strLabel = "";
       if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
-        strLabel = "<div class='lam-feature-title lam-col'>" + field.label + ":</div>";
+        strLabel = "<div class='lam-feature-title lam-col'>" + (field.label ? field.label + " :" : "") + "</div>";
       }
       switch (field.type) {
         case "int":
@@ -617,6 +617,19 @@ let LamTemplates = (function () {
     if (!tempBody) {
       tempBody += LamTemplates.standardTemplate(props, feature.lamLayer);
     }
+
+    //rendering the related features
+    if (feature.featureGroupCollection.length) {
+      let tempBodySub = "";
+      if (feature.featureTemplate && feature.featureTemplate.hasOwnProperty("groupTitle")) {
+        tempBodySub += "<div class='lam-feature__group-features__title'>" + feature.featureTemplate.groupTitle + "</div>";
+      }
+      feature.featureGroupCollection.forEach(function (featureGroup) {
+        tempBodySub += renderBodyGroupFeature(featureGroup);
+      });
+      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
+    }
+
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
     if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
@@ -625,23 +638,6 @@ let LamTemplates = (function () {
     if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
     tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
-    //rendering the related features
-    if (feature.featureGroupCollection.length) {
-      let tempBodySub = "";
-      if (feature.featureTemplate && feature.featureTemplate.hasOwnProperty("groupTitle")) {
-        tempBodySub +=
-          "<div class='lam-feature__group-features__title'>" +
-          "<i title='Informazioni sul layer' class='layertree-layer__icon lam-left lam-mr-1'>" +
-          LamResources.svgInfo +
-          "</i> " +
-          feature.featureTemplate.groupTitle +
-          "</div>";
-      }
-      feature.featureGroupCollection.forEach(function (featureGroup) {
-        tempBodySub += renderBodyGroupFeature(featureGroup);
-      });
-      tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
-    }
     return tempBody;
   };
 
