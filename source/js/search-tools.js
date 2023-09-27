@@ -381,6 +381,7 @@ var LamSearchTools = (function () {
   };
 
   let parseResponseAddress = function (data) {
+
     LamDispatcher.dispatch("hide-loader");
     lamDispatch("clear-layer-info");
     if (!data.features.length) {
@@ -391,9 +392,11 @@ var LamSearchTools = (function () {
     let isPoint = data.features[0].geometry.type.toLowerCase().indexOf("point") >= 0;
     let searchProviderAddressField = LamStore.getAppState().searchProviderAddressField;
     let searchProviderHouseNumberField = LamStore.getAppState().searchProviderHouseNumberField;
+    var index = 0;
     data.features.forEach(function (feature) {
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
       feature.tooltip = isPoint ? feature.properties[searchProviderHouseNumberField] : feature.properties[searchProviderAddressField];
+      feature.index = index++;
     });
     //defining the right template based on geometry result type
     var template = isPoint
@@ -402,11 +405,13 @@ var LamSearchTools = (function () {
     let layerGid = isPoint ? LamStore.getAppState().searchProviderHouseNumberLayerGid : LamStore.getAppState().searchProviderAddressLayerGid;
     data.features.forEach(function (feature) {
       feature.layerGid = layerGid;
+      feature.featureTemplate = template;
     });
+    LamStore.getAppState().currentInfoItems = data;
     lamDispatch({
       eventName: "show-search-items",
       features: data,
-      template: template,
+      //template: template,
     });
     lamDispatch({
       eventName: "show-info-geometries",
@@ -469,11 +474,16 @@ var LamSearchTools = (function () {
       return element.gid == currentLayer;
     })[0];
     console.log("parse");
+    var index = 0;
+    let template = LamTemplates.getTemplate(layer.gid, layer.templateUrl, LamStore.getAppState().templatesRepositoryUrl);
     data.features.forEach(function (feature) {
       feature.layerGid = layer.gid;
       feature.srid = LamMap.getSRIDfromCRSName(data.crs.properties.name);
       feature.tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
+      feature.index = index++;
+      feature.featureTemplate = template;
     });
+    LamStore.getAppState().currentInfoItems = data;
     if (data.features.length > 0) {
       lamDispatch({
         eventName: "show-search-items",

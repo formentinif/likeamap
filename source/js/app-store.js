@@ -604,7 +604,7 @@ var LamStore = (function () {
     return LamStore.getAppState().termsLinks;
   };
 
-  let parseResponse = function (e) {};
+  let parseResponse = function (e) { };
 
   let getLayers = function () {
     let arrDest = [];

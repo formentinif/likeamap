@@ -619,7 +619,7 @@ let LamTemplates = (function () {
     }
 
     //rendering the related features
-    if (feature.featureGroupCollection.length) {
+    if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
       let tempBodySub = "";
       if (feature.featureTemplate && feature.featureTemplate.hasOwnProperty("groupTitle")) {
         tempBodySub += "<div class='lam-feature__group-features__title'>" + feature.featureTemplate.groupTitle + "</div>";
@@ -663,7 +663,7 @@ let LamTemplates = (function () {
     if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
 
     //rendering the related features
-    if (feature.featureGroupCollection.length) {
+    if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
       let tempBodySub = "";
       feature.featureGroupCollection.forEach(function (featureGroup) {
         tempBodySub += renderBodyFeature(featureGroup);
