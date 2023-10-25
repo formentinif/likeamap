@@ -49,18 +49,16 @@ var LamRelations = (function () {
 
   /**
    * Shows the relation from an infobox item
-   * @param {string} relationGid
-   * @param {int} resultIndex
    */
-  var showPrevRelation = function (relationGid, resultIndex) {
+  var showPrevRelation = function () {
     relationHistory.pop();
     showRelationByItem(relationHistory[relationHistory.length - 1].relationGid, relationHistory[relationHistory.length - 1].resultItem);
   };
 
   /**
    * Shows the relation from an infobox item
-   * @param {string} relationGid
-   * @param {int} resultIndex
+   * @param {string} relationGid Gid of the relation
+   * @param {int} resultIndex Index of the result in the info items
    */
   var showRelation = function (relationGid, resultIndex) {
     relationHistory.push({
@@ -72,8 +70,8 @@ var LamRelations = (function () {
 
   /**
    * Shows the relation from a relation's table results
-   * @param {string} relationGid
-   * @param {int} resultIndex
+   * @param {string} relationGid Gid of the relation
+   * @param {int} resultIndex Index of the result in the info items
    */
   var showConcatenatedRelation = function (relationGid, resultIndex) {
     relationHistory.push({

@@ -6401,18 +6401,16 @@ var LamRelations = (function () {
 
   /**
    * Shows the relation from an infobox item
-   * @param {string} relationGid
-   * @param {int} resultIndex
    */
-  var showPrevRelation = function (relationGid, resultIndex) {
+  var showPrevRelation = function () {
     relationHistory.pop();
     showRelationByItem(relationHistory[relationHistory.length - 1].relationGid, relationHistory[relationHistory.length - 1].resultItem);
   };
 
   /**
    * Shows the relation from an infobox item
-   * @param {string} relationGid
-   * @param {int} resultIndex
+   * @param {string} relationGid Gid of the relation
+   * @param {int} resultIndex Index of the result in the info items
    */
   var showRelation = function (relationGid, resultIndex) {
     relationHistory.push({
@@ -6424,8 +6422,8 @@ var LamRelations = (function () {
 
   /**
    * Shows the relation from a relation's table results
-   * @param {string} relationGid
-   * @param {int} resultIndex
+   * @param {string} relationGid Gid of the relation
+   * @param {int} resultIndex Index of the result in the info items
    */
   var showConcatenatedRelation = function (relationGid, resultIndex) {
     relationHistory.push({
@@ -9380,7 +9378,7 @@ let LamTemplates = (function () {
    *
    * @param {Object} feature
    */
-  let renderBodyFeature = function (feature, index) {
+  let renderBodyFeature = function (feature) {
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -9401,10 +9399,10 @@ let LamTemplates = (function () {
 
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
-    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, feature.index);
     //sezione charts
     let layerCharts = getLayerCharts(feature.layerGid);
-    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, feature.index);
     tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
     return tempBody;
@@ -9418,7 +9416,7 @@ let LamTemplates = (function () {
    *
    * @param {Object} feature
    */
-  let renderBodyGroupFeature = function (feature, index) {
+  let renderBodyGroupFeature = function (feature) {
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -9426,10 +9424,10 @@ let LamTemplates = (function () {
     }
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
-    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, feature.index);
     //sezione charts
     let layerCharts = getLayerCharts(feature.layerGid);
-    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, feature.index);
 
     //rendering the related features
     if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
@@ -9450,7 +9448,7 @@ let LamTemplates = (function () {
         features: featureInfoCollection,
       };
     }
-    featureInfoCollection.features.forEach(function (feature, index) {
+    featureInfoCollection.features.forEach(function (feature) {
       if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       //let props = feature.properties ? feature.properties : feature;
       //let layer = LamStore.getLayer(feature.layerGid);
@@ -9458,10 +9456,9 @@ let LamTemplates = (function () {
       //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
       tempBody += "<div class=' lam-bottom-info__content-item'>";
       tempBody += feature.tooltip;
-      tempBody += LamTemplates.featureIconsTemplate(index);
+      tempBody += LamTemplates.featureIconsTemplate(feature.index);
       tempBody += "</div>";
       body += tempBody;
-      index++;
     });
     return body;
   };

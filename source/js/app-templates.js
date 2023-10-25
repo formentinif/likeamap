@@ -611,7 +611,7 @@ let LamTemplates = (function () {
    *
    * @param {Object} feature
    */
-  let renderBodyFeature = function (feature, index) {
+  let renderBodyFeature = function (feature) {
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -632,10 +632,10 @@ let LamTemplates = (function () {
 
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
-    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, feature.index);
     //sezione charts
     let layerCharts = getLayerCharts(feature.layerGid);
-    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, feature.index);
     tempBody += LamTemplates.featureIconsTemplate(feature.index);
 
     return tempBody;
@@ -649,7 +649,7 @@ let LamTemplates = (function () {
    *
    * @param {Object} feature
    */
-  let renderBodyGroupFeature = function (feature, index) {
+  let renderBodyGroupFeature = function (feature) {
     let props = feature.properties ? feature.properties : feature;
     let tempBody = LamTemplates.processTemplate(feature.featureTemplate, props, feature.lamLayer);
     if (!tempBody) {
@@ -657,10 +657,10 @@ let LamTemplates = (function () {
     }
     //sezione relations
     let layerRelations = getLayerRelations(feature.layerGid);
-    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, index);
+    if (layerRelations.length) tempBody += LamTemplates.relationsTemplate(layerRelations, props, feature.index);
     //sezione charts
     let layerCharts = getLayerCharts(feature.layerGid);
-    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, index);
+    if (layerCharts.length) tempBody += LamTemplates.chartsTemplate(layerCharts, feature.index);
 
     //rendering the related features
     if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
@@ -681,7 +681,7 @@ let LamTemplates = (function () {
         features: featureInfoCollection,
       };
     }
-    featureInfoCollection.features.forEach(function (feature, index) {
+    featureInfoCollection.features.forEach(function (feature) {
       if (feature.featureTemplate && feature.featureTemplate.layerGroup) return;
       //let props = feature.properties ? feature.properties : feature;
       //let layer = LamStore.getLayer(feature.layerGid);
@@ -689,10 +689,9 @@ let LamTemplates = (function () {
       //let tooltip = LamTemplates.getLabelFeature(feature.properties, layer.labelField, layer.layerName);
       tempBody += "<div class=' lam-bottom-info__content-item'>";
       tempBody += feature.tooltip;
-      tempBody += LamTemplates.featureIconsTemplate(index);
+      tempBody += LamTemplates.featureIconsTemplate(feature.index);
       tempBody += "</div>";
       body += tempBody;
-      index++;
     });
     return body;
   };
