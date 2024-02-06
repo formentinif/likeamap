@@ -99,6 +99,8 @@ var LamLegendTools = (function () {
 
   var showLegend = function (gid, scaled, showInfoWindow) {
     var thisLayer = LamStore.getLayer(gid);
+    let isGropuLayerGeoserver = false;
+    if (thisLayer.groupTemplateUrls) isGropuLayerGeoserver = thisLayer.groupTemplateUrls.length > 0;
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
     if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
@@ -122,7 +124,7 @@ var LamLegendTools = (function () {
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
-    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage && !thisLayer.legendUrl) {
       if (scaled) {
         html +=
           "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
@@ -130,7 +132,13 @@ var LamLegendTools = (function () {
           "', scaled: false })\">Visualizza legenda completa</a></div>";
       }
     }
-    if (thisLayer.queryable) {
+
+    if (thisLayer.legendUrl) {
+      html +=
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='" + thisLayer.legendUrl + "' target='_blank' class='lam-btn lam-depth-1'>Visualizza legenda</a></div>";
+    }
+
+    if (thisLayer.queryable && !isGropuLayerGeoserver) {
       html += "<div class='lam-mt-2' style='display:flow-root;'>";
       //open attribute table
       html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";

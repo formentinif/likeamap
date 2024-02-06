@@ -67,19 +67,21 @@
 .lam-feature-title {
   padding: 4px 4px;
   font-size: 1rem;
-  font-weight: 500;
+  /* font-weight: bolder; */
 }
 
 .lam-feature-content {
   padding: 4px 4px;
   overflow: auto;
   font-size: 1rem;
+  font-style: italic;
 }
 
 .lam-feature__relations {
   padding: 4px 4px;
   font-size: 1rem;
 }
+
 .lam-feature__charts {
   padding: 4px 4px;
   font-size: 1rem;
@@ -132,10 +134,29 @@
 .lam-feature__group-features .lam-feature-title {
   font-size: 0.9rem;
 }
+
 .lam-feature__group-features .lam-feature-heading {
   font-size: 1rem;
+  padding: 2px 2px;
 }
 
+.lam-feature__group-features__item:nth-child(even) {
+  background: #e8ecf0 !important;
+}
+
+.lam-feature__group-features__item:nth-child(even) .lam-grid {
+  background: #e8ecf0 !important;
+  border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+.lam-feature__group-features__item:nth-child(odd) {
+  background: #fff !important;
+}
+
+.lam-feature__group-features__item:nth-child(odd) .lam-grid {
+  background: #fff !important;
+  border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+}
 
 .lam-layer-icon {
   display: inline-block;
@@ -172,6 +193,7 @@
 .lam-table tr:nth-child(even) {
   background: #e8ecf0;
 }
+
 .lam-table tr:nth-child(odd) {
   background: #fff;
 }
@@ -284,7 +306,8 @@ a.lam-link-blue:active {
 }
 
 .lam-slidecontainer {
-  width: 100%; /* Width of the outside container */
+  width: 100%;
+  /* Width of the outside container */
 }
 
 .lam-slider {

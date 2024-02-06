@@ -218,7 +218,7 @@ let LamTemplates = (function () {
         "<div class='lam-grid lam-mb-1'>" +
         "<div class='lam-feature-title lam-col'>" +
         propertyName +
-        ":</div>" +
+        "</div>" +
         "<div class='lam-feature-content lam-col'>" +
         (props[propertyName] == null ? "" : props[propertyName]) +
         "</div>" +
@@ -427,7 +427,7 @@ let LamTemplates = (function () {
       let field = template.fields[i];
       var strLabel = "";
       if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
-        strLabel = "<div class='lam-feature-title lam-col'>" + (field.label ? field.label + " :" : "") + "</div>";
+        strLabel = "<div class='lam-feature-title lam-col'>" + (field.label ? field.label + " " : "") + "</div>";
       }
       switch (field.type) {
         case "int":
@@ -486,13 +486,13 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
-          str += '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
           break;
         case "phone":
-          str += '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
           break;
         case "email":
-          str += '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
       }
       str += "</div>";
@@ -617,7 +617,6 @@ let LamTemplates = (function () {
     if (!tempBody) {
       tempBody += LamTemplates.standardTemplate(props, feature.lamLayer);
     }
-
     //rendering the related features
     if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
       let tempBodySub = "";
@@ -625,7 +624,8 @@ let LamTemplates = (function () {
         tempBodySub += "<div class='lam-feature__group-features__title'>" + feature.featureTemplate.groupTitle + "</div>";
       }
       feature.featureGroupCollection.forEach(function (featureGroup) {
-        tempBodySub += renderBodyGroupFeature(featureGroup);
+
+        tempBodySub += "<div class='lam-feature__group-features__item'>" + renderBodyGroupFeature(featureGroup) + "</div>";
       });
       tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }

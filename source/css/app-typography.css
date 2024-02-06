@@ -2,6 +2,10 @@
   font-weight: bold;
 }
 
+.lam-italic {
+  font-style: italic;
+}
+
 .lam-title {
   margin: 8px 0px;
   font-size: 2rem;
@@ -76,6 +80,7 @@
   border-bottom: 2px solid var(--lam-btn-color-lighter);
   cursor: pointer;
 }
+
 .lam-bar__item-selected {
   border-bottom: 2px solid var(--lam-btn-color-darken);
   color: var(--lam-btn-color-darken);

@@ -110,12 +110,26 @@ var LamPrintTools = (function () {
 
   var templatePrint = function () {
     template = "";
+
     template += '<h4 class="lam-title">Stampa</h4>';
     template += '<div class="lam-card lam-depth-2">';
+
+    if (LamStore.getAppState().printDisclaimer) {
+      if (LamStore.getAppState().printDisclaimerTitle) {
+        template += '<div class="lam-title-h4 lam-mb-0">';
+        template += LamStore.getAppState().printDisclaimerTitle;
+        template += "</div>";
+      }
+      template += '<div class="lam-mb-2 lam-italic">';
+      template += LamStore.getAppState().printDisclaimer;
+      template += "</div>";
+    }
+
     template += '<div class="lam-mb-2">';
     template += "La modalità di stampa è attiva. Seleziona la dimensione e orientamento preferito e clicca su <i>Stampa mappa</i>.";
     template += "<br/>Per creare un pdf, cliccare su <i>Stampa mappa</i> e poi selezionare <i>Salva come pdf</i>.";
     template += "</div>";
+
     template += '<div class="lam-mb-2">';
     template += '<label class="lam-label" for="print-tools__paper" class="lam-label">Dimensione</label>';
     template += '<select id="print-tools__paper" class="lam-select">';

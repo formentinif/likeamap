@@ -3991,12 +3991,26 @@ var LamPrintTools = (function () {
 
   var templatePrint = function () {
     template = "";
+
     template += '<h4 class="lam-title">Stampa</h4>';
     template += '<div class="lam-card lam-depth-2">';
+
+    if (LamStore.getAppState().printDisclaimer) {
+      if (LamStore.getAppState().printDisclaimerTitle) {
+        template += '<div class="lam-title-h4 lam-mb-0">';
+        template += LamStore.getAppState().printDisclaimerTitle;
+        template += "</div>";
+      }
+      template += '<div class="lam-mb-2 lam-italic">';
+      template += LamStore.getAppState().printDisclaimer;
+      template += "</div>";
+    }
+
     template += '<div class="lam-mb-2">';
     template += "La modalità di stampa è attiva. Seleziona la dimensione e orientamento preferito e clicca su <i>Stampa mappa</i>.";
     template += "<br/>Per creare un pdf, cliccare su <i>Stampa mappa</i> e poi selezionare <i>Salva come pdf</i>.";
     template += "</div>";
+
     template += '<div class="lam-mb-2">';
     template += '<label class="lam-label" for="print-tools__paper" class="lam-label">Dimensione</label>';
     template += '<select id="print-tools__paper" class="lam-select">';
@@ -4479,6 +4493,7 @@ var LamSearchTools = (function () {
     data.features.forEach(function (feature) {
       feature.layerGid = layerGid;
       feature.featureTemplate = template;
+      if (feature.geometry.coordinates) feature.properties.lamCoordinates = feature.geometry.coordinates;
     });
     LamStore.getAppState().currentInfoItems = data;
     lamDispatch({
@@ -5295,6 +5310,8 @@ var LamLegendTools = (function () {
 
   var showLegend = function (gid, scaled, showInfoWindow) {
     var thisLayer = LamStore.getLayer(gid);
+    let isGropuLayerGeoserver = false;
+    if (thisLayer.groupTemplateUrls) isGropuLayerGeoserver = thisLayer.groupTemplateUrls.length > 0;
     $("#lam-legend-container").remove();
     var html = "<div id='lam-legend-container'>";
     if (thisLayer) html += "<h4 class='lam-title-legend'>" + thisLayer.layerName + "</h4>";
@@ -5318,7 +5335,7 @@ var LamLegendTools = (function () {
     if (thisLayer.attribution) {
       html += "<p>Dati forniti da " + thisLayer.attribution + "</p>";
     }
-    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage) {
+    if (!thisLayer.hideLegend && !thisLayer.hideLegendImage && !thisLayer.legendUrl) {
       if (scaled) {
         html +=
           "<div class='lam-mt-2' style='display:flow-root;'><a href='#' class='lam-btn lam-depth-1' onclick=\"LamDispatcher.dispatch({ eventName: 'show-legend', gid: '" +
@@ -5326,7 +5343,13 @@ var LamLegendTools = (function () {
           "', scaled: false })\">Visualizza legenda completa</a></div>";
       }
     }
-    if (thisLayer.queryable) {
+
+    if (thisLayer.legendUrl) {
+      html +=
+        "<div class='lam-mt-2' style='display:flow-root;'><a href='" + thisLayer.legendUrl + "' target='_blank' class='lam-btn lam-depth-1'>Visualizza legenda</a></div>";
+    }
+
+    if (thisLayer.queryable && !isGropuLayerGeoserver) {
       html += "<div class='lam-mt-2' style='display:flow-root;'>";
       //open attribute table
       html += "<a href='#' target='_blank' class='lam-btn lam-btn-small lam-depth-1' ";
@@ -8985,7 +9008,7 @@ let LamTemplates = (function () {
         "<div class='lam-grid lam-mb-1'>" +
         "<div class='lam-feature-title lam-col'>" +
         propertyName +
-        ":</div>" +
+        "</div>" +
         "<div class='lam-feature-content lam-col'>" +
         (props[propertyName] == null ? "" : props[propertyName]) +
         "</div>" +
@@ -9194,7 +9217,7 @@ let LamTemplates = (function () {
       let field = template.fields[i];
       var strLabel = "";
       if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
-        strLabel = "<div class='lam-feature-title lam-col'>" + (field.label ? field.label + " :" : "") + "</div>";
+        strLabel = "<div class='lam-feature-title lam-col'>" + (field.label ? field.label + " " : "") + "</div>";
       }
       switch (field.type) {
         case "int":
@@ -9253,13 +9276,13 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
-          str += '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
           break;
         case "phone":
-          str += '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
           break;
         case "email":
-          str += '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
+          str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
       }
       str += "</div>";
@@ -9384,7 +9407,6 @@ let LamTemplates = (function () {
     if (!tempBody) {
       tempBody += LamTemplates.standardTemplate(props, feature.lamLayer);
     }
-
     //rendering the related features
     if (feature.featureGroupCollection && feature.featureGroupCollection.length) {
       let tempBodySub = "";
@@ -9392,7 +9414,8 @@ let LamTemplates = (function () {
         tempBodySub += "<div class='lam-feature__group-features__title'>" + feature.featureTemplate.groupTitle + "</div>";
       }
       feature.featureGroupCollection.forEach(function (featureGroup) {
-        tempBodySub += renderBodyGroupFeature(featureGroup);
+
+        tempBodySub += "<div class='lam-feature__group-features__item'>" + renderBodyGroupFeature(featureGroup) + "</div>";
       });
       tempBody += "<div class='lam-feature__group-features'>" + tempBodySub + "</div>";
     }

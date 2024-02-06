@@ -67,7 +67,9 @@
     "srid": {
       "title": "SRID (Spatial reference ID)",
       "description": "SRID della mappa. Es: 3857 (al momento è supportato solo il 3857)",
-      "enum": ["3857"],
+      "enum": [
+        "3857"
+      ],
       "type": "string"
     },
     "startMapLon": {
@@ -138,54 +140,80 @@
     "infoSelectBehaviour": {
       "title": "Modalità di interrogazione",
       "description": "Definisce la modalità di interrogazione degli oggetti, singola o multipla. In modalità singola viene restituita solo il primo oggetto trovato. In modalità multipla sono restuiti tutti (drill down). I valori sono: 1 Single 2 Multipla.",
-      "enum": [1, 2],
+      "enum": [
+        1,
+        2
+      ],
       "default": 2,
       "type": "integer"
     },
     "openResultInInfoWindow": {
       "title": "Modalità di visualizzazione delle interrogazioni",
       "description": "Imposta l'apertura dei risultati delle interrogazioni nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "openLinksInInfoWindow": {
       "title": "Modalità di visualizzazione dei link",
       "description": "Imposta l'apertura dell'elenco dei link nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "openLegendInInfoWindow": {
       "title": "Modalità di visualizzazione delle legendo",
       "description": "Imposta l'apertura delle legende nel pannello laterale o nella info window. 0 Left Panel 1 Infowindow",
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "improveMobileBehaviour": {
       "title": "Miglioramenti automatici per i dispositivi mobili",
       "description": "Migliora il comportamento dell'appstate per la visualizzazione mobile. Se mobile tutti preload vengono impostati a 0 e il queryable a 1",
       "default": 0,
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "enableBrowserLocationOnMobile": {
       "title": "Posizionamento automatico per i dispositivi mobili",
       "description": "Abilita il posizionamento automatico con la posizione del browser nel caso di dispositivi mobili.",
       "default": 0,
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "disableAjaxRequestInfo": {
       "title": "Disabilita tutte le interrogazioni",
       "description": "Disabilita tutte le interrogazioni al click del mouse o altre richieste ajax. Da utilizzare ai solo fini di DEBUG.",
       "default": 0,
-      "enum": [0, 1],
+      "enum": [
+        0,
+        1
+      ],
       "type": "integer"
     },
     "searchProvider": {
       "title": "Provider di ricerca (deprecated)",
       "description": "Valore deprecato, lasciare a 0.",
       "type": "string",
-      "enum": ["nominatim", "wms_geoserver", "google", "bing"]
+      "enum": [
+        "nominatim",
+        "wms_geoserver",
+        "google",
+        "bing"
+      ]
     },
     "searchProviderAddressUrl": {
       "title": "Url del provider di ricerca per le vie",
@@ -245,6 +273,16 @@
         "type": "array",
         "title": "Coppie di stringhe di trasformazione es: [[stringa1,stringa2],[stringa3,stringa4]]"
       }
+    },
+    "printDisclaimerTitle": {
+      "title": "Titolo dell'informativa da visualizzare nel tool di stampa",
+      "description": "Titolo dell'informativa da visualizzare nel tool di stampa, prima della generazione della mappa.",
+      "type": "string"
+    },
+    "printDisclaimer": {
+      "title": "Informativa da visualizzare nel tool di stampa",
+      "description": "Informativa da visualizzare nel tool di stampa, prima della generazione della mappa.",
+      "type": "string"
     }
   },
   "cookieConsent": {
@@ -305,7 +343,11 @@
         "title": "Tipo di autenticazione",
         "description": "Tipo di autenticazione",
         "type": "string",
-        "enum": ["anonymous", "basic", "custom"]
+        "enum": [
+          "anonymous",
+          "basic",
+          "custom"
+        ]
       },
       "authToken": {
         "title": "Token di autenticazione",
@@ -447,24 +489,37 @@
           "title": "Tipologia",
           "description": "Tipologia del group layer",
           "type": "string",
-          "enum": ["group"]
+          "enum": [
+            "group"
+          ]
         },
         "nestingStyle": {
           "title": "Dimensione gerarchia",
           "description": "Dimensione da applicare per la gerarchia dell'oggetto. I colori e la dimensione del testo saranno variati in automatico.",
           "type": "string",
-          "enum": ["sub1", "sub2", "sub3", "sub4"]
+          "enum": [
+            "sub1",
+            "sub2",
+            "sub3",
+            "sub4"
+          ]
         },
         "visible": {
           "title": "Visibilità iniziale",
           "description": "Visibilità iniziale, il gruppo sarà aperto (1) o chiuso (0)",
-          "enum": [0, 1],
+          "enum": [
+            0,
+            1
+          ],
           "type": "integer"
         },
         "childLayersSelectionMode": {
           "title": "Modalita di selezione dei layer (singola o multipla)",
           "description": "Modalita di selezione dei layer 0 Selezione multipla (default) - 1 selezione singola",
-          "enum": [0, 1],
+          "enum": [
+            0,
+            1
+          ],
           "type": "integer"
         },
         "cssClass": {
@@ -513,7 +568,15 @@
               "layerType": {
                 "title": "Tipologia di layer",
                 "description": "Tipologia del layer. Sono supportati layer di tipo WMS, Tiled o sfondi OSM.",
-                "enum": ["group", "osm", "otm", "ocm", "wms", "wmstiled", "tms"],
+                "enum": [
+                  "group",
+                  "osm",
+                  "otm",
+                  "ocm",
+                  "wms",
+                  "wmstiled",
+                  "tms"
+                ],
                 "type": "string",
                 "default": "wmstiled"
               },
@@ -525,7 +588,9 @@
               "srid": {
                 "title": "SRID del layer",
                 "description": "Spatial reference ID del layer. Es: 3857 (al momento è supportato solo il 3857)",
-                "enum": ["3857"],
+                "enum": [
+                  "3857"
+                ],
                 "type": "string"
               },
               "geometryFieldName": {
@@ -536,7 +601,19 @@
               "opacity": {
                 "title": "Opacità",
                 "description": "Trasparenza iniziale del layer",
-                "enum": [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0],
+                "enum": [
+                  1,
+                  0.9,
+                  0.8,
+                  0.7,
+                  0.6,
+                  0.5,
+                  0.4,
+                  0.3,
+                  0.2,
+                  0.1,
+                  0
+                ],
                 "type": "number"
               },
               "params": {
@@ -547,25 +624,38 @@
               "tileMode": {
                 "title": "Tipologia Tile",
                 "description": "Tipologia di tile da utilizare nel caso di tiled layer. Lasciare vuoto per il formato server predefinito",
-                "enum": ["", "xyz", "quadkey"],
+                "enum": [
+                  "",
+                  "xyz",
+                  "quadkey"
+                ],
                 "type": "string"
               },
               "visible": {
                 "title": "Visibilità iniziale",
                 "description": "Visibilità iniziale del layer in mappa",
-                "enum": [0, 1],
+                "enum": [
+                  0,
+                  1
+                ],
                 "type": "integer"
               },
               "queryable": {
                 "title": "Layer interrogabile",
                 "description": "Definisce se il layer è interrogabile tramite click, se visibile.",
-                "enum": [0, 1],
+                "enum": [
+                  0,
+                  1
+                ],
                 "type": "integer"
               },
               "searchable": {
                 "title": "Layer ricercabile",
                 "description": "Definire se il layer è ricercabile.",
-                "enum": [0, 1],
+                "enum": [
+                  0,
+                  1
+                ],
                 "type": "integer"
               },
               "searchCustomEvent": {
@@ -621,7 +711,7 @@
               },
               "groupTemplateUrls": {
                 "title": "Url del template nel caso si tratti di un grouplayer",
-                "description": "Lista degli Url assoluti dei template dei layer in caso si tratti di un layer raggruppato. Tutti i template saranno caricati all'avvio dell'applicazione. Al momento dell'interrogazione l'associazione tra la feature e il template sarà effettuata tramite la proprietà id della feature (geoserver) e la proprietà layer del template che dovrà essere obbligatoriamente impostata.",
+                "description": "Lista degli Url assoluti dei template dei layer in caso si tratti di un layer raggruppato. Tutti i template saranno caricati all'avvio dell'applicazione. Al momento dell'interrogazione l'associazione tra la feature e il template sarà effettuata tramite la proprietà id della feature (geoserver) e la proprietà layer del template che dovrà essere obbligatoriamente impostata. La presenza di questa impostazione influenza alcuni elementi della mappa come la legenda.",
                 "type": "array"
               },
               "secured": {
@@ -637,7 +727,10 @@
               "preload": {
                 "title": "Preload del layer",
                 "description": "Abilita il caricamento in preload del layer",
-                "enum": [0, 1],
+                "enum": [
+                  0,
+                  1
+                ],
                 "type": "integer"
               },
               "vectorRadius": {
@@ -684,7 +777,13 @@
           }
         }
       },
-      "required": ["gid", "layerType", "layerName", "visible", "layers"]
+      "required": [
+        "gid",
+        "layerType",
+        "layerName",
+        "visible",
+        "layers"
+      ]
     }
   },
   "relations": {
