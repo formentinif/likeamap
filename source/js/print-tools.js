@@ -115,13 +115,15 @@ var LamPrintTools = (function () {
     template += '<div class="lam-card lam-depth-2">';
 
     if (LamStore.getAppState().printDisclaimer) {
+      template += '<div class="lam-mb-2 lam-app-bg lam-p-1">';
       if (LamStore.getAppState().printDisclaimerTitle) {
-        template += '<div class="lam-title-h4 lam-mb-0">';
+        template += '<div class="lam-title-h4 lam-mb-0 lam-mt-0">';
         template += LamStore.getAppState().printDisclaimerTitle;
         template += "</div>";
       }
-      template += '<div class="lam-mb-2 lam-italic">';
+      template += '<div class="lam-italic ">';
       template += LamStore.getAppState().printDisclaimer;
+      template += "</div>";
       template += "</div>";
     }
 

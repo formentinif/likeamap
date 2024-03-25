@@ -120,25 +120,32 @@ var LamSearchTools = (function () {
         searchAddressProviderField = providerAddressField;
         searchHouseNumberProviderUrl = providerHouseNumberUrl;
         searchHouseNumberProviderField = providerHouseNumberField;
-
         var templateTemp = templateSearchWFSGeoserver(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function () {
           LamDispatcher.dispatch("clear-layer-info");
-          var layerSelected = $("#search-tools__select-layers option:selected").val();
-          var layer = searchLayers.filter(function (element) {
+          const optionSelected = $("#search-tools__select-layers option:selected");
+          const layerSelected = optionSelected.val();
+          let layer = searchLayers.filter(function (element) {
             return element.gid == layerSelected;
           });
-          if (layer.length) layer = layer[0];
-          $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
-          //controllo del form custom
-          if (layer.searchCustomEvent) {
-            //esecuzione della funzione custom
-            LamDispatcher.dispatch(layer.searchCustomEvent);
+          if (layer.length) {
+            layer = layer[0];
+            $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
+            //controllo del form custom
+            if (layer.searchCustomEvent) {
+              //esecuzione della funzione custom
+              LamDispatcher.dispatch(layer.searchCustomEvent);
+            } else {
+              $("#search-tools__search-layers-custom").hide();
+              $("#search-tools__search-layers-standard").show();
+            }
           } else {
-            $("#search-tools__search-layers-custom").hide();
-            $("#search-tools__search-layers-standard").show();
+            //se il layer non esiste verifico se esiste un evento sulla option
+            if (optionSelected.attr("searchCustomEvent")) {
+              LamDispatcher.dispatch(optionSelected.attr("searchCustomEvent"));
+            }
           }
           resetSearch();
         });
@@ -196,11 +203,11 @@ var LamSearchTools = (function () {
       '<div id="lam-bar__item-address" class="lam-bar__item lam-is-half lam-bar__item-selected" onclick="LamSearchTools.showSearchAddress(); return false;">';
     template += '<a id="search-tools__button-address" class="" autofocus>Indirizzi</a>';
     template += "</div>";
-    if (layersNum) {
-      template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half" onclick="LamSearchTools.showSearchLayers(); return false;">';
-      template += '<a id="search-tools__button-layers" class="" >Oggetti</a>';
-      template += "</div>";
-    }
+    let divSearchItemsVisible = layersNum ? "" : "lam-hidden";
+    template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half ' + divSearchItemsVisible + '" onclick="LamSearchTools.showSearchLayers(); return false;">';
+    var title = LamStore.getAppState().searchObjectsPanelTitle || "Oggetti";
+    template += '<a id="search-tools__button-layers" class="" >' + title + '</a>';
+    template += "</div>";
     template += "</div>";
     return template;
   };
@@ -249,9 +256,9 @@ var LamSearchTools = (function () {
       '<input id="search-tools__search-address" class="lam-input" type="search" onkeyup="LamSearchTools.searchAddressKeyup(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
-    if (searchLayers.length > 0) {
-      template += templateLayersTools(searchLayers);
-    }
+    //if (searchLayers.length > 0) {
+    template += templateLayersTools(searchLayers);
+    //}
     template += '<div class="div-10"></div>';
     template += '<div id="' + searchResultsDiv + '" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";

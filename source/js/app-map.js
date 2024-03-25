@@ -97,6 +97,8 @@ let LamMap = (function () {
       new ol.View({
         center: point,
         zoom: zoom,
+        minZoom: LamStore.getAppState().minZoom ? LamStore.getAppState().minZoom : 0,
+        maxZoom: LamStore.getAppState().maxZoom ? LamStore.getAppState().maxZoom : 28
       })
     );
   };
@@ -402,7 +404,7 @@ let LamMap = (function () {
       serverType = paramsLocal.serverType;
     }
     let source = new ol.source.TileWMS(
-      /** @type {olx.source.TileWMSOptions} */ ({
+      /** @type {olx.source.TileWMSOptions} */({
         url: uri,
         params: paramsLocal,
         serverType: serverType,
@@ -587,7 +589,7 @@ let LamMap = (function () {
       try {
         let arrVal = arrKeys[i].split("=");
         dict[arrVal[0]] = arrVal[1];
-      } catch (e) {}
+      } catch (e) { }
     }
     return dict;
   };
@@ -664,7 +666,6 @@ let LamMap = (function () {
       };
       controls.extend([scaleControl()]);
     }
-
     mainMap = new ol.Map({
       controls: controls,
       pixelRatio: 1,
@@ -673,6 +674,8 @@ let LamMap = (function () {
       view: new ol.View({
         center: ol.proj.transform([10.41, 44.94], "EPSG:4326", "EPSG:3857"),
         zoom: 10,
+        minZoom: LamStore.getAppState().minZoom ? LamStore.getAppState().minZoom : 0,
+        maxZoom: LamStore.getAppState().maxZoom ? LamStore.getAppState().maxZoom : 28
       }),
     });
 
@@ -1384,7 +1387,7 @@ let LamMap = (function () {
         return ol.events.condition.shiftKeyOnly(event) && ol.events.condition.singleClick(event);
       },
     });
-    modifyInteraction.on("modifyend", function (event) {});
+    modifyInteraction.on("modifyend", function (event) { });
     mainMap.addInteraction(modifyInteraction);
 
     try {

@@ -84,6 +84,18 @@
       "default": 0,
       "type": "number"
     },
+    "minZoom": {
+      "title": "Zoom minimo della mappa",
+      "description": "Zoom minimo a cui la mappa può essere ingrandita. Valore di default 0",
+      "default": 0,
+      "type": "integer"
+    },
+    "maxZoom": {
+      "title": "Zoom massimo della mappa",
+      "description": "Zoom massimo a cui la mappa può essere ridotta. Valore di default 28",
+      "default": 28,
+      "type": "integer"
+    },
     "startMapZoom": {
       "title": "Zoom iniziale",
       "description": "Zoom della della posizione iniziale della mappa, utilizzata anche dal bottone 'Home'",
@@ -253,6 +265,11 @@
     "searchProviderHouseNumberLayerGid": {
       "title": "Gid del layer collegato",
       "description": "Fornendo l'identificativo di un layer saranno ereditate relazioni e grafici",
+      "type": "string"
+    },
+    "searchObjectsPanelTitle": {
+      "title": "Titolo della ricerca per layer",
+      "description": "Titolo della ricerca per layer, il default è 'Oggetti'",
       "type": "string"
     },
     "metaDataServiceUrlTemplate": {

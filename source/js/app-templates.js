@@ -486,12 +486,21 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
           break;
         case "phone":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
           break;
         case "email":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
       }
@@ -573,7 +582,15 @@ let LamTemplates = (function () {
         }
       });
       feature.featureGroupCollection = featureGroupCollection;
+      //ordino le features in base all'ordine definito nel template
+      if (feature.lamLayer && feature.lamLayer.groupTemplateUrls) {
+        feature.featureGroupCollection.sort(function (a, b) {
+          //confronto gli indici delle feature in modo da ordinare le feature in base all'ordine definito nel grouplayer
+          return feature.lamLayer.groupTemplateUrls.indexOf(a.featureTemplate.templateUrl) - feature.lamLayer.groupTemplateUrls.indexOf(b.featureTemplate.templateUrl);
+        });
+      }
     });
+
     var featureCount = 0;
     //TODO semplificare non è necessario un loop
     featureInfoCollection.features.forEach(function (feature) {

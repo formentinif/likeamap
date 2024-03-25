@@ -73,7 +73,6 @@ var LamSearchToolsNominatim = (function () {
         searchAddressProviderField = providerAddressField;
         searchHouseNumberProviderUrl = providerHouseNumberUrl;
         searchHouseNumberProviderField = providerHouseNumberField;
-
         var templateTemp = templateSearchWFSGeoserver(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);

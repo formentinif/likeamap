@@ -1204,6 +1204,8 @@ let LamMap = (function () {
       new ol.View({
         center: point,
         zoom: zoom,
+        minZoom: LamStore.getAppState().minZoom ? LamStore.getAppState().minZoom : 0,
+        maxZoom: LamStore.getAppState().maxZoom ? LamStore.getAppState().maxZoom : 28
       })
     );
   };
@@ -1509,7 +1511,7 @@ let LamMap = (function () {
       serverType = paramsLocal.serverType;
     }
     let source = new ol.source.TileWMS(
-      /** @type {olx.source.TileWMSOptions} */ ({
+      /** @type {olx.source.TileWMSOptions} */({
         url: uri,
         params: paramsLocal,
         serverType: serverType,
@@ -1694,7 +1696,7 @@ let LamMap = (function () {
       try {
         let arrVal = arrKeys[i].split("=");
         dict[arrVal[0]] = arrVal[1];
-      } catch (e) {}
+      } catch (e) { }
     }
     return dict;
   };
@@ -1771,7 +1773,6 @@ let LamMap = (function () {
       };
       controls.extend([scaleControl()]);
     }
-
     mainMap = new ol.Map({
       controls: controls,
       pixelRatio: 1,
@@ -1780,6 +1781,8 @@ let LamMap = (function () {
       view: new ol.View({
         center: ol.proj.transform([10.41, 44.94], "EPSG:4326", "EPSG:3857"),
         zoom: 10,
+        minZoom: LamStore.getAppState().minZoom ? LamStore.getAppState().minZoom : 0,
+        maxZoom: LamStore.getAppState().maxZoom ? LamStore.getAppState().maxZoom : 28
       }),
     });
 
@@ -2491,7 +2494,7 @@ let LamMap = (function () {
         return ol.events.condition.shiftKeyOnly(event) && ol.events.condition.singleClick(event);
       },
     });
-    modifyInteraction.on("modifyend", function (event) {});
+    modifyInteraction.on("modifyend", function (event) { });
     mainMap.addInteraction(modifyInteraction);
 
     try {
@@ -3996,13 +3999,15 @@ var LamPrintTools = (function () {
     template += '<div class="lam-card lam-depth-2">';
 
     if (LamStore.getAppState().printDisclaimer) {
+      template += '<div class="lam-mb-2 lam-app-bg lam-p-1">';
       if (LamStore.getAppState().printDisclaimerTitle) {
-        template += '<div class="lam-title-h4 lam-mb-0">';
+        template += '<div class="lam-title-h4 lam-mb-0 lam-mt-0">';
         template += LamStore.getAppState().printDisclaimerTitle;
         template += "</div>";
       }
-      template += '<div class="lam-mb-2 lam-italic">';
+      template += '<div class="lam-italic ">';
       template += LamStore.getAppState().printDisclaimer;
+      template += "</div>";
       template += "</div>";
     }
 
@@ -4207,25 +4212,32 @@ var LamSearchTools = (function () {
         searchAddressProviderField = providerAddressField;
         searchHouseNumberProviderUrl = providerHouseNumberUrl;
         searchHouseNumberProviderField = providerHouseNumberField;
-
         var templateTemp = templateSearchWFSGeoserver(searchLayers);
         var output = templateTemp(searchLayers);
         jQuery("#" + div).html(output);
         $("#search-tools__select-layers").on("change", function () {
           LamDispatcher.dispatch("clear-layer-info");
-          var layerSelected = $("#search-tools__select-layers option:selected").val();
-          var layer = searchLayers.filter(function (element) {
+          const optionSelected = $("#search-tools__select-layers option:selected");
+          const layerSelected = optionSelected.val();
+          let layer = searchLayers.filter(function (element) {
             return element.gid == layerSelected;
           });
-          if (layer.length) layer = layer[0];
-          $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
-          //controllo del form custom
-          if (layer.searchCustomEvent) {
-            //esecuzione della funzione custom
-            LamDispatcher.dispatch(layer.searchCustomEvent);
+          if (layer.length) {
+            layer = layer[0];
+            $("#search-tools__search-layers__label").text(layer.searchFieldLabel || layer.searchField);
+            //controllo del form custom
+            if (layer.searchCustomEvent) {
+              //esecuzione della funzione custom
+              LamDispatcher.dispatch(layer.searchCustomEvent);
+            } else {
+              $("#search-tools__search-layers-custom").hide();
+              $("#search-tools__search-layers-standard").show();
+            }
           } else {
-            $("#search-tools__search-layers-custom").hide();
-            $("#search-tools__search-layers-standard").show();
+            //se il layer non esiste verifico se esiste un evento sulla option
+            if (optionSelected.attr("searchCustomEvent")) {
+              LamDispatcher.dispatch(optionSelected.attr("searchCustomEvent"));
+            }
           }
           resetSearch();
         });
@@ -4283,11 +4295,11 @@ var LamSearchTools = (function () {
       '<div id="lam-bar__item-address" class="lam-bar__item lam-is-half lam-bar__item-selected" onclick="LamSearchTools.showSearchAddress(); return false;">';
     template += '<a id="search-tools__button-address" class="" autofocus>Indirizzi</a>';
     template += "</div>";
-    if (layersNum) {
-      template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half" onclick="LamSearchTools.showSearchLayers(); return false;">';
-      template += '<a id="search-tools__button-layers" class="" >Oggetti</a>';
-      template += "</div>";
-    }
+    let divSearchItemsVisible = layersNum ? "" : "lam-hidden";
+    template += '<div id="lam-bar__item-layers" class="lam-bar__item lam-is-half ' + divSearchItemsVisible + '" onclick="LamSearchTools.showSearchLayers(); return false;">';
+    var title = LamStore.getAppState().searchObjectsPanelTitle || "Oggetti";
+    template += '<a id="search-tools__button-layers" class="" >' + title + '</a>';
+    template += "</div>";
     template += "</div>";
     return template;
   };
@@ -4336,9 +4348,9 @@ var LamSearchTools = (function () {
       '<input id="search-tools__search-address" class="lam-input" type="search" onkeyup="LamSearchTools.searchAddressKeyup(event)" placeholder="Via o civico">';
     template += "</div>";
     template += "</div>";
-    if (searchLayers.length > 0) {
-      template += templateLayersTools(searchLayers);
-    }
+    //if (searchLayers.length > 0) {
+    template += templateLayersTools(searchLayers);
+    //}
     template += '<div class="div-10"></div>';
     template += '<div id="' + searchResultsDiv + '" class="lam-card lam-depth-2 lam-scrollable">';
     template += "</div>";
@@ -9276,12 +9288,21 @@ let LamTemplates = (function () {
           str += field.footer;
           break;
         case "link":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{format_url ' + field.field + " '" + field.label + "'}}}</div>";
           break;
         case "phone":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{phone_link ' + field.field + " }}}</div>";
           break;
         case "email":
+          if ((field && !field.hasOwnProperty("hideLabel")) || !field.hideLabel) {
+            strLabel = "<div class='lam-feature-title lam-col'></div>";
+          }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
       }
@@ -9363,7 +9384,15 @@ let LamTemplates = (function () {
         }
       });
       feature.featureGroupCollection = featureGroupCollection;
+      //ordino le features in base all'ordine definito nel template
+      if (feature.lamLayer && feature.lamLayer.groupTemplateUrls) {
+        feature.featureGroupCollection.sort(function (a, b) {
+          //confronto gli indici delle feature in modo da ordinare le feature in base all'ordine definito nel grouplayer
+          return feature.lamLayer.groupTemplateUrls.indexOf(a.featureTemplate.templateUrl) - feature.lamLayer.groupTemplateUrls.indexOf(b.featureTemplate.templateUrl);
+        });
+      }
     });
+
     var featureCount = 0;
     //TODO semplificare non è necessario un loop
     featureInfoCollection.features.forEach(function (feature) {
