@@ -41,7 +41,11 @@
     "templateType": {
       "title": "Tipologia",
       "description": "Tipologia del template",
-      "enum": ["simple", "table", "string"],
+      "enum": [
+        "simple",
+        "table",
+        "string"
+      ],
       "type": "string"
     },
     "templateString": {
@@ -89,7 +93,8 @@
               "email",
               "relation",
               "file",
-              "file_preview"
+              "file_preview",
+              "template"
             ]
           },
           "header": {
@@ -113,9 +118,19 @@
             "type": "string"
           }
         },
-        "required": ["field", "label", "type"]
+        "required": [
+          "field",
+          "label",
+          "type"
+        ]
       }
     }
   },
-  "required": ["title", "layer", "layerGid", "templateType", "fields"]
+  "required": [
+    "title",
+    "layer",
+    "layerGid",
+    "templateType",
+    "fields"
+  ]
 }

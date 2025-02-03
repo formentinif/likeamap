@@ -503,6 +503,9 @@ let LamTemplates = (function () {
           }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
+        case "template":
+          str += field.field;
+          break;
       }
       str += "</div>";
     }
@@ -783,6 +786,9 @@ let LamTemplates = (function () {
         break;
       case "email":
         str += "<td>{{{email_link " + templateField.field + " }}}</td>";
+        break;
+      case "template":
+        str += field.field;
         break;
       default:
         str += "<td>{{" + templateField.field + "}}</td>";

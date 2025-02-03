@@ -723,11 +723,12 @@ let LamMapInfo = (function () {
     //Ajax requests
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
-    let viewResolution = LamMap.getMap().getView().getResolution();
+
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
     LamMap.getMap()
       .getLayers()
       .forEach(function (layer) {
+        let viewResolution = LamMap.getMap().getView().getResolution();
         var lamlayer = LamStore.getLayer(layer.gid);
         if (lamlayer && lamlayer.hasOwnProperty("showPointClickedAsGeometry") && lamlayer.showPointClickedAsGeometry) {
           viewResolution = lowestResolution;
@@ -801,7 +802,7 @@ let LamMapInfo = (function () {
       crossDomain: true,
       contentType: "application/json",
       cache: false,
-      success: function (response) {},
+      success: function (response) { },
       error: function (jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
@@ -1086,6 +1087,10 @@ let LamMapInfo = (function () {
     return aName > bName ? -1 : aName < bName ? 1 : 0;
   }
 
+  let getLastCoordinateClicked = function () {
+    return lastCoordinateClicked;
+  }
+
   return {
     addGeometryInfoToMap: addGeometryInfoToMap,
     addFeatureFlashToMap: addFeatureFlashToMap,
@@ -1094,6 +1099,7 @@ let LamMapInfo = (function () {
     clearLayerFlash: clearLayerFlash,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
+    getLastCoordinateClicked: getLastCoordinateClicked,
     init: init,
     //processRequestInfo: processRequestInfo,
     processRequestInfoAll: processRequestInfoAll,
@@ -2933,6 +2939,22 @@ let LamHandlebars = (function () {
       return options.inverse(this);
     });
 
+    Handlebars.registerHelper("get_point_clicked_x", function (options) {
+      try {
+        return LamMapInfo.getLastCoordinateClicked()[0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_point_clicked_y", function (options) {
+      try {
+        return LamMapInfo.getLastCoordinateClicked()[1];
+      } catch (error) {
+        return "";
+      }
+    });
+
     Handlebars.registerHelper("get_point_x", function (options) {
       try {
         return options.data.root.lamCoordinates[0];
@@ -3018,7 +3040,7 @@ let LamHandlebars = (function () {
       try {
         let dateArr = dateStr.split(",");
         return dateArr[0];
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
 
@@ -3040,7 +3062,7 @@ let LamHandlebars = (function () {
         if (minutes < 10) minutes = "0" + minutes;
         if (seconds < 10) seconds = "0" + seconds;
         return dd + "/" + mm + "/" + yyyy + " " + hours + ":" + minutes + ":" + seconds;
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
 
@@ -3056,7 +3078,7 @@ let LamHandlebars = (function () {
         if (dd < 10) dd = "0" + dd;
         if (mm < 10) mm = "0" + mm;
         return dd + "/" + mm + "/" + yyyy;
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
   };
@@ -9305,6 +9327,9 @@ let LamTemplates = (function () {
           }
           str += strLabel + '<div class="lam-feature-content lam-col">{{{email_link ' + field.field + " }}}</div>";
           break;
+        case "template":
+          str += field.field;
+          break;
       }
       str += "</div>";
     }
@@ -9585,6 +9610,9 @@ let LamTemplates = (function () {
         break;
       case "email":
         str += "<td>{{{email_link " + templateField.field + " }}}</td>";
+        break;
+      case "template":
+        str += field.field;
         break;
       default:
         str += "<td>{{" + templateField.field + "}}</td>";

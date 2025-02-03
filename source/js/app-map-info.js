@@ -217,11 +217,12 @@ let LamMapInfo = (function () {
     //Ajax requests
     requestQueue = new RequestQueue(coordinate, visibleLayers);
     requestQueueData = [];
-    let viewResolution = LamMap.getMap().getView().getResolution();
+
     //ricavo i livelli visibili e li ordino per livello di visualizzazione
     LamMap.getMap()
       .getLayers()
       .forEach(function (layer) {
+        let viewResolution = LamMap.getMap().getView().getResolution();
         var lamlayer = LamStore.getLayer(layer.gid);
         if (lamlayer && lamlayer.hasOwnProperty("showPointClickedAsGeometry") && lamlayer.showPointClickedAsGeometry) {
           viewResolution = lowestResolution;
@@ -295,7 +296,7 @@ let LamMapInfo = (function () {
       crossDomain: true,
       contentType: "application/json",
       cache: false,
-      success: function (response) {},
+      success: function (response) { },
       error: function (jqXHR, textStatus, errorThrown) {
         //requestQueue.ajaxPending = false;
         //procede to next step
@@ -580,6 +581,10 @@ let LamMapInfo = (function () {
     return aName > bName ? -1 : aName < bName ? 1 : 0;
   }
 
+  let getLastCoordinateClicked = function () {
+    return lastCoordinateClicked;
+  }
+
   return {
     addGeometryInfoToMap: addGeometryInfoToMap,
     addFeatureFlashToMap: addFeatureFlashToMap,
@@ -588,6 +593,7 @@ let LamMapInfo = (function () {
     clearLayerFlash: clearLayerFlash,
     clearLayerInfo: clearLayerInfo,
     getRequestInfo: getRequestInfo,
+    getLastCoordinateClicked: getLastCoordinateClicked,
     init: init,
     //processRequestInfo: processRequestInfo,
     processRequestInfoAll: processRequestInfoAll,

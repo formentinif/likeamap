@@ -18,6 +18,22 @@ let LamHandlebars = (function () {
       return options.inverse(this);
     });
 
+    Handlebars.registerHelper("get_point_clicked_x", function (options) {
+      try {
+        return LamMapInfo.getLastCoordinateClicked()[0];
+      } catch (error) {
+        return "";
+      }
+    });
+
+    Handlebars.registerHelper("get_point_clicked_y", function (options) {
+      try {
+        return LamMapInfo.getLastCoordinateClicked()[1];
+      } catch (error) {
+        return "";
+      }
+    });
+
     Handlebars.registerHelper("get_point_x", function (options) {
       try {
         return options.data.root.lamCoordinates[0];
@@ -103,7 +119,7 @@ let LamHandlebars = (function () {
       try {
         let dateArr = dateStr.split(",");
         return dateArr[0];
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
 
@@ -125,7 +141,7 @@ let LamHandlebars = (function () {
         if (minutes < 10) minutes = "0" + minutes;
         if (seconds < 10) seconds = "0" + seconds;
         return dd + "/" + mm + "/" + yyyy + " " + hours + ":" + minutes + ":" + seconds;
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
 
@@ -141,7 +157,7 @@ let LamHandlebars = (function () {
         if (dd < 10) dd = "0" + dd;
         if (mm < 10) mm = "0" + mm;
         return dd + "/" + mm + "/" + yyyy;
-      } catch (error) {}
+      } catch (error) { }
       return "";
     });
   };
