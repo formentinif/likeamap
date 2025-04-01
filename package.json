@@ -22,7 +22,7 @@
     "handlebars": "^4.7.7",
     "lite-server": "^2.5.3",
     "proj4": "^2.6.0",
-    "minimist": ">=1.2.2"
+    "minimist": ">=1.2.6"
   },
   "dependencies": {
     "chart.js": "^2.9.4",
