@@ -551,7 +551,7 @@ let LamTemplates = (function () {
       let featureTemplate = template;
       let props = feature.properties ? feature.properties : feature;
       //adding the coords as properties
-      if (feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
+      if (feature.geometry && feature.geometry.coordinates) props.lamCoordinates = feature.geometry.coordinates;
       let layer = {};
       if (feature.layerGid) {
         layer = LamStore.getLayer(feature.layerGid);

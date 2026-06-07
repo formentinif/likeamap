@@ -413,7 +413,7 @@ var LamSearchTools = (function () {
     data.features.forEach(function (feature) {
       feature.layerGid = layerGid;
       feature.featureTemplate = template;
-      if (feature.geometry.coordinates) feature.properties.lamCoordinates = feature.geometry.coordinates;
+      if (feature.geometry && feature.geometry.coordinates) feature.properties.lamCoordinates = feature.geometry.coordinates;
     });
     LamStore.getAppState().currentInfoItems = data;
     lamDispatch({
